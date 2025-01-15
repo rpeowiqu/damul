@@ -43,4 +43,17 @@
 - 중간에서 WebSocket 서버가 메세지를 받아 클라이언트로 먼저 보내고 웹서버로 보내는 방식
 
 ### 한계
-- 웹소켓 서버가 다수가 될 경우 채널 관리가 서버마다 독립적으로 이루어지게 되고
+- 웹소켓 서버가 다수가 될 경우 채널 관리가 서버마다 독립적으로 이루어지게 되고 각 서버마다 호환이 어렵다
+- 해결방안1: 각 서버에 접속중인 클라이언트 파악, 각 클라이언트가 구독하고 있는 채널 정보 공유
+- 해결방안2: 외부 Message Broker 사용
+
+## 외부 Message Broker
+**외부 Message Broker 적용 전**
+![외부MB적용전](./images/WebSocket3.png "외부MB적용전")
+**외부 Message Broker 적용 후**
+![외부MB적용후](./images/WebSocket4.png "외부MB적용후")
+- 두 가지의 가장 큰 차이점은 STOMP TCP 통신을 통해 message가 외부 Message Broker까지 전달이 됨
+- 내부 Broker에서 구독 클라이언트로 메시지를 전송하기 위해 Broker Relay를 사용한다는 것이다.
+- 이러한 프로세스를 통해 만약 웹소켓 서버가 여러 개 존재하더라도, 외부 Message Broker를 거쳐서
+- 메세지가 전달이 되기 때문에, 정확한 라우팅으로 메세지 송수신이 가능해진다.
+- 또한 외부 Message Broker는 Message Queing 방식을 통해 메세지를 처리한다.
