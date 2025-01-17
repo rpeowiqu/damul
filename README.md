@@ -28,7 +28,7 @@
     <td align="center"><a href="https://github.com/rpeowiqu"><img src="https://github.com/rpeowiqu.png" width="100px;" alt=""/><br /><sub><b>한재서</b></sub></a><br />👑백 팀장<br/><a href="https://github.com/rpeowiqu"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
     <td align="center"><a href="https://github.com/gggwww06"><img src="https://github.com/gggwww06.png" width="100px;" alt=""/><br /><sub><b>윤혜진</b></sub></a><br />👽백엔드 개발<br/><a href="https://github.com/gggwww06"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
      <td align="center"><a href="https://github.com/deongGu"><img src="https://github.com/deongGu.png" width="100px;" alt=""/><br /><sub><b>신성우</b></sub></a><br />🔨 프론트엔드 개발<br/><a href="https://github.com/deongGu/"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
-      <td align="center"><a href="https://github.com/zyu22"><img src="https://github.com/zyu22.png" width="100px;" alt=""/><br /><sub><b>지유림</b></sub></a><br />🔨 백엔드 개발<br/><a href="https://github.com/zyu22"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
+      <td align="center"><a href="https://github.com/zyu22"><img src="https://github.com/zyu22.png" width="100px;" alt=""/><br /><sub><b>지유림</b></sub></a><br />🫠 백엔드 개발<br/><a href="https://github.com/zyu22"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
   </tr>
 </table>
 
@@ -100,7 +100,7 @@
 - JDK 17
 - Vite
 - Gradle
-- MySQL 8.0
+- MySQL 9.1
 - Docker
 ```
 
