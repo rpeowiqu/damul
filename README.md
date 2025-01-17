@@ -23,11 +23,11 @@
 ## 👥 팀원 소개
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/Seoheeda"><img src="https://github.com/Seoheeda.png" width="100px;" alt=""/><br /><sub><b>윤서희</b></sub></a><br />👑총괄팀장<br/><a href="https://github.com/Seoheeda"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
-    <td align="center"><a href="https://github.com/jinlaove17"><img src="https://github.com/jinlaove17.png" width="100px;" alt=""/><br /><sub><b>전종우</b></sub></a><br />👑프론트팀장<br/><a href="https://github.com/jinlaove17"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
-    <td align="center"><a href="https://github.com/rpeowiqu"><img src="https://github.com/rpeowiqu.png" width="100px;" alt=""/><br /><sub><b>한재서</b></sub></a><br />👑백팀장<br/><a href="https://github.com/rpeowiqu"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
-    <td align="center"><a href="https://github.com/gggwww06"><img src="https://github.com/gggwww06.png" width="100px;" alt=""/><br /><sub><b>윤혜진</b></sub></a><br />🔨백엔드 개발<br/><a href="https://github.com/gggwww06"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
-     <td align="center"><a href="https://github.com/deongGu"><img src="https://github.com/deongGu.png" width="100px;" alt=""/><br /><sub><b>신성우</b></sub></a><br />🔨 프론트 개발<br/><a href="https://github.com/deongGu/"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
+    <td align="center"><a href="https://github.com/Seoheeda"><img src="https://github.com/Seoheeda.png" width="100px;" alt=""/><br /><sub><b>윤서희</b></sub></a><br />👑총괄 팀장<br/><a href="https://github.com/Seoheeda"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
+    <td align="center"><a href="https://github.com/jinlaove17"><img src="https://github.com/jinlaove17.png" width="100px;" alt=""/><br /><sub><b>전종우</b></sub></a><br />👑프론트 팀장<br/><a href="https://github.com/jinlaove17"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
+    <td align="center"><a href="https://github.com/rpeowiqu"><img src="https://github.com/rpeowiqu.png" width="100px;" alt=""/><br /><sub><b>한재서</b></sub></a><br />👑백 팀장<br/><a href="https://github.com/rpeowiqu"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
+    <td align="center"><a href="https://github.com/gggwww06"><img src="https://github.com/gggwww06.png" width="100px;" alt=""/><br /><sub><b>윤혜진</b></sub></a><br />👽백엔드 개발<br/><a href="https://github.com/gggwww06"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
+     <td align="center"><a href="https://github.com/deongGu"><img src="https://github.com/deongGu.png" width="100px;" alt=""/><br /><sub><b>신성우</b></sub></a><br />🔨 프론트엔드 개발<br/><a href="https://github.com/deongGu/"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
       <td align="center"><a href="https://github.com/zyu22"><img src="https://github.com/zyu22.png" width="100px;" alt=""/><br /><sub><b>지유림</b></sub></a><br />🔨 백엔드 개발<br/><a href="https://github.com/zyu22"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/></a></td>
   </tr>
 </table>
@@ -38,10 +38,10 @@
 <tr>
     <td align="center">프론트엔드</td>
     <td>
-      <img src="https://img.shields.io/badge/JavaScript-ECD53F?style=flat&logo=openjdk&logoColor=white"/>
-       <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=apache-maven&logoColor=white"/>
-      <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=spring&logoColor=white"/>
-      <img src="https://img.shields.io/badge/TailwindCss-06B6D4?style=flat&logo=spring-security&logoColor=white"/>
+      <img src="https://img.shields.io/badge/JavaScript-ECD53F?style=flat&logo=javascript&logoColor=white"/>
+       <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white"/>
+      <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=white"/>
+      <img src="https://img.shields.io/badge/TailwindCss-06B6D4?style=flat&logo=tailwindcss&logoColor=white"/>
     </td>
   </tr>
   <tr>
@@ -50,7 +50,7 @@
       <img src="https://img.shields.io/badge/Java_17-ED8B00?style=flat&logo=openjdk&logoColor=white"/>
       <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=spring&logoColor=white"/>
       <img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=flat&logo=spring-security&logoColor=white"/>
-      <img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=apache-maven&logoColor=white"/>
+      <img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=gradle&logoColor=white"/>
     </td>
   </tr>
   <tr>
@@ -63,17 +63,17 @@
   <tr>
     <td align="center">인프라</td>
     <td>
-      <img src="https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazon-aws&logoColor=white"/>
+      <img src="https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazonwebservices&logoColor=white"/>
       <img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white"/>
-      <img src="https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=github-actions&logoColor=white"/>
+      <img src="https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=jenkins&logoColor=white"/>
     </td>
   </tr>
   <tr>
     <td align="center">기획/디자인</td>
     <td>
-      <img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=amazon-aws&logoColor=white"/>
-      <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=docker&logoColor=white"/>
-      <img src="https://img.shields.io/badge/Jira-0052CC?style=flat&logo=github-actions&logoColor=white"/>
+      <img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white"/>
+      <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=figma&logoColor=white"/>
+      <img src="https://img.shields.io/badge/Jira-0052CC?style=flat&logo=jira&logoColor=white"/>
     </td>
   </tr>
 </table>
