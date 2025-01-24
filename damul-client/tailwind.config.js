@@ -7,6 +7,9 @@ module.exports = {
       pc: "600px",
     },
     extend: {
+      fontFamily: {
+        suite: ["SUITE-Regular"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
