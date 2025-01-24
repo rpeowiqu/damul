@@ -3,6 +3,9 @@ module.exports = {
   darkMode: ["class"],
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
+    screens: {
+      pc: "600px",
+    },
     extend: {
       borderRadius: {
         lg: "var(--radius)",

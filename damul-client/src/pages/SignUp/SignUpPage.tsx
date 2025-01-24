@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 
-const LoginPage = () => {
+const SignUpPage = () => {
   return (
     <main className="text-center">
-      <p>로그인 페이지</p>
+      <p>회원가입 페이지</p>
       <Button>Click me</Button>
     </main>
   );
 };
 
-export default LoginPage;
+export default SignUpPage;
