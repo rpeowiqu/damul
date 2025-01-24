@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -33,7 +34,14 @@ public class SecurityConfig {
                         oauth2.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(new JwtAuthenticationConverter())
                         )
-                );
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userService(customOAuth2UserService)
+                        .successHandler((request, response, authentication) -> {
+                            OAuth2User uAuth2User = (OAuth2User) authentication.getPrincipal();
+                            customOAuth2UserService.registerUser(oAuth2User);
+                            response.sendRedirect("/");
+                        }));
         return http.build();
     }
 }
