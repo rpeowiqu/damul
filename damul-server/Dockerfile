@@ -1,5 +1,5 @@
 # Build stage
-FROM gradle:8.5-jdk17 AS build
+FROM gradle:8.11.1-jdk17 AS build
 WORKDIR /app
 
 # Gradle 의존성 먼저 복사 및 다운로드
