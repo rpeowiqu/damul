@@ -15,7 +15,7 @@ FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
 
 # 빌드 결과물 복사
-COPY --from=build /app/build .
+COPY --from=build /app/dist .
 
 # 포트 설정
 EXPOSE 80
