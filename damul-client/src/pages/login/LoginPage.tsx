@@ -60,6 +60,16 @@ const LoginPage = () => {
             저장하기
           </DamulButton>
         </div>
+        <div className="flex justify-center gap-3">
+          <DamulButton
+            variant="shadow"
+            size="full"
+            textSize="lg"
+            onClick={() => {}}
+          >
+            카카오로 시작하기
+          </DamulButton>
+        </div>
       </div>
     </main>
   );
