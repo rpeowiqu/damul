@@ -19,7 +19,7 @@ const router = createBrowserRouter([
       },
       {
         path: "community",
-        children: [{ path: "recipe", element: <RecipeMainPage /> }],
+        element: <RecipeMainPage/>,
       },
     ],
   },
