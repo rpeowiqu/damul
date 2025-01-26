@@ -16,7 +16,7 @@ import { useState, useEffect } from "react";
 import DamulButton from "@/components/common/DamulButton";
 import DamulModal from "@/components/common/DamulModal";
 
-import terms from "@/utils/terms";
+import terms from "@/constants/terms";
 
 const checkContents = [
   {
