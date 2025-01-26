@@ -24,7 +24,7 @@ interface DamulModalProps {
 }
 
 const defaultContentStyle = "p-4 border-0 max-w-72 rounded-xl";
-const defaultHeaderStyle = "pb-3 border-b-2 border-b-[#DEDEDE]";
+const defaultHeaderStyle = "pb-3 border-b-2 border-b-normal-200";
 const defaultTitleStyle = "text-positive-300 text-xl";
 
 const DamulModal = ({
