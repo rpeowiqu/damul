@@ -9,7 +9,7 @@ import ProfileIcon from "../svg/ProfileIcon";
 const tabs = [
   { to: "/", label: "홈", icon: HomeIcon },
   { to: "/statistics", label: "통계", icon: StatisticsIcon },
-  { to: "/community/recipe", label: "커뮤니티", icon: CommunityIcon },
+  { to: "/community", label: "커뮤니티", icon: CommunityIcon },
   { to: "/chatting", label: "채팅", icon: ChattingIcon },
   { to: "/profile", label: "프로필", icon: ProfileIcon },
 ];
