@@ -12,13 +12,13 @@ interface TabProps {
 // 채팅 알람 개수 (임시값)
 const chatAlarmNum = 3;
 
-const Tab: React.FC<TabProps> = ({
+const Tab = ({
   iconType: Icon,
   iconFill = "none",
   menuColor = "black",
   label = "홈",
   bgColor = "bg-positive-300",
-}) => {
+}: TabProps) => {
   return (
     <div className="flex h-full items-center justify-center">
       <div
