@@ -3,13 +3,13 @@ import Tab from "../footer/Tab";
 import HomeIcon from "../svg/HomeIcon";
 import StatisticsIcon from "../svg/StatisticsIcon";
 import CommunityIcon from "../svg/CommunityIcon";
-import ChattingIcon from "../svg/ChattingICon";
+import ChattingIcon from "../svg/ChattingIcon";
 import ProfileIcon from "../svg/ProfileIcon";
 
 const tabs = [
   { to: "/", label: "홈", icon: HomeIcon },
   { to: "/statistics", label: "통계", icon: StatisticsIcon },
-  { to: "/community", label: "커뮤니티", icon: CommunityIcon },
+  { to: "/community/recipe", label: "커뮤니티", icon: CommunityIcon },
   { to: "/chatting", label: "채팅", icon: ChattingIcon },
   { to: "/profile", label: "프로필", icon: ProfileIcon },
 ];
