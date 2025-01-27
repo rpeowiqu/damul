@@ -2,7 +2,7 @@ package com.damul.api.main.service;
 
 import com.damul.api.main.dto.HomeResponse;
 
-public interface MainService {
+public interface HomeService {
 
     HomeResponse getUserIngredientList(int userId);
 

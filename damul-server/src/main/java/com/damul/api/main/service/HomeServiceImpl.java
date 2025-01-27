@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MainServiceImpl implements MainService {
+public class HomeServiceImpl implements HomeService {
 
     private final UserIngredientRepository userIngredientRepository;
 
