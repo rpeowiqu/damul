@@ -3,6 +3,7 @@ import Layout from "@/components/common/Layout";
 import LoginPage from "@/pages/login/LoginPage";
 import SignUpPage from "@/pages/signUp/SignUpPage";
 import RecipeMainPage from "@/pages/community/RecipeMainPage";
+import RecipeSearchPage from "@/pages/community/RecipeSearchPage";
 
 const router = createBrowserRouter([
   {
@@ -19,7 +20,16 @@ const router = createBrowserRouter([
       },
       {
         path: "community",
-        element: <RecipeMainPage/>,
+        children: [
+          {
+            index: true,
+            element: <RecipeMainPage/>,
+          },
+          {
+            path: "recipe/search",
+            element: <RecipeSearchPage/>
+          }
+        ]
       },
     ],
   },
