@@ -1,7 +1,6 @@
-package com.damul.api.damulserver.auth.repository;
+package com.damul.api.auth.repository;
 
-import com.damul.api.damulserver.auth.entity.User;
-import lombok.RequiredArgsConstructor;
+import com.damul.api.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

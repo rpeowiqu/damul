@@ -1,8 +1,9 @@
-package com.damul.api.damulserver.config;
+package com.damul.api.config;
 
-import com.damul.api.damulserver.auth.oauth2.handler.OAuth2FailureHandler;
-import com.damul.api.damulserver.auth.oauth2.handler.OAuth2SuccessHandler;
-import com.damul.api.damulserver.auth.oauth2.service.CustomOAuth2UserService;
+
+import com.damul.api.auth.oauth2.handler.OAuth2FailureHandler;
+import com.damul.api.auth.oauth2.handler.OAuth2SuccessHandler;
+import com.damul.api.auth.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -10,10 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;

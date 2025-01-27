@@ -1,5 +1,9 @@
-package com.damul.api.damulserver.auth.oauth2.service;
+package com.damul.api.auth.oauth2.service;
 
+import com.damul.api.auth.oauth2.dto.GoogleResponse;
+import com.damul.api.auth.oauth2.dto.KaKaoResponse;
+import com.damul.api.auth.oauth2.dto.NaverResponse;
+import com.damul.api.auth.oauth2.dto.OAuth2Response;
 import com.damul.api.damulserver.auth.entity.User;
 import com.damul.api.damulserver.auth.entity.type.Provider;
 import com.damul.api.damulserver.auth.entity.type.Role;
@@ -23,6 +27,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         log.info("OAuth2 연결");
         OAuth2User oAuth2User = super.loadUser(userRequest);
+
+        // OAuth2 제공자 ID 추출(google, naver, kakao)
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        log.info("registrationId: {}", registrationId);
+
+        OAuth2Response oAuth2Response = null;
+
+        if(registrationId.equals("naver")) {
+            oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
+        } else if(registrationId.equals("google")) {
+            oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
+        } else if(registrationId.equals("kakao")) {
+            oAuth2Response = new KaKaoResponse(oAuth2User.getAttributes());
+        } else return null;
+
+
         return oAuth2User;
     }
 
