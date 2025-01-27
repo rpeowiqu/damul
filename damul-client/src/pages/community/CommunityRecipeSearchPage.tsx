@@ -1,6 +1,6 @@
 import RecentSearches from "@/components/common/RecentSearches";
 
-const RecipeSearchPage = () => {
+const CommunityRecipeSearchPage = () => {
 
   return (
     <main className="text-center p-4 pc:p-6">
@@ -11,4 +11,4 @@ const RecipeSearchPage = () => {
   );
 };
 
-export default RecipeSearchPage;
+export default CommunityRecipeSearchPage;

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const MarketMainPage = () => {
+const CommunityMarketMainPage = () => {
   return (
     <main className="text-center p-4 pc:p-6">
       <Link to="/community/market/search">
@@ -10,4 +10,4 @@ const MarketMainPage = () => {
   );
 };
 
-export default MarketMainPage;
+export default CommunityMarketMainPage;

@@ -1,4 +1,4 @@
-const RecipePostPage = () => {
+const CommunityRecipePostPage = () => {
   return (
     <main className="text-center p-4 pc:p-6">
       <div className="space-y-4">레시피 작성 페이지</div>
@@ -6,4 +6,4 @@ const RecipePostPage = () => {
   );
 };
 
-export default RecipePostPage;
+export default CommunityRecipePostPage;

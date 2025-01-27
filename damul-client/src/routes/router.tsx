@@ -2,14 +2,14 @@ import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import Layout from "@/components/common/Layout";
 import LoginPage from "@/pages/login/LoginPage";
 import SignUpPage from "@/pages/signUp/SignUpPage";
-import RecipeMainPage from "@/pages/community/CommunityRecipeMainPage";
-import RecipeSearchPage from "@/pages/community/CommunityRecipeSearchPage";
-import RecipePostPage from "@/pages/community/CommunityRecipePostPage";
-import RecipeDetailPage from "@/pages/community/CommunityRecipeDetailPage";
-import MarketMainPage from "@/pages/community/CommunityMarketMainPage";
-import MarketSearchPage from "@/pages/community/CommunityMarketSearchPage";
-import MarketPostPage from "@/pages/community/CommunityMarketPostPage";
-import MarketDetailPage from "@/pages/community/CommunityMarketDetailPage";
+import CommunityRecipeMainPage from "@/pages/community/CommunityRecipeMainPage";
+import CommunityRecipeSearchPage from "@/pages/community/CommunityRecipeSearchPage";
+import CommunityRecipePostPage from "@/pages/community/CommunityRecipePostPage";
+import CommunityRecipeDetailPage from "@/pages/community/CommunityRecipeDetailPage";
+import CommunityMarketMainPage from "@/pages/community/CommunityMarketMainPage";
+import CommunityMarketSearchPage from "@/pages/community/CommunityMarketSearchPage";
+import CommunityMarketPostPage from "@/pages/community/CommunityMarketPostPage";
+import CommunityMarketDetailPage from "@/pages/community/CommunityMarketDetailPage";
 import ProfilePage from "@/pages/profile/ProfilePage";
 import ProfileInfoPage from "@/pages/profile/ProfileInfoPage";
 import ProfileBadgePage from "@/pages/profile/ProfileBadgePage";
@@ -74,11 +74,11 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <RecipeMainPage />,
+                element: <CommunityRecipeMainPage />,
               },
               {
                 path: "search",
-                element: <RecipeSearchPage />,
+                element: <CommunityRecipeSearchPage />,
               },
             ],
           },
@@ -92,11 +92,11 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <MarketMainPage />,
+                element: <CommunityMarketMainPage />,
               },
               {
                 path: "search",
-                element: <MarketSearchPage />,
+                element: <CommunityMarketSearchPage />,
               },
             ],
           },
@@ -105,19 +105,19 @@ const router = createBrowserRouter([
       // 독립적인 경로로 설정
       {
         path: "community/recipe/post",
-        element: <RecipePostPage />,
+        element: <CommunityRecipePostPage />,
       },
       {
         path: "community/recipe/:id",
-        element: <RecipeDetailPage />,
+        element: <CommunityRecipeDetailPage />,
       },
       {
         path: "community/market/post",
-        element: <MarketPostPage />,
+        element: <CommunityMarketPostPage />,
       },
       {
         path: "community/market/:id",
-        element: <MarketDetailPage />,
+        element: <CommunityMarketDetailPage />,
       },
     ],
   },
