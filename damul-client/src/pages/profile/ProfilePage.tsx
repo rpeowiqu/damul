@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-
 import DamulTab from "@/components/common/DamulTab";
 
 const tabItems = [
