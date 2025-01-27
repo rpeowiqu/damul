@@ -1,4 +1,4 @@
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import Layout from "@/components/common/Layout";
 import LoginPage from "@/pages/login/LoginPage";
 import SignUpPage from "@/pages/signUp/SignUpPage";
@@ -35,6 +35,10 @@ const router = createBrowserRouter([
         element: <ProfilePage />,
         children: [
           {
+            index: true,
+            element: <Navigate to="info" replace />,
+          },
+          {
             path: "info",
             element: <ProfileInfoPage />,
           },
@@ -58,7 +62,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <RecipeMainPage />,
+            element: <Navigate to="recipe" replace />,
           },
           {
             path: "recipe",
