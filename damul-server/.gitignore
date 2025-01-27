@@ -51,6 +51,7 @@ local.properties
 ### Environment Variables ###
 src/main/resources/env.properties
 src/main/resources/application-*.yml
+.env
 
 ### Logs ###
 logs
