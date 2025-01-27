@@ -9,12 +9,12 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsByEmail(String email);
-// SELECT EXISTS(SELECT 1 FROM user WHERE email = ?) 쿼리 자동 생성
+    // SELECT EXISTS(SELECT 1 FROM user WHERE email = ?) 쿼리 자동 생성
 
     Optional<User> findByEmail(String email);
-// SELECT * FROM user WHERE email = ? 쿼리 자동 생성
+    // SELECT * FROM user WHERE email = ? 쿼리 자동 생성
 
     User save(User user);
-// INSERT 또는 UPDATE 쿼리 자동 생성
+    // INSERT 또는 UPDATE 쿼리 자동 생성
 
 }
