@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,9 +21,21 @@ public class HomeController {
     @GetMapping
     public ResponseEntity<IngredientResponse> getUserIngredients(int userId) {
         log.debug("유저 식자재 목록 조회 시작 userId: {}");
-        IngredientResponse ingredientResponse = homeService.getUserIngredientList(userId);
+        IngredientResponse response = homeService.getUserIngredientList(userId);
         log.debug("유저 식자재 목록 조회 성공");
-        return ResponseEntity.ok(ingredientResponse);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<IngredientResponse> searchUserIngredients(
+            int userId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String orderByDir,
+            @RequestParam(required = false) String orderBy) {
+        log.debug("유저 식자재 목록 검색 시작 userId: {}, keyword: {}, orderByDir: {}, orderBy: {}", userId, keyword, orderByDir, orderBy);
+        IngredientResponse response = homeService.getSearchUserIngredientList(userId, keyword, orderByDir, orderBy);
+        log.debug("유저 식자재 목록 검색 성공 userId: {}, keyword: {}, orderByDir: {}, orderBy: {}", userId, keyword, orderByDir, orderBy);
+        return ResponseEntity.ok(response);
     }
 
 }
