@@ -184,21 +184,6 @@ const SignUpPage = () => {
             }}
           />
 
-          <DamulModal
-            isOpen={isOpenTerm}
-            setIsOpen={() => {
-              if (isOpenTerm) {
-                setIsOpenTerm(false);
-                setTerm("");
-              }
-            }}
-            triggerComponent={<div></div>}
-            contentStyle="max-w-96"
-            title="이용약관"
-          >
-            <div className="w-full h-52 px-5 overflow-y-auto">{term}</div>
-          </DamulModal>
-
           <DamulButton
             variant="positive"
             size="full"
@@ -216,6 +201,21 @@ const SignUpPage = () => {
         개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있으며, 동의 거부 시
         회원제 서비스 이용이 제한됩니다.
       </p>
+
+      <DamulModal
+        isOpen={isOpenTerm}
+        setIsOpen={() => {
+          if (isOpenTerm) {
+            setIsOpenTerm(false);
+            setTerm("");
+          }
+        }}
+        triggerComponent={<div></div>}
+        contentStyle="max-w-96"
+        title="이용약관"
+      >
+        <div className="w-full h-52 px-5 overflow-y-auto">{term}</div>
+      </DamulModal>
     </main>
   );
 };
