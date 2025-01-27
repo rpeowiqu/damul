@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: damul-server
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-name: GOOGLE
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
+            authorization-grant-type: authorization_code
+            scope:
+              - profile
+              - email
+        provider:
+          ????: # provider 이름
+            authorization-uri: ??? ??? ? ??
+            token-uri: ?? ?? ?? ??
+            user-info-uri: ??? ?? ?? ??
+            user-name-attribute: ?? ??? ??
+
+  datasource:
+    driver-class-name: ${DB_DRIVER}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+    org.springframework.security: debug
