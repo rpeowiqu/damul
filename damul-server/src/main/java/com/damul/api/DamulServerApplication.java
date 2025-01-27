@@ -1,4 +1,4 @@
-package com.damul.api.damulserver;
+package com.damul.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
