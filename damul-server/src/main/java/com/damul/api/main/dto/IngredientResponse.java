@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class HomeResponse {
+public class IngredientResponse {
 
     private List<UserIngredientList> userIngredients;
 

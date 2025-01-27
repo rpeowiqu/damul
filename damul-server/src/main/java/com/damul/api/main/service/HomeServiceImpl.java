@@ -1,10 +1,11 @@
 package com.damul.api.main.service;
 
-import com.damul.api.main.dto.HomeResponse;
+import com.damul.api.main.dto.IngredientResponse;
 import com.damul.api.main.dto.UserIngredientList;
 import com.damul.api.main.entity.UserIngredient;
 import com.damul.api.main.repository.UserIngredientRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,7 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     @Transactional(readOnly = true)
-    public HomeResponse getUserIngredientList(int userId) {
+    public IngredientResponse getUserIngredientList(int userId) {
         // 1. 사용자의 재료 목록 조회
         List<UserIngredient> userIngredients = userIngredientRepository.findByUserId(userId);
 
@@ -29,7 +30,32 @@ public class HomeServiceImpl implements HomeService {
                 .collect(Collectors.toList());
 
         // 3. HomeResponse 생성 및 반환
-        return new HomeResponse(ingredientDtos);
+        return new IngredientResponse(ingredientDtos);
+    }
+
+    @Override
+    public IngredientResponse getSearchUserIngredientList(int userId, String keyword, String orderByDir, String orderBy) {
+        Sort.Direction direction = (orderByDir != null && orderByDir.equalsIgnoreCase("desc"))
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        String sortBy = "id"; // 기본값
+        if (orderBy != null) {
+            switch (orderBy.toLowerCase()) {
+                case "quantity":
+                    sortBy = "ingredientQuantity";
+                    break;
+                case "date":
+                    sortBy = "dueDate";
+                    break;
+            }
+        }
+
+        Sort sort = Sort.by(direction, sortBy);
+        List<UserIngredient> userIngredients = userIngredientRepository
+                .findByUserIdAndKeyword(userId, keyword, sort);
+
+        return new IngredientResponse(userIngredients);
     }
 
 }
