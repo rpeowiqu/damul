@@ -34,14 +34,7 @@ const Feeds = () => {
   return (
     <div className="space-y-2">
       {mockData.map((item) => (
-        <FeedCard
-          key={item.id}
-          title={item.title}
-          description={item.description}
-          date={item.date}
-          author={item.author}
-          image={item.image}
-        />
+        <FeedCard key={item.id} {...item} />
       ))}
     </div>
   );
