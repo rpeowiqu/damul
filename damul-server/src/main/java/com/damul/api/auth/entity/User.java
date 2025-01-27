@@ -1,7 +1,7 @@
 package com.damul.api.auth.entity;
 
-import com.damul.api.damulserver.auth.entity.type.Provider;
-import com.damul.api.damulserver.auth.entity.type.Role;
+import com.damul.api.auth.entity.type.Provider;
+import com.damul.api.auth.entity.type.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.stereotype.Service;

@@ -82,6 +82,12 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_VALIDITY}
+  refresh-token-expiration: ${JWT_REFRESH_VALIDITY}
+  temporary-token-expiration: ${JWT_TEMPORARY_VALIDITY}
+
 logging:
   level:
     org.hibernate.SQL: debug
