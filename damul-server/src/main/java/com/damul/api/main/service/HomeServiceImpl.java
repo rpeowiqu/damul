@@ -35,11 +35,12 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     public IngredientResponse getSearchUserIngredientList(int userId, String keyword, String orderByDir, String orderBy) {
+        // 여기 parameter들이 null인지 validation하기 프론트에서 무조건 받는걸로
         Sort.Direction direction = (orderByDir != null && orderByDir.equalsIgnoreCase("desc"))
                 ? Sort.Direction.DESC
                 : Sort.Direction.ASC;
 
-        String sortBy = "id"; // 기본값
+        String sortBy = "ingredientName"; // 기본값
         if (orderBy != null) {
             switch (orderBy.toLowerCase()) {
                 case "quantity":
@@ -53,9 +54,13 @@ public class HomeServiceImpl implements HomeService {
 
         Sort sort = Sort.by(direction, sortBy);
         List<UserIngredient> userIngredients = userIngredientRepository
-                .findByUserIdAndKeyword(userId, keyword, sort);
+                .findByUserIdAndIngredientNameContaining(userId, keyword, sort);
 
-        return new IngredientResponse(userIngredients);
+        List<UserIngredientList> ingredientDtos = userIngredients.stream()
+                .map(UserIngredientList::from)
+                .collect(Collectors.toList());
+
+        return new IngredientResponse(ingredientDtos);
     }
 
 }
