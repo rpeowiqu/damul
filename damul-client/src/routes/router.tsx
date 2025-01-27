@@ -1,12 +1,21 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import Layout from "@/components/common/Layout";
 import LoginPage from "@/pages/login/LoginPage";
-import SignUpPage from "@/pages/SignUp/SignUpPage";
+import SignUpPage from "@/pages/signUp/SignUpPage";
+import CommunityRecipeMainPage from "@/pages/community/CommunityRecipeMainPage";
+import CommunityRecipeSearchPage from "@/pages/community/CommunityRecipeSearchPage";
+import CommunityRecipePostPage from "@/pages/community/CommunityRecipePostPage";
+import CommunityRecipeDetailPage from "@/pages/community/CommunityRecipeDetailPage";
+import CommunityMarketMainPage from "@/pages/community/CommunityMarketMainPage";
+import CommunityMarketSearchPage from "@/pages/community/CommunityMarketSearchPage";
+import CommunityMarketPostPage from "@/pages/community/CommunityMarketPostPage";
+import CommunityMarketDetailPage from "@/pages/community/CommunityMarketDetailPage";
 import ProfilePage from "@/pages/profile/ProfilePage";
 import ProfileInfoPage from "@/pages/profile/ProfileInfoPage";
 import ProfileBadgePage from "@/pages/profile/ProfileBadgePage";
 import ProfileRecipePage from "@/pages/profile/ProfileRecipePage";
 import ProfileBookmarkPage from "@/pages/profile/ProfileBookmarkPage";
+import CommunityPage from "@/pages/community/CommunityPage";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +35,10 @@ const router = createBrowserRouter([
         element: <ProfilePage />,
         children: [
           {
+            index: true,
+            element: <Navigate to="info" replace />,
+          },
+          {
             path: "info",
             element: <ProfileInfoPage />,
           },
@@ -43,6 +56,69 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "community",
+        element: <CommunityPage />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="recipe" replace />,
+          },
+          {
+            path: "recipe",
+            element: (
+              <>
+                <Outlet />
+              </>
+            ),
+            children: [
+              {
+                index: true,
+                element: <CommunityRecipeMainPage />,
+              },
+              {
+                path: "search",
+                element: <CommunityRecipeSearchPage />,
+              },
+            ],
+          },
+          {
+            path: "market",
+            element: (
+              <>
+                <Outlet />
+              </>
+            ),
+            children: [
+              {
+                index: true,
+                element: <CommunityMarketMainPage />,
+              },
+              {
+                path: "search",
+                element: <CommunityMarketSearchPage />,
+              },
+            ],
+          },
+        ],
+      },
+      // 독립적인 경로로 설정
+      {
+        path: "community/recipe/post",
+        element: <CommunityRecipePostPage />,
+      },
+      {
+        path: "community/recipe/:id",
+        element: <CommunityRecipeDetailPage />,
+      },
+      {
+        path: "community/market/post",
+        element: <CommunityMarketPostPage />,
+      },
+      {
+        path: "community/market/:id",
+        element: <CommunityMarketDetailPage />,
+      },
     ],
   },
   {
@@ -58,3 +134,4 @@ const router = createBrowserRouter([
 ]);
 
 export default router;
+
