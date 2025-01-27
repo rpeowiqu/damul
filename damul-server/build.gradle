@@ -40,13 +40,13 @@ dependencies {
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.780'
 
 	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
 
 //	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 //	runtimeOnly 'com.mysql:mysql-connector-j'
 	runtimeOnly 'com.h2database:h2'
-	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
