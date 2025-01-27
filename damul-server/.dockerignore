@@ -1,0 +1,14 @@
+.git
+.gradle
+build
+!build/libs/*.jar
+*.log
+.DS_Store
+HELP.md
+.env
+*.class
+bin/
+target/
+.idea
+.vscode
+
