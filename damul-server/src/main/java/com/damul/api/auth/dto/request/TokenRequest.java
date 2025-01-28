@@ -1,4 +1,4 @@
-package com.damul.api.damulserver.auth.dto.request;
+package com.damul.api.auth.dto.request;
 
 public class TokenRequest {
 }

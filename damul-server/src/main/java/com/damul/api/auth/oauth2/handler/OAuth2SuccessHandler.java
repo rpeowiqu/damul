@@ -1,6 +1,6 @@
-package com.damul.api.damulserver.auth.oauth2.handler;
+package com.damul.api.auth.oauth2.handler;
 
-import com.damul.api.damulserver.auth.jwt.JwtTokenProvider;
+import com.damul.api.auth.jwt.JwtTokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,4 +1,4 @@
-package com.damul.api.damulserver.auth.jwt;
+package com.damul.api.auth.jwt;
 
 public class JwtAuthenticationFilter {
 }

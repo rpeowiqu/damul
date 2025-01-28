@@ -1,9 +1,9 @@
-package com.damul.api.damulserver.auth.oauth2.service;
+package com.damul.api.auth.oauth2.service;
 
-import com.damul.api.damulserver.auth.entity.User;
-import com.damul.api.damulserver.auth.entity.type.Provider;
-import com.damul.api.damulserver.auth.entity.type.Role;
-import com.damul.api.damulserver.auth.repository.UserRepository;
+import com.damul.api.auth.entity.User;
+import com.damul.api.auth.entity.type.Provider;
+import com.damul.api.auth.entity.type.Role;
+import com.damul.api.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

@@ -1,4 +1,4 @@
-package com.damul.api.damulserver.auth.oauth2.handler;
+package com.damul.api.auth.oauth2.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

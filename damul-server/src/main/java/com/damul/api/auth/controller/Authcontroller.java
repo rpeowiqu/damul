@@ -1,4 +1,4 @@
-package com.damul.api.damulserver.auth.controller;
+package com.damul.api.auth.controller;
 
 public class Authcontroller {
 }
