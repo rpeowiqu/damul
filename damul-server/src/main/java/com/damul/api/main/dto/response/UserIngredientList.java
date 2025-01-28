@@ -1,5 +1,6 @@
-package com.damul.api.main.dto;
+package com.damul.api.main.dto.response;
 
+import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.entity.UserIngredient;
 import lombok.*;
 

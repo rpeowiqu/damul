@@ -1,4 +1,4 @@
-package com.damul.api.main.dto;
+package com.damul.api.main.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IngredientResponse {
+public class HomeResponse {
 
     private List<UserIngredientList> userIngredients;
 

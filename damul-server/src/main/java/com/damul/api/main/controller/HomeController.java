@@ -1,7 +1,7 @@
 package com.damul.api.main.controller;
 
-import com.damul.api.main.dto.HomeIngredientDetail;
-import com.damul.api.main.dto.IngredientResponse;
+import com.damul.api.main.dto.response.HomeIngredientDetail;
+import com.damul.api.main.dto.response.IngredientResponse;
 import com.damul.api.main.service.HomeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

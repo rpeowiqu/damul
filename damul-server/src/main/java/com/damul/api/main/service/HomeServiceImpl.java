@@ -1,10 +1,11 @@
 package com.damul.api.main.service;
 
-import com.damul.api.main.dto.HomeIngredientDetail;
-import com.damul.api.main.dto.IngredientResponse;
-import com.damul.api.main.dto.UserIngredientList;
+import com.damul.api.main.dto.response.HomeIngredientDetail;
+import com.damul.api.main.dto.response.IngredientResponse;
+import com.damul.api.main.dto.response.UserIngredientList;
 import com.damul.api.main.entity.UserIngredient;
 import com.damul.api.main.repository.UserIngredientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -77,5 +78,17 @@ public class HomeServiceImpl implements HomeService {
         log.info("사용자 식자재 상세 가져오기 성공");
         return homeIngredientDetail;
     }
+
+    @Override
+    @Transactional
+    public void updateQuantity(int ingredientId, int quantity) {
+        log.info("식자재 양 업데이트 시작");
+        UserIngredient ingredient = userIngredientRepository.findById(ingredientId)
+                .orElseThrow(() -> new EntityNotFoundException("재료를 찾을 수 없습니다."));
+
+        ingredient.updateQuantity(quantity);
+        log.info("식자재 양 업데이트 성공");
+    }
+
 
 }

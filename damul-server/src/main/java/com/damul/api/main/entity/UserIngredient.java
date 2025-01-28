@@ -39,4 +39,8 @@ public class UserIngredient {
     @Enumerated(EnumType.STRING)
     @Column(name = "ingredient_storage", nullable = false)
     private IngredientStorage ingredientStorage;
+
+    public void updateQuantity(int quantity) {
+        this.ingredientQuantity = quantity;
+    }
 }
