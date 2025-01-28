@@ -16,7 +16,7 @@ const tabs = [
 
 const Footer = () => {
   return (
-    <footer className="absolute bottom-0 w-full h-16 border-t-1 bg-white border-gray-200">
+    <footer className="fixed bottom-0 left-0 right-0 w-full max-w-[600px] h-16 mx-auto bg-white border-x border-t border-normal-100">
       <div className="flex w-full h-full">
         {tabs.map(({ to, label, icon: Icon }) => (
           <NavLink to={to} className="flex-1" key={to}>

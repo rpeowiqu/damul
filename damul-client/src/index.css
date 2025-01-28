@@ -123,4 +123,5 @@
 
 html {
   font-family: "SUITE-Regular";
+  overflow-y: scroll;
 }
