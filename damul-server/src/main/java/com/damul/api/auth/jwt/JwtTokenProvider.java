@@ -1,4 +1,4 @@
-package com.damul.api.damulserver.auth.jwt;
+package com.damul.api.auth.jwt;
 
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;

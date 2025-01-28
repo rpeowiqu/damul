@@ -1,4 +1,4 @@
-package com.damul.api.damulserver.auth.dto.response;
+package com.damul.api.auth.dto.response;
 
 public class TokenResponse {
 }

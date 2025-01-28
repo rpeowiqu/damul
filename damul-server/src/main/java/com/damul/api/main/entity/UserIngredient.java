@@ -1,5 +1,6 @@
 package com.damul.api.main.entity;
 
+import com.damul.api.auth.entity.User;
 import com.damul.api.main.dto.IngredientStorage;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,12 +13,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class UserIngredient {
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;  // int userId → User 객체로 변경
+
     @Id
     @Column(name = "id")
-    private int id;
-
-    @Column(name = "user_id", nullable = false)
-    private int userId;
+    private int userIngredientId;
 
     @Column(name = "category_id", nullable = false)
     private int categoryId;
