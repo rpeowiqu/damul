@@ -21,7 +21,7 @@ const BadgeShowcase = ({ badgeList }: { badgeList: BadgeShowcaseProps[] }) => {
   }, [currentBadgeIndex]);
 
   return (
-    <div className="flex flex-col gap-3 p-3 border border-normal-100 rounded-md">
+    <div className="flex flex-col gap-3 p-3 border border-normal-100 rounded-xl">
       <p className="text-end text-sm">
         보유 뱃지 수 : {badgeList.length || 0}개
       </p>

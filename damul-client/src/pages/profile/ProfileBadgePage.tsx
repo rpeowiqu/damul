@@ -48,7 +48,7 @@ const dummyBadgeData = [
 
 const ProfileBadgePage = () => {
   return (
-    <div className="flex flex-col gap-2 h-full p-5 bg-white">
+    <div className="flex flex-col gap-2 p-5 bg-white">
       <div className="flex flex-col gap-2">
         <h1 className="text-lg font-bold">토마토러버전종우님의 뱃지 전시대</h1>
         <p className="text-normal-600">그동안 획득한 뱃지들을 살펴보세요!</p>
