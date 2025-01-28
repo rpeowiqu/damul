@@ -1,5 +1,6 @@
 package com.damul.api.main.service;
 
+import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.HomeIngredientDetail;
 import com.damul.api.main.dto.response.IngredientResponse;
 import com.damul.api.main.dto.response.UserIngredientList;
@@ -81,12 +82,12 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     @Transactional
-    public void updateQuantity(int ingredientId, int quantity) {
+    public void updateQuantity(int ingredientId, UserIngredientUpdate update) {
         log.info("식자재 양 업데이트 시작");
         UserIngredient ingredient = userIngredientRepository.findById(ingredientId)
                 .orElseThrow(() -> new EntityNotFoundException("재료를 찾을 수 없습니다."));
 
-        ingredient.updateQuantity(quantity);
+        ingredient.updateQuantity(update.getIngredientquantity());
         log.info("식자재 양 업데이트 성공");
     }
 
