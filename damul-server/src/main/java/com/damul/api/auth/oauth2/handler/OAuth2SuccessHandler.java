@@ -39,7 +39,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         response.addCookie(createCookie("refresh_token", refreshToken, 604800)); // 7일
 
         // 프론트엔드 페이지로 리다이렉트
-        response.sendRedirect("http://your-frontend-url");
+        response.sendRedirect("http://localhost:3000/oauth2/success");
     }
 
 
