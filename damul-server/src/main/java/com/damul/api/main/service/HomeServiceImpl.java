@@ -3,6 +3,7 @@ package com.damul.api.main.service;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.HomeIngredientDetail;
 import com.damul.api.main.dto.response.IngredientResponse;
+import com.damul.api.main.dto.response.SelectedIngredientList;
 import com.damul.api.main.dto.response.UserIngredientList;
 import com.damul.api.main.entity.UserIngredient;
 import com.damul.api.main.repository.UserIngredientRepository;
@@ -89,6 +90,19 @@ public class HomeServiceImpl implements HomeService {
 
         ingredient.updateQuantity(update.getIngredientquantity());
         log.info("식자재 양 업데이트 성공");
+    }
+
+    @Override
+    public SelectedIngredientList getSelectedIngredientList(List<Integer> ingredientIds) {
+        log.info("선택된 식자재 조회 시작");
+        List<UserIngredient> ingredients = userIngredientRepository.findAllById(ingredientIds);
+
+        if (ingredients.isEmpty()) {
+            throw new EntityNotFoundException("선택된 식자재가 없습니다.");
+        }
+
+        log.info("선택된 식자재 조회 성공");
+        return SelectedIngredientList.from(ingredients);
     }
 
 
