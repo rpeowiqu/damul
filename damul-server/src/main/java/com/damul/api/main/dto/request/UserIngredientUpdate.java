@@ -1,16 +1,14 @@
-package com.damul.api.main.dto;
+package com.damul.api.main.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class HomeResponse {
+public class UserIngredientUpdate {
 
-    private List<UserIngredientList> userIngredients;
+    private int ingredientquantity;
 
 }

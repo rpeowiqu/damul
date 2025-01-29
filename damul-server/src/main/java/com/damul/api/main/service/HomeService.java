@@ -1,7 +1,8 @@
 package com.damul.api.main.service;
 
-import com.damul.api.main.dto.HomeIngredientDetail;
-import com.damul.api.main.dto.IngredientResponse;
+import com.damul.api.main.dto.request.UserIngredientUpdate;
+import com.damul.api.main.dto.response.HomeIngredientDetail;
+import com.damul.api.main.dto.response.IngredientResponse;
 
 public interface HomeService {
 
@@ -10,5 +11,7 @@ public interface HomeService {
     IngredientResponse getSearchUserIngredientList(int userId, String keyword, String orderByDir, String orderBy);
 
     HomeIngredientDetail getUserIngredientDetail(int ingredientId);
+
+    void updateQuantity(int ingredientId, UserIngredientUpdate update);
 
 }
