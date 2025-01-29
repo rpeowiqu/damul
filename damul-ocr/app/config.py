@@ -1,1 +1,8 @@
-# 설정 파일 (환경 변수, DB 설정 등)
+# 환경 설정
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+OPENAI_KEY1 = os.getenv('OPENAI_KEY1')
+OPENAI_KEY2 = os.getenv('OPENAI_KEY2')
