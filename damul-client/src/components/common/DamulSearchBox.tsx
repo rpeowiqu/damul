@@ -24,7 +24,9 @@ const DamulSearchBox = ({
     <div className="relative">
       <Input
         placeholder={placeholder}
-        className={"rounded-lg transition-colors p-2 pr-8 pc:pl-4 pc:pr-10 bg-normal-50 border-1 border-normal-100 text-sm text-normal-700 focus:border-normal-500"}
+        className={
+          "rounded-lg transition-colors p-2 pr-8 pc:pl-4 pc:pr-10 bg-normal-50 border-1 border-normal-100 text-sm text-normal-700 focus:border-normal-500"
+        }
         onClick={onInputClick}
         onChange={handleInputChange}
         value={inputValue}

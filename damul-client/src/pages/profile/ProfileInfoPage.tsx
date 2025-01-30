@@ -1,5 +1,6 @@
 import { Bar, BarChart, Cell, XAxis, YAxis } from "recharts";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
+import { Link } from "react-router-dom";
 
 const ingredientHisoryData = [
   { name: "달걀류", count: 3, color: "#f28b82" },
@@ -25,14 +26,20 @@ const ProfileInfoPage = () => {
   return (
     <div className="flex flex-col gap-3 h-full">
       <div className="flex font-bold py-6 bg-white">
-        <div className="flex flex-col items-center flex-1 border-r border-normal-50">
+        <Link
+          to={"/friend/follower"}
+          className="flex flex-col items-center flex-1 border-r border-normal-50"
+        >
           <p className="text-sm">팔로워</p>
           <p className="text-lg">923,722</p>
-        </div>
-        <div className="flex flex-col items-center flex-1 border-r border-transparent">
+        </Link>
+        <Link
+          to={"/friend/following"}
+          className="flex flex-col items-center flex-1 border-r border-transparent"
+        >
           <p className="text-sm">팔로잉</p>
           <p className="text-lg">0</p>
-        </div>
+        </Link>
       </div>
 
       <div className="flex flex-col gap-2 p-5 bg-white">
