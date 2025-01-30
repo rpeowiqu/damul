@@ -43,6 +43,7 @@ public class SecurityConfig {
                     log.info("URL 접근 권한 설정");
                     auth
                             .requestMatchers("/", "/login", "/admin/login").permitAll() // 누구나 접근 가능
+                            .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
                             .requestMatchers("/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
                             .anyRequest().authenticated();                              // 나머지는 인증 필요
                 })
@@ -94,6 +95,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+        configuration.addAllowedHeader("Set-Cookie");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

@@ -8,9 +8,11 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Provider;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -32,49 +35,60 @@ import java.util.Optional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        log.info("OAuth2 연결");
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         // OAuth2 제공자 ID 추출(google, naver, kakao)
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        log.info("registrationId: {}", registrationId);
 
         OAuth2Response oAuth2Response = getOAuth2Response(registrationId, oAuth2User.getAttributes());
 
-        log.info("이메일 확인 : {}", oAuth2Response.getEmail());
-
         // 기존 회원인지 확인
         Optional<User> existingUser = userRepository.findByEmail(oAuth2Response.getEmail());
-        log.info("기존 사용자 존재 여부: {}", existingUser.isPresent());
 
         if (existingUser.isEmpty()) {
-            // 미가입 사용자인 경우 임시로 OAuth2 정보를 세션에 저장
-            HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                    .getRequest().getSession();
-            session.setAttribute("oauth2Registration", registrationId);
-            session.setAttribute("oauth2User", oAuth2Response);
+            log.info("새로운 회원입니다.");
+            // 미가입 사용자인 경우 Redis에 OAuth2 정보를 저장
+            // 현재 세션 ID를 키로 사용
+            String sessionKey = "oauth2:user:" + RequestContextHolder.currentRequestAttributes().getSessionId();
 
-            // 예외발생
+            // Map으로 변환하여 저장 -> 직렬화 문제 방지
+            try {
+                Map<String, String> oauth2Info = Map.of(
+                        "email", oAuth2Response.getEmail(),
+                        "nickname", oAuth2Response.getNickname(),
+                        "profileImage", oAuth2Response.getProfileImage(),
+                        "providerId", oAuth2Response.getProviderId(),
+                        "provider", oAuth2Response.getProvider()
+                );
+
+                // Map을 JSON 문자열로 변환
+                String jsonString = objectMapper.writeValueAsString(oauth2Info);
+                redisTemplate.opsForValue().set(sessionKey, jsonString, Duration.ofMinutes(30));
+            } catch (Exception e) {
+                log.error("Redis 저장 중 오류 발생", e);
+                throw new OAuth2AuthenticationException(
+                        new OAuth2Error("server_error"),
+                        "서버 오류가 발생했습니다."
+                );
+            }
+
             throw new OAuth2AuthenticationException(
                     new OAuth2Error("terms_agreement_required"),
                     "약관 동의가 필요합니다."
             );
         }
 
+        // 기존 로직 유지
+        log.info("기존 유저입니다.");
         User user = existingUser.get();
         return new DefaultOAuth2User(
-                // 첫 번째 매개변수: 사용자의 권한 정보 설정
-                // SimpleGrantedAuthority 객체로 권한 정보를 생성하고, Collections.singleton()로 단일 권한을 가진 Set을 생성
                 Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())),
-                // 두 번째 매개변수: OAuth2 제공자로부터 받은 원본 사용자 정보
-                // 이 정보는 나중에 필요할 때 사용할 수 있도록 저장됨
                 oAuth2User.getAttributes(),
-                // 세 번째 매개변수: 사용자를 식별할 수 있는 속성의 이름
-                // application.yml에 설정된 user-name-attribute 값을 사용
-                // 예: 구글은 'sub', 네이버는 'response', 카카오는 'id'
                 userRequest.getClientRegistration().getProviderDetails()
                         .getUserInfoEndpoint().getUserNameAttributeName()
         );
@@ -93,7 +107,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return userRepository.save(user);
     }
 
-    private OAuth2Response getOAuth2Response(String registrationId, Map<String, Object> attributes) {
+    public OAuth2Response getOAuth2Response(String registrationId, Map<String, Object> attributes) {
         if (registrationId.equals("naver")) {
             log.info("naver, ID: {}", registrationId);
             return new NaverResponse(attributes);

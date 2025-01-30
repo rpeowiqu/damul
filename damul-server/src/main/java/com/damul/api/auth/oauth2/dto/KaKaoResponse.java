@@ -1,40 +1,34 @@
 package com.damul.api.auth.oauth2.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+
+import java.io.Serializable;
 import java.util.Map;
 
-public class KaKaoResponse implements OAuth2Response {
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class KaKaoResponse implements OAuth2Response, Serializable {
+    private String email;
+    private String nickname;
+    private String profileImage;
+    private String providerId;
 
-    private final Map<String, Object> attribute;
-
-    public KaKaoResponse(final Map<String, Object> attribute) {
-        this.attribute = attribute;
-    }
-
-    @Override
+    @JsonIgnore
     public String getProvider() {
         return "kakao";
     }
 
-    @Override
-    public String getProviderId() {
-        return attribute.get("id").toString();
-    }
-
-    @Override
-    public String getEmail() {
-        Map<String, Object> account = (Map<String, Object>) attribute.get("kakao_account");
-        return (String) account.get("email");
-    }
-
-    @Override
-    public String getProfileImage() {
+    public KaKaoResponse(Map<String, Object> attribute) {
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attribute.get("kakao_account");
         Map<String, Object> properties = (Map<String, Object>) attribute.get("properties");
-        return (String) properties.get("profile_image");
+
+        this.email = kakaoAccount != null ? (String) kakaoAccount.get("email") : null;
+        this.nickname = properties != null ? (String) properties.get("nickname") : null;
+        this.profileImage = properties != null ? (String) properties.get("profile_image") : null;
+        this.providerId = attribute != null ? attribute.get("id").toString() : null;
     }
 
-    @Override
-    public String getNickname() {
-        Map<String, Object> properties = (Map<String, Object>) attribute.get("properties");
-        return (String) properties.get("nickname");
-    }
 }

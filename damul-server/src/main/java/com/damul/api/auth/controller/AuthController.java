@@ -1,15 +1,17 @@
 package com.damul.api.auth.controller;
 
 import com.damul.api.auth.entity.User;
-import com.damul.api.auth.entity.type.Provider;
-import com.damul.api.auth.entity.type.Role;
-import com.damul.api.auth.oauth2.dto.OAuth2Response;
+import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.repository.UserRepository;
+import com.damul.api.auth.service.AuthService;
+import com.damul.api.auth.util.CookieUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,39 +21,18 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
+
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTemplate<String, String> redisTemplate;
     private final UserRepository userRepository;
-
-    // 로그인된 사용자 정보 조회
-    @GetMapping("/user/info")
-    public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal OAuth2User oauth2User) {
-        String email = oauth2User.getAttribute("email");
-
-        // Optional로 변경하여 더 안전하게 처리
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "User not found with email: " + email
-                ));
-
-        // 약관 동의 여부 체크
-        if (!user.isTermsAgreed()) {
-            // 약관 동의가 되지 않은 경우 400 상태 코드 반환
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of(
-                            "message", "약관 동의가 필요합니다",
-                            "needsTermsAgreement", true,
-                            "email", email,
-                            "redirectUrl", "/terms-agreement"
-                    ));
-        }
-
-        return ResponseEntity.ok(user);
-    }
+    private final CookieUtil cookieUtil;
 
     // 로그아웃
     @PostMapping("/logout")
@@ -74,39 +55,24 @@ public class AuthController {
     }
 
     // 약관 동의
-
     @PostMapping("/terms-agreement")
-    public ResponseEntity<?> agreeToTerms(HttpSession session) {
-        // 세션에서 OAuth2 정보 가져오기
-        String registrationId = (String) session.getAttribute("oauth2Registration");
-        OAuth2Response oAuth2Response = (OAuth2Response) session.getAttribute("oauth2User");
+    public ResponseEntity<?> agreeToTerms(HttpServletRequest request, HttpServletResponse response) {
+        String sessionId = request.getSession().getId();
 
-        if (oAuth2Response == null) {
-            return ResponseEntity.badRequest().body("OAuth2 정보를 찾을 수 없습니다.");
-        }
+        Map<String, String> tokens = authService.processTermsAgreement(sessionId);
 
-        // 이메일 중복 체크 추가
-        if (userRepository.findByEmail(oAuth2Response.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("이미 가입된 이메일입니다.");
-        }
+        // 쿠키 설정
+        cookieUtil.addCookie(response, "access_token", tokens.get("accessToken"),
+                (int) jwtTokenProvider.getAccessTokenExpire() / 1000);
+        cookieUtil.addCookie(response, "refresh_token", tokens.get("refreshToken"),
+                (int) jwtTokenProvider.getRefreshTokenExpire() / 1000);
 
-        // 사용자 생성 및 저장
-        User user = User.builder()
-                .email(oAuth2Response.getEmail())
-                .nickname(oAuth2Response.getNickname())
-                .profileImageUrl(oAuth2Response.getProfileImage())
-                .provider(Provider.valueOf(registrationId.toUpperCase()))
-                .role(Role.USER)
-                .termsAgreed(true)
-                .build();
 
-        userRepository.save(user);
-
-        // 세션의 임시 데이터 삭제
-        session.removeAttribute("oauth2Registration");
-        session.removeAttribute("oauth2User");
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok()
+                .body(Map.of(
+                        "success", true,
+                        "redirectUrl", "/"
+                ));
     }
 }
 //

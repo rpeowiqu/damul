@@ -12,10 +12,13 @@ import org.springframework.stereotype.Service;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name = "users")
 public class User {
     @Id    // Primary Key 지정
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "INT AUTO_INCREMENT")
     private int id;
+
     private String nickname;
     private String email;
     private String profileImageUrl;

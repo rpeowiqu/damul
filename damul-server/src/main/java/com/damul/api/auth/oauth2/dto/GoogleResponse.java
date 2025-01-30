@@ -1,37 +1,30 @@
 package com.damul.api.auth.oauth2.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
+
+import java.io.Serializable;
 import java.util.Map;
 
-public class GoogleResponse implements OAuth2Response {
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class GoogleResponse implements OAuth2Response, Serializable {
+    private String email;
+    private String nickname;
+    private String profileImage;
+    private String providerId;
 
-    private final Map<String, Object> attribute;
-
-    public GoogleResponse(final Map<String, Object> attribute) {
-        this.attribute = attribute;
-    }
-
-    @Override
     public String getProvider() {
         return "google";
     }
 
-    @Override
-    public String getProviderId() {
-        return attribute.get("sub").toString();
-    }
-
-    @Override
-    public String getEmail() {
-        return attribute.get("email").toString();
-    }
-
-    @Override
-    public String getProfileImage() {
-        return attribute.get("picture").toString();
-    }
-
-    @Override
-    public String getNickname() {
-        return attribute.get("name").toString();
+    public GoogleResponse(Map<String, Object> attribute) {
+        this.email = attribute.get("email") != null ? attribute.get("email").toString() : null;
+        this.nickname = attribute.get("name") != null ? attribute.get("name").toString() : null;
+        this.profileImage = attribute.get("picture") != null ? attribute.get("picture").toString() : null;
+        this.providerId = attribute.get("sub") != null ? attribute.get("sub").toString() : null;
     }
 }

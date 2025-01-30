@@ -1,39 +1,31 @@
 package com.damul.api.auth.oauth2.dto;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class NaverResponse implements OAuth2Response{
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class NaverResponse implements OAuth2Response, Serializable {
+    private String email;
+    private String nickname;
+    private String profileImage;
+    private String providerId;
 
-    private final Map<String, Object> attribute;
-
-    public NaverResponse(Map<String, Object> attribute) {
-        this.attribute = (Map<String, Object>) attribute.get("response");
-    }
-
-    @Override
+    @JsonIgnore
     public String getProvider() {
         return "naver";
     }
 
-    @Override
-    public String getProviderId() {
-        return attribute.get("id").toString();
-    }
-
-    @Override
-    public String getEmail() {
-        return attribute.get("email").toString();
-    }
-
-    @Override
-    public String getProfileImage() {
-        return attribute.get("profile_image").toString();
-    }
-
-    @Override
-    public String getNickname() {
-        return attribute.get("nickname").toString();
+    public NaverResponse(Map<String, Object> attribute) {
+        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
+        this.email = response != null ? (String) response.get("email") : null;
+        this.nickname = response != null ? (String) response.get("nickname") : null;
+        this.profileImage = response != null ? (String) response.get("profile_image") : null;
+        this.providerId = response != null ? (String) response.get("id") : null;
     }
 }
