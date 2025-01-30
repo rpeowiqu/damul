@@ -1,5 +1,5 @@
-package com.damul.api.auth.entity.type;
+package com.damul.api.damulserver.auth.entity.type;
 
 public enum Provider {
-    GOOGLE, NAVER, KAKAO
+    GOOGLE, KAKAO
 }

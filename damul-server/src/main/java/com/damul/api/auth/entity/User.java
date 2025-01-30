@@ -1,10 +1,9 @@
-package com.damul.api.auth.entity;
+package com.damul.api.damulserver.auth.entity;
 
-import com.damul.api.auth.entity.type.Provider;
-import com.damul.api.auth.entity.type.Role;
+import com.damul.api.damulserver.auth.entity.type.Provider;
+import com.damul.api.damulserver.auth.entity.type.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Entity
@@ -12,13 +11,10 @@ import org.springframework.stereotype.Service;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "users")
 public class User {
     @Id    // Primary Key 지정
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "INT AUTO_INCREMENT")
     private int id;
-
     private String nickname;
     private String email;
     private String profileImageUrl;
@@ -28,8 +24,4 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;         // ENUM
-
-    @Column(nullable = false)
-    private boolean termsAgreed = false;
-
 }
