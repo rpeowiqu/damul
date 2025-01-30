@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Feeds from "@/components/common/Feeds";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
-import DamulButton from "@/components/common/DamulButton";
-import WriteIcon from "@/components/svg/WriteIcon";
+import PostButton from "@/components/community/PostButton";
 
 const CommunityRecipeMainPage = () => {
   const navigate = useNavigate();
@@ -16,17 +15,7 @@ const CommunityRecipeMainPage = () => {
         }}
       />
       <Feeds />
-      <div className="absolute bottom-20 right-5">
-        <DamulButton
-          variant="round"
-          px={3}
-          onClick={() => {
-            navigate("/community/recipe/post");
-          }}
-        >
-          <WriteIcon />
-        </DamulButton>
-      </div>
+      <PostButton to="recipe"/>
     </main>
   );
 };
