@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ScrollResponse<T> {
 
-    private final List<T> data;
-    private final CursorPageMetaDto meta;
+    private List<T> data;
+    private CursorPageMetaInfo meta;
 
 }
