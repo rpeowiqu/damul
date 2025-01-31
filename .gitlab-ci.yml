@@ -79,10 +79,12 @@ deploy:
   stage: deploy
   image: alpine:latest
   before_script:
-    - apk add --no-cache openssh
+    - apk add --no-cache openssh openssh-keygen
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY" | base64 -d | tr -d '\r' > ~/.ssh/id_rsa  # 개행 문자 제거
     - chmod 600 ~/.ssh/id_rsa
+    - eval $(ssh-agent -s)  # ssh-agent 시작
+    - ssh-add ~/.ssh/id_rsa
     - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
   script:
     - |
