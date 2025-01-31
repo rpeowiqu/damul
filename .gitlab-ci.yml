@@ -87,6 +87,8 @@ deploy:
     - chmod 600 ~/.ssh/I12A306T.pem
     - eval $(ssh-agent -s)
     - ssh-add ~/.ssh/I12A306T.pem
+    - ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
   script:
     - |
       # Client 브랜치 배포: 클라이언트 컨테이너만 배포
