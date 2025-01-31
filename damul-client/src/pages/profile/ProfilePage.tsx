@@ -24,7 +24,7 @@ const ProfilePage = () => {
   return (
     <main className="flex flex-col">
       <div className="h-44 bg-normal-200"></div>
-      <DamulTab propItems={tabItems} />
+      <DamulTab tabList={tabItems} />
       <Outlet />
     </main>
   );
