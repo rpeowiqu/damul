@@ -79,16 +79,14 @@ deploy:
   stage: deploy
   image: alpine:latest
   before_script:
-    - apk update && apk add openssh-client openssl
+    # 디버깅을 위한 키 내용 확인 (실제 배포 시에는 제거)
+    - echo "$SSH_PRIVATE_KEY" | base64 -d | head -n 1
+    - apk update && apk add openssh-client
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/I12A306T.pem
     - chmod 600 ~/.ssh/I12A306T.pem
-    # 키 변환 추가
-    - ssh-keygen -p -N "" -m PEM -f ~/.ssh/I12A306T.pem
     - eval $(ssh-agent -s)
     - ssh-add ~/.ssh/I12A306T.pem
-    # SSH 호스트 체크 비활성화
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
     - |
       # Client 브랜치 배포: 클라이언트 컨테이너만 배포
