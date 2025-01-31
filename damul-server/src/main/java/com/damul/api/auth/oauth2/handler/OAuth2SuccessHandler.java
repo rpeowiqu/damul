@@ -1,5 +1,6 @@
 package com.damul.api.auth.oauth2.handler;
 
+import com.damul.api.auth.dto.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.oauth2.service.CustomOAuth2UserService;
@@ -56,7 +57,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // 기존 사용자인 경우 로그 출력
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
-        Optional<User> existingUser = userRepository.findByEmail(email);
+        Optional<UserInfo> existingUser = userRepository.findByEmail(email);
         if (existingUser.isPresent()) {
             log.info("기존 사용자 로그인 성공: {}", email);
         } else {
@@ -64,7 +65,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         }
 
 
-        // 리다이렉트
+        // 리다이렉트 -> 메인페이지
         response.sendRedirect("http://localhost:3000/oauth2/success");
     }
 }

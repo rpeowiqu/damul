@@ -53,7 +53,7 @@ public class AuthController {
     public ResponseEntity<?> agreeToTerms(HttpServletRequest request, HttpServletResponse response) {
         String sessionId = request.getSession().getId();
 
-        Map<String, String> tokens = authService.processTermsAgreement(sessionId);
+        Map<String, String> tokens = authService.processSignup(sessionId);
 
         // 쿠키 설정
         cookieUtil.addCookie(response, "access_token", tokens.get("accessToken"),

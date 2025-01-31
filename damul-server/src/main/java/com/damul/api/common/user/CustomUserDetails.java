@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -14,13 +15,12 @@ import java.util.Map;
 @Getter
 @RequiredArgsConstructor
 public class CustomUserDetails implements OAuth2User {
-    private final UserInfo userInfo;     // id와 nickname만 포함된 UserInfo
+    private final UserInfo userInfo;
     private final Map<String, Object> attributes;
-
 
     @Override
     public String getName() {
-        return userInfo.getNickname();  // email 대신 nickname 반환
+        return userInfo.getNickname();
     }
 
     @Override
@@ -30,11 +30,14 @@ public class CustomUserDetails implements OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 기본 권한 ROLE_USER 부여
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+        if (userInfo == null) {
+            return Collections.emptyList();
+        }
+        return Collections.singletonList(
+                new SimpleGrantedAuthority("ROLE_USER")
+        );
     }
 
-    // UserInfo에서는 id와 nickname만 접근 가능
     public int getId() {
         return userInfo.getId();
     }

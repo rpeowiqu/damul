@@ -1,7 +1,6 @@
 package com.damul.api.auth.oauth2.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.damul.api.auth.entity.type.Provider;
 import lombok.*;
 
 import java.io.Serializable;
@@ -17,7 +16,7 @@ public class GoogleResponse implements OAuth2Response, Serializable {
     private String profileImage;
     private String providerId;
 
-    public String getProvider() {
+    public Provider getProvider() {
         return "google";
     }
 

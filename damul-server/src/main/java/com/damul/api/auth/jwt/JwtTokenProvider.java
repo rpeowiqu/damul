@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Map;
+
 /**
  * JWT 토큰의 생성, 검증, 정보 추출을 담당하는 서비스
  * Access Token과 Refresh Token의 생성 및 관리를 처리
@@ -25,6 +27,9 @@ public class JwtTokenProvider {
 
     @Value("${jwt.refresh-token-expiration}")
     private long refreshTokenExpire;       // Refresh Token 만료 시간 (ms)
+
+    @Value("${jwt.temporary-token-expiration}")
+    private long temporaryTokenExpire;
 
     /**
      * Access Token 생성
@@ -78,6 +83,16 @@ public class JwtTokenProvider {
                 .setIssuedAt(new Date())                        // 발행 시간
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpire))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)  // HS512 알고리즘으로 암호화
+                .compact();
+    }
+
+    // 임시토큰 생성
+    public String generateTempToken(Map<String, Object> claims) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + temporaryTokenExpire))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 

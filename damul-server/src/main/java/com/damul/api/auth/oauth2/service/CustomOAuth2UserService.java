@@ -1,6 +1,8 @@
 package com.damul.api.auth.oauth2.service;
 
+import com.damul.api.auth.dto.TermsList;
 import com.damul.api.auth.dto.UserInfo;
+import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.oauth2.dto.GoogleResponse;
 import com.damul.api.auth.oauth2.dto.KaKaoResponse;
 import com.damul.api.auth.oauth2.dto.NaverResponse;
@@ -8,14 +10,13 @@ import com.damul.api.auth.oauth2.dto.OAuth2Response;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Provider;
 import com.damul.api.auth.entity.type.Role;
+import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.repository.UserRepository;
 import com.damul.api.common.user.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -24,12 +25,9 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -39,6 +37,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final TermsRepository termsRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -54,16 +54,35 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             String sessionKey = "oauth2:user:" + RequestContextHolder.currentRequestAttributes().getSessionId();
 
             try {
-                Map<String, String> oauth2Info = Map.of(
-                        "email", oAuth2Response.getEmail(),
-                        "nickname", oAuth2Response.getNickname(),
-                        "profileImage", oAuth2Response.getProfileImage(),
-                        "providerId", oAuth2Response.getProviderId(),
-                        "provider", oAuth2Response.getProvider()
+                User user = User.builder()
+                                .email(oAuth2Response.getEmail())
+                                .nickname(oAuth2Response.getNickname())
+                                .profileImageUrl(oAuth2Response.getProfileImage())
+                                .provider(oAuth2Response.getProvider())
+                                .role(Role.USER)
+                                .build();
+
+                // Redis에 저장
+                String jsonString = objectMapper.writeValueAsString(user);
+                redisTemplate.opsForValue().set(sessionKey, jsonString, Duration.ofMinutes(30));
+
+                // 약관 조회
+                List<TermsList> terms = termsRepository.findAll();
+
+
+                Map<String, Object> signupInfo = new HashMap<>();
+                signupInfo.put("email", user.getEmail());
+                signupInfo.put("nickname", user.getNickname());
+                signupInfo.put("terms", terms);
+
+                String tempToken = jwtTokenProvider.generateTempToken(signupInfo);
+
+                return new DefaultOAuth2User(
+                        Collections.emptyList(),
+                        Map.of("tempToken", tempToken),
+                        "email"
                 );
 
-                String jsonString = objectMapper.writeValueAsString(oauth2Info);
-                redisTemplate.opsForValue().set(sessionKey, jsonString, Duration.ofMinutes(30));
             } catch (Exception e) {
                 log.error("Redis 저장 중 오류 발생", e);
                 throw new OAuth2AuthenticationException(
@@ -71,20 +90,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         "서버 오류가 발생했습니다."
                 );
             }
-
-            throw new OAuth2AuthenticationException(
-                    new OAuth2Error("terms_agreement_required"),
-                    "약관 동의가 필요합니다."
-            );
         }
 
         log.info("기존 유저입니다.");
-        UserInfo user = existingUser.get();
-        // JPQL 쓸것
+        UserInfo userInfo = existingUser.get();
 
         // DefaultOAuth2User 대신 CustomUserDetails 반환
         return new CustomUserDetails(
-                user,
+                userInfo,
                 oAuth2User.getAttributes()
         );
     }
