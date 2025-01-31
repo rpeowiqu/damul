@@ -1,11 +1,11 @@
-import { useState, ChangeEvent, MouseEventHandler } from "react";
+import { useState, ChangeEvent, KeyboardEvent, MouseEventHandler } from "react";
 import { Input } from "@/components/ui/input";
 import SearchIcon from "../svg/SearchIcon";
 
 interface SearchBoxProps {
   placeholder?: string;
   onInputClick?: MouseEventHandler<HTMLInputElement>; // Input 클릭 이벤트
-  onButtonClick?: (value: string) => void; // 버튼 클릭 이벤트 (입력값 전달)
+  onButtonClick?: (_value: string) => void; // 버튼 클릭 이벤트 (입력값 전달)
 }
 
 const DamulSearchBox = ({
@@ -20,21 +20,37 @@ const DamulSearchBox = ({
     setInputValue(e.target.value);
   };
 
+  // 엔터 키 입력 핸들러
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && inputValue.trim() !== "") {
+      e.preventDefault();
+      onButtonClick?.(inputValue);
+      setInputValue("");
+    }
+  };
+
+  // 검색 버튼 클릭 핸들러
+  const handleButtonClick = () => {
+    if (inputValue.trim() !== "") {
+      onButtonClick?.(inputValue);
+      setInputValue("");
+    }
+  };
+
   return (
     <div className="relative">
       <Input
         placeholder={placeholder}
-        className={
-          "rounded-lg transition-colors p-2 pr-8 pc:pl-4 pc:pr-10 bg-normal-50 border-1 border-normal-100 text-sm text-normal-700 focus:border-normal-500"
-        }
+        className="rounded-lg transition-colors p-2 pr-8 pc:pl-4 pc:pr-10 bg-normal-50 border border-normal-100 text-sm text-normal-700 focus:border-normal-500"
         onClick={onInputClick}
         onChange={handleInputChange}
         value={inputValue}
+        onKeyDown={handleKeyDown}
       />
       <button
         type="button"
         className="absolute inset-y-2 right-2 pc:right-3"
-        onClick={() => onButtonClick?.(inputValue)}
+        onClick={handleButtonClick}
       >
         <SearchIcon className="fill-normal-300" />
       </button>

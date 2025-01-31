@@ -10,6 +10,7 @@ import CommunityMarketMainPage from "@/pages/community/CommunityMarketMainPage";
 import CommunityMarketSearchPage from "@/pages/community/CommunityMarketSearchPage";
 import CommunityMarketPostPage from "@/pages/community/CommunityMarketPostPage";
 import CommunityMarketDetailPage from "@/pages/community/CommunityMarketDetailPage";
+import CommunitySearchResultPage from "@/pages/community/CommunitySearchResultPage";
 import ProfilePage from "@/pages/profile/ProfilePage";
 import ProfileInfoPage from "@/pages/profile/ProfileInfoPage";
 import ProfileBadgePage from "@/pages/profile/ProfileBadgePage";
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
                 path: "search",
                 element: <CommunityRecipeSearchPage />,
               },
+              {
+                path: "search/:keyword",
+                element: <CommunitySearchResultPage />,
+              },
             ],
           },
           {
@@ -100,6 +105,10 @@ const router = createBrowserRouter([
               {
                 path: "search",
                 element: <CommunityMarketSearchPage />,
+              },
+              {
+                path: "search/:keyword",
+                element: <CommunitySearchResultPage />,
               },
             ],
           },
