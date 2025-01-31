@@ -79,13 +79,11 @@ deploy:
   stage: deploy
   image: alpine:latest
   before_script:
-    - apk add --no-cache openssh openssh-keygen openssl
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/I12A306T.pem
+    - chmod 600 ~/.ssh/I12A306T.pem
     - eval $(ssh-agent -s)
-    - ssh-add -v ~/.ssh/id_rsa
-    - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+    - ssh-add ~/.ssh/I12A306T.pem
   script:
     - |
       # Client 브랜치 배포: 클라이언트 컨테이너만 배포
