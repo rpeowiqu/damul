@@ -23,8 +23,8 @@ interface DamulModalProps {
   footerComponent?: ReactNode; // 모달창 하단 컴포넌트 요소
 }
 
-const defaultContentStyle = "p-4 border-0 max-w-72 rounded-xl";
-const defaultHeaderStyle = "pb-3 border-b-2 border-b-normal-200";
+const defaultContentStyle = "p-5 max-w-96 rounded-xl";
+const defaultHeaderStyle = "pb-3 border-b border-b-normal-100";
 const defaultTitleStyle = "text-positive-300 text-xl";
 
 const DamulModal = ({

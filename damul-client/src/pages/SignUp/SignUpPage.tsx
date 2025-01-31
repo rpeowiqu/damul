@@ -11,12 +11,14 @@ import {
 } from "@/components/ui/form";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect, ChangeEvent } from "react";
 
 import DamulButton from "@/components/common/DamulButton";
 import DamulModal from "@/components/common/DamulModal";
 
 import terms from "@/constants/terms";
+import { Input } from "@/components/ui/input";
+import { checkNickname } from "@/utils/regex";
 
 const checkContents = [
   {
@@ -65,8 +67,11 @@ const formSchema = z.object({
 });
 
 const SignUpPage = () => {
-  const [isOpenTerm, setIsOpenTerm] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const modalContentIndex = useRef(0);
   const [term, setTerm] = useState("");
+  const [nicknameInput, setNicknameInput] = useState("");
+  const [validInfo, setValidInfo] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     // zodResolver를 사용하여 zod 스키마와 연결
@@ -78,12 +83,13 @@ const SignUpPage = () => {
 
   useEffect(() => {
     if (term) {
-      setIsOpenTerm(true);
+      setIsOpen(true);
     }
   }, [term]);
 
   const onSubmit = (data: any) => {
-    console.log("회원가입 되었습니다.");
+    modalContentIndex.current = 1;
+    setIsOpen(true);
   };
 
   const handleAllCheckChange = (checked: string | boolean, field: any) => {
@@ -98,6 +104,18 @@ const SignUpPage = () => {
       // 모든 체크박스를 해제할 경우
       field.onChange([]);
     }
+  };
+
+  const handleNicknameInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const newInput = e.target.value;
+
+    if (!checkNickname(newInput)) {
+      setValidInfo("닉네임은 한글, 영문 2-8자여야 합니다.");
+    } else {
+      setValidInfo("");
+    }
+
+    setNicknameInput(newInput);
   };
 
   return (
@@ -168,6 +186,7 @@ const SignUpPage = () => {
                             className="text-normal-200 shrink-0"
                             type="button"
                             onClick={() => {
+                              modalContentIndex.current = 0;
                               setTerm(terms[item.id - 1]);
                             }}
                           >
@@ -203,18 +222,40 @@ const SignUpPage = () => {
       </p>
 
       <DamulModal
-        isOpen={isOpenTerm}
+        isOpen={isOpen}
         setIsOpen={() => {
-          if (isOpenTerm) {
-            setIsOpenTerm(false);
+          if (isOpen) {
+            setIsOpen(false);
             setTerm("");
+            setValidInfo("");
           }
         }}
         triggerComponent={<div></div>}
         contentStyle="max-w-96"
-        title="이용약관"
+        title={modalContentIndex.current === 0 ? "이용약관" : "닉네임 설정"}
       >
-        <div className="w-full h-52 px-5 overflow-y-auto">{term}</div>
+        {modalContentIndex.current === 0 ? (
+          <div className="w-full h-52 px-5 overflow-y-auto whitespace-pre-wrap">
+            {term}
+          </div>
+        ) : (
+          <div className="space-y-1">
+            <div className="flex w-full items-center space-x-3">
+              <Input
+                type="text"
+                placeholder="닉네임을 입력해 주세요."
+                value={nicknameInput}
+                onChange={handleNicknameInput}
+                className="focus:ring-0"
+              />
+              <DamulButton variant="positive" onClick={() => {}}>
+                중복 확인
+              </DamulButton>
+            </div>
+
+            <p className="text-negative-400">{validInfo}</p>
+          </div>
+        )}
       </DamulModal>
     </main>
   );
