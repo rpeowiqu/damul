@@ -90,6 +90,19 @@ module.exports = {
           900: "#3d3d3d",
         },
       },
+      fontSize: {
+        xxs: "0.625rem", // 10px
+        xxxs: "0.5rem", // 8px
+      },
+      width: {
+        22: "5.5rem",
+      },
+      height: {
+        22: "5.5rem",
+      },
+      borderWidth: {
+        1: "1px",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

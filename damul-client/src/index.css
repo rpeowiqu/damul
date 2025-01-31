@@ -124,3 +124,25 @@
 html {
   font-family: "SUITE-Regular";
 }
+
+/* 스크롤바 전체 영역 */
+::-webkit-scrollbar {
+  width: 12px; /* 세로축 스크롤바 폭 너비 */
+  height: 12px; /* 가로축 스크롤바 폭 너비 */
+}
+
+/* 스크롤바 막대 */
+::-webkit-scrollbar-thumb {
+  background: #97d174;
+  border-radius: 12px;
+}
+
+/* 스크롤바 막대 중 thumb가 아닌 곳 */
+::-webkit-scrollbar-track {
+  background: #f6f6f6;
+  border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #7fc259;
+}
