@@ -3,10 +3,10 @@ import AlarmIcon from "@/components/svg/AlarmIcon";
 
 const LoginPage = () => {
   return (
-    <main className="text-center">
+    <div className="text-center">
       <p>로그인 페이지</p>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-10">
         <div className="flex justify-center gap-3">
           <DamulButton variant="positive" onClick={() => {}}>
             <AlarmIcon />
@@ -71,7 +71,16 @@ const LoginPage = () => {
           </DamulButton>
         </div>
       </div>
-    </main>
+
+      <div className="h-24 bg-red-400"></div>
+      <div className="h-24 bg-blue-400"></div>
+      <div className="h-24 bg-red-400"></div>
+      <div className="h-24 bg-blue-400"></div>
+      <div className="h-24 bg-red-400"></div>
+      <div className="h-24 bg-blue-400"></div>
+      <div className="h-24 bg-red-400"></div>
+      <div className="h-24 bg-blue-400"></div>
+    </div>
   );
 };
 

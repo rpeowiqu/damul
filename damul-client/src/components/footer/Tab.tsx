@@ -25,7 +25,7 @@ const Tab = ({
         className={`relative flex flex-col w-12 h-12 pc:w-14 pc:h-14 items-center justify-center gap-0.5 pt-1 rounded-full ${bgColor}`}
       >
         {Icon && <Icon iconFill={iconFill} iconStroke={menuColor} />}
-        <p className={`text-xxs text-${menuColor}`}>{label}</p>
+        <p className={`text-xxs text-${menuColor} font-bold`}>{label}</p>
         {label === "채팅" && chatAlarmNum > 0 && (
           <ChatAlarm chatAlarmNum={chatAlarmNum} />
         )}
