@@ -19,7 +19,7 @@ const CommunitySearchResultPage = () => {
           />
         </div>
         <DamulDropdown
-          label="검색 조건"
+          label="정렬 조건"
           variant="normal-outline"
           items={[
             { label: "최신순", onClick: () => console.log("작성자 클릭") },

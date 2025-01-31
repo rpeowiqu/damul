@@ -12,7 +12,10 @@ import DamulButton from "@/components/common/DamulButton";
 interface PostDrawerProps {
   title: string;
   description: string;
-  headerContent: (_setTitle: Dispatch<SetStateAction<string>>, _title: string) => ReactNode;
+  headerContent: (
+    _setTitle: Dispatch<SetStateAction<string>>,
+    _title: string,
+  ) => ReactNode;
 }
 
 const PostDrawer = ({ title, description, headerContent }: PostDrawerProps) => {
