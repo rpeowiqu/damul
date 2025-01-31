@@ -79,9 +79,7 @@ deploy:
   stage: deploy
   image: alpine:latest
   before_script:
-    # 디버깅을 위한 키 내용 확인 (실제 배포 시에는 제거)
-    - echo "$SSH_PRIVATE_KEY" | base64 -d | head -n 1
-    - apk update && apk add openssh-client
+    - apk update && apk add openssh-client docker-compose
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/I12A306T.pem
     - chmod 600 ~/.ssh/I12A306T.pem
@@ -89,6 +87,7 @@ deploy:
     - ssh-add ~/.ssh/I12A306T.pem
     - ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - ssh -i ~/.ssh/I12A306T.pem ubuntu@$EC2_HOST 'cd ~/project && pwd'
   script:
     - |
       # Client 브랜치 배포: 클라이언트 컨테이너만 배포
