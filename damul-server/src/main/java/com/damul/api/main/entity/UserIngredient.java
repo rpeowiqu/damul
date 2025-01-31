@@ -1,7 +1,7 @@
 package com.damul.api.main.entity;
 
-import com.damul.api.auth.entity.User;
 import com.damul.api.main.dto.IngredientStorage;
+import com.damul.api.receipt.entity.UserReceipt;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 public class UserIngredient {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;  // int userId → User 객체로 변경
+    @JoinColumn(name = "receipt_id", referencedColumnName = "id")
+    private UserReceipt userRecieptId;  // int userId → User 객체로 변경
 
     @Id
     @Column(name = "id")
@@ -39,6 +39,9 @@ public class UserIngredient {
     @Enumerated(EnumType.STRING)
     @Column(name = "ingredient_storage", nullable = false)
     private IngredientStorage ingredientStorage;
+
+    @Column(name = "price")
+    private double price;
 
     public void updateQuantity(int quantity) {
         this.ingredientQuantity = quantity;
