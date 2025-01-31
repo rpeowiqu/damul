@@ -1,6 +1,6 @@
 package com.damul.api.common.user;
 
-import com.damul.api.auth.entity.User;
+import com.damul.api.auth.dto.UserInfo;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,21 +11,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-// auth/security/CustomUserDetails.java
 @Getter
 @RequiredArgsConstructor
 public class CustomUserDetails implements OAuth2User {
-    private final User user;
-    private Map<String, Object> attributes;
+    private final UserInfo userInfo;     // id와 nickname만 포함된 UserInfo
+    private final Map<String, Object> attributes;
 
-    public CustomUserDetails(User user, Map<String, Object> attributes) {
-        this.user = user;
-        this.attributes = attributes;
-    }
 
     @Override
     public String getName() {
-        return user.getEmail();
+        return userInfo.getNickname();  // email 대신 nickname 반환
     }
 
     @Override
@@ -35,20 +30,16 @@ public class CustomUserDetails implements OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()));
+        // 기본 권한 ROLE_USER 부여
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
-    // 계정 상태 체크 메소드 추가
-    public boolean isActive() {
-        return user.isActive();
+    // UserInfo에서는 id와 nickname만 접근 가능
+    public int getId() {
+        return userInfo.getId();
     }
 
-    // 필요한 다른 사용자 상태 체크 메소드들 추가 가능
-    public boolean isWarned() {
-        return user.isWarning();
-    }
-
-    public int getReportCount() {
-        return user.getReportCount();
+    public String getNickname() {
+        return userInfo.getNickname();
     }
 }

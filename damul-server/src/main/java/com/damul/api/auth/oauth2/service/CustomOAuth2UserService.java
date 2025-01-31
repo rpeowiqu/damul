@@ -1,5 +1,6 @@
 package com.damul.api.auth.oauth2.service;
 
+import com.damul.api.auth.dto.UserInfo;
 import com.damul.api.auth.oauth2.dto.GoogleResponse;
 import com.damul.api.auth.oauth2.dto.KaKaoResponse;
 import com.damul.api.auth.oauth2.dto.NaverResponse;
@@ -46,7 +47,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = getOAuth2Response(registrationId, oAuth2User.getAttributes());
 
-        Optional<User> existingUser = userRepository.findByEmail(oAuth2Response.getEmail());
+        Optional<UserInfo> existingUser = userRepository.findByEmail(oAuth2Response.getEmail());
 
         if (existingUser.isEmpty()) {
             log.info("새로운 회원입니다.");
@@ -78,7 +79,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         log.info("기존 유저입니다.");
-        User user = existingUser.get();
+        UserInfo user = existingUser.get();
+        // JPQL 쓸것
 
         // DefaultOAuth2User 대신 CustomUserDetails 반환
         return new CustomUserDetails(
