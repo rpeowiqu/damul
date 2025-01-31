@@ -10,7 +10,8 @@ interface ButtonProps {
     | "negative-outline"
     | "normal"
     | "normal-outline"
-    | "shadow";
+    | "shadow"
+    | "round";
   size?: "sm" | "md" | "lg" | "full"; // 크기(default: 텍스트 길이에 px가 추가된 크기를 가짐)
   px?: number;
   textSize?: "sm" | "base" | "lg"; // 텍스트 사이즈(default: sm)
@@ -44,6 +45,8 @@ const DamulButton = ({
         variant === "normal-outline",
       "bg-white hover:bg-normal-100 border border-normal-200 shadow-md text-normal-700":
         variant === "shadow",
+      "bg-positive-300 hover:bg-positive-400 rounded-full h-12 w-12":
+        variant === "round",
     },
     {
       "min-w-[70px]": size === "sm",
