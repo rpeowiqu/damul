@@ -1,10 +1,24 @@
 use damul;
 
+SET FOREIGN_KEY_CHECKS = 0;
+SET restrict_fk_on_non_standard_key = OFF;
+
+DROP TABLE IF EXISTS `user_badge`;
+
+CREATE TABLE `user_badge` (
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`badgeId`	INT	NOT NULL,
+	`userId`	INT	NOT NULL,
+	`level`	TINYINT	NOT NULL,
+	`count`	INT	NOT NULL
+);
+
 DROP TABLE IF EXISTS `users`;
+
 CREATE TABLE `users` (
-	`id`	INT	NOT NULL,
-	`nickname`	VARCHAR(50)	NOT NULL	UNIQUE,
-	`email`	VARCHAR(255)	NOT NULL	UNIQUE,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`nickname`	VARCHAR(50)	NOT NULL UNIQUE,
+	`email`	VARCHAR(255)	NOT NULL UNIQUE,
 	`profile_image_url`	TEXT	NULL,
 	`profile_background_image_url`	TEXT	NULL,
 	`provider`	ENUM('GOOGLE', 'KAKAO', 'NAVER')	NOT NULL,
@@ -20,8 +34,9 @@ CREATE TABLE `users` (
 );
 
 DROP TABLE IF EXISTS `recipes`;
+
 CREATE TABLE `recipes` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`writer_id`	INT	NOT NULL,
 	`title`	VARCHAR(200)	NOT NULL,
 	`content`	TEXT	NOT NULL,
@@ -34,8 +49,9 @@ CREATE TABLE `recipes` (
 );
 
 DROP TABLE IF EXISTS `user_receipts`;
+
 CREATE TABLE `user_receipts` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`user_id`	INT	NOT NULL,
 	`store_name`	VARCHAR(100)	NULL,
 	`purchase_at`	DATETIME	NULL,
@@ -43,25 +59,28 @@ CREATE TABLE `user_receipts` (
 );
 
 DROP TABLE IF EXISTS `follows`;
+
 CREATE TABLE `follows` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`follower_id`	INT	NOT NULL,
 	`following_id`	INT	NOT NULL,
 	`created_at`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS `recipe_steps`;
+
 CREATE TABLE `recipe_steps` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`recipe_id`	INT	NOT NULL,
 	`step_number`	INT	NOT NULL	DEFAULT 0,
 	`content`	TEXT	NULL,
 	`image_url`	VARCHAR(255)	NULL
 );
 
-DROP TABLE IF EXISTS `reports`;
-CREATE TABLE `reports` (
-	`id`	VARCHAR(255)	NOT NULL,
+DROP TABLE IF EXISTS `report`;
+
+CREATE TABLE `report` (
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`reporter_id`	INT	NOT NULL,
 	`category_id`	INT	NOT NULL,
 	`report_type`	ENUM('RECIPE', 'COMMENT', 'POST')	NOT NULL,
@@ -73,21 +92,32 @@ CREATE TABLE `reports` (
 	`resolved_at`	DATETIME	NULL
 );
 
+DROP TABLE IF EXISTS `terms_and_conditions`;
+
+CREATE TABLE `terms_and_conditions` (
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(100) NOT NULL,
+	`content`	TEXT	NOT NULL
+);
+
 DROP TABLE IF EXISTS `user_ingredients`;
+
 CREATE TABLE `user_ingredients` (
-	`id`	INT	NOT NULL,
-	`user_id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`receipt_id`	INT	NOT NULL,
 	`category_id`	INT	NOT NULL,
 	`ingredient_quantity`	INT	NOT NULL	DEFAULT 100,
 	`ingredient_up`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
 	`ingredient_name`	VARCHAR(100)	NOT NULL,
 	`due_date`	DATETIME	NOT NULL,
-	`ingredient_storage`	ENUM('FROZEN', 'REFRIGERATED', 'ROOM_TEMPERATURE')	NOT NULL
+	`ingredient_storage`	ENUM('FROZEN', 'REFRIGERATED', 'ROOM_TEMPERATURE')	NOT NULL,
+	`Field`	VARCHAR(255)	NULL
 );
 
 DROP TABLE IF EXISTS `recipe_ingredients`;
+
 CREATE TABLE `recipe_ingredients` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`recipe_id`	INT	NOT NULL,
 	`ingredient_name`	VARCHAR(50)	NOT NULL,
 	`amount`	DECIMAL(5,1)	NOT NULL,
@@ -96,25 +126,27 @@ CREATE TABLE `recipe_ingredients` (
 );
 
 DROP TABLE IF EXISTS `post_images`;
+
 CREATE TABLE `post_images` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`post_id`	INT	NOT NULL,
 	`image_url`	VARCHAR(255)	NULL,
 	`created_at`	DATETIME	NOT NULL
 );
 
+DROP TABLE IF EXISTS `badge`;
 
-DROP TABLE IF EXISTS `badges`;
-CREATE TABLE `badges` (
-	`id`	INT	NOT NULL,
+CREATE TABLE `badge` (
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`name`	VARCHAR(100)	NOT NULL,
-	`level`	TINYINT	NOT NULL,
-	`standard`	SMALLINT	NOT NULL
+	`standard`	SMALLINT	NOT NULL,
+	`description`	VARCHAR(255)	NOT NULL
 );
 
 DROP TABLE IF EXISTS `recipe_comments`;
+
 CREATE TABLE `recipe_comments` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`recipe_id`	INT	NOT NULL,
 	`writer_id`	INT	NOT NULL,
 	`parent_id`	INT	NULL,
@@ -125,30 +157,34 @@ CREATE TABLE `recipe_comments` (
 );
 
 DROP TABLE IF EXISTS `report_category`;
+
 CREATE TABLE `report_category` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`name`	VARCHAR(10)	NOT NULL
 );
 
 DROP TABLE IF EXISTS `bookmarks`;
+
 CREATE TABLE `bookmarks` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`recipe_id`	INT	NOT NULL,
 	`user_id`	INT	NOT NULL,
 	`created_at`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP TABLE IF EXISTS `recipe_likes`;
-CREATE TABLE `recipe_likes` (
-	`id`	INT	NOT NULL,
+DROP TABLE IF EXISTS `recipe_like`;
+
+CREATE TABLE `recipe_like` (
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`recipe_id`	INT	NOT NULL,
 	`user_id`	INT	NOT NULL,
 	`created_at`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS `chart_ingredients`;
+
 CREATE TABLE `chart_ingredients` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`category_id`	INT	NOT NULL,
 	`indegrient_name`	VARCHAR(50)	NOT NULL UNIQUE,
 	`ingredient_num`	INT	NOT NULL,
@@ -156,8 +192,9 @@ CREATE TABLE `chart_ingredients` (
 );
 
 DROP TABLE IF EXISTS `post_comments`;
+
 CREATE TABLE `post_comments` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`post_id`	INT	NOT NULL,
 	`writer_id`	INT	NOT NULL,
 	`parent_id`	INT	NULL,
@@ -169,14 +206,16 @@ CREATE TABLE `post_comments` (
 );
 
 DROP TABLE IF EXISTS `food_categories`;
+
 CREATE TABLE `food_categories` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`category_name`	VARCHAR(10)	NOT NULL UNIQUE
 );
 
 DROP TABLE IF EXISTS `posts`;
+
 CREATE TABLE `posts` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`writer_id`	INT	NOT NULL,
 	`title`	VARCHAR(200)	NOT NULL,
 	`content`	TEXT	NOT NULL,
@@ -187,17 +226,10 @@ CREATE TABLE `posts` (
 	`updated_at`	DATETIME	NULL
 );
 
-DROP TABLE IF EXISTS `user_products`;
-CREATE TABLE `user_products` (
-	`id`	INT	NOT NULL,
-	`user_receipt_id`	INT	NOT NULL,
-	`product_name`	VARCHAR(200)	NOT NULL,
-	`product_price`	INT	NOT NULL
-);
-
 DROP TABLE IF EXISTS `chat_rooms`;
+
 CREATE TABLE `chat_rooms` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`creator_id`	INT	NULL,
 	`post_id`	INT	NULL,
 	`room_name`	VARCHAR(100)	NOT NULL,
@@ -208,21 +240,24 @@ CREATE TABLE `chat_rooms` (
 );
 
 DROP TABLE IF EXISTS `recipe_tags`;
+
 CREATE TABLE `recipe_tags` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`recipe_id`	INT	NOT NULL,
 	`tag_id`	INT	NOT NULL
 );
 
 DROP TABLE IF EXISTS `tags`;
+
 CREATE TABLE `tags` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`tag_name`	VARCHAR(30)	NOT NULL UNIQUE
 );
 
 DROP TABLE IF EXISTS `chat_room_members`;
+
 CREATE TABLE `chat_room_members` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`room_id`	INT	NOT NULL,
 	`user_id`	INT	NOT NULL,
 	`nickname`	VARCHAR(50)	NOT NULL,
@@ -231,17 +266,19 @@ CREATE TABLE `chat_room_members` (
 	`last_read_message_id`	INT	NOT NULL	DEFAULT 0
 );
 
-DROP TABLE IF EXISTS `food_preferences`;
-CREATE TABLE `food_preferences` (
-	`id`	INT	NOT NULL,
+DROP TABLE IF EXISTS `food_preference`;
+
+CREATE TABLE `food_preference` (
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`user_id`	INT	NOT NULL,
 	`category_id`	INT	NOT NULL,
 	`category_preference`	INT	NOT NULL
 );
 
 DROP TABLE IF EXISTS `chat_messages`;
+
 CREATE TABLE `chat_messages` (
-	`id`	INT	NOT NULL,
+	`id`	INT	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`room_id`	INT	NOT NULL,
 	`sender_id`	INT	NOT NULL,
 	`message_type`	ENUM('TEXT', 'IMAGE', 'FILE')	NOT NULL	DEFAULT 'TEXT',
@@ -250,113 +287,17 @@ CREATE TABLE `chat_messages` (
 	`created_at`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP TABLE IF EXISTS `terms_and_conditions`;
-CREATE TABLE `terms_and_conditions` (
-	`id`	INT	NOT NULL,
-	`content`	TEXT	NOT NULL
-);
-
-ALTER TABLE `users` ADD CONSTRAINT `PK_USERS` PRIMARY KEY (
+ALTER TABLE `user_badge` ADD CONSTRAINT `FK_badge_TO_user_badge_1` FOREIGN KEY (
+	`badgeId`
+)
+REFERENCES `badge` (
 	`id`
 );
 
-ALTER TABLE `recipes` ADD CONSTRAINT `PK_RECIPES` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `user_receipts` ADD CONSTRAINT `PK_USER_RECEIPTS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `follows` ADD CONSTRAINT `PK_FOLLOWS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `recipe_steps` ADD CONSTRAINT `PK_RECIPE_STEPS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `reports` ADD CONSTRAINT `PK_REPORT` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `user_ingredients` ADD CONSTRAINT `PK_USER_INGREDIENTS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `recipe_ingredients` ADD CONSTRAINT `PK_RECIPE_INGREDIENTS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `post_images` ADD CONSTRAINT `PK_POST_IMAGES` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `badges` ADD CONSTRAINT `PK_BADGE` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `recipe_comments` ADD CONSTRAINT `PK_RECIPE_COMMENTS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `report_category` ADD CONSTRAINT `PK_REPORT_CATEGORY` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `bookmarks` ADD CONSTRAINT `PK_BOOKMARKS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `recipe_likes` ADD CONSTRAINT `PK_RECIPE_LIKE` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `chart_ingredients` ADD CONSTRAINT `PK_CHART_INGREDIENTS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `post_comments` ADD CONSTRAINT `PK_POST_COMMENTS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `food_categories` ADD CONSTRAINT `PK_FOOD_CATEGORIES` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `posts` ADD CONSTRAINT `PK_POSTS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `user_products` ADD CONSTRAINT `PK_USER_PRODUCTS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `chat_rooms` ADD CONSTRAINT `PK_CHAT_ROOMS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `recipe_tags` ADD CONSTRAINT `PK_RECIPE_TAGS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `tags` ADD CONSTRAINT `PK_TAGS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `chat_room_members` ADD CONSTRAINT `PK_CHAT_ROOM_MEMBERS` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `food_preferences` ADD CONSTRAINT `PK_FOOD_PREFERENCE` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `chat_messages` ADD CONSTRAINT `PK_CHAT_MESSAGES` PRIMARY KEY (
-	`id`
-);
-
-ALTER TABLE `terms_and_conditions` ADD CONSTRAINT `PK_TERMS_AND_CONDITIONS` PRIMARY KEY (
+ALTER TABLE `user_badge` ADD CONSTRAINT `FK_users_TO_user_badge_1` FOREIGN KEY (
+	`userId`
+)
+REFERENCES `users` (
 	`id`
 );
 
@@ -395,24 +336,24 @@ REFERENCES `recipes` (
 	`id`
 );
 
-ALTER TABLE `reports` ADD CONSTRAINT `FK_users_TO_report_1` FOREIGN KEY (
+ALTER TABLE `report` ADD CONSTRAINT `FK_users_TO_report_1` FOREIGN KEY (
 	`reporter_id`
 )
 REFERENCES `users` (
 	`id`
 );
 
-ALTER TABLE `reports` ADD CONSTRAINT `FK_report_category_TO_report_1` FOREIGN KEY (
+ALTER TABLE `report` ADD CONSTRAINT `FK_report_category_TO_report_1` FOREIGN KEY (
 	`category_id`
 )
 REFERENCES `report_category` (
 	`id`
 );
 
-ALTER TABLE `user_ingredients` ADD CONSTRAINT `FK_users_TO_user_ingredients_1` FOREIGN KEY (
-	`user_id`
+ALTER TABLE `user_ingredients` ADD CONSTRAINT `FK_user_receipts_TO_user_ingredients_1` FOREIGN KEY (
+	`receipt_id`
 )
-REFERENCES `users` (
+REFERENCES `user_receipts` (
 	`id`
 );
 
@@ -472,14 +413,14 @@ REFERENCES `recipes` (
 	`id`
 );
 
-ALTER TABLE `recipe_likes` ADD CONSTRAINT `FK_users_TO_recipe_like_1` FOREIGN KEY (
+ALTER TABLE `recipe_like` ADD CONSTRAINT `FK_users_TO_recipe_like_1` FOREIGN KEY (
 	`recipe_id`
 )
 REFERENCES `users` (
 	`id`
 );
 
-ALTER TABLE `recipe_likes` ADD CONSTRAINT `FK_recipes_TO_recipe_like_1` FOREIGN KEY (
+ALTER TABLE `recipe_like` ADD CONSTRAINT `FK_recipes_TO_recipe_like_1` FOREIGN KEY (
 	`user_id`
 )
 REFERENCES `recipes` (
@@ -518,13 +459,6 @@ ALTER TABLE `posts` ADD CONSTRAINT `FK_users_TO_posts_1` FOREIGN KEY (
 	`writer_id`
 )
 REFERENCES `users` (
-	`id`
-);
-
-ALTER TABLE `user_products` ADD CONSTRAINT `FK_user_receipts_TO_user_products_1` FOREIGN KEY (
-	`user_receipt_id`
-)
-REFERENCES `user_receipts` (
 	`id`
 );
 
@@ -570,14 +504,14 @@ REFERENCES `users` (
 	`id`
 );
 
-ALTER TABLE `food_preferences` ADD CONSTRAINT `FK_users_TO_food_preference_1` FOREIGN KEY (
+ALTER TABLE `food_preference` ADD CONSTRAINT `FK_users_TO_food_preference_1` FOREIGN KEY (
 	`user_id`
 )
 REFERENCES `users` (
 	`id`
 );
 
-ALTER TABLE `food_preferences` ADD CONSTRAINT `FK_food_categories_TO_food_preference_1` FOREIGN KEY (
+ALTER TABLE `food_preference` ADD CONSTRAINT `FK_food_categories_TO_food_preference_1` FOREIGN KEY (
 	`category_id`
 )
 REFERENCES `food_categories` (
@@ -598,3 +532,5 @@ REFERENCES `users` (
 	`id`
 );
 
+SET restrict_fk_on_non_standard_key = ON;
+SET FOREIGN_KEY_CHECKS = 1;
