@@ -13,6 +13,7 @@ const CommunityRecipeMainPage = () => {
         onInputClick={() => {
           navigate("/community/recipe/search");
         }}
+        className="cursor-pointer"
       />
       <FeedList />
       <PostButton to="recipe" />

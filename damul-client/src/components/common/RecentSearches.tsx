@@ -32,7 +32,7 @@ const RecentSearches = ({
         <>
           <div className="flex justify-between items-center">
             <h3 className="font-semibold text-md">최근 검색어</h3>
-            <p className="text-sm" onClick={onRemoveSearchAll}>
+            <p className="text-sm cursor-pointer" onClick={onRemoveSearchAll}>
               전체 삭제
             </p>
           </div>

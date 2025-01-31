@@ -1,6 +1,6 @@
 import DamulTabItem from "./DamulTabItem";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 
 interface DamulTabProps {

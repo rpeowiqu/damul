@@ -15,6 +15,7 @@ const RecentSearchWord = ({
         onClick={() => {
           onSearch(content);
         }}
+        className="cursor-pointer"
       >
         {content}
       </span>
@@ -22,6 +23,7 @@ const RecentSearchWord = ({
         onClick={() => {
           onRemove(content);
         }}
+        className="cursor-pointer"
       >
         X
       </span>
