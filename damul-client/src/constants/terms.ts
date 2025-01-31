@@ -1,4 +1,4 @@
-const terms = [
+const termList = [
   `1. 만 14세 이상입니다.
 보기 (상세 내용 예시)
 본 서비스는 만 14세 이상의 이용자를 대상으로 제공됩니다. 회원 가입을 신청하는 자(이하 “가입신청자”)가 만 14세 미만인 경우,
@@ -81,4 +81,4 @@ const terms = [
 `,
 ];
 
-export default terms;
+export default termList;
