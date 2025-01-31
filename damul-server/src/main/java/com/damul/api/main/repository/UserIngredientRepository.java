@@ -1,8 +1,11 @@
 package com.damul.api.main.repository;
 
+import com.damul.api.main.dto.response.HomeIngredientDetail;
 import com.damul.api.main.entity.UserIngredient;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,4 +21,14 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
             String keyword,
             Sort sort
     );
+
+    @Query("SELECT new com.damul.api.main.dto.response.HomeIngredientDetail(" +
+            "ui.userIngredientId, ui.categoryId, ui.ingredientQuantity, " +
+            "ui.ingredientUp, ui.ingredientName, ui.dueDate, ui.user.warning) " +  // user 관계 사용
+            "FROM UserIngredient ui " +
+            "WHERE ui.userIngredientId = :ingredientId")
+    HomeIngredientDetail findHomeIngredientDetailById(@Param("ingredientId") int ingredientId);
+
+
+
 }

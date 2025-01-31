@@ -1,5 +1,6 @@
-package com.damul.api.main.dto;
+package com.damul.api.main.dto.response;
 
+import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.entity.UserIngredient;
 import lombok.*;
 
@@ -8,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class UserIngredientList {
 
-    private int ingredientId;
+    private int userIngredientId;
     private int categoryId;
     private String ingredientName;
     private int ingredientQuantity;
@@ -16,7 +17,7 @@ public class UserIngredientList {
 
     public static UserIngredientList from(UserIngredient entity) {
         return new UserIngredientList(
-                entity.getId(),
+                entity.getUserIngredientId(),
                 entity.getCategoryId(),
                 entity.getIngredientName(),
                 entity.getIngredientQuantity(),

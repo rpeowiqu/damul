@@ -1,6 +1,5 @@
 package com.damul.api.auth.oauth2.service;
 
-
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Provider;
 import com.damul.api.auth.entity.type.Role;
