@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
-import Feeds from "@/components/common/Feeds";
+import FeedList from "@/components/common/FeedList";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
-import DamulDropdown from "@/components/common/DamulDropDown";
 
 const CommunitySearchResultPage = () => {
   const navigate = useNavigate();
@@ -18,27 +17,8 @@ const CommunitySearchResultPage = () => {
             }}
           />
         </div>
-        <DamulDropdown
-          label="정렬 조건"
-          variant="normal-outline"
-          items={[
-            { label: "최신순", onClick: () => console.log("작성자 클릭") },
-            {
-              label: "좋아요 많은순",
-              onClick: () => console.log("제목+본문 클릭"),
-            },
-            {
-              label: "좋아요 적은순",
-              onClick: () => console.log("제목+본문 클릭"),
-            },
-            {
-              label: "조회수 높은순",
-              onClick: () => console.log("제목+본문 클릭"),
-            },
-          ]}
-        />
       </div>
-      <Feeds />
+      <FeedList />
     </main>
   );
 };

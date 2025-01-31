@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import FeedCard from "@/components/common/FeedCard";
 
-const Feeds = () => {
+const FeedList = () => {
   const location = useLocation();
   const { pathname } = location;
 
@@ -66,7 +66,9 @@ const Feeds = () => {
   ];
 
   // pathname이 "recipe"로 끝나면 recipe 데이터를, "market"으로 끝나면 market 데이터를 사용
-  const mockData = pathname.endsWith("recipe") ? mockDataRecipe : mockDataMarket;
+  const mockData = pathname.endsWith("recipe")
+    ? mockDataRecipe
+    : mockDataMarket;
 
   return (
     <div className="space-y-3">
@@ -77,4 +79,4 @@ const Feeds = () => {
   );
 };
 
-export default Feeds;
+export default FeedList;

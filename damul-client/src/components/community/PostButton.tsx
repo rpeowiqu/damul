@@ -3,10 +3,10 @@ import DamulButton from "../common/DamulButton";
 import WriteIcon from "../svg/WriteIcon";
 
 interface PostButtonProps {
-    to: string;
+  to: string;
 }
 
-const PostButton = ({to}: PostButtonProps) => {
+const PostButton = ({ to }: PostButtonProps) => {
   const navigate = useNavigate();
 
   return (

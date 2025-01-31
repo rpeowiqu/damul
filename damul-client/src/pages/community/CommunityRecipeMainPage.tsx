@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import Feeds from "@/components/common/Feeds";
+import FeedList from "@/components/common/FeedList";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import PostButton from "@/components/community/PostButton";
 
@@ -14,8 +14,8 @@ const CommunityRecipeMainPage = () => {
           navigate("/community/recipe/search");
         }}
       />
-      <Feeds />
-      <PostButton to="recipe"/>
+      <FeedList />
+      <PostButton to="recipe" />
     </main>
   );
 };

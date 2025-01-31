@@ -3,7 +3,6 @@ import useManageRecentSearches from "@/hooks/useManageRecentSearches";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import RecentSearches from "@/components/common/RecentSearches";
 import PostButton from "@/components/community/PostButton";
-import DamulDropdown from "../common/DamulDropDown";
 
 interface CommunitySearch {
   placeholder: string;
@@ -23,17 +22,6 @@ const CommunitySearch = ({ placeholder, title, postTo }: CommunitySearch) => {
   return (
     <>
       <div className="flex justify-between gap-2">
-        <DamulDropdown
-          label="검색 조건"
-          variant="normal-outline"
-          items={[
-            { label: "작성자", onClick: () => console.log("작성자 클릭") },
-            {
-              label: "제목+본문",
-              onClick: () => console.log("제목+본문 클릭"),
-            },
-          ]}
-        />
         <div className="flex-grow">
           <DamulSearchBox
             placeholder={placeholder}

@@ -1,4 +1,4 @@
-import RecentSearchBubble from "./RecentSearchBubble";
+import RecentSearchWord from "./RecentSearchWord";
 import AlertCircleIcon from "../svg/AlertCircleIcon";
 
 interface RecentSearchesProps {
@@ -28,7 +28,7 @@ const RecentSearches = ({
 }: RecentSearchesProps) => {
   return (
     <div className="flex flex-col text-start px-2">
-      {(recentSearches && recentSearches.length > 0) ? (
+      {recentSearches && recentSearches.length > 0 ? (
         <>
           <div className="flex justify-between items-center">
             <h3 className="font-semibold text-md">최근 검색어</h3>
@@ -38,7 +38,7 @@ const RecentSearches = ({
           </div>
           <div className="flex flex-wrap gap-3 py-4">
             {recentSearches.map((item, index) => (
-              <RecentSearchBubble
+              <RecentSearchWord
                 key={index}
                 content={item}
                 onRemove={onRemoveSearch}

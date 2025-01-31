@@ -1,15 +1,14 @@
-interface RecentSearchBubbleProps {
+interface RecentSearchWordProps {
   content: string;
   onRemove: (_searchTerm: string) => void;
   onSearch: (_searchTerm: string) => void;
 }
 
-const RecentSearchBubble = ({
+const RecentSearchWord = ({
   content,
   onRemove,
   onSearch,
-}: RecentSearchBubbleProps) => {
-
+}: RecentSearchWordProps) => {
   return (
     <span className="inline-flex bg-normal-100 px-3 py-1 rounded-full gap-3 text-sm">
       <span
@@ -30,4 +29,4 @@ const RecentSearchBubble = ({
   );
 };
 
-export default RecentSearchBubble;
+export default RecentSearchWord;
