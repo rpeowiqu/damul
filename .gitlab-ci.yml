@@ -1,3 +1,8 @@
+variables:
+  DOCKER_TLS_CERTDIR: ""
+  CLIENT_DOCKER_IMAGE: $CI_REGISTRY_IMAGE/client:latest
+  SERVER_DOCKER_IMAGE: $CI_REGISTRY_IMAGE/server:latest
+
 stages:
   - build
   - test
@@ -50,7 +55,7 @@ client-test:
     - npm ci
     - npm run test
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(Client|client-develop|master)$/ && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^Client|client-develop|master$/ && $CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
     - if: '$CI_COMMIT_BRANCH =~ /^Client|client-develop|master$/'
       changes:
@@ -66,7 +71,7 @@ server-test:
     - cd damul-server
     - gradle clean test
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(Server|server-develop|master)$/ && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^Server|server-develop|master$/ && $CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
     - if: '$CI_COMMIT_BRANCH =~ /^Server|server-develop|master$/'
       changes:
@@ -79,23 +84,19 @@ deploy:
   stage: deploy
   image: alpine:latest
   before_script:
-    - apk update && apk add openssh-client docker-compose
+    - apk add --no-cache openssh
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/I12A306T.pem
-    - chmod 600 ~/.ssh/I12A306T.pem
-    - eval $(ssh-agent -s)
-    - ssh-add ~/.ssh/I12A306T.pem
-    - ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - ssh -i ~/.ssh/I12A306T.pem ubuntu@$EC2_HOST 'cd ~/S12P11A306 && pwd'
+    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
   script:
     - |
       # Client 브랜치 배포: 클라이언트 컨테이너만 배포
       if [[ "$CI_COMMIT_BRANCH" == "Client" ]]; then
-        ssh $EC2_USER@$EC2_HOST "
+      ssh $EC2_USER@$EC2_HOST "
           cd /home/ubuntu/S12P11A306 &&
           docker pull $CI_REGISTRY_IMAGE/client:latest &&
-          docker compose -f docker-compose.prod.yml up -d server"
+          docker-compose -f docker-compose.prod.yml up -d server"
       fi
 
       # Server 브랜치 배포: 서버 컨테이너만 배포
@@ -103,15 +104,7 @@ deploy:
         ssh $EC2_USER@$EC2_HOST "
           cd /home/ubuntu/S12P11A306 &&
           docker pull $CI_REGISTRY_IMAGE/server:latest &&
-          docker compose -f docker-compose.prod.yml up -d server"
-      fi
-
-      # master 브랜치 배포: 클라이언트와 서버 컨테이너 모두 배포
-      if [[ "$CI_COMMIT_BRANCH" == "master" ]]; then
-        ssh $EC2_USER@$EC2_HOST "
-          cd /home/ubuntu/S12P11A306 &&
-          docker pull $CI_REGISTRY_IMAGE/server:latest &&
-          docker compose -f docker-compose.prod.yml up -d server"
+          docker-compose -f docker-compose.prod.yml up -d server"
       fi
 
       # master 브랜치 배포: 클라이언트와 서버 컨테이너 모두 배포
@@ -120,7 +113,7 @@ deploy:
           cd /home/ubuntu/S12P11A306 &&
           docker pull $CI_REGISTRY_IMAGE/client:latest &&
           docker pull $CI_REGISTRY_IMAGE/server:latest &&
-          docker compose -f docker-compose.prod.yml up -d server"
+          docker-compose -f docker-compose.prod.yml up -d server"
       fi
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^Client|Server|master$/'
