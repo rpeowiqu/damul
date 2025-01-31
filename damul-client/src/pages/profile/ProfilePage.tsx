@@ -1,5 +1,7 @@
 import { Outlet } from "react-router-dom";
+
 import DamulTab from "@/components/common/DamulTab";
+import ProfileBanner from "@/components/profile/ProfileBanner";
 
 const tabItems = [
   {
@@ -22,10 +24,12 @@ const tabItems = [
 
 const ProfilePage = () => {
   return (
-    <main className="flex flex-col">
-      <div className="h-44 bg-normal-200"></div>
-      <DamulTab tabList={tabItems} />
-      <Outlet />
+    <main className="flex flex-col h-full">
+      <DamulTab propItems={tabItems} />
+      <ProfileBanner nickname={"토마토러버전종우"} />
+      <div className="flex-1 bg-normal-50">
+        <Outlet />
+      </div>
     </main>
   );
 };

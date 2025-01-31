@@ -17,6 +17,9 @@ import ProfileBadgePage from "@/pages/profile/ProfileBadgePage";
 import ProfileRecipePage from "@/pages/profile/ProfileRecipePage";
 import ProfileBookmarkPage from "@/pages/profile/ProfileBookmarkPage";
 import CommunityPage from "@/pages/community/CommunityPage";
+import FriendPage from "@/pages/friend/FriendPage";
+import FriendFollowerPage from "@/pages/friend/FriendFollowerPage";
+import FriendFollowingPage from "@/pages/friend/FriendFollowingPage";
 
 const router = createBrowserRouter([
   {
@@ -128,6 +131,24 @@ const router = createBrowserRouter([
         path: "community/market/:id",
         element: <CommunityMarketDetailPage />,
       },
+      {
+        path: "friend",
+        element: <FriendPage />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="follower" replace />,
+          },
+          {
+            path: "follower",
+            element: <FriendFollowerPage />,
+          },
+          {
+            path: "following",
+            element: <FriendFollowingPage />,
+          },
+        ],
+      },
     ],
   },
   {
@@ -143,4 +164,3 @@ const router = createBrowserRouter([
 ]);
 
 export default router;
-

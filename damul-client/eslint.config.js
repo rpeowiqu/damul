@@ -33,7 +33,7 @@ export default tseslint.config(
       "no-unreachable": "error", // 도달할 수 없는 코드 방지.
 
       // Code Style Rules
-      indent: ["error", 2], // 코드 들여쓰기를 강제합니다.
+      // indent: ["error", 2], // 코드 들여쓰기를 강제합니다.
       quotes: ["error", "double"], // 문자열 따옴표 스타일을 지정합니다.
       semi: ["error", "always"], // 문장의 끝에 세미콜론을 강제합니다.
       "eol-last": ["error", "always"], // 파일의 마지막에 공백 줄을 강제합니다.
