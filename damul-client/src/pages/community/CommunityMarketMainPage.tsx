@@ -13,6 +13,7 @@ const CommunityMarketMainPage = () => {
         onInputClick={() => {
           navigate("/community/market/search");
         }}
+        className="cursor-pointer"
       />
       <FeedList />
       <PostButton to="market" />

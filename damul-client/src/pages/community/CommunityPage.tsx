@@ -15,7 +15,7 @@ const tabItems = [
 const CommunityPage = () => {
   return (
     <main className="flex flex-col">
-      <DamulTab propItems={tabItems} />
+      <DamulTab tabList={tabItems} />
       <Outlet />
     </main>
   );

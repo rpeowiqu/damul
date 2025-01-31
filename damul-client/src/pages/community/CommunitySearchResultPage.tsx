@@ -15,6 +15,7 @@ const CommunitySearchResultPage = () => {
             onInputClick={() => {
               navigate("/community/market/search");
             }}
+            className="cursor-pointer"
           />
         </div>
       </div>
