@@ -48,8 +48,8 @@ public class AuthController {
         return ResponseEntity.ok().body("Successfully logged out");
     }
 
-    // 약관 동의
-    @PostMapping("/terms-agreement")
+    // 약관 동의 후 회원가입
+    @PostMapping("/signup")
     public ResponseEntity<?> agreeToTerms(HttpServletRequest request, HttpServletResponse response) {
         String sessionId = request.getSession().getId();
 

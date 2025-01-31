@@ -30,7 +30,7 @@ public class AuthService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public Map<String, String> processTermsAgreement(String sessionId) {
+    public Map<String, String> processSignup(String sessionId) {
         try {
             // Redis에서 OAuth2 정보 조회
             String sessionKey = "oauth2:user:" + sessionId;
@@ -50,6 +50,7 @@ public class AuthService {
                     .build();
 
             User savedUser = userRepository.save(user);
+
             log.info("Saved User: {}", savedUser);  // 저장된 사용자 정보 로깅
 
             // 토큰 생성 로직 수정
