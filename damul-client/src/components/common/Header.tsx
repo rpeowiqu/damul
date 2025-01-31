@@ -4,12 +4,12 @@ import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
-    <header>
-      <nav className="h-14 border-b-[1px] border-gray-200">
-        <ul className="flex justify-between h-full px-5">
+    <header className="fixed top-0 left-0 right-0 w-full max-w-[600px] h-14 mx-auto bg-white border-x border-b border-normal-100">
+      <nav className="w-full h-full">
+        <ul className="flex justify-between items-center w-full h-full px-5">
           <li className="flex items-center">
             <button>
-              <AlarmIcon className="stroke-neutral-700" />
+              <AlarmIcon className="stroke-normal-700" />
             </button>
           </li>
           <li className="flex items-center">
@@ -19,7 +19,7 @@ const Header = () => {
           </li>
           <li className="flex items-center">
             <button>
-              <OptionIcon className="stroke-neutral-700 stroke-2" />
+              <OptionIcon className="stroke-normal-700 stroke-2" />
             </button>
           </li>
         </ul>
