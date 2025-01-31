@@ -25,7 +25,7 @@ const tabItems = [
 const ProfilePage = () => {
   return (
     <main className="flex flex-col h-full">
-      <DamulTab propItems={tabItems} />
+      <DamulTab tabList={tabItems} />
       <ProfileBanner nickname={"토마토러버전종우"} />
       <div className="flex-1 bg-normal-50">
         <Outlet />
