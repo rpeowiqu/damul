@@ -13,7 +13,6 @@ const PostRecipeIngrediants = ({
   setIngredients,
   ingredients,
 }: PostRecipeIngrediantsProps) => {
-
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
@@ -23,27 +22,34 @@ const PostRecipeIngrediants = ({
     setIngredients(ingredients.filter((ingredient) => ingredient.id !== id));
   };
 
-  // 재료 값 변경
-  const handleChange = (
-    id: number,
-    field: keyof Omit<IngredientProps, "id">,
-    value: string,
-  ) => {
-    setIngredients(
-      ingredients.map((ingredient) =>
-        ingredient.id === id ? { ...ingredient, [field]: value } : ingredient,
-      ),
-    );
-  };
-
   const handleSubmit = () => {
+    if (!name || !quantity || !unit) {
+      return;
+    }
+
     const newIngredient: IngredientProps = {
-      id: Date.now(), // 새로운 id는 현재 시간을 기준으로 생성
+      id: Date.now(),
       name,
       quantity,
       unit,
     };
-    setIngredients([...ingredients, newIngredient]);
+
+    setIngredients((prev) => {
+      let updatedIngredients = [...prev, newIngredient];
+
+      // 첫 번째 요소가 비어있다면 제거
+      if (
+        updatedIngredients.length >= 2 &&
+        (!updatedIngredients[0].name ||
+          !updatedIngredients[0].quantity ||
+          !updatedIngredients[0].unit)
+      ) {
+        updatedIngredients = updatedIngredients.slice(1);
+      }
+
+      return updatedIngredients;
+    });
+
     setName("");
     setQuantity("");
     setUnit("");
@@ -76,33 +82,27 @@ const PostRecipeIngrediants = ({
                 <input
                   type="text"
                   value={ingredient.name}
-                  onChange={(e) =>
-                    handleChange(ingredient.id, "name", e.target.value)
-                  }
                   placeholder="재료"
                   className="w-full outline-none"
+                  disabled
                 />
               </td>
               <td className="p-2">
                 <input
                   type="text"
                   value={ingredient.quantity}
-                  onChange={(e) =>
-                    handleChange(ingredient.id, "quantity", e.target.value)
-                  }
                   placeholder="수량"
                   className="w-full outline-none"
+                  disabled
                 />
               </td>
               <td className="p-2">
                 <input
                   type="text"
                   value={ingredient.unit}
-                  onChange={(e) =>
-                    handleChange(ingredient.id, "unit", e.target.value)
-                  }
                   placeholder="단위"
                   className="w-full outline-none"
+                  disabled
                 />
               </td>
             </tr>
@@ -128,7 +128,7 @@ const PostRecipeIngrediants = ({
             setUnit={setUnit}
           />
         }
-        footerContent={<SubmitButton/>}
+        footerContent={<SubmitButton />}
         onFooterClick={handleSubmit}
       />
     </div>

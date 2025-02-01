@@ -6,17 +6,25 @@ import PostRecipeTitle from "@/components/community/PostRecipeTitle";
 import PostRecipeImage from "@/components/community/PostRecipeImage";
 import PostRecipeIngrediants from "@/components/community/PostRecipeIngrediants";
 import PostRecipeOrders from "@/components/community/PostRecipeOrders";
-import { IngredientProps } from "@/types/interfaces";
+import { IngredientProps, OrderProps } from "@/types/interfaces";
 
 const CommunityRecipePostPage = () => {
   const [title, setTitle] = useState<string>("");
-  const [image, setImage] = useState<string>("");
+  const [image, setImage] = useState<File | null>(null);
   const [ingredients, setIngredients] = useState<IngredientProps[]>([
     {
       id: 0,
       name: "",
       quantity: "",
       unit: "",
+    },
+  ]);
+
+  const [orders, setOrders] = useState<OrderProps[]>([
+    {
+      id: 0,
+      description: "",
+      image: null,
     },
   ]);
 
@@ -41,7 +49,7 @@ const CommunityRecipePostPage = () => {
           }
           headerContent={<PostRecipeImage setImage={setImage} image={image} />}
           footerContent={<SubmitButton />}
-          onFooterClick={()=>{}}
+          onFooterClick={() => {}}
         />
         <PostDrawer
           trigerConent={
@@ -60,7 +68,7 @@ const CommunityRecipePostPage = () => {
           trigerConent={
             <PostCard title="조리순서" description="조리순서를 입력해주세요" />
           }
-          headerContent={<PostRecipeOrders setTitle={setTitle} title={title} />}
+          headerContent={<PostRecipeOrders setOrders={setOrders} orders={orders} />}
           footerContent={<SubmitButton />}
           onFooterClick={() => {}}
         />

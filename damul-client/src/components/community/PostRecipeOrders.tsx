@@ -1,45 +1,119 @@
-import React, { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import PostDrawer from "@/components/community/PostDrawer";
+import PostRecipeOrderForm from "./PostRecipeOrderForm";
+import SubmitButton from "./SubmitButton";
+import { OrderProps } from "@/types/interfaces";
 
-interface PostRecipeOrdersProps {
-  title: string;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
+interface PostRecipeStepsProps {
+  setOrders: Dispatch<SetStateAction<OrderProps[]>>;
+  orders: OrderProps[];
 }
 
-const PostRecipeOrders = ({ title, setTitle }: PostRecipeOrdersProps) => {
-  const [isLimitExceeded, setIsLimitExceeded] = useState(false);
-  const MAX_LENGTH = 50;
+const PostRecipeSteps = ({ setOrders, orders }: PostRecipeStepsProps) => {
+  const [orderDescription, setOrderDescription] = useState("");
+  const [orderImage, setOrderImage] = useState<File | null>(null);
+  const [preImage, setPreImage] = useState<string>("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    if (value.length <= MAX_LENGTH) {
-      setTitle(value);
-      setIsLimitExceeded(false);
-    } else {
-      setIsLimitExceeded(true);
+  // 단계 삭제
+  const handleRemoveStep = (id: number) => {
+    setOrders(orders.filter((order) => order.id !== id));
+  };
+
+  // 단계 추가
+  const handleSubmit = () => {
+    if (!orderDescription.trim()) {
+      return;
     }
+
+    const newOrder: OrderProps = {
+      id: Date.now(),
+      description: orderDescription.trim(),
+      image: orderImage,
+    };
+
+    setOrders((prev) => {
+      let updatedOrders = [...prev, newOrder];
+
+      if (updatedOrders.length >= 2 && !updatedOrders[0].description) {
+        updatedOrders = updatedOrders.slice(1);
+      }
+
+      return updatedOrders;
+    });
+
+    // 입력값 초기화
+    setOrderDescription("");
+    setOrderImage(null);
+    setPreImage("");
   };
 
   return (
-    <>
-      <textarea
-        value={title}
-        onChange={handleChange}
-        className={`w-full mt-5 p-5 border-2 rounded-md outline-none resize-none ${
-          isLimitExceeded ? "border-red-500" : "border-gray-300"
-        }`}
-        placeholder="제목을 입력해주세요"
-        rows={3}
+    <div className="overflow-x-hidden">
+      <table className="min-w-full">
+        <thead>
+          <tr>
+            <th className="text-left"></th>
+            <th className="text-center">이미지</th>
+            <th className="text-left">조리 단계</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-neutral-300">
+          {orders.map((order, index) => (
+            <tr key={order.id}>
+              <td className="p-1">
+                <button
+                  type="button"
+                  onClick={() => handleRemoveStep(order.id)}
+                  className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:text-negative-700 border-2 border-negative-600 text-xl font-semibold"
+                >
+                  -
+                </button>
+              </td>
+              <td className="p-2">
+                {order.image ? (
+                  <img
+                    src={URL.createObjectURL(order.image)}
+                    alt={`Step ${index + 1}`}
+                    className="w-full h-20 object-cover rounded-lg"
+                  />
+                ) : (
+                  <span className="text-gray-400">사진 없음</span>
+                )}
+              </td>
+              <td className="p-2">
+                <textarea
+                  value={order.description}
+                  className="w-full min-h-20 outline-none"
+                  disabled
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <PostDrawer
+        trigerConent={
+          <button
+            type="button"
+            className="text-blue-500 hover:text-blue-700 text-xl"
+          >
+            +
+          </button>
+        }
+        headerContent={
+          <PostRecipeOrderForm
+            orderDescription={orderDescription}
+            setOrderDescription={setOrderDescription}
+            setOrderImage={setOrderImage}
+            setPreImage={setPreImage}
+            preImage={preImage}
+          />
+        }
+        footerContent={<SubmitButton />}
+        onFooterClick={handleSubmit}
       />
-      <div className="flex justify-between items-center mt-1 text-sm">
-        {isLimitExceeded && (
-          <p className="text-red-500">최대 50자까지 입력 가능합니다.</p>
-        )}
-        <p className={isLimitExceeded ? "text-red-500" : "text-gray-500"}>
-          {title.length} / {MAX_LENGTH}
-        </p>
-      </div>
-    </>
+    </div>
   );
 };
 
-export default PostRecipeOrders;
+export default PostRecipeSteps;

@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import { useState, Dispatch, SetStateAction, ChangeEvent } from "react";
 
 interface PostRecipeTitleProps {
   title: string;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
+  setTitle: Dispatch<SetStateAction<string>>;
 }
 
 const PostRecipeTitle = ({ title, setTitle }: PostRecipeTitleProps) => {
   const [isLimitExceeded, setIsLimitExceeded] = useState(false);
   const MAX_LENGTH = 50;
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     if (value.length <= MAX_LENGTH) {
       setTitle(value);

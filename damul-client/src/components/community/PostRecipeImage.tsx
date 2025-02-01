@@ -1,35 +1,43 @@
-import React from "react";
+import { useState, Dispatch, SetStateAction, ChangeEvent } from "react";
 import AlarmIcon from "../svg/AlarmIcon";
 
 interface PostRecipeImageProps {
-  image: string;
-  setImage: React.Dispatch<React.SetStateAction<string>>;
+  image: File | null;
+  setImage: Dispatch<SetStateAction<File | null>>;
 }
 
-const PostRecipeImage = ({ image, setImage }: PostRecipeImageProps) => {
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+const PostRecipeImage = ({ setImage }: PostRecipeImageProps) => {
+  const [preImage, setPreImage] = useState("");
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result as string);
+        setPreImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const handleImageRemove = () => {
+    setPreImage("");
+    setImage(null);
+  };
+
   return (
     <div className="flex flex-col items-center p-4 border border-normal-200 rounded-lg w-full">
-      {image ? (
+      {preImage ? (
         <div className="relative w-full">
           <img
-            src={image}
+            src={preImage}
             alt="사진"
             className="w-full h-48 pc:h-64 object-cover rounded-lg shadow-md"
           />
           <button
             className="absolute top-2 right-2 bg-normal-800 text-white p-1 w-8 h-8 rounded-full"
-            onClick={() => setImage("")}
+            onClick={handleImageRemove}
           >
             X
           </button>

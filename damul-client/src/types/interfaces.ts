@@ -4,3 +4,9 @@ export interface IngredientProps {
   quantity: string;
   unit: string;
 }
+
+export interface OrderProps {
+  id: number;
+  description: string;
+  image: File | null;
+}
