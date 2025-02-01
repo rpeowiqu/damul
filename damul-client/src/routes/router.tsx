@@ -16,10 +16,12 @@ import ProfileInfoPage from "@/pages/profile/ProfileInfoPage";
 import ProfileBadgePage from "@/pages/profile/ProfileBadgePage";
 import ProfileRecipePage from "@/pages/profile/ProfileRecipePage";
 import ProfileBookmarkPage from "@/pages/profile/ProfileBookmarkPage";
+import ProfileIngredientsPage from "@/pages/profile/ProfileIngredientsPage";
 import CommunityPage from "@/pages/community/CommunityPage";
 import FriendPage from "@/pages/friend/FriendPage";
 import FriendFollowerPage from "@/pages/friend/FriendFollowerPage";
 import FriendFollowingPage from "@/pages/friend/FriendFollowingPage";
+import NotFoundPage from "@/pages/notFound/NotFoundPage";
 
 const router = createBrowserRouter([
   {
@@ -35,7 +37,7 @@ const router = createBrowserRouter([
         element: <SignUpPage />,
       },
       {
-        path: "profile",
+        path: "profile/:userId",
         element: <ProfilePage />,
         children: [
           {
@@ -57,6 +59,10 @@ const router = createBrowserRouter([
           {
             path: "bookmark",
             element: <ProfileBookmarkPage />,
+          },
+          {
+            path: "ingredients",
+            element: <ProfileIngredientsPage />,
           },
         ],
       },
@@ -160,6 +166,10 @@ const router = createBrowserRouter([
         element: <LoginPage />,
       },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ]);
 

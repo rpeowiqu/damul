@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "@/components/common/Image";
+import { useOutletContext } from "react-router-dom";
 
 const dummyRecipeData = [
   {
@@ -44,6 +45,7 @@ const dummyRecipeData = [
 ];
 
 const ProfileRecipePage = () => {
+  const { user } = useOutletContext();
   const [sortType, setSortType] = useState("date");
 
   const sortedData = useMemo(() => {
@@ -60,9 +62,7 @@ const ProfileRecipePage = () => {
   return (
     <div className="flex flex-col gap-2 p-5 bg-white">
       <div className="flex flex-col gap-2">
-        <h1 className="text-lg font-bold">
-          토마토러버전종우님이 작성한 레시피
-        </h1>
+        <h1 className="text-lg font-bold">{user.nickname}님이 작성한 레시피</h1>
         <p className="text-normal-600">
           회원님이 직접 만들고 공유한 레시피들이에요.
         </p>
