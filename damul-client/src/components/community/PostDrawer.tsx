@@ -1,4 +1,4 @@
-import { useState, ReactNode, Dispatch, SetStateAction } from "react";
+import { JSX } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -6,33 +6,26 @@ import {
   DrawerHeader,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import PostCard from "@/components/community/PostCard";
-import DamulButton from "@/components/common/DamulButton";
 
 interface PostDrawerProps {
-  title: string;
-  description: string;
-  headerContent: (
-    _setTitle: Dispatch<SetStateAction<string>>,
-    _title: string,
-  ) => ReactNode;
+  trigerConent: JSX.Element;
+  headerContent: JSX.Element;
+  footerContent: JSX.Element;
+  onFooterClick: () => void;
 }
 
-const PostDrawer = ({ title, description, headerContent }: PostDrawerProps) => {
-  const [inputValue, setInputValue] = useState("");
-
+const PostDrawer = ({
+  trigerConent,
+  headerContent,
+  footerContent,
+  onFooterClick,
+}: PostDrawerProps) => {
   return (
     <Drawer>
-      <DrawerTrigger>
-        <PostCard title={title} description={description} />
-      </DrawerTrigger>
+      <DrawerTrigger>{trigerConent}</DrawerTrigger>
       <DrawerContent>
-        <DrawerHeader>{headerContent(setInputValue, inputValue)}</DrawerHeader>
-        <DrawerFooter>
-          <DamulButton variant="positive" onClick={() => {}}>
-            완료
-          </DamulButton>
-        </DrawerFooter>
+        <DrawerHeader>{headerContent}</DrawerHeader>
+        <DrawerFooter onClick={onFooterClick}>{footerContent}</DrawerFooter>
       </DrawerContent>
     </Drawer>
   );
