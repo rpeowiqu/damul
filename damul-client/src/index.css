@@ -125,3 +125,7 @@ html {
   font-family: "SUITE-Regular";
   overflow-y: scroll;
 }
+
+html > body[data-scroll-locked] {
+  margin-right: 0 !important;
+}
