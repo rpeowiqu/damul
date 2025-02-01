@@ -5,13 +5,13 @@ import PostRecipeIngrediantForm from "@/components/community/PostRecipeIngredian
 import SubmitButton from "./SubmitButton";
 
 interface PostRecipeIngrediantsProps {
-  setIngredients: Dispatch<SetStateAction<IngredientProps[]>>;
-  ingredients: IngredientProps[];
+  setTempIngredients: Dispatch<SetStateAction<IngredientProps[]>>;
+  tempIngredients: IngredientProps[];
 }
 
 const PostRecipeIngrediants = ({
-  setIngredients,
-  ingredients,
+  setTempIngredients,
+  tempIngredients,
 }: PostRecipeIngrediantsProps) => {
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -19,7 +19,7 @@ const PostRecipeIngrediants = ({
 
   // 재료 삭제
   const handleRemoveIngredient = (id: number) => {
-    setIngredients(ingredients.filter((ingredient) => ingredient.id !== id));
+    setTempIngredients(tempIngredients.filter((ingredient) => ingredient.id !== id));
   };
 
   const handleSubmit = () => {
@@ -34,7 +34,7 @@ const PostRecipeIngrediants = ({
       unit,
     };
 
-    setIngredients((prev) => {
+    setTempIngredients((prev) => {
       let updatedIngredients = [...prev, newIngredient];
 
       // 첫 번째 요소가 비어있다면 제거
@@ -67,7 +67,7 @@ const PostRecipeIngrediants = ({
           </tr>
         </thead>
         <tbody className="divide-y divide-neutral-300">
-          {ingredients.map((ingredient) => (
+          {tempIngredients.map((ingredient) => (
             <tr key={ingredient.id}>
               <td className="p-5">
                 <button

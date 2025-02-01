@@ -6,11 +6,14 @@ import PostRecipeTitle from "@/components/community/PostRecipeTitle";
 import PostRecipeImage from "@/components/community/PostRecipeImage";
 import PostRecipeIngrediants from "@/components/community/PostRecipeIngrediants";
 import PostRecipeOrders from "@/components/community/PostRecipeOrders";
+import DamulButton from "@/components/common/DamulButton";
 import { IngredientProps, OrderProps } from "@/types/interfaces";
 
 const CommunityRecipePostPage = () => {
   const [title, setTitle] = useState<string>("");
+  const [tempTitle, setTempTitle] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
+  const [tempImage, setTempImage] = useState<File | null>(null);
   const [ingredients, setIngredients] = useState<IngredientProps[]>([
     {
       id: 0,
@@ -19,8 +22,22 @@ const CommunityRecipePostPage = () => {
       unit: "",
     },
   ]);
-
+  const [tempIngredients, setTempIngredients] = useState<IngredientProps[]>([
+    {
+      id: 0,
+      name: "",
+      quantity: "",
+      unit: "",
+    },
+  ]);
   const [orders, setOrders] = useState<OrderProps[]>([
+    {
+      id: 0,
+      description: "",
+      image: null,
+    },
+  ]);
+  const [tempOrders, setTempOrders] = useState<OrderProps[]>([
     {
       id: 0,
       description: "",
@@ -37,42 +54,88 @@ const CommunityRecipePostPage = () => {
       <div className="flex flex-col gap-10">
         <PostDrawer
           trigerConent={
-            <PostCard title="제목" description="제목을 입력해주세요" />
-          }
-          headerContent={<PostRecipeTitle setTitle={setTitle} title={title} />}
-          footerContent={<SubmitButton />}
-          onFooterClick={() => {}}
-        />
-        <PostDrawer
-          trigerConent={
-            <PostCard title="사진" description="사진을 업로드해주세요" />
-          }
-          headerContent={<PostRecipeImage setImage={setImage} image={image} />}
-          footerContent={<SubmitButton />}
-          onFooterClick={() => {}}
-        />
-        <PostDrawer
-          trigerConent={
-            <PostCard title="재료" description="재료를 입력해주세요" />
+            <PostCard
+              title="제목"
+              description="제목을 입력해주세요"
+              isEmpty={!title}
+            />
           }
           headerContent={
-            <PostRecipeIngrediants
-              setIngredients={setIngredients}
-              ingredients={ingredients}
+            <PostRecipeTitle
+              setTempTitle={setTempTitle}
+              tempTitle={tempTitle}
             />
           }
           footerContent={<SubmitButton />}
-          onFooterClick={() => {}}
+          onFooterClick={() => {
+            setTitle(tempTitle);
+          }}
         />
         <PostDrawer
           trigerConent={
-            <PostCard title="조리순서" description="조리순서를 입력해주세요" />
+            <PostCard
+              title="사진"
+              description="사진을 업로드해주세요"
+              isEmpty={!image}
+            />
           }
-          headerContent={<PostRecipeOrders setOrders={setOrders} orders={orders} />}
+          headerContent={<PostRecipeImage setTempImage={setTempImage} />}
           footerContent={<SubmitButton />}
-          onFooterClick={() => {}}
+          onFooterClick={() => {
+            setImage(tempImage);
+          }}
+        />
+        <PostDrawer
+          trigerConent={
+            <PostCard
+              title="재료"
+              description="재료를 입력해주세요"
+              isEmpty={!ingredients[0].name}
+            />
+          }
+          headerContent={
+            <PostRecipeIngrediants
+              setTempIngredients={setTempIngredients}
+              tempIngredients={tempIngredients}
+            />
+          }
+          footerContent={<SubmitButton />}
+          onFooterClick={() => {
+            setIngredients(tempIngredients);
+          }}
+        />
+        <PostDrawer
+          trigerConent={
+            <PostCard
+              title="조리순서"
+              description="조리순서를 입력해주세요"
+              isEmpty={!orders[0].description}
+            />
+          }
+          headerContent={
+            <PostRecipeOrders
+              setTempOrders={setTempOrders}
+              tempOrders={tempOrders}
+            />
+          }
+          footerContent={<SubmitButton />}
+          onFooterClick={() => {
+            setOrders(tempOrders);
+          }}
         />
       </div>
+      {title && image && ingredients[0].name && orders[0].description && (
+        <div className="absolute bottom-16 left-0 w-full p-6">
+          <DamulButton
+            variant="positive-outline"
+            size="full"
+            textSize="lg"
+            onClick={() => {}}
+          >
+            레시피 작성하기
+          </DamulButton>
+        </div>
+      )}
     </main>
   );
 };

@@ -5,18 +5,18 @@ import SubmitButton from "./SubmitButton";
 import { OrderProps } from "@/types/interfaces";
 
 interface PostRecipeStepsProps {
-  setOrders: Dispatch<SetStateAction<OrderProps[]>>;
-  orders: OrderProps[];
+  setTempOrders: Dispatch<SetStateAction<OrderProps[]>>;
+  tempOrders: OrderProps[];
 }
 
-const PostRecipeSteps = ({ setOrders, orders }: PostRecipeStepsProps) => {
+const PostRecipeSteps = ({ setTempOrders, tempOrders }: PostRecipeStepsProps) => {
   const [orderDescription, setOrderDescription] = useState("");
   const [orderImage, setOrderImage] = useState<File | null>(null);
   const [preImage, setPreImage] = useState<string>("");
 
   // 단계 삭제
   const handleRemoveStep = (id: number) => {
-    setOrders(orders.filter((order) => order.id !== id));
+    setTempOrders(tempOrders.filter((order) => order.id !== id));
   };
 
   // 단계 추가
@@ -31,7 +31,7 @@ const PostRecipeSteps = ({ setOrders, orders }: PostRecipeStepsProps) => {
       image: orderImage,
     };
 
-    setOrders((prev) => {
+    setTempOrders((prev) => {
       let updatedOrders = [...prev, newOrder];
 
       if (updatedOrders.length >= 2 && !updatedOrders[0].description) {
@@ -58,7 +58,7 @@ const PostRecipeSteps = ({ setOrders, orders }: PostRecipeStepsProps) => {
           </tr>
         </thead>
         <tbody className="divide-y divide-neutral-300">
-          {orders.map((order, index) => (
+          {tempOrders.map((order, index) => (
             <tr key={order.id}>
               <td className="p-1">
                 <button
@@ -83,7 +83,7 @@ const PostRecipeSteps = ({ setOrders, orders }: PostRecipeStepsProps) => {
               <td className="p-2">
                 <textarea
                   value={order.description}
-                  className="w-full min-h-20 outline-none"
+                  className="w-full min-h-20 outline-none p-2"
                   disabled
                 />
               </td>

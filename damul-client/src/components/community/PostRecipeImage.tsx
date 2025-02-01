@@ -2,17 +2,16 @@ import { useState, Dispatch, SetStateAction, ChangeEvent } from "react";
 import AlarmIcon from "../svg/AlarmIcon";
 
 interface PostRecipeImageProps {
-  image: File | null;
-  setImage: Dispatch<SetStateAction<File | null>>;
+  setTempImage: Dispatch<SetStateAction<File | null>>;
 }
 
-const PostRecipeImage = ({ setImage }: PostRecipeImageProps) => {
+const PostRecipeImage = ({ setTempImage }: PostRecipeImageProps) => {
   const [preImage, setPreImage] = useState("");
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setImage(file);
+      setTempImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreImage(reader.result as string);
@@ -23,7 +22,7 @@ const PostRecipeImage = ({ setImage }: PostRecipeImageProps) => {
 
   const handleImageRemove = () => {
     setPreImage("");
-    setImage(null);
+    setTempImage(null);
   };
 
   return (
