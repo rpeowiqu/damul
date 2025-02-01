@@ -17,7 +17,7 @@ client-build:
     - docker build -t $CLIENT_DOCKER_IMAGE ./damul-client
     - docker push $CLIENT_DOCKER_IMAGE
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^(Client|client-develop|master$/'
+    - if: '$CI_COMMIT_BRANCH =~ /^(Client|client-develop|master)$/'
       changes:
         - "damul-client/**/*"
 
