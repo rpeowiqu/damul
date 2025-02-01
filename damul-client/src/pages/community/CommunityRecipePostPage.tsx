@@ -2,8 +2,8 @@ import { useState } from "react";
 import PostDrawer from "@/components/community/PostDrawer";
 import PostCard from "@/components/community/PostCard";
 import SubmitButton from "@/components/community/SubmitButton";
-import PostRecipeTitle from "@/components/community/PostRecipeTitle";
-import PostRecipeImage from "@/components/community/PostRecipeImage";
+import PostRecipeTitle from "@/components/community/PostTitle";
+import PostRecipeImage from "@/components/community/PostImage";
 import PostRecipeIngrediants from "@/components/community/PostRecipeIngrediants";
 import PostRecipeOrders from "@/components/community/PostRecipeOrders";
 import DamulButton from "@/components/common/DamulButton";
@@ -47,7 +47,10 @@ const CommunityRecipePostPage = () => {
 
   return (
     <main className="flex flex-col px-7 py-4 pc:p-6 gap-5">
-      <div className="p-4 space-x-5 font-semibold">
+      <div
+        className="p-4 space-x-5 font-semibold"
+        onClick={() => window.history.back()}
+      >
         <span>{"<"}</span>
         <span className="space-y-4">나만의 레시피 작성</span>
       </div>

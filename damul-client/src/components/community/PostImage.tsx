@@ -1,11 +1,11 @@
 import { useState, Dispatch, SetStateAction, ChangeEvent } from "react";
 import AlarmIcon from "../svg/AlarmIcon";
 
-interface PostRecipeImageProps {
+interface PostImageProps {
   setTempImage: Dispatch<SetStateAction<File | null>>;
 }
 
-const PostRecipeImage = ({ setTempImage }: PostRecipeImageProps) => {
+const PostImage = ({ setTempImage }: PostImageProps) => {
   const [preImage, setPreImage] = useState("");
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -61,4 +61,4 @@ const PostRecipeImage = ({ setTempImage }: PostRecipeImageProps) => {
   );
 };
 
-export default PostRecipeImage;
+export default PostImage;
