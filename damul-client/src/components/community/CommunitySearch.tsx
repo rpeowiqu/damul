@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useManageRecentSearches from "@/hooks/useManageRecentSearches";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
@@ -19,6 +20,8 @@ const CommunitySearch = ({ placeholder, title, postTo }: CommunitySearch) => {
   } = useManageRecentSearches();
   const navigate = useNavigate();
 
+  const [inputValue, setInputValue] = useState("");
+
   return (
     <>
       <div className="flex justify-between gap-2">
@@ -29,6 +32,8 @@ const CommunitySearch = ({ placeholder, title, postTo }: CommunitySearch) => {
               handleAddSearch(content);
               navigate(`${content}`);
             }}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
           />
         </div>
       </div>
