@@ -1,11 +1,11 @@
 import { useState, Dispatch, SetStateAction, ChangeEvent } from "react";
 
-interface PostMarketContentProps {
+interface PostContentProps {
   tempContent: string;
   setTempContent: Dispatch<SetStateAction<string>>;
 }
 
-const PostMarketContent = ({ tempContent, setTempContent }: PostMarketContentProps) => {
+const PostContent = ({ tempContent, setTempContent }: PostContentProps) => {
   const [isLimitExceeded, setIsLimitExceeded] = useState(false);
   const MAX_LENGTH = 500;
 
@@ -42,4 +42,4 @@ const PostMarketContent = ({ tempContent, setTempContent }: PostMarketContentPro
   );
 };
 
-export default PostMarketContent;
+export default PostContent;

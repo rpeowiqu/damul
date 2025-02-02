@@ -4,7 +4,7 @@ import PostCard from "@/components/community/PostCard";
 import SubmitButton from "@/components/community/SubmitButton";
 import PostTitle from "@/components/community/PostTitle";
 import PostImage from "@/components/community/PostImage";
-import PostMarketContent from "@/components/community/PostMarketContent";
+import PostContent from "@/components/community/PostContent";
 import PostMarketMemberCnt from "@/components/community/PostMarketMemberCnt";
 import DamulButton from "@/components/common/DamulButton";
 
@@ -21,7 +21,7 @@ const CommunityMarketPostPage = () => {
   return (
     <main className="flex flex-col px-7 py-4 pc:p-6 gap-5">
       <div
-        className="p-4 space-x-5 font-semibold"
+        className="p-4 space-x-5 font-semibold cursor-pointer"
         onClick={() => window.history.back()}
       >
         <span>{"<"}</span>
@@ -67,7 +67,7 @@ const CommunityMarketPostPage = () => {
             />
           }
           headerContent={
-            <PostMarketContent
+            <PostContent
               setTempContent={setTempContent}
               tempContent={tempContent}
             />

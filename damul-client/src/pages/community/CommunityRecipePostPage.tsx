@@ -4,6 +4,7 @@ import PostCard from "@/components/community/PostCard";
 import SubmitButton from "@/components/community/SubmitButton";
 import PostRecipeTitle from "@/components/community/PostTitle";
 import PostRecipeImage from "@/components/community/PostImage";
+import PostContent from "@/components/community/PostContent";
 import PostRecipeIngrediants from "@/components/community/PostRecipeIngrediants";
 import PostRecipeOrders from "@/components/community/PostRecipeOrders";
 import DamulButton from "@/components/common/DamulButton";
@@ -14,6 +15,8 @@ const CommunityRecipePostPage = () => {
   const [tempTitle, setTempTitle] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [tempImage, setTempImage] = useState<File | null>(null);
+  const [content, setContent] = useState<string>("");
+  const [tempContent, setTempContent] = useState<string>("");
   const [ingredients, setIngredients] = useState<IngredientProps[]>([
     {
       id: 0,
@@ -48,7 +51,7 @@ const CommunityRecipePostPage = () => {
   return (
     <main className="flex flex-col px-7 py-4 pc:p-6 gap-5">
       <div
-        className="p-4 space-x-5 font-semibold"
+        className="p-4 space-x-5 font-semibold cursor-pointer"
         onClick={() => window.history.back()}
       >
         <span>{"<"}</span>
@@ -91,6 +94,25 @@ const CommunityRecipePostPage = () => {
         <PostDrawer
           trigerConent={
             <PostCard
+              title="소개"
+              description="소개글을 입력해주세요"
+              isEmpty={!content}
+            />
+          }
+          headerContent={
+            <PostContent
+              setTempContent={setTempContent}
+              tempContent={tempContent}
+            />
+          }
+          footerContent={<SubmitButton />}
+          onFooterClick={() => {
+            setContent(tempContent);
+          }}
+        />
+        <PostDrawer
+          trigerConent={
+            <PostCard
               title="재료"
               description="재료를 입력해주세요"
               isEmpty={!ingredients[0].name}
@@ -127,7 +149,7 @@ const CommunityRecipePostPage = () => {
           }}
         />
       </div>
-      {title && image && ingredients[0].name && orders[0].description && (
+      {title && image && content && ingredients[0].name && orders[0].description && (
         <div className="absolute bottom-16 left-0 w-full p-6">
           <DamulButton
             variant="positive-outline"

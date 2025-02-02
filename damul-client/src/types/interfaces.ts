@@ -10,3 +10,13 @@ export interface OrderProps {
   description: string;
   image: File | null;
 }
+
+export interface Comment {
+  id: number;
+  userId: number;
+  nickname: string;
+  profileImageUrl: string;
+  comment: string;
+  createdAt: string;
+  parentId?: number;
+}
