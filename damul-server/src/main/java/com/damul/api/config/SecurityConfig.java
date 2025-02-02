@@ -71,13 +71,7 @@ public class SecurityConfig {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
                 })
                 // 로그아웃
-                .logout(logout -> {
-                    log.info("로그아웃 설정");
-                    logout
-                            .logoutUrl("/api/v1/auth/logout")
-                            .logoutSuccessUrl("/api/v1/auth/login") // 로그인 창으로 이동
-                            .clearAuthentication(true);
-                })
+                .logout(logout -> logout.disable())
                 // CORS 설정 추가
                 .cors(cors -> {
                     log.info("CORS 설정");

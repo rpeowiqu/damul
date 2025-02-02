@@ -112,6 +112,20 @@ public class JwtTokenProvider {
     }
 
     /**
+     * JWT 토큰에서 Claims(페이로드) 추출
+     *
+     * @param token JWT 토큰 문자열
+     * @return 토큰에 포함된 모든 Claims
+     */
+    public Claims getClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    /**
      * JWT 토큰의 유효성 검증
      * 토큰의 형식, 서명, 만료 여부 등을 검사
      *

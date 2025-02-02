@@ -7,6 +7,7 @@ import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.Collections;
 import java.util.Map;
@@ -29,58 +31,69 @@ public class AuthService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
+
     @Transactional
-    public Map<String, String> processSignup(String sessionId) {
-        try {
-            // Redis에서 OAuth2 정보 조회
-            String sessionKey = "oauth2:user:" + sessionId;
+    public Map<String, String> processSignup(String tempToken, String nickname) {
+            log.info("임시 토큰에서 OAuth2 인증 정보 추출 시작");
+            // 1. 임시 토큰에서 OAuth2 인증 정보 추출
+            Claims claims = jwtTokenProvider.getClaims(tempToken);
+            String email = claims.get("email", String.class);
+
+            log.info("이메일 - email: {}", email);
+
+            log.info("Redis 조회");
+            // 2. Redis에서 저장된 유저 정보 가져오기
+            String sessionKey = "oauth2:user:" + RequestContextHolder.currentRequestAttributes().getSessionId();
             String jsonString = redisTemplate.opsForValue().get(sessionKey);
 
-            Map<String, String> oauth2Info = objectMapper.readValue(jsonString,
-                    new TypeReference<Map<String, String>>() {});
+            if (jsonString == null) {
+                throw new RuntimeException("유저 정보를 찾을 수 없습니다.");
+            }
 
-            // 사용자 엔티티 생성 및 저장
-            User user = User.builder()
-                    .email(oauth2Info.get("email"))
-                    .nickname(oauth2Info.get("nickname"))
-                    .profileImageUrl(oauth2Info.get("profileImage"))
-                    .provider(Provider.valueOf(oauth2Info.get("provider").toUpperCase()))
-                    .role(Role.USER)
-                    .termsAgreed(true)
-                    .build();
+            try {
 
-            User savedUser = userRepository.save(user);
+                // Redis에 저장된 User 정보 파싱
+                User user = objectMapper.readValue(jsonString, User.class);
+                log.info("닉네임 적용 전 - nickname: {}", user.getNickname());
 
-            log.info("Saved User: {}", savedUser);  // 저장된 사용자 정보 로깅
+                // 수정된 닉네임 적용
+                user.builder()
+                        .nickname(nickname);
 
-            // 토큰 생성 로직 수정
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    user.getEmail(),
-                    null,
-                    Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()))
-            );
+                log.info("닉네임 적용 완료 - nickname: {}", user.getNickname());
 
-            String accessToken = jwtTokenProvider.generateAccessToken(authentication);
-            String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
+                // DB에 저장
+                User savedUser = userRepository.save(user);
+                log.info("회원 가입 완료: {}", email);
 
-            // Refresh Token Redis에 저장
-            redisTemplate.opsForValue().set(
-                    "RT:" + user.getEmail(),
-                    refreshToken,
-                    jwtTokenProvider.getRefreshTokenExpire(),
-                    TimeUnit.MILLISECONDS
-            );
+                // 토큰 생성
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        user.getEmail(),
+                        null,
+                        Collections.singletonList(new SimpleGrantedAuthority(savedUser.getRole().name()))
+                );
 
-            // Redis 임시 정보 삭제
-            redisTemplate.delete(sessionKey);
+                String accessToken = jwtTokenProvider.generateAccessToken(authentication);
+                String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
 
-            return Map.of(
-                    "accessToken", accessToken,
-                    "refreshToken", refreshToken
-            );
+                // Refresh Token Redis에 저장
+                redisTemplate.opsForValue().set(
+                        "RT:" + savedUser.getEmail(),
+                        refreshToken,
+                        jwtTokenProvider.getRefreshTokenExpire(),
+                        TimeUnit.MILLISECONDS
+                );
+
+                // 임시 저장된 OAuth 정보 삭제
+                redisTemplate.delete(sessionKey);
+
+                return Map.of(
+                        "accessToken", accessToken,
+                        "refreshToken", refreshToken
+                );
         } catch (Exception e) {
-            log.error("약관 동의 처리 중 오류 발생", e);
-            throw new RuntimeException("약관 동의 처리 중 오류가 발생했습니다.", e);
+            log.error("회원가입 처리 중 오류 발생", e);
+            throw new RuntimeException("유저 정보 파싱 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -103,7 +116,6 @@ public class AuthService {
         );
     }
 
-    // 리프레시 토큰 관련 메서드들
     public String findRefreshToken(String userId) {
         return redisTemplate.opsForValue().get("RT:" + userId);
     }
@@ -112,7 +124,6 @@ public class AuthService {
         redisTemplate.delete("RT:" + userId);
     }
 
-    // 리프레시 토큰 검증 메서드 추가 가능
     public boolean validateRefreshToken(String userId, String refreshToken) {
         String storedRefreshToken = findRefreshToken(userId);
         return storedRefreshToken != null && storedRefreshToken.equals(refreshToken);
