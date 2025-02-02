@@ -23,6 +23,11 @@ import FriendFollowerPage from "@/pages/friend/FriendFollowerPage";
 import FriendFollowingPage from "@/pages/friend/FriendFollowingPage";
 import NotFoundPage from "@/pages/notFound/NotFoundPage";
 import SettingPage from "@/pages/setting/SettingPage";
+import AdminPage from "@/pages/admin/AdminPage";
+import AdminLoginPage from "@/pages/admin/AdminLoginPage";
+import AdminReportPage from "@/pages/admin/AdminReportPage";
+import AdminUserPage from "@/pages/admin/AdminUserPage";
+import AdminPostPage from "@/pages/admin/AdminPostPage";
 
 const router = createBrowserRouter([
   {
@@ -169,6 +174,28 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <LoginPage />,
+      },
+    ],
+  },
+  {
+    path: "/admin/login",
+    element: <AdminLoginPage />,
+  },
+  {
+    path: "/admin",
+    element: <AdminPage />,
+    children: [
+      {
+        path: "report",
+        element: <AdminReportPage />,
+      },
+      {
+        path: "user",
+        element: <AdminUserPage />,
+      },
+      {
+        path: "post",
+        element: <AdminPostPage />,
       },
     ],
   },
