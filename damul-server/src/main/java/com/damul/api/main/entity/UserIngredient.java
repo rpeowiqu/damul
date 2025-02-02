@@ -15,7 +15,7 @@ public class UserIngredient {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receipt_id", referencedColumnName = "id")
-    private UserReceipt userRecieptId;  // int userId → User 객체로 변경
+    private UserReceipt userReciept;  // int userId → User 객체로 변경
 
     @Id
     @Column(name = "id")
