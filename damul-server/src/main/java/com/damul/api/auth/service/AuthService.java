@@ -1,11 +1,8 @@
 package com.damul.api.auth.service;
 
 import com.damul.api.auth.entity.User;
-import com.damul.api.auth.entity.type.Provider;
-import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
-import com.damul.api.auth.repository.UserRepository;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.damul.api.auth.repository.AuthRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
@@ -63,7 +60,7 @@ public class AuthService {
                 log.info("닉네임 적용 완료 - nickname: {}", user.getNickname());
 
                 // DB에 저장
-                User savedUser = userRepository.save(user);
+                User savedUser = authRepository.save(user);
                 log.info("회원 가입 완료: {}", email);
 
                 // 토큰 생성

@@ -1,10 +1,8 @@
 package com.damul.api.auth.oauth2.handler;
 
-import com.damul.api.auth.dto.UserInfo;
-import com.damul.api.auth.entity.User;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.oauth2.service.CustomOAuth2UserService;
-import com.damul.api.auth.repository.UserRepository;
+import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
 import com.damul.api.common.user.CustomUserDetails;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 
 @Slf4j
@@ -33,7 +30,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final AuthService authService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final CookieUtil cookieUtil;
 
     @Override

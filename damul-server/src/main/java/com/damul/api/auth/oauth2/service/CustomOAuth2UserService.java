@@ -10,7 +10,7 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Provider;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.repository.TermsRepository;
-import com.damul.api.auth.repository.UserRepository;
+import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.common.user.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
     private final TermsRepository termsRepository;
@@ -47,7 +47,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = getOAuth2Response(registrationId, oAuth2User.getAttributes());
 
-        Optional<UserInfo> existingUser = userRepository.findByEmail(oAuth2Response.getEmail());
+        Optional<UserInfo> existingUser = authRepository.findByEmail(oAuth2Response.getEmail());
 
         if (existingUser.isEmpty()) {
             log.info("CustomOAuth2UserService, 신규 회원입니다.");
@@ -107,7 +107,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .role(Role.USER)
                 .build();
 
-        return userRepository.save(user);
+        return authRepository.save(user);
     }
 
     public OAuth2Response getOAuth2Response(String registrationId, Map<String, Object> attributes) {

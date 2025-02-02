@@ -2,7 +2,6 @@ package com.damul.api.auth.repository;
 
 import com.damul.api.auth.dto.UserInfo;
 import com.damul.api.auth.entity.User;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface AuthRepository extends JpaRepository<User, Integer> {
     boolean existsByEmail(String email);
 // SELECT EXISTS(SELECT 1 FROM user WHERE email = ?) 쿼리 자동 생성
 

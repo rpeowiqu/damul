@@ -4,7 +4,7 @@ import com.damul.api.auth.dto.SignupRequest;
 import com.damul.api.auth.dto.TermsResponse;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.repository.TermsRepository;
-import com.damul.api.auth.repository.UserRepository;
+import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
 import io.jsonwebtoken.Claims;
@@ -32,7 +32,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final CookieUtil cookieUtil;
     private final TermsRepository termsRepository;
 
