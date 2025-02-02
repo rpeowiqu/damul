@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import Image from "../common/Image";
 import AlarmIcon from "../svg/AlarmIcon";
 
@@ -7,6 +8,7 @@ interface AuthorInfoProps {
   viewCnt?: number;
   likeCnt?: number;
   type: string;
+  id: number;
 }
 const AuthorInfo = ({
   profileImageUrl,
@@ -14,7 +16,10 @@ const AuthorInfo = ({
   viewCnt,
   likeCnt,
   type,
+  id,
 }: AuthorInfoProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex justify-between h-20 px-2">
       <div className="flex items-center">
@@ -38,7 +43,12 @@ const AuthorInfo = ({
               <AlarmIcon className="w-4 h-4 stroke-neutral-500" />
               <p className="text-sm">신고하기</p>
             </div>
-            <div className="flex items-center gap-1">
+            <div
+              className="flex items-center gap-1"
+              onClick={() => {
+                navigate(`/community/${type}/${id}/edit`);
+              }}
+            >
               <AlarmIcon className="w-4 h-4 stroke-neutral-500" />
               <p className="text-sm">수정하기</p>
             </div>
@@ -53,6 +63,19 @@ const AuthorInfo = ({
           <div className="flex items-center">
             <AlarmIcon className="w-4 h-4 stroke-neutral-500" />
             <p className="text-sm text-neutral-500">신고하기</p>
+          </div>
+          <div
+            className="flex items-center gap-1"
+            onClick={() => {
+              navigate(`/community/${type}/${id}/edit`);
+            }}
+          >
+            <AlarmIcon className="w-4 h-4 stroke-neutral-500" />
+            <p className="text-sm">수정하기</p>
+          </div>
+          <div className="flex items-center gap-1">
+            <AlarmIcon className="w-4 h-4 stroke-neutral-500" />
+            <p className="text-sm">삭제</p>
           </div>
         </div>
       )}

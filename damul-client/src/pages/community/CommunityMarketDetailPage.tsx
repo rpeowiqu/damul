@@ -80,6 +80,7 @@ const CommunityMarketDetailPage = () => {
         <AuthorInfo
           profileImageUrl={mockData.profileImageUrl}
           authorName={mockData.authorName}
+          id={mockData.id}
           type="market"
         />
         <ContentSection

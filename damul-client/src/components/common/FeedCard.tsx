@@ -25,9 +25,9 @@ const FeedCard = ({
 
   const pathTo = (id: number) => {
     if (pathname.endsWith("recipe")) {
-      return `${id}`;
+      navigate(`/community/recipe/${id}`);
     } else {
-      return `${id}`;
+      navigate(`/community/market/${id}`);
     }
   };
 
@@ -35,7 +35,7 @@ const FeedCard = ({
     <div
       className="flex h-24 pc:h-28 border-2 border-positive-200 hover:bg-positive-50 hover:shadow-inner active:border-positive-500 rounded-lg"
       onClick={() => {
-        navigate(pathTo(id));
+        pathTo(id);
       }}
     >
       <Image src={image} alt="썸네일 이미지" className="rounded-s-lg" />

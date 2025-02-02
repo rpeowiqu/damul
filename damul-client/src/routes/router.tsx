@@ -124,12 +124,20 @@ const router = createBrowserRouter([
         element: <CommunityRecipeDetailPage />,
       },
       {
+        path: "community/recipe/:id/edit",
+        element: <CommunityRecipePostPage />,
+      },
+      {
         path: "community/market/post",
         element: <CommunityMarketPostPage />,
       },
       {
         path: "community/market/:id",
         element: <CommunityMarketDetailPage />,
+      },
+      {
+        path: "community/market/:id/edit",
+        element: <CommunityMarketPostPage />,
       },
       {
         path: "friend",

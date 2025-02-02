@@ -89,6 +89,7 @@ const CommunityRecipeDetailPage = () => {
           authorName={mockData.authorName}
           viewCnt={mockData.viewCnt}
           likeCnt={mockData.likeCnt}
+          id={mockData.id}
           type="recipe"
         />
         <ContentSection

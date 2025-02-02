@@ -22,7 +22,7 @@ const FixedCommentInput = ({
             <p className="text-sm font-bold">{replyingTo.nickname}</p>
             <p className="text-sm">{replyingTo.comment}</p>
           </div>
-          <div onClick={cancelReply} className="text-xs w-16 text-end pr-2 text-red-500">
+          <div onClick={cancelReply} className="text-xs w-16 text-end pr-2 text-red-500 cursor-pointer">
             취소
           </div>
         </div>
