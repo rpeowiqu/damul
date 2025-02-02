@@ -1,6 +1,8 @@
 package com.damul.api.auth.controller;
 
+import com.damul.api.auth.dto.TermsResponse;
 import com.damul.api.auth.jwt.JwtTokenProvider;
+import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.repository.UserRepository;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
@@ -10,9 +12,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -27,6 +31,7 @@ public class AuthController {
     private final RedisTemplate<String, String> redisTemplate;
     private final UserRepository userRepository;
     private final CookieUtil cookieUtil;
+    private final TermsRepository termsRepository;
 
     // 로그아웃
     @PostMapping("/logout")
@@ -50,7 +55,7 @@ public class AuthController {
 
     // 약관 동의 후 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<?> agreeToTerms(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> signup(HttpServletRequest request, HttpServletResponse response) {
         String sessionId = request.getSession().getId();
 
         Map<String, String> tokens = authService.processSignup(sessionId);
@@ -68,41 +73,29 @@ public class AuthController {
                         "redirectUrl", "/"
                 ));
     }
+
+    // 약관 동의 조회
+    @GetMapping("/terms")
+    public ResponseEntity<?> getTerms(@CookieValue(name="temp_token", required = true) String tempToken) {
+
+        log.info("약관 동의 조회 요청");
+
+        // 임시토큰 검증
+        if(!jwtTokenProvider.validateToken(tempToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "유효하지 않은 토큰입니다."));
+        }
+
+        // 약관 데이터 조회
+        log.info("약관 데이터 조회 시작");
+        List<TermsResponse> terms = termsRepository.findAll();
+        if(terms.size() == 0 || terms.isEmpty()) {
+            log.info("약관 데이터 조회 성공 - 데이터 없음");
+            return ResponseEntity.noContent().build();
+        }
+
+        log.info("약관 데이터 조회 성공, size: {}", terms.size());
+
+        return ResponseEntity.ok().body(terms);
+    }
 }
-//
-//    // 회원 정보 수정
-//    @PutMapping("/user/update")
-//    public ResponseEntity<?> updateUserInfo(
-//            @AuthenticationPrincipal OAuth2User oauth2User,
-//            @RequestBody UserUpdateRequest request) {
-//        String email = oauth2User.getAttribute("email");
-//        User user = userRepository.findByEmail(email)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        user.updateProfile(request.getNickname(), request.getProfileImageUrl());
-//        userRepository.save(user);
-//
-//        return ResponseEntity.ok(user);
-//    }
-//
-//    // 회원 탈퇴
-//    @DeleteMapping("/user/withdraw")
-//    public ResponseEntity<?> withdrawUser(
-//            @AuthenticationPrincipal OAuth2User oauth2User,
-//            HttpServletResponse response) {
-//        String email = oauth2User.getAttribute("email");
-//        userRepository.deleteByEmail(email);
-//
-//        // 쿠키 제거 (로그아웃과 동일)
-//        Cookie accessToken = new Cookie("access_token", "");
-//        Cookie refreshToken = new Cookie("refresh_token", "");
-//        accessToken.setMaxAge(0);
-//        refreshToken.setMaxAge(0);
-//        accessToken.setPath("/");
-//        refreshToken.setPath("/");
-//        response.addCookie(accessToken);
-//        response.addCookie(refreshToken);
-//
-//        return ResponseEntity.ok().body("Account successfully deleted");
-//    }
-//}

@@ -67,13 +67,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 String jsonString = objectMapper.writeValueAsString(user);
                 redisTemplate.opsForValue().set(sessionKey, jsonString, Duration.ofMinutes(30));
 
-                // 약관 조회
-                List<TermsList> terms = termsRepository.findAll();
-
                 Map<String, Object> signupInfo = new HashMap<>();
                 signupInfo.put("email", user.getEmail());
                 signupInfo.put("nickname", user.getNickname());
-                signupInfo.put("terms", terms);
 
                 String tempToken = jwtTokenProvider.generateTempToken(signupInfo);
 
