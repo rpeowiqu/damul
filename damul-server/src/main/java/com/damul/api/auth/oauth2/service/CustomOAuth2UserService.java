@@ -42,6 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.info("CustomOAuth2UserService, loadUser 진입");
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
@@ -50,7 +51,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Optional<UserInfo> existingUser = userRepository.findByEmail(oAuth2Response.getEmail());
 
         if (existingUser.isEmpty()) {
-            log.info("새로운 회원입니다.");
+            log.info("CustomOAuth2UserService, 신규 회원입니다.");
             String sessionKey = "oauth2:user:" + RequestContextHolder.currentRequestAttributes().getSessionId();
 
             try {
@@ -68,7 +69,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
                 // 약관 조회
                 List<TermsList> terms = termsRepository.findAll();
-
 
                 Map<String, Object> signupInfo = new HashMap<>();
                 signupInfo.put("email", user.getEmail());
