@@ -1,7 +1,7 @@
 import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import Layout from "@/components/common/Layout";
 import LoginPage from "@/pages/login/LoginPage";
-import SignUpPage from "@/pages/signUp/SignUpPage";
+import SignUpPage from "@/pages/SignUp/SignUpPage";
 import CommunityRecipeMainPage from "@/pages/community/CommunityRecipeMainPage";
 import CommunityRecipeSearchPage from "@/pages/community/CommunityRecipeSearchPage";
 import CommunityRecipePostPage from "@/pages/community/CommunityRecipePostPage";
@@ -20,6 +20,7 @@ import CommunityPage from "@/pages/community/CommunityPage";
 import FriendPage from "@/pages/friend/FriendPage";
 import FriendFollowerPage from "@/pages/friend/FriendFollowerPage";
 import FriendFollowingPage from "@/pages/friend/FriendFollowingPage";
+import HomePage from "@/pages/home/HomePage";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
         path: "signup",
         element: <SignUpPage />,
       },
+      { path: "home", element: <HomePage /> },
       {
         path: "profile",
         element: <ProfilePage />,

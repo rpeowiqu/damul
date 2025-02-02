@@ -5,6 +5,8 @@ module.exports = {
   theme: {
     screens: {
       pc: "600px",
+      sm: "480px",
+      xs: "360px",
     },
     extend: {
       borderRadius: {
