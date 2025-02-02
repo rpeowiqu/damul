@@ -12,8 +12,10 @@ const InfoForm = ({ userInput, setUserInput, onPrev }: SignUpFormProps) => {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 닉네임 유효성 검사 문구가 Falsy일 경우, 회원가입에 성공한다.
-    if (!infoText) {
+    if (!isValidNickname(userInput.nickname)) {
+      setInfoText("닉네임은 한글, 영문 2-8자로만 구성되어야 합니다.");
+    } else {
+      setInfoText("");
       alert("회원가입 되었습니다.");
     }
   };
@@ -54,20 +56,25 @@ const InfoForm = ({ userInput, setUserInput, onPrev }: SignUpFormProps) => {
           &lt;
         </button>
         <h1 className="text-xl font-black text-normal-700">
-          당신은 누구신가요?
+          회원 정보를 입력해 주세요.
         </h1>
       </div>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-12 mt-12">
+      <form onSubmit={onSubmit} className="flex flex-col gap-10 mt-10">
         <div>
-          <p className="text-sm text-normal-400">연동된 이메일 계정</p>
+          <p className="text-sm text-positive-400 font-bold">
+            연동된 이메일 계정
+          </p>
           <p>jongwoo@google.com</p>
         </div>
 
         <div className="relative">
           <div className="flex w-full items-end space-x-3">
             <div className="flex flex-col justify-end w-full">
-              <Label htmlFor="nickname" className="text-sm text-normal-400">
+              <Label
+                htmlFor="nickname"
+                className="text-sm text-positive-400 font-bold"
+              >
                 닉네임
               </Label>
               <Input
@@ -92,14 +99,17 @@ const InfoForm = ({ userInput, setUserInput, onPrev }: SignUpFormProps) => {
         </div>
 
         <div className="flex flex-col justify-end w-full">
-          <Label htmlFor="introduction" className="text-sm text-normal-400">
+          <Label
+            htmlFor="introduction"
+            className="text-sm text-positive-400 font-bold"
+          >
             자기소개
           </Label>
           <Textarea
             id="introduction"
             name="introduction"
             className="resize-none focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0"
-            placeholder="당신이 누구인지 소개해 보세요."
+            placeholder="회원님에 대해 자유롭게 소개해 보세요."
             value={userInput.introduction}
             onChange={handleInput}
           />
