@@ -1,5 +1,5 @@
 import { useState } from "react";
-import RecipeHeader from "@/components/community/RecipeHeader";
+import CommunityDetailHeader from "@/components/community/CommunityDetailHeader";
 import AuthorInfo from "@/components/community/AuthorInfo";
 import ContentSection from "@/components/community/ContentSection";
 import IngredientsSection from "@/components/community/IngredientsSection";
@@ -83,22 +83,25 @@ const CommunityRecipeDetailPage = () => {
   return (
     <div className="flex">
       <main className="relative flex flex-col justify-center w-full text-center p-5 pc:p-6 mb-12">
-        <RecipeHeader title={mockData.title} createdAt={mockData.createdAt} />
+        <CommunityDetailHeader title={mockData.title} createdAt={mockData.createdAt} type="recipe"/>
         <AuthorInfo
           profileImageUrl={mockData.profileImageUrl}
           authorName={mockData.authorName}
           viewCnt={mockData.viewCnt}
           likeCnt={mockData.likeCnt}
+          type="recipe"
         />
         <ContentSection
           contentImageUrl={mockData.contentImageUrl}
           content={mockData.content}
+          type="recipe"
         />
         <IngredientsSection ingredients={mockData.ingredients} />
         <CookingOrdersSection cookingOrders={mockData.cookingOrders} />
         <CommentsSection
           comments={mockData.comments}
           onReply={(comment) => setReplyingTo(comment)}
+          type="recipe"
         />
       </main>
       <FixedCommentInput

@@ -5,7 +5,6 @@ import { Comment } from "@/types/interfaces";
 interface FixedCommentInputProps {
   replyingTo: Comment | null;
   comment: string;
-  // 여기서 React의 상태 업데이트 함수 타입을 사용합니다.
   setComment: Dispatch<SetStateAction<string>>;
   cancelReply: () => void;
 }
@@ -23,9 +22,9 @@ const FixedCommentInput = ({
             <p className="text-sm font-bold">{replyingTo.nickname}</p>
             <p className="text-sm">{replyingTo.comment}</p>
           </div>
-          <button onClick={cancelReply} className="text-xs text-red-500">
+          <div onClick={cancelReply} className="text-xs w-16 text-end pr-2 text-red-500">
             취소
-          </button>
+          </div>
         </div>
       )}
       <DamulCommentInput
