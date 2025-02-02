@@ -49,7 +49,7 @@ client-test:
   tags:
     - docker
   stage: test
-  image: node:16
+  image: node:latest
   script:
     - cd damul-client
     - npm ci
