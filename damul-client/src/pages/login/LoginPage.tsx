@@ -82,7 +82,7 @@ const LoginPage = () => {
       <div className="h-24 bg-blue-400"></div>
       <div className="h-24 bg-red-400"></div>
       <div className="h-24 bg-blue-400"></div>
-    </div>
+    </main>
   );
 };
 
