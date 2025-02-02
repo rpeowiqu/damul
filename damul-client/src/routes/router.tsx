@@ -22,6 +22,7 @@ import FriendPage from "@/pages/friend/FriendPage";
 import FriendFollowerPage from "@/pages/friend/FriendFollowerPage";
 import FriendFollowingPage from "@/pages/friend/FriendFollowingPage";
 import NotFoundPage from "@/pages/notFound/NotFoundPage";
+import SettingPage from "@/pages/setting/SettingPage";
 
 const router = createBrowserRouter([
   {
@@ -154,6 +155,10 @@ const router = createBrowserRouter([
             element: <FriendFollowingPage />,
           },
         ],
+      },
+      {
+        path: "setting",
+        element: <SettingPage />,
       },
     ],
   },
