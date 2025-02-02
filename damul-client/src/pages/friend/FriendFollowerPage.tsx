@@ -1,4 +1,4 @@
-import { useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 
 import DamulButton from "@/components/common/DamulButton";
 import Image from "@/components/common/Image";
@@ -37,7 +37,7 @@ const followerDummyData = [
   },
   {
     id: 7,
-    nickname: "토마토맛토토맛토마토",
+    nickname: "토마토맛토토맛토",
     profileImage: defaultProfile,
   },
   {
@@ -69,7 +69,12 @@ const FriendFollowerPage = () => {
             <div className="h-16 rounded-full overflow-hidden border border-normal-100">
               <Image src={defaultProfile} className="h-full object-cover" />
             </div>
-            <p className="flex-1 line-clamp-1">{item.nickname}</p>
+            <Link
+              to={`/profile/${item.id}/info`}
+              className="flex-1 line-clamp-1"
+            >
+              {item.nickname}
+            </Link>
             <div className="flex justify-center gap-3">
               <DamulButton variant="positive" onClick={() => {}}>
                 채팅 시작

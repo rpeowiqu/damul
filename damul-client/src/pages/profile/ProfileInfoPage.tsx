@@ -1,5 +1,10 @@
-import { Bar, BarChart, Cell, XAxis, YAxis } from "recharts";
-import { ChartConfig, ChartContainer } from "@/components/ui/chart";
+import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { Link, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ProfileInfo } from "@/types/profile";
@@ -8,7 +13,7 @@ import useUserStore from "@/stores/user";
 
 const chartConfig = {
   categoryPreference: {
-    label: "count",
+    label: "등록 횟수",
   },
 } satisfies ChartConfig;
 
@@ -133,11 +138,13 @@ const ProfileInfoPage = () => {
             data={profileInfo.foodPreference}
             layout="vertical"
           >
+            <CartesianGrid vertical={true} />
             <XAxis className="text-sm" type="number" />
             <YAxis className="text-sm" type="category" dataKey="categoryName" />
+            <ChartTooltip content={<ChartTooltipContent />} />
             <Bar dataKey="categoryPreference">
-              {profileInfo.foodPreference.map((_, index) => (
-                <Cell key={index} fill={colorList[index]} />
+              {profileInfo.foodPreference.map((item, index) => (
+                <Cell key={item.categoryId} fill={colorList[index]} />
               ))}
             </Bar>
           </BarChart>

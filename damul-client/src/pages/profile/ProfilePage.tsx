@@ -49,11 +49,9 @@ const ProfilePage = () => {
           }
 
           const data = await response.json();
-          console.log(data);
           const foundUser = data.find(
             (item: ProfileHeader) => item.userId === parseInt(userId),
           );
-
           setHeader(foundUser);
         } catch (error) {
           console.error(error);
