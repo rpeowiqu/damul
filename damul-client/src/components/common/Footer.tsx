@@ -5,7 +5,7 @@ import StatisticsIcon from "../svg/StatisticsIcon";
 import CommunityIcon from "../svg/CommunityIcon";
 import ChattingIcon from "../svg/ChattingIcon";
 import ProfileIcon from "../svg/ProfileIcon";
-import useUserStore from "@/stores/user";
+import useUserStore from "../../stores/user";
 
 const Footer = () => {
   // Zustand에서 사용자의 userId를 가져온다.
