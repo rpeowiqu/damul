@@ -1,18 +1,18 @@
-import React, { useState } from "react";
+import { useState, Dispatch, SetStateAction, ChangeEvent } from "react";
 
-interface PostRecipeTitleProps {
-  title: string;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
+interface PostContentProps {
+  tempContent: string;
+  setTempContent: Dispatch<SetStateAction<string>>;
 }
 
-const PostRecipeTitle = ({ title, setTitle }: PostRecipeTitleProps) => {
+const PostContent = ({ tempContent, setTempContent }: PostContentProps) => {
   const [isLimitExceeded, setIsLimitExceeded] = useState(false);
-  const MAX_LENGTH = 50;
+  const MAX_LENGTH = 500;
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     if (value.length <= MAX_LENGTH) {
-      setTitle(value);
+        setTempContent(value);
       setIsLimitExceeded(false);
     } else {
       setIsLimitExceeded(true);
@@ -22,24 +22,24 @@ const PostRecipeTitle = ({ title, setTitle }: PostRecipeTitleProps) => {
   return (
     <>
       <textarea
-        value={title}
+        value={tempContent}
         onChange={handleChange}
         className={`w-full mt-5 p-5 border-2 rounded-md outline-none resize-none ${
           isLimitExceeded ? "border-red-500" : "border-gray-300"
         }`}
-        placeholder="제목을 입력해주세요"
-        rows={3}
+        placeholder="내용을 입력해주세요"
+        rows={8}
       />
       <div className="flex justify-between items-center mt-1 text-sm">
         {isLimitExceeded && (
-          <p className="text-red-500">최대 50자까지 입력 가능합니다.</p>
+          <p className="text-red-500">최대 500자까지 입력 가능합니다.</p>
         )}
         <p className={isLimitExceeded ? "text-red-500" : "text-gray-500"}>
-          {title.length} / {MAX_LENGTH}
+          {tempContent.length} / {MAX_LENGTH}
         </p>
       </div>
     </>
   );
 };
 
-export default PostRecipeTitle;
+export default PostContent;

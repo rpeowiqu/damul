@@ -1,44 +1,137 @@
-import React, { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import { IngredientProps } from "@/types/interfaces";
+import PostDrawer from "@/components/community/PostDrawer";
+import PostRecipeIngrediantForm from "@/components/community/PostRecipeIngrediantForm";
+import SubmitButton from "./SubmitButton";
 
 interface PostRecipeIngrediantsProps {
-  title: string;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
+  setTempIngredients: Dispatch<SetStateAction<IngredientProps[]>>;
+  tempIngredients: IngredientProps[];
 }
 
-const PostRecipeIngrediants = ({ title, setTitle }: PostRecipeIngrediantsProps) => {
-  const [isLimitExceeded, setIsLimitExceeded] = useState(false);
-  const MAX_LENGTH = 50;
+const PostRecipeIngrediants = ({
+  setTempIngredients,
+  tempIngredients,
+}: PostRecipeIngrediantsProps) => {
+  const [name, setName] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [unit, setUnit] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    if (value.length <= MAX_LENGTH) {
-      setTitle(value);
-      setIsLimitExceeded(false);
-    } else {
-      setIsLimitExceeded(true);
+  // 재료 삭제
+  const handleRemoveIngredient = (id: number) => {
+    setTempIngredients(tempIngredients.filter((ingredient) => ingredient.id !== id));
+  };
+
+  const handleSubmit = () => {
+    if (!name || !quantity || !unit) {
+      return;
     }
+
+    const newIngredient: IngredientProps = {
+      id: Date.now(),
+      name,
+      quantity,
+      unit,
+    };
+
+    setTempIngredients((prev) => {
+      let updatedIngredients = [...prev, newIngredient];
+
+      // 첫 번째 요소가 비어있다면 제거
+      if (
+        updatedIngredients.length >= 2 &&
+        (!updatedIngredients[0].name ||
+          !updatedIngredients[0].quantity ||
+          !updatedIngredients[0].unit)
+      ) {
+        updatedIngredients = updatedIngredients.slice(1);
+      }
+
+      return updatedIngredients;
+    });
+
+    setName("");
+    setQuantity("");
+    setUnit("");
   };
 
   return (
-    <>
-      <textarea
-        value={title}
-        onChange={handleChange}
-        className={`w-full mt-5 p-5 border-2 rounded-md outline-none resize-none ${
-          isLimitExceeded ? "border-red-500" : "border-gray-300"
-        }`}
-        placeholder="제목을 입력해주세요"
-        rows={3}
+    <div className="overflow-x-hidden">
+      <table className="min-w-full">
+        <thead>
+          <tr>
+            <th className="pc:w-24 p-6 text-left"></th>
+            <th className="p-2 text-left">재료</th>
+            <th className="p-2 text-left">수량</th>
+            <th className="p-2 text-left">단위</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-neutral-300">
+          {tempIngredients.map((ingredient) => (
+            <tr key={ingredient.id}>
+              <td className="p-5">
+                <button
+                  type="button"
+                  onClick={() => handleRemoveIngredient(ingredient.id)}
+                  className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:negative-700 border-2 border-negative-600 text-xl font-semibold"
+                >
+                  -
+                </button>
+              </td>
+              <td className="p-2">
+                <input
+                  type="text"
+                  value={ingredient.name}
+                  placeholder="재료"
+                  className="w-full outline-none"
+                  disabled
+                />
+              </td>
+              <td className="p-2">
+                <input
+                  type="text"
+                  value={ingredient.quantity}
+                  placeholder="수량"
+                  className="w-full outline-none"
+                  disabled
+                />
+              </td>
+              <td className="p-2">
+                <input
+                  type="text"
+                  value={ingredient.unit}
+                  placeholder="단위"
+                  className="w-full outline-none"
+                  disabled
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <PostDrawer
+        trigerConent={
+          <button
+            type="button"
+            className="text-blue-500 hover:text-blue-700 text-xl"
+          >
+            +
+          </button>
+        }
+        headerContent={
+          <PostRecipeIngrediantForm
+            name={name}
+            setName={setName}
+            quantity={quantity}
+            setQuantity={setQuantity}
+            unit={unit}
+            setUnit={setUnit}
+          />
+        }
+        footerContent={<SubmitButton />}
+        onFooterClick={handleSubmit}
       />
-      <div className="flex justify-between items-center mt-1 text-sm">
-        {isLimitExceeded && (
-          <p className="text-red-500">최대 50자까지 입력 가능합니다.</p>
-        )}
-        <p className={isLimitExceeded ? "text-red-500" : "text-gray-500"}>
-          {title.length} / {MAX_LENGTH}
-        </p>
-      </div>
-    </>
+    </div>
   );
 };
 
