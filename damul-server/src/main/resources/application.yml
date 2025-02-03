@@ -10,6 +10,9 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
 
+  main:
+    allow-bean-definition-overriding: true
+
   security:
     admin:
       password: ${admin.password}

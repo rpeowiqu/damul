@@ -10,6 +10,8 @@ import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -194,7 +196,7 @@ public class AuthService {
 
         // 비밀번호 검증
         if (!BCrypt.checkpw(request.getPassword(), hashedAdminPassword)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new BusinessException(ErrorCode.ADMIN_NOT_FOUND);
         }
 
         // 인증 객체 생성

@@ -24,6 +24,7 @@ public enum ErrorCode {
 
     // 유저 관련 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저 ID가 존재하지 않습니다"),
+    ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "관리자 계정이 존재하지 않습니다"),
 
     // 유효성 검증
     INVALID_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자 ID가 포함되어 있습니다."),

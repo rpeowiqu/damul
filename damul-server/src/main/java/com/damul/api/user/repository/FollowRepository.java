@@ -17,29 +17,37 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
 
     // 커서 기반 팔로워 목록 조회
     // 나를 팔로우하는 사람들 목록 (팔로워 목록)
-    @Query("SELECT f.follower FROM Follow f " +
-            "WHERE f.following.id = :userId " +
+    @Query("SELECT new com.damul.api.user.dto.response.UserList(" +
+            "f.follower.id, " +
+            "f.follower.nickname, " +
+            "f.follower.email) " +
+            "FROM Follow f " +
+            "WHERE f.following.id = :followingId " +
             "AND f.id > :cursorId " +
             "ORDER BY f.id " +
             "LIMIT :size")
-    List<UserList> findFollowersByUserIdAndCursorId(@Param("userId") int userId,
+    List<UserList> findFollowersByUserIdAndCursorId(@Param("followingId") int followingId,
                                                      @Param("cursorId") int cursorId,
                                                      @Param("size") int size);
     // 내가 팔로우하는 사람들 목록 (팔로잉 목록)
-    @Query("SELECT f.following FROM Follow f " +
-            "WHERE f.follower.id = :userId " +
+    @Query("SELECT new com.damul.api.user.dto.response.UserList(" +
+            "f.following.id, " +
+            "f.following.nickname, " +
+            "f.following.email) " +
+            "FROM Follow f " +
+            "WHERE f.following.id = :followerId " +
             "AND f.id > :cursorId " +
             "ORDER BY f.id " +
             "LIMIT :size")
-    List<UserList> findFollowingsByUserIdAndCursorId(@Param("userId") int userId,
+    List<UserList> findFollowingsByUserIdAndCursorId(@Param("followerId") int followerId,
                                                 @Param("cursorId") int cursorId,
                                                 @Param("size") int size);
 
     // 팔로우 관계를 확인
-    Optional<Follow> findByUserIdAndFollowId(@Param("userId") int userId,
-                                               @Param("followId") int followId);
+    Optional<Follow> findByFollower_IdAndFollowing_Id(@Param("followerId") int followerId,
+                                               @Param("followingId") int followingId);
 
     // 팔로워 강제 삭제
-    void deleteByUserIdAndFollowId(@Param("userId") int userId,
-                                   @Param("followId") int followId);
+    void deleteByFollower_IdAndFollowing_Id(@Param("followerId") int followerId,
+                                            @Param("followingId") int followingId);
 }
