@@ -9,6 +9,7 @@ import com.damul.api.user.dto.request.CheckNicknameRequest;
 import com.damul.api.user.dto.request.FollowRequest;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.FollowResponse;
+import com.damul.api.user.dto.response.SettingResponse;
 import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.service.FollowService;
 import com.damul.api.user.service.UserService;
@@ -30,7 +31,10 @@ public class UserController {
     // 설정 조회
     @GetMapping("/{userId}/settings")
     public ResponseEntity<?> getSetting(@PathVariable int userId) {
-        return null;
+        log.info("설정 조회 요청 - userId: {}", userId);
+        SettingResponse settingResponse = userService.getSetting(userId);
+        log.info("설정 조회 완료 - userId: {}", userId);
+        return ResponseEntity.ok(settingResponse);
     }
 
     // 설정 수정 - file 저장 구현 후 할 것!
@@ -118,13 +122,13 @@ public class UserController {
                                     @RequestParam String keyword,
                                     @RequestBody ScrollRequest scrollRequest) {
         log.info("사용자 목록 검색/조회 요청 - userId: {}, keyword: {}", userId, keyword);
-        ScrollResponse<UserList> userList = null;
-        if(keyword == null || keyword.length() == 0) {
-            log.info("검색어 없음 - 전체조회 시작");
-            userList = userService.getUserList(scrollRequest);
+        ScrollResponse<UserList> userList = userService.getSearchUserList(scrollRequest, keyword);
+        if(userList.getData().isEmpty() || userList.getData().size() == 0) {
+            log.info("사용자 목록 검색/조회 완료 - 데이터 없음");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
-            log.info("검색어 있음 - nickname: {}", keyword);
-            userList = userService.getSearchUserList(scrollRequest, keyword);
+            log.info("사용자 목록 검색/조회 완료 - 개수: {}", userList.getData().size());
+            return ResponseEntity.ok(userList);
         }
     }
 }
