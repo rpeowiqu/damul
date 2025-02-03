@@ -1,5 +1,6 @@
 package com.damul.api.auth.oauth2.dto;
 
+import com.damul.api.auth.entity.type.Provider;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -16,9 +17,8 @@ public class NaverResponse implements OAuth2Response, Serializable {
     private String profileImage;
     private String providerId;
 
-    @JsonIgnore
-    public String getProvider() {
-        return "naver";
+    public Provider getProvider() {
+        return Provider.NAVER;
     }
 
     public NaverResponse(Map<String, Object> attribute) {

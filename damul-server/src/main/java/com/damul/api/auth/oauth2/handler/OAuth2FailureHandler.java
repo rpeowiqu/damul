@@ -31,7 +31,6 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         log.error("OAuth2 로그인 실패: {}", exception.getMessage());
 
-        // Redis 조회 로직 제거
         if (exception.getMessage().equals("약관 동의가 필요합니다.")) {
             String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/terms-agreement")
                     .queryParam("sessionId", request.getSession().getId())

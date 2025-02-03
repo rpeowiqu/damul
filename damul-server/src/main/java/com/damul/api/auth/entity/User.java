@@ -2,6 +2,7 @@ package com.damul.api.auth.entity;
 
 import com.damul.api.auth.entity.type.Provider;
 import com.damul.api.auth.entity.type.Role;
+import com.damul.api.user.dto.request.SettingUpdate;
 import jakarta.persistence.*;
 import lombok.*;
 import org.joda.time.DateTime;
@@ -55,5 +56,15 @@ public class User {
 
     @Column(name = "is_warning", nullable = false)
     private boolean warning;
+
+
+    public void updateSettings(SettingUpdate settingUpdate) {
+        this.nickname = settingUpdate.getNickname();
+        this.selfIntroduction = settingUpdate.getSelfIntroduction();
+        this.profileImageUrl = settingUpdate.getProfileImageUrl();
+        this.profileBackgroundImageUrl = settingUpdate.getProfileBackgroundImageUrl();
+        this.isFridgePublic = settingUpdate.isFridgeVisible();
+        this.warning = settingUpdate.isWarningEnabled();
+    }
 
 }

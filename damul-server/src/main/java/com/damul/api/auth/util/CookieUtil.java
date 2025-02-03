@@ -1,11 +1,14 @@
 package com.damul.api.auth.util;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -28,12 +31,42 @@ public class CookieUtil {
 
     }
 
-    // 쿠키 삭제용 메서드도 추가할 수 있음
-    public static Cookie deleteCookie(String key) {
-        Cookie cookie = new Cookie(key, "");
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        return cookie;
+    /**
+     * 쿠키 삭제
+     * addCookie와 동일한 형식으로 맞추고, 실제 응답에 쿠키를 추가하도록 수정
+     */
+    public void deleteCookie(HttpServletResponse response, String name) {
+        log.debug("쿠키 삭제 시작 - 이름: {}", name);
+
+        ResponseCookie cookie = ResponseCookie.from(name, "")
+                .path("/")
+                .domain("")
+                .sameSite("Lax")
+                .httpOnly(true)
+                .secure(false)    // 개발 환경에서는 false, 운영에서는 true
+                .maxAge(0)        // 즉시 만료
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        log.debug("쿠키 삭제 완료 - 이름: {}", name);
+    }
+
+    /**
+     * 특정 이름의 쿠키를 찾아서 반환
+     */
+    public Optional<Cookie> getCookie(HttpServletRequest request, String name) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(name)) {
+                    log.debug("쿠키 조회 성공 - 이름: {}, 값: {}", name, cookie.getValue());
+                    return Optional.of(cookie);
+                }
+            }
+        }
+
+        log.debug("쿠키를 찾을 수 없음 - 이름: {}", name);
+        return Optional.empty();
     }
 }

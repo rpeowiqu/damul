@@ -1,18 +1,37 @@
 package com.damul.api.auth.controller;
 
+import com.amazonaws.Response;
+import com.damul.api.auth.dto.request.AdminLoginRequest;
+import com.damul.api.auth.dto.request.SignupRequest;
+import com.damul.api.auth.dto.response.TermsResponse;
+import com.damul.api.auth.dto.response.UserConsent;
+import com.damul.api.auth.entity.User;
+import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
-import com.damul.api.auth.repository.UserRepository;
+import com.damul.api.auth.repository.TermsRepository;
+import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 
@@ -25,84 +44,102 @@ public class AuthController {
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final CookieUtil cookieUtil;
+    private final TermsRepository termsRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+
 
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        // 쿠키에서 JWT 토큰 제거
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("access_token") ||
-                        cookie.getName().equals("refresh_token")) {
-                    cookie.setValue("");
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                }
-            }
+        try {
+            authService.logout(request, response);
+            return ResponseEntity.ok()
+                    .body(Map.of(
+                            "success", true,
+                            "message", "로그아웃 되었습니다."
+                    ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "로그아웃 처리 중 오류가 발생했습니다."));
+        }
+    }
+
+    // 약관 동의 후 회원가입
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@CookieValue(name = "temp_token", required = true) String tempToken,
+                                    @RequestBody SignupRequest signupRequest,
+                                    HttpServletResponse response) {
+        try {
+            authService.signup(tempToken, signupRequest, response);
+            return ResponseEntity.ok()
+                    .body(Map.of("message", "회원가입이 완료되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            log.error("회원가입 처리 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "회원가입 처리 중 오류가 발생했습니다."));
+        }
+    }
+
+    // 약관 동의 및 닉네임, 이메일 조회
+    @GetMapping("/consent")
+    public ResponseEntity<?> getTerms(@CookieValue(name="temp_token", required = true) String tempToken) {
+        log.info("약관 동의 조회 요청");
+        log.info("닉네임 갖고오기");
+        Claims claims = jwtTokenProvider.getClaims(tempToken);
+        String defaultNickname = claims.get("nickname", String.class);
+        String email = claims.get("email", String.class);
+
+        log.info("닉네임 조회 - nickname: {}", defaultNickname);
+        log.info("이메일 조회 - email: {}", email);
+
+        // 임시토큰 검증
+        if(!jwtTokenProvider.validateToken(tempToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "유효하지 않은 토큰입니다."));
         }
 
-        return ResponseEntity.ok().body("Successfully logged out");
+        // 약관 데이터 조회
+        log.info("약관 데이터 조회 시작");
+        List<TermsResponse> terms = termsRepository.findAll();
+        if(terms.size() == 0 || terms.isEmpty()) {
+            log.info("약관 데이터 조회 성공 - 데이터 없음");
+            return ResponseEntity.noContent().build();
+        }
+
+        log.info("약관 데이터 조회 성공, size: {}", terms.size());
+        UserConsent consent = UserConsent.builder()
+                .email(email)
+                .nickname(defaultNickname)
+                .terms(terms)
+                .build();
+
+
+       return ResponseEntity.ok(consent);
     }
 
-    // 약관 동의
-    @PostMapping("/terms-agreement")
-    public ResponseEntity<?> agreeToTerms(HttpServletRequest request, HttpServletResponse response) {
-        String sessionId = request.getSession().getId();
-
-        Map<String, String> tokens = authService.processTermsAgreement(sessionId);
-
-        // 쿠키 설정
-        cookieUtil.addCookie(response, "access_token", tokens.get("accessToken"),
-                (int) jwtTokenProvider.getAccessTokenExpire() / 1000);
-        cookieUtil.addCookie(response, "refresh_token", tokens.get("refreshToken"),
-                (int) jwtTokenProvider.getRefreshTokenExpire() / 1000);
-
-
-        return ResponseEntity.ok()
-                .body(Map.of(
-                        "success", true,
-                        "redirectUrl", "/"
-                ));
+    // 관리자 로그인
+    @PostMapping("/admin/login")
+    public ResponseEntity adminLogin(@RequestBody AdminLoginRequest request, HttpServletResponse response) {
+        log.info("관리자 로그인 요청");
+        try {
+            log.info("관리자 로그인 요청");
+            authService.adminLogin(request, response);
+            return ResponseEntity.ok()
+                    .body(Map.of("message", "관리자 로그인 성공"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "인증에 실패했습니다."));
+        } catch (Exception e) {
+            log.error("관리자 로그인 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "로그인 처리 중 오류가 발생했습니다."));
+        }
     }
 }
-//
-//    // 회원 정보 수정
-//    @PutMapping("/user/update")
-//    public ResponseEntity<?> updateUserInfo(
-//            @AuthenticationPrincipal OAuth2User oauth2User,
-//            @RequestBody UserUpdateRequest request) {
-//        String email = oauth2User.getAttribute("email");
-//        User user = userRepository.findByEmail(email)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        user.updateProfile(request.getNickname(), request.getProfileImageUrl());
-//        userRepository.save(user);
-//
-//        return ResponseEntity.ok(user);
-//    }
-//
-//    // 회원 탈퇴
-//    @DeleteMapping("/user/withdraw")
-//    public ResponseEntity<?> withdrawUser(
-//            @AuthenticationPrincipal OAuth2User oauth2User,
-//            HttpServletResponse response) {
-//        String email = oauth2User.getAttribute("email");
-//        userRepository.deleteByEmail(email);
-//
-//        // 쿠키 제거 (로그아웃과 동일)
-//        Cookie accessToken = new Cookie("access_token", "");
-//        Cookie refreshToken = new Cookie("refresh_token", "");
-//        accessToken.setMaxAge(0);
-//        refreshToken.setMaxAge(0);
-//        accessToken.setPath("/");
-//        refreshToken.setPath("/");
-//        response.addCookie(accessToken);
-//        response.addCookie(refreshToken);
-//
-//        return ResponseEntity.ok().body("Account successfully deleted");
-//    }
-//}

@@ -1,5 +1,7 @@
 package com.damul.api.auth.oauth2.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.oauth2.dto.GoogleResponse;
 import com.damul.api.auth.oauth2.dto.KaKaoResponse;
 import com.damul.api.auth.oauth2.dto.NaverResponse;
@@ -7,13 +9,13 @@ import com.damul.api.auth.oauth2.dto.OAuth2Response;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Provider;
 import com.damul.api.auth.entity.type.Role;
-import com.damul.api.auth.repository.UserRepository;
+import com.damul.api.auth.repository.TermsRepository;
+import com.damul.api.auth.repository.AuthRepository;
+import com.damul.api.common.user.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -22,53 +24,60 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final TermsRepository termsRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.info("CustomOAuth2UserService, loadUser 진입");
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        // OAuth2 제공자 ID 추출(google, naver, kakao)
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-
         OAuth2Response oAuth2Response = getOAuth2Response(registrationId, oAuth2User.getAttributes());
 
-        // 기존 회원인지 확인
-        Optional<User> existingUser = userRepository.findByEmail(oAuth2Response.getEmail());
+        Optional<UserInfo> existingUser = authRepository.findByEmail(oAuth2Response.getEmail());
 
         if (existingUser.isEmpty()) {
-            log.info("새로운 회원입니다.");
-            // 미가입 사용자인 경우 Redis에 OAuth2 정보를 저장
-            // 현재 세션 ID를 키로 사용
+            log.info("CustomOAuth2UserService, 신규 회원입니다.");
             String sessionKey = "oauth2:user:" + RequestContextHolder.currentRequestAttributes().getSessionId();
 
-            // Map으로 변환하여 저장 -> 직렬화 문제 방지
             try {
-                Map<String, String> oauth2Info = Map.of(
-                        "email", oAuth2Response.getEmail(),
-                        "nickname", oAuth2Response.getNickname(),
-                        "profileImage", oAuth2Response.getProfileImage(),
-                        "providerId", oAuth2Response.getProviderId(),
-                        "provider", oAuth2Response.getProvider()
+                User user = User.builder()
+                                .email(oAuth2Response.getEmail())
+                                .nickname(oAuth2Response.getNickname())
+                                .profileImageUrl(oAuth2Response.getProfileImage())
+                                .provider(oAuth2Response.getProvider())
+                                .role(Role.USER)
+                                .build();
+
+                // Redis에 저장
+                String jsonString = objectMapper.writeValueAsString(user);
+                redisTemplate.opsForValue().set(sessionKey, jsonString, Duration.ofMinutes(30));
+
+                Map<String, Object> signupInfo = new HashMap<>();
+                signupInfo.put("email", user.getEmail());
+                signupInfo.put("nickname", user.getNickname());
+
+                String tempToken = jwtTokenProvider.generateTempToken(signupInfo);
+
+                return new DefaultOAuth2User(
+                        Collections.emptyList(),
+                        Map.of("tempToken", tempToken),
+                        "email"
                 );
 
-                // Map을 JSON 문자열로 변환
-                String jsonString = objectMapper.writeValueAsString(oauth2Info);
-                redisTemplate.opsForValue().set(sessionKey, jsonString, Duration.ofMinutes(30));
             } catch (Exception e) {
                 log.error("Redis 저장 중 오류 발생", e);
                 throw new OAuth2AuthenticationException(
@@ -76,21 +85,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         "서버 오류가 발생했습니다."
                 );
             }
-
-            throw new OAuth2AuthenticationException(
-                    new OAuth2Error("terms_agreement_required"),
-                    "약관 동의가 필요합니다."
-            );
         }
 
-        // 기존 로직 유지
         log.info("기존 유저입니다.");
-        User user = existingUser.get();
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())),
-                oAuth2User.getAttributes(),
-                userRequest.getClientRegistration().getProviderDetails()
-                        .getUserInfoEndpoint().getUserNameAttributeName()
+        UserInfo userInfo = existingUser.get();
+
+        // DefaultOAuth2User 대신 CustomUserDetails 반환
+        return new CustomUserDetails(
+                userInfo,
+                oAuth2User.getAttributes()
         );
     }
 
@@ -104,7 +107,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .role(Role.USER)
                 .build();
 
-        return userRepository.save(user);
+        return authRepository.save(user);
     }
 
     public OAuth2Response getOAuth2Response(String registrationId, Map<String, Object> attributes) {

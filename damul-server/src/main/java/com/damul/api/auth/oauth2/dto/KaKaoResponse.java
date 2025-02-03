@@ -1,5 +1,6 @@
 package com.damul.api.auth.oauth2.dto;
 
+import com.damul.api.auth.entity.type.Provider;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -16,9 +17,8 @@ public class KaKaoResponse implements OAuth2Response, Serializable {
     private String profileImage;
     private String providerId;
 
-    @JsonIgnore
-    public String getProvider() {
-        return "kakao";
+    public Provider getProvider() {
+        return Provider.KAKAO;
     }
 
     public KaKaoResponse(Map<String, Object> attribute) {
