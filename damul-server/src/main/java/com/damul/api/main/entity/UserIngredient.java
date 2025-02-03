@@ -43,6 +43,14 @@ public class UserIngredient {
     @Column(name = "price")
     private double price;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;  // 삭제 상태 필드 추가
+
+    // 논리적 삭제를 위한 메서드
+    public void delete() {
+        this.isDeleted = true;
+    }
+
     public void updateQuantity(int quantity) {
         this.ingredientQuantity = quantity;
     }

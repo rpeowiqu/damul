@@ -19,4 +19,6 @@ public interface HomeService {
 
     SelectedIngredientList getSelectedIngredientList(List<Integer> ingredientIds);
 
+    void deleteIngredient(int userIngredientId);
+
 }

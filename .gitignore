@@ -20,7 +20,7 @@ bin/
 ### IntelliJ IDEA ###
 .idea
 .idea/**
-**/.ida/**
+**/.idea/**
 *.iws
 *.iml
 *.ipr

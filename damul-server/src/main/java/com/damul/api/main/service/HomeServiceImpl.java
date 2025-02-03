@@ -29,7 +29,7 @@ public class HomeServiceImpl implements HomeService {
     public IngredientResponse getUserIngredientList(int userId) {
         log.info("사용자 식자재 전체 가져오기 시작");
         // 1. 사용자의 재료 목록 조회
-        List<UserIngredient> userIngredients = userIngredientRepository.findByUserId(userId);
+        List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(userId);
 
         // 2. Entity를 DTO로 변환
         List<UserIngredientList> ingredientDtos = userIngredients.stream()
@@ -103,6 +103,16 @@ public class HomeServiceImpl implements HomeService {
 
         log.info("선택된 식자재 조회 성공");
         return SelectedIngredientList.from(ingredients);
+    }
+
+    @Override
+    public void deleteIngredient(int userIngredientId) {
+        log.info("식자재 삭제 시작");
+        UserIngredient ingredient = userIngredientRepository.findByIdAndNotDeleted(userIngredientId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 재료입니다."));
+
+        log.info("식자재 삭제 성공");
+        ingredient.delete();  // 논리적 삭제 처리
     }
 
 

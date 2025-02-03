@@ -69,6 +69,12 @@ public class HomeController {
         return ResponseEntity.ok().build();
     }
 
-
+    @DeleteMapping("/ingredients/{userIngredientId}")
+    public ResponseEntity<?> deleteUserIngredient(@PathVariable int userIngredientId) {
+        log.info("유저 식자재 삭제 시작 userIngredientId: {}", userIngredientId);
+        homeService.deleteIngredient(userIngredientId);
+        log.info("유저 식자재 삭제 성공");
+        return ResponseEntity.ok().build();
+    }
 
 }
