@@ -65,7 +65,6 @@ public class FollowServiceImpl implements FollowService {
             }
         } catch (DataIntegrityViolationException e) {
             log.error("팔로우 처리 중 데이터베이스 제약조건 위반", e);
-            // ErrorCode에 DATABASE_ERROR 추가 필요
             throw new BusinessException(ErrorCode.DATABASE_ERROR, "팔로우 처리 중 데이터베이스 오류가 발생했습니다.");
         } catch (DataAccessException e) {
             log.error("팔로우 처리 중 데이터베이스 오류", e);

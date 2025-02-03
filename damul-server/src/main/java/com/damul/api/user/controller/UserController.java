@@ -75,9 +75,18 @@ public class UserController {
     
     // 팔로잉 목록 조회
     @GetMapping("/{userId}/follwings")
-    public ResponseEntity<?> getFollwings(@PathVariable int userId) {
+    public ResponseEntity<?> getFollwings(@RequestBody ScrollRequest scrollRequest,
+                                          @PathVariable int userId) {
+        log.info("팔로잉 목록 조회 요청");
+        ScrollResponse<UserList> userList = followService.getFollowings(scrollRequest, userId);
 
-        return null;
+        if(userList.getData().isEmpty() || userList.getData().size() == 0) {
+            log.info("팔로잉 목록 조회 성공 - 데이터없음");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        log.info("팔로잉 목록 조회 성공, 개수: {}", userList.getData().size());
+        return ResponseEntity.ok(userList);
     }
 
     // 팔로우/언팔로우
@@ -93,8 +102,8 @@ public class UserController {
         return ResponseEntity.ok(followResponse);
     }
 
-    // 친구 삭제
-    
+    // 팔로워 삭제
+    @DeleteMapping
     // 사용자 목록 검색/조회
 
 
