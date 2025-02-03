@@ -2,11 +2,14 @@ package com.damul.api.user.controller;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.repository.AuthRepository;
+import com.damul.api.common.dto.request.ScrollRequest;
+import com.damul.api.common.dto.response.ScrollResponse;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.user.dto.request.CheckNicknameRequest;
 import com.damul.api.user.dto.request.FollowRequest;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.FollowResponse;
+import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.service.FollowService;
 import com.damul.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -54,8 +57,10 @@ public class UserController {
 
     // 팔로워 목록 조회
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<?> getFollowers(@PathVariable int userId) {
-
+    public ResponseEntity<?> getFollowers(@RequestBody ScrollRequest scrollRequest,
+                                          @PathVariable int userId) {
+        log.info("팔로워 목록 조회 요청");
+        ScrollResponse<UserList> userList = followService.getFollowers(scrollRequest, userId);
         return null;
     }
 
