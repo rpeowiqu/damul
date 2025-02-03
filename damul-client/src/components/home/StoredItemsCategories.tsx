@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import IngredientsButton from "./ingredientsButton";
+import IngredientsButton from "./IngredientsButton";
 import { CATEGORYNUMBER } from "@/constants/category";
 import { STORAGE_ICON, STORAGE_TYPE } from "@/constants/storage";
 
