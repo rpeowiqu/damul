@@ -22,6 +22,13 @@ import FriendPage from "@/pages/friend/FriendPage";
 import FriendFollowerPage from "@/pages/friend/FriendFollowerPage";
 import FriendFollowingPage from "@/pages/friend/FriendFollowingPage";
 import NotFoundPage from "@/pages/notFound/NotFoundPage";
+import SettingPage from "@/pages/setting/SettingPage";
+import AdminPage from "@/pages/admin/AdminPage";
+import AdminLoginPage from "@/pages/admin/AdminLoginPage";
+import AdminReportPage from "@/pages/admin/AdminReportPage";
+import AdminUserPage from "@/pages/admin/AdminUserPage";
+import AdminPostPage from "@/pages/admin/AdminPostPage";
+import HomePage from "@/pages/home/HomePage";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +43,7 @@ const router = createBrowserRouter([
         path: "signup",
         element: <SignUpPage />,
       },
+      { path: "home", element: <HomePage /> },
       {
         path: "profile/:userId",
         element: <ProfilePage />,
@@ -130,12 +138,20 @@ const router = createBrowserRouter([
         element: <CommunityRecipeDetailPage />,
       },
       {
+        path: "community/recipe/:id/edit",
+        element: <CommunityRecipePostPage />,
+      },
+      {
         path: "community/market/post",
         element: <CommunityMarketPostPage />,
       },
       {
         path: "community/market/:id",
         element: <CommunityMarketDetailPage />,
+      },
+      {
+        path: "community/market/:id/edit",
+        element: <CommunityMarketPostPage />,
       },
       {
         path: "friend",
@@ -155,6 +171,10 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "setting",
+        element: <SettingPage />,
+      },
     ],
   },
   {
@@ -164,6 +184,32 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <LoginPage />,
+      },
+      {
+        path: "signup",
+        element: <SignUpPage />,
+      },
+    ],
+  },
+  {
+    path: "/admin/login",
+    element: <AdminLoginPage />,
+  },
+  {
+    path: "/admin",
+    element: <AdminPage />,
+    children: [
+      {
+        path: "report",
+        element: <AdminReportPage />,
+      },
+      {
+        path: "user",
+        element: <AdminUserPage />,
+      },
+      {
+        path: "post",
+        element: <AdminPostPage />,
       },
     ],
   },

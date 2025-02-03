@@ -1,12 +1,56 @@
-import { Button } from "@/components/ui/button";
+import { Dispatch, SetStateAction, useState } from "react";
+import TermsForm from "@/components/signup/TermForm";
+import InfoForm from "@/components/signup/InfoForm";
+
+enum SignUpStep {
+  TERMS,
+  INFO,
+}
+
+interface UserInput {
+  selectBit: number;
+  nickname: string;
+  introduction: string;
+}
+
+export interface SignUpFormProps {
+  userInput: UserInput;
+  setUserInput: Dispatch<SetStateAction<UserInput>>;
+  onNext?: () => void;
+  onPrev?: () => void;
+}
 
 const SignUpPage = () => {
-  return (
-    <main className="text-center">
-      <p>회원가입 페이지</p>
-      <Button>Click me</Button>
-    </main>
-  );
+  const [step, setStep] = useState<SignUpStep>(SignUpStep.TERMS);
+  const [userInput, setUserInput] = useState({
+    selectBit: 0,
+    nickname: "",
+    introduction: "",
+  });
+
+  const currentForm = () => {
+    switch (step) {
+      case SignUpStep.TERMS:
+      default:
+        return (
+          <TermsForm
+            userInput={userInput}
+            setUserInput={setUserInput}
+            onNext={() => setStep(SignUpStep.INFO)}
+          />
+        );
+      case SignUpStep.INFO:
+        return (
+          <InfoForm
+            userInput={userInput}
+            setUserInput={setUserInput}
+            onPrev={() => setStep(SignUpStep.TERMS)}
+          />
+        );
+    }
+  };
+
+  return currentForm();
 };
 
 export default SignUpPage;
