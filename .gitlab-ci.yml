@@ -49,13 +49,13 @@ client-test:
   tags:
     - docker
   stage: test
-  image: node:16
+  image: node:latest
   script:
     - cd damul-client
     - npm ci
     - npm run test
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(Client|client-develop|master)$/'
       when: always
     - if: '$CI_COMMIT_BRANCH =~ /^(Client|client-develop|master)$/'
       changes:
@@ -71,7 +71,7 @@ server-test:
     - cd damul-server
     - gradle clean test
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(Server|server-develop|master)$/'
       when: always
     - if: '$CI_COMMIT_BRANCH =~ /^(Server|server-develop|master)$/'
       changes:
