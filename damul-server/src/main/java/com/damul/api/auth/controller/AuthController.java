@@ -1,13 +1,19 @@
 package com.damul.api.auth.controller;
 
+import com.amazonaws.Response;
+import com.damul.api.auth.dto.request.AdminLoginRequest;
+import com.damul.api.auth.dto.request.AdminRequest;
 import com.damul.api.auth.dto.request.SignupRequest;
 import com.damul.api.auth.dto.response.TermsResponse;
 import com.damul.api.auth.dto.response.UserConsent;
+import com.damul.api.auth.entity.User;
+import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +24,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +43,8 @@ public class AuthController {
     private final AuthRepository authRepository;
     private final CookieUtil cookieUtil;
     private final TermsRepository termsRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 로그아웃
     @PostMapping("/logout")
@@ -144,5 +153,17 @@ public class AuthController {
 
 
        return ResponseEntity.ok(consent);
+    }
+
+    // 관리자 로그인
+    @PostMapping("/admin/login")
+    public ResponseEntity adminLogin(@RequestBody AdminLoginRequest adminRequest, HttpServletResponse response) {
+        log.info("관리자 로그인 요청");
+        User admin = userRepository.findByRole(Role.ADMIN)
+                .orElseThrow(() -> new IllegalArgumentException());
+
+        if (!passwordEncoder.matches(adminRequest.getPassword(), ) {
+            throw new InvalidPasswordException();
+        }
     }
 }

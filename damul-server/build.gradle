@@ -41,6 +41,9 @@ dependencies {
 	// AWS S3
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.780'
 
+	// PasswordEncoder
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
