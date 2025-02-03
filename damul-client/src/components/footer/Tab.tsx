@@ -1,8 +1,8 @@
-import React from "react";
+import { ElementType } from "react";
 import ChatAlarm from "./ChatAlram";
 
 interface TabProps {
-  iconType: React.ElementType;
+  iconType: ElementType;
   iconFill?: string;
   menuColor?: string;
   label?: string;
