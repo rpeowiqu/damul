@@ -67,16 +67,10 @@ spring:
             user-name-attribute: response
 
   datasource:
-    driver-class-name: ${MYSQL_DRIVER}
-    url: ${MYSQL_URL}
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 10
-      idle-timeout: 300000
-      connection-timeout: 30000
-      max-lifetime: 1200000
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
   jpa:
     hibernate:
