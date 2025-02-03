@@ -3,11 +3,11 @@ import DamulTab from "@/components/common/DamulTab";
 
 const tabItems = [
   {
-    absPath: "/community/recipe",
+    path: "/community/recipe",
     name: "레시피 게시판",
   },
   {
-    absPath: "/community/market",
+    path: "/community/market",
     name: "공구/나눔 마켓",
   },
 ];

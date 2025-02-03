@@ -1,28 +1,91 @@
-import { Bar, BarChart, Cell, XAxis, YAxis } from "recharts";
-import { ChartConfig, ChartContainer } from "@/components/ui/chart";
-import { Link } from "react-router-dom";
-
-const ingredientHisoryData = [
-  { name: "달걀류", count: 3, color: "#f28b82" },
-  { name: "유제품", count: 5, color: "#fbbc04" },
-  { name: "과일류", count: 8, color: "#fdd663" },
-  { name: "육류", count: 25, color: "#97d174" },
-  { name: "채소류", count: 12, color: "#6fcf97" },
-  { name: "수산물", count: 15, color: "#76d7ea" },
-  { name: "양념류", count: 2, color: "#4a90e2" },
-  { name: "기름류", count: 1, color: "#ab7fd0" },
-  { name: "곡물류", count: 5, color: "#f4a9c0" },
-  { name: "기타", count: 11, color: "#cfd8dc" },
-];
+import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Link, useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { ProfileInfo } from "@/types/profile";
+import DamulButton from "@/components/common/DamulButton";
+import useUserStore from "@/stores/user";
 
 const chartConfig = {
-  count: {
-    label: "count",
-    color: "#97d174",
+  categoryPreference: {
+    label: "등록 횟수",
   },
 } satisfies ChartConfig;
 
+const colorList = [
+  "#f28b82",
+  "#fbbc04",
+  "#fdd663",
+  "#97d174",
+  "#6fcf97",
+  "#76d7ea",
+  "#4a90e2",
+  "#ab7fd0",
+  "#f4a9c0",
+  "#cfd8dc",
+];
+
 const ProfileInfoPage = () => {
+  const { user } = useOutletContext();
+  const myId = useUserStore((state) => state.myId);
+  const [profileInfo, setProfileInfo] = useState<ProfileInfo>({
+    followerCount: 0,
+    followingCount: 0,
+    selfIntroduction: "",
+    foodPreference: [],
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `/mocks/profile/user-profile-info_${user.userId}.json`,
+        );
+        if (!response.ok) {
+          throw new Error("데이터를 불러오지 못했습니다.");
+        }
+
+        const data = await response.json();
+        setProfileInfo(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
+  if (isLoading) {
+    return null;
+  }
+
+  const getFavoriteFood = () => {
+    const favoriteFood = profileInfo.foodPreference.reduce(
+      (maxItem, item, index) =>
+        item.categoryPreference > maxItem.item.categoryPreference
+          ? { item, index }
+          : maxItem,
+      { item: profileInfo.foodPreference[0], index: 0 },
+    );
+
+    return (
+      <span
+        className={"font-bold ml-0.5"}
+        style={{ color: colorList[favoriteFood.index] }}
+      >
+        {favoriteFood.item.categoryName}
+      </span>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-3 h-full">
       <div className="flex font-bold py-6 bg-white">
@@ -31,23 +94,35 @@ const ProfileInfoPage = () => {
           className="flex flex-col items-center flex-1 border-r border-normal-50"
         >
           <p className="text-sm">팔로워</p>
-          <p className="text-lg">923,722</p>
+          <p className="text-lg">
+            {profileInfo.followerCount.toLocaleString()}
+          </p>
         </Link>
         <Link
           to={"/friend/following"}
-          className="flex flex-col items-center flex-1 border-r border-transparent"
+          className="flex flex-col items-center flex-1 border-r border-normal-50"
         >
           <p className="text-sm">팔로잉</p>
-          <p className="text-lg">0</p>
+          <p className="text-lg">
+            {profileInfo.followingCount.toLocaleString()}
+          </p>
         </Link>
+        {user.userId !== myId && (
+          <div className="flex items-center flex-1 gap-2 border-r border-transparent">
+            <DamulButton variant="positive" onClick={() => {}}>
+              팔로우
+            </DamulButton>
+            <DamulButton variant="positive" onClick={() => {}}>
+              채팅하기
+            </DamulButton>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-2 p-5 bg-white">
         <h1 className="text-lg font-bold">자기소개</h1>
         <p className="text-normal-600">
-          1일 1토마토를 못 먹으면 입 안에 가시가 돋는다.
-          <br />
-          안녕하세요, 토마토러버 전종우입니다.
+          {profileInfo.selfIntroduction}
           <br />
         </p>
       </div>
@@ -55,20 +130,21 @@ const ProfileInfoPage = () => {
       <div className="flex flex-col flex-1 gap-2 p-5 bg-white">
         <h1 className="text-lg font-bold">선호 식자재 그래프</h1>
         <p className="text-normal-600">
-          토마토러버전종우님은 <span className="text-negative-500">육류</span>를
-          가장 좋아하시는군요!
+          {user.nickname}님은 {getFavoriteFood()}을(를) 가장 좋아하시는군요!
         </p>
         <ChartContainer config={chartConfig} className="w-full min-h-80">
           <BarChart
             accessibilityLayer
-            data={ingredientHisoryData}
+            data={profileInfo.foodPreference}
             layout="vertical"
           >
+            <CartesianGrid vertical={true} />
             <XAxis className="text-sm" type="number" />
-            <YAxis className="text-sm" type="category" dataKey="name" />
-            <Bar dataKey="count">
-              {ingredientHisoryData.map((item, index) => (
-                <Cell key={index} fill={item.color} />
+            <YAxis className="text-sm" type="category" dataKey="categoryName" />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Bar dataKey="categoryPreference">
+              {profileInfo.foodPreference.map((item, index) => (
+                <Cell key={item.categoryId} fill={colorList[index]} />
               ))}
             </Bar>
           </BarChart>

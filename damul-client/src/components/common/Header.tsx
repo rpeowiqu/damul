@@ -18,9 +18,9 @@ const Header = () => {
             </Link>
           </li>
           <li className="flex items-center">
-            <button>
+            <Link to={"/setting"}>
               <OptionIcon className="stroke-normal-700 stroke-2" />
-            </button>
+            </Link>
           </li>
         </ul>
       </nav>

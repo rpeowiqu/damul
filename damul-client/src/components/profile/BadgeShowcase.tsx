@@ -2,15 +2,9 @@ import { useState, useEffect } from "react";
 
 import Badge from "./Badge";
 import DamulModal from "../common/DamulModal";
+import { BadgeList } from "@/types/profile";
 
-interface BadgeShowcaseProps {
-  level: number;
-  title: string;
-  condition: string;
-  description: string;
-}
-
-const BadgeShowcase = ({ badgeList }: { badgeList: BadgeShowcaseProps[] }) => {
+const BadgeShowcase = ({ list }: BadgeList) => {
   const [currentBadgeIndex, setCurrentBadgeIndex] = useState(-1);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -22,12 +16,11 @@ const BadgeShowcase = ({ badgeList }: { badgeList: BadgeShowcaseProps[] }) => {
 
   return (
     <div className="flex flex-col gap-3 p-3 border border-normal-100 rounded-xl">
-      <p className="text-end text-sm">
-        보유 뱃지 수 : {badgeList.length || 0}개
-      </p>
-      <div className="flex flex-col">
+      <p className="text-end text-sm">보유 뱃지 수 : {list.length}개</p>
+
+      {list.length > 0 ? (
         <div className="grid grid-cols-5 pc:grid-cols-6 place-items-center gap-4">
-          {badgeList.map((badge, index) => (
+          {list.map((badge, index) => (
             <Badge
               key={index}
               {...badge}
@@ -37,7 +30,13 @@ const BadgeShowcase = ({ badgeList }: { badgeList: BadgeShowcaseProps[] }) => {
             />
           ))}
         </div>
-      </div>
+      ) : (
+        <p className="text-center text-normal-200 text-lg">
+          보유 중인 뱃지가 없습니다.
+          <br />
+          식자재를 등록하고 뱃지를 획득해 보세요.
+        </p>
+      )}
 
       {currentBadgeIndex > -1 && (
         <DamulModal
@@ -55,7 +54,7 @@ const BadgeShowcase = ({ badgeList }: { badgeList: BadgeShowcaseProps[] }) => {
           <div className="flex flex-col justify-center gap-5 px-3">
             <div className="flex items-center gap-3">
               <div className="flex justify-center items-center w-20 h-20 pt-2 rounded-full border-2 border-normal-100">
-                <Badge level={badgeList[currentBadgeIndex].level} />
+                <Badge badgeLevel={list[currentBadgeIndex].badgeLevel} />
               </div>
 
               <div className="flex flex-col gap-2 flex-1">
@@ -63,10 +62,10 @@ const BadgeShowcase = ({ badgeList }: { badgeList: BadgeShowcaseProps[] }) => {
                   <p className="text-xs text-positive-400">뱃지명</p>
                   <div className="flex gap-1">
                     <p className="font-bold">
-                      {badgeList[currentBadgeIndex].title}
+                      {list[currentBadgeIndex].badgeName}
                     </p>
                     <p className="font-black">
-                      (Lv.{badgeList[currentBadgeIndex].level})
+                      (Lv.{list[currentBadgeIndex].badgeLevel})
                     </p>
                   </div>
                 </div>
@@ -79,7 +78,7 @@ const BadgeShowcase = ({ badgeList }: { badgeList: BadgeShowcaseProps[] }) => {
 
             <div className="text-center">
               <p className="text-base font-black">
-                {badgeList[currentBadgeIndex].condition}
+                {list[currentBadgeIndex].condition}
               </p>
               <p className="text-positive-400 text-sm">
                 상위 0.55%가 이 뱃지를 획득했어요.
@@ -87,7 +86,7 @@ const BadgeShowcase = ({ badgeList }: { badgeList: BadgeShowcaseProps[] }) => {
             </div>
 
             <p className="text-center text-normal-300">
-              {badgeList[currentBadgeIndex].description}
+              {list[currentBadgeIndex].description}
             </p>
           </div>
         </DamulModal>
