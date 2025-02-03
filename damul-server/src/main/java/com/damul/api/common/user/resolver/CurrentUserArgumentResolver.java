@@ -57,7 +57,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         // Principal이 CustomUserDetails 타입인지 확인하고
         // CustomUserDetails에서 User 객체를 추출하여 반환
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
-            return ((CustomUserDetails) authentication.getPrincipal()).getUser();
+            return ((CustomUserDetails) authentication.getPrincipal()).getUserInfo();
         }
 
         return null; // CustomUserDetails가 아닌 경우 null 반환
