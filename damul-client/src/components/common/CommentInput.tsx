@@ -1,13 +1,8 @@
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import { ChangeEvent, KeyboardEvent, Dispatch, SetStateAction } from "react";
 import { Input } from "@/components/ui/input";
 import SendIcon from "../svg/SendIcon";
 
-interface DamulCommentInputProps {
+interface CommentInputProps {
   placeholder?: string;
   onButtonClick?: (_value: string) => void; // 버튼 클릭 이벤트 (입력값 전달)
   comment: string;
@@ -15,16 +10,16 @@ interface DamulCommentInputProps {
   className?: string; // 추가된 스타일링 prop
 }
 
-const DamulCommentInput = ({
+const CommentInput = ({
   placeholder,
   onButtonClick,
   comment,
   setComment,
   className = "",
-}: DamulCommentInputProps) => {
+}: CommentInputProps) => {
   // 입력값 변경 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setComment?.(e.target.value);
+    setComment(e.target.value);
   };
 
   // 엔터 키 입력 핸들러
@@ -32,14 +27,14 @@ const DamulCommentInput = ({
     if (e.key === "Enter" && (comment || "").trim() !== "") {
       e.preventDefault();
       onButtonClick?.(comment || ""); // 기본값 "" 설정
-      setComment?.("");
+      setComment("");
     }
   };
 
   // 입력 버튼 클릭 핸들러
   const handleButtonClick = () => {
-      console.log(comment);
-      setComment?.("");
+    console.log(comment);
+    setComment("");
   };
 
   return (
@@ -56,10 +51,10 @@ const DamulCommentInput = ({
         className="absolute inset-y-2 right-2 pc:right-3"
         onClick={handleButtonClick}
       >
-        <SendIcon className="w-7 h-7"/>
+        <SendIcon className="w-7 h-7" />
       </button>
     </div>
   );
 };
 
-export default DamulCommentInput;
+export default CommentInput;

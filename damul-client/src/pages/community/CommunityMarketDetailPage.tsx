@@ -3,8 +3,8 @@ import CommunityDetailHeader from "@/components/community/CommunityDetailHeader"
 import AuthorInfo from "@/components/community/AuthorInfo";
 import ContentSection from "@/components/community/ContentSection";
 import CommentsSection from "@/components/community/CommentsSection";
-import FixedCommentInput from "@/components/community/FixedCommentInput";
-import { Comment } from "@/types/interfaces";
+import FixedCommentInfo from "@/components/community/FixedCommentInfo";
+import { Comment } from "@/types/community";
 
 const CommunityMarketDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
@@ -96,7 +96,7 @@ const CommunityMarketDetailPage = () => {
           type="market"
         />
       </main>
-      <FixedCommentInput
+      <FixedCommentInfo
         replyingTo={replyingTo}
         comment={comment}
         setComment={setComment}
