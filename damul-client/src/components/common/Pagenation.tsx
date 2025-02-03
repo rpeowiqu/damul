@@ -3,7 +3,7 @@ import { PAGE_SIZE, NAVIGATION_SIZE } from "@/constants/pagenation";
 
 interface PagenationProps {
   page: number;
-  setPage: Dispatch<SetStateAction<number>>;
+  setPage: (page: number) => void;
   totalPage: number;
 }
 
@@ -16,8 +16,6 @@ const Pagenation = ({ page, setPage, totalPage }: PagenationProps) => {
       : curRangeStartPage + NAVIGATION_SIZE - 1;
   const isInEndRange =
     page >= Math.floor((totalPage - 1) / NAVIGATION_SIZE) * NAVIGATION_SIZE + 1;
-
-  console.log(page, curRangeStartPage, curRangeEndPage);
 
   return (
     <nav className="flex justify-center">

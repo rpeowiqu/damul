@@ -9,18 +9,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
-import { Report } from "@/types/admin";
 import Pagenation from "@/components/common/Pagenation";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Report } from "@/types/admin";
 
 const AdminReportPage = () => {
-  const [searchType, setSearchType] = useState<"all" | "reportId" | "nickname">(
-    "all",
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
   const [keyword, setKeyword] = useState<string>("");
   const [totalPage, setTotalPage] = useState<number>(0);
-  const [page, setPage] = useState<number>(1);
   const [reportList, setReportList] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const nav = useNavigate();
+
+  // URL의 쿼리 파라미터에서 검색 타입과, 현재 페이지를 가져온다.
+  // 검색어는 onChange 이벤트가 호출될 때마다 URL이 바뀌면 안되기 때문에 별도의 STATE로 관리한다.
+  const searchType = searchParams.get("searchType") || "";
+  const page = parseInt(searchParams.get("page") || "1");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,7 +35,6 @@ const AdminReportPage = () => {
         }
 
         const data = await response.json();
-        console.log(data);
         setReportList(data.content);
         setTotalPage(data.pageInfo.totalPages);
       } catch (error) {
@@ -52,8 +55,11 @@ const AdminReportPage = () => {
       <div className="flex items-center gap-3">
         <Select
           value={searchType}
-          onValueChange={(value) =>
-            setSearchType(value as "all" | "reportId" | "nickname")
+          onValueChange={(value: "all" | "reportId" | "nickname") =>
+            setSearchParams((prev) => {
+              prev.set("searchType", value);
+              return prev;
+            })
           }
         >
           <SelectTrigger className="w-28">
@@ -72,7 +78,7 @@ const AdminReportPage = () => {
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
                 value="reportId"
               >
-                신고번호
+                신고 번호
               </SelectItem>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
@@ -86,9 +92,12 @@ const AdminReportPage = () => {
 
         <DamulSearchBox
           placeholder="검색어를 입력해 주세요."
-          className="w-full"
+          className="w-full focus-visible:ring-1 focus-visible:ring-offset-0"
           inputValue={keyword}
           setInputValue={setKeyword}
+          onButtonClick={() => {
+            setSearchParams({ keyword, searchType, page: "1" });
+          }}
         />
       </div>
 
@@ -100,10 +109,10 @@ const AdminReportPage = () => {
                 신고 번호
               </th>
               <th scope="col" className="p-2">
-                구분
+                닉네임
               </th>
               <th scope="col" className="p-2">
-                닉네임
+                구분
               </th>
               <th scope="col" className="p-2">
                 처리 상태
@@ -111,14 +120,15 @@ const AdminReportPage = () => {
             </tr>
           </thead>
           <tbody>
-            {reportList.map((item) => (
+            {reportList.map((item: Report) => (
               <tr
                 key={item.id}
                 className="bg-white border-b border-normal-100 hover:bg-positive-50 cursor-pointer"
+                onClick={() => nav(`${item.id}`)}
               >
                 <td className="p-2">{item.id}</td>
-                <td className="p-2">{item.categoryName}</td>
                 <td className="p-2">{item.nickname}</td>
+                <td className="p-2">{item.categoryName}</td>
                 <td
                   className={`p-2 ${item.status === "미완료" ? "text-negative-400 " : "text-positive-400"}`}
                 >
@@ -130,7 +140,16 @@ const AdminReportPage = () => {
         </table>
       </div>
 
-      <Pagenation page={page} setPage={setPage} totalPage={totalPage} />
+      <Pagenation
+        page={page}
+        setPage={(newPage: number) =>
+          setSearchParams((prev) => {
+            prev.set("page", `${newPage}`);
+            return prev;
+          })
+        }
+        totalPage={totalPage}
+      />
     </div>
   );
 };
