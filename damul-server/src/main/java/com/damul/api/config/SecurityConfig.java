@@ -38,22 +38,6 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
 
-//
-//    @Bean
-//    @Primary
-//    public ObjectPostProcessor<Object> objectPostProcessor() {
-//        return new ObjectPostProcessor<Object>() {
-//            @Override
-//            public <O> O postProcess(O object) {
-//                // 로깅 추가 (선택사항)
-//                if (object != null) {
-//                    log.debug("Processing object: {}", object.getClass().getName());
-//                }
-//                return object;
-//            }
-//        };
-//    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
