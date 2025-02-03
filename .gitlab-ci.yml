@@ -107,31 +107,40 @@ deploy:
     - ssh-add ~/.ssh/I12A306T.pem
     - ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - ssh -i ~/.ssh/I12A306T.pem ubuntu@$EC2_HOST 'cd ~/S12P11A306 && pwd'
   script:
     - |
-      if [[ "$CI_COMMIT_BRANCH" == "Server" ]]; then
-        ssh $EC2_USER@$EC2_HOST "
-          cd ~/S12P11A306 &&
-          git pull origin ${CI_COMMIT_BRANCH} &&
-          docker pull $CI_REGISTRY_IMAGE/server:latest &&
-          docker-compose -f docker-compose.prod.yml up -d server"
-      fi
-
+      # Client 브랜치 배포: 클라이언트 컨테이너만 배포
       if [[ "$CI_COMMIT_BRANCH" == "Client" ]]; then
         ssh $EC2_USER@$EC2_HOST "
-          cd ~/S12P11A306 &&
-          git pull origin ${CI_COMMIT_BRANCH} &&
+          cd /home/ubuntu/S12P11A306 &&
           docker pull $CI_REGISTRY_IMAGE/client:latest &&
-          docker-compose -f docker-compose.prod.yml up -d client"
+          docker compose -f docker-compose.prod.yml up -d server"
       fi
 
+      # Server 브랜치 배포: 서버 컨테이너만 배포
+      if [[ "$CI_COMMIT_BRANCH" == "Server" ]]; then
+        ssh $EC2_USER@$EC2_HOST "
+          cd /home/ubuntu/S12P11A306 &&
+          docker pull $CI_REGISTRY_IMAGE/server:latest &&
+          docker compose -f docker-compose.prod.yml up -d server"
+      fi
+
+      # master 브랜치 배포: 클라이언트와 서버 컨테이너 모두 배포
       if [[ "$CI_COMMIT_BRANCH" == "master" ]]; then
         ssh $EC2_USER@$EC2_HOST "
-          cd ~/S12P11A306 &&
-          git pull origin ${CI_COMMIT_BRANCH} &&
+          cd /home/ubuntu/S12P11A306 &&
+          docker pull $CI_REGISTRY_IMAGE/server:latest &&
+          docker compose -f docker-compose.prod.yml up -d server"
+      fi
+
+      # master 브랜치 배포: 클라이언트와 서버 컨테이너 모두 배포
+      if [[ "$CI_COMMIT_BRANCH" == "master" ]]; then
+        ssh $EC2_USER@$EC2_HOST "
+          cd /home/ubuntu/S12P11A306 &&
           docker pull $CI_REGISTRY_IMAGE/client:latest &&
           docker pull $CI_REGISTRY_IMAGE/server:latest &&
-          docker-compose -f docker-compose.prod.yml up -d"
+          docker compose -f docker-compose.prod.yml up -d server"
       fi
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^(Client|Server|master)$/'
+    - if: '$CI_COMMIT_BRANCH =~ /^Client|Server|master$/'
