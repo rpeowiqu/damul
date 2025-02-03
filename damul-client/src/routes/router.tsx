@@ -16,10 +16,19 @@ import ProfileInfoPage from "@/pages/profile/ProfileInfoPage";
 import ProfileBadgePage from "@/pages/profile/ProfileBadgePage";
 import ProfileRecipePage from "@/pages/profile/ProfileRecipePage";
 import ProfileBookmarkPage from "@/pages/profile/ProfileBookmarkPage";
+import ProfileIngredientsPage from "@/pages/profile/ProfileIngredientsPage";
 import CommunityPage from "@/pages/community/CommunityPage";
 import FriendPage from "@/pages/friend/FriendPage";
 import FriendFollowerPage from "@/pages/friend/FriendFollowerPage";
 import FriendFollowingPage from "@/pages/friend/FriendFollowingPage";
+import NotFoundPage from "@/pages/notFound/NotFoundPage";
+import SettingPage from "@/pages/setting/SettingPage";
+import AdminPage from "@/pages/admin/AdminPage";
+import AdminLoginPage from "@/pages/admin/AdminLoginPage";
+import AdminReportPage from "@/pages/admin/AdminReportPage";
+import AdminUserPage from "@/pages/admin/AdminUserPage";
+import AdminPostPage from "@/pages/admin/AdminPostPage";
+import HomePage from "@/pages/home/HomePage";
 
 const router = createBrowserRouter([
   {
@@ -34,8 +43,9 @@ const router = createBrowserRouter([
         path: "signup",
         element: <SignUpPage />,
       },
+      { path: "home", element: <HomePage /> },
       {
-        path: "profile",
+        path: "profile/:userId",
         element: <ProfilePage />,
         children: [
           {
@@ -57,6 +67,10 @@ const router = createBrowserRouter([
           {
             path: "bookmark",
             element: <ProfileBookmarkPage />,
+          },
+          {
+            path: "ingredients",
+            element: <ProfileIngredientsPage />,
           },
         ],
       },
@@ -157,6 +171,10 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "setting",
+        element: <SettingPage />,
+      },
     ],
   },
   {
@@ -167,7 +185,37 @@ const router = createBrowserRouter([
         path: "login",
         element: <LoginPage />,
       },
+      {
+        path: "signup",
+        element: <SignUpPage />,
+      },
     ],
+  },
+  {
+    path: "/admin/login",
+    element: <AdminLoginPage />,
+  },
+  {
+    path: "/admin",
+    element: <AdminPage />,
+    children: [
+      {
+        path: "report",
+        element: <AdminReportPage />,
+      },
+      {
+        path: "user",
+        element: <AdminUserPage />,
+      },
+      {
+        path: "post",
+        element: <AdminPostPage />,
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ]);
 

@@ -1,9 +1,12 @@
 import { MouseEventHandler } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 
 export interface DamulTabItemProps {
-  // URL 절대 경로
-  absPath: string;
+  // URL 경로
+  path: string;
+
+  // 동적 경로일 경우, 경로 변수
+  pathVariables?: string[];
 
   // 탭의 이름
   name: string;
@@ -13,10 +16,28 @@ export interface DamulTabItemProps {
 }
 
 const DamulTabItem = ({
-  absPath,
+  path,
+  pathVariables,
   name,
   onClick = () => {},
 }: DamulTabItemProps) => {
+  const params = useParams();
+
+  const getPath = () => {
+    if (pathVariables && pathVariables.length > 0) {
+      let resolvedPath = path;
+      pathVariables.forEach((param) => {
+        if (params[param]) {
+          resolvedPath = resolvedPath.replace(`:${param}`, params[param]);
+        }
+      });
+
+      return resolvedPath;
+    }
+
+    return path;
+  };
+
   return (
     <NavLink
       className={({ isActive }) =>
@@ -24,7 +45,7 @@ const DamulTabItem = ({
           ? "text-positive-400 flex-1 text-center font-bold"
           : "flex-1 text-center text-normal-200 font-bold"
       }
-      to={absPath}
+      to={getPath()}
       onClick={onClick}
     >
       {name}
