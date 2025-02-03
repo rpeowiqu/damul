@@ -1,6 +1,6 @@
 package com.damul.api.auth.repository;
 
-import com.damul.api.auth.dto.UserInfo;
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

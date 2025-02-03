@@ -1,16 +1,13 @@
-package com.damul.api.auth.dto;
+package com.damul.api.auth.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TermsResponse {
+public class UserInfo {
     private int id;
-    private String title;
-    private String content;
+    private String nickname;
 }

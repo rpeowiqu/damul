@@ -1,6 +1,6 @@
 package com.damul.api.common.user;
 
-import com.damul.api.auth.dto.UserInfo;
+import com.damul.api.auth.dto.response.UserInfo;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

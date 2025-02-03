@@ -1,7 +1,8 @@
 package com.damul.api.auth.controller;
 
-import com.damul.api.auth.dto.SignupRequest;
-import com.damul.api.auth.dto.TermsResponse;
+import com.damul.api.auth.dto.request.SignupRequest;
+import com.damul.api.auth.dto.response.TermsResponse;
+import com.damul.api.auth.dto.response.UserConsent;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.repository.AuthRepository;
@@ -90,7 +91,7 @@ public class AuthController {
 
             // 회원가입 시작
             log.info("회원가입 요청 - email: {}", email);
-            Map<String, String> tokens = authService.processSignup(tempToken, signupRequest.getNickname());
+            Map<String, String> tokens = authService.processSignup(tempToken, signupRequest);
 
             log.info("쿠키 설정");
             cookieUtil.addCookie(response, "access_token", tokens.get("accessToken"),
@@ -108,15 +109,17 @@ public class AuthController {
         }
     }
 
-    // 약관 동의 조회
-    @GetMapping("/terms")
+    // 약관 동의 및 닉네임, 이메일 조회
+    @GetMapping("/consent")
     public ResponseEntity<?> getTerms(@CookieValue(name="temp_token", required = true) String tempToken) {
         log.info("약관 동의 조회 요청");
         log.info("닉네임 갖고오기");
         Claims claims = jwtTokenProvider.getClaims(tempToken);
         String defaultNickname = claims.get("nickname", String.class);
+        String email = claims.get("email", String.class);
 
         log.info("닉네임 조회 - nickname: {}", defaultNickname);
+        log.info("이메일 조회 - email: {}", email);
 
         // 임시토큰 검증
         if(!jwtTokenProvider.validateToken(tempToken)) {
@@ -133,12 +136,13 @@ public class AuthController {
         }
 
         log.info("약관 데이터 조회 성공, size: {}", terms.size());
+        UserConsent consent = UserConsent.builder()
+                .email(email)
+                .nickname(defaultNickname)
+                .terms(terms)
+                .build();
 
 
-
-       return ResponseEntity.ok(Map.of(
-                "terms", terms,
-                "defaultNickname", defaultNickname
-        ));
+       return ResponseEntity.ok(consent);
     }
 }

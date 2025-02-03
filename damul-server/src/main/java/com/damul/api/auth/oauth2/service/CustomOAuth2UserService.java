@@ -1,6 +1,6 @@
 package com.damul.api.auth.oauth2.service;
 
-import com.damul.api.auth.dto.UserInfo;
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.oauth2.dto.GoogleResponse;
 import com.damul.api.auth.oauth2.dto.KaKaoResponse;

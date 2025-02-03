@@ -1,6 +1,6 @@
 package com.damul.api.auth.repository;
 
-import com.damul.api.auth.dto.TermsResponse;
+import com.damul.api.auth.dto.response.TermsResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

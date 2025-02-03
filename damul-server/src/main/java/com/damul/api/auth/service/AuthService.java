@@ -1,5 +1,6 @@
 package com.damul.api.auth.service;
 
+import com.damul.api.auth.dto.request.SignupRequest;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.repository.AuthRepository;
@@ -30,7 +31,7 @@ public class AuthService {
 
 
     @Transactional
-    public Map<String, String> processSignup(String tempToken, String nickname) {
+    public Map<String, String> processSignup(String tempToken, SignupRequest signupRequest) {
             log.info("임시 토큰에서 OAuth2 인증 정보 추출 시작");
             // 1. 임시 토큰에서 OAuth2 인증 정보 추출
             Claims claims = jwtTokenProvider.getClaims(tempToken);
@@ -55,7 +56,8 @@ public class AuthService {
 
                 // 수정된 닉네임 적용
                 user.builder()
-                        .nickname(nickname);
+                        .nickname(signupRequest.getNickname())
+                        .selfIntroduction(signupRequest.getSelfIntroduction());
 
                 log.info("닉네임 적용 완료 - nickname: {}", user.getNickname());
 
