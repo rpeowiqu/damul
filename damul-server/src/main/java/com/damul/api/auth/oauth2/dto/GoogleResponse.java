@@ -2,10 +2,12 @@ package com.damul.api.auth.oauth2.dto;
 
 import com.damul.api.auth.entity.type.Provider;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.util.Map;
 
+@Slf4j
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,6 +23,7 @@ public class GoogleResponse implements OAuth2Response, Serializable {
     }
 
     public GoogleResponse(Map<String, Object> attribute) {
+        log.info("GoogleResponse attributes: {}", attribute);
         this.email = attribute.get("email") != null ? attribute.get("email").toString() : null;
         this.nickname = attribute.get("name") != null ? attribute.get("name").toString() : null;
         this.profileImage = attribute.get("picture") != null ? attribute.get("picture").toString() : null;

@@ -75,7 +75,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             String tempToken = oAuth2User.getAttribute("tempToken");
 
             // 쿠키로 전달
-            cookieUtil.addCookie(response, "temp_token", tempToken, 1800); // 30분 유지
+            cookieUtil.addCookie(response, "tempToken", tempToken, 1800); // 30분 유지
 
             // 신규 회원이면 약관동의 페이지로 Redirect
             response.sendRedirect(frontUrl+terms);

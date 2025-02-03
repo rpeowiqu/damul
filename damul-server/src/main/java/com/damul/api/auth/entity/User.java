@@ -52,9 +52,9 @@ public class User {
     @Column(name = "self_introduction")
     private String selfIntroduction;
 
-    @Column(name = "accessRange", nullable = false)
+    @Column(name = "access_range")
     private AccessRange accessRange;
 
-    @Column(name = "warningEnabled", nullable = false)
+    @Column(name = "warning_enabled")
     private boolean warningEnabled;
 }

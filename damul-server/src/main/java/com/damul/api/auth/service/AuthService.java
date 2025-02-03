@@ -79,7 +79,7 @@ public class AuthService {
     public void signup(String tempToken, SignupRequest signupRequest, HttpServletResponse response) {
         // 1. 토큰 검증
         if(!jwtTokenProvider.validateToken(tempToken)) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         try {
@@ -89,11 +89,14 @@ public class AuthService {
             log.info("이메일 - email: {}", email);
 
             // 3. Redis에서 유저 정보 가져오기
-            String sessionKey = "oauth2:user:" + RequestContextHolder.currentRequestAttributes().getSessionId();
+            String sessionKey = "oauth2:user:" + email;
+            log.info("Redis 세션 키: {}", sessionKey);
+
             String jsonString = redisTemplate.opsForValue().get(sessionKey);
+            log.info("Redis에서 가져온 JSON 문자열: {}", jsonString);
 
             if (jsonString == null) {
-                throw new RuntimeException("유저 정보를 찾을 수 없습니다.");
+                throw new BusinessException(ErrorCode.USER_NOT_FOUND);
             }
 
             // 4. 유저 정보 파싱 및 저장

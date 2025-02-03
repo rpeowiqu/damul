@@ -61,7 +61,7 @@ public class AuthController {
 
     // 약관 동의 후 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@CookieValue(name = "temp_token", required = true) String tempToken,
+    public ResponseEntity<?> signup(@CookieValue(name = "tempToken", required = true) String tempToken,
                                     @RequestBody SignupRequest signupRequest,
                                     HttpServletResponse response) {
         try {
@@ -80,8 +80,16 @@ public class AuthController {
 
     // 약관 동의 및 닉네임, 이메일 조회
     @GetMapping("/consent")
-    public ResponseEntity<?> getTerms(@CookieValue(name="temp_token", required = true) String tempToken) {
+    public ResponseEntity<?> getTerms(@CookieValue(name="tempToken", required = true) String tempToken) {
         log.info("약관 동의 조회 요청");
+
+        // tempToken null이면 클라이언트가 인증되지 않은 상태일 수 있음
+        if (tempToken == null) {
+            log.error("tempToken 존재하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "인증 토큰이 없습니다."));
+        }
+
         log.info("닉네임 갖고오기");
         Claims claims = jwtTokenProvider.getClaims(tempToken);
         String defaultNickname = claims.get("nickname", String.class);
