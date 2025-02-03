@@ -18,7 +18,6 @@ const AdminReportPage = () => {
   );
   const [keyword, setKeyword] = useState<string>("");
   const [totalPage, setTotalPage] = useState<number>(0);
-  const [totalElement, setTotalElement] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const [reportList, setReportList] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -34,8 +33,6 @@ const AdminReportPage = () => {
         const data = await response.json();
         console.log(data);
         setReportList(data.content);
-        setPage(data.pageInfo.currentPage);
-        setTotalElement(data.pageInfo.totalElements);
         setTotalPage(data.pageInfo.totalPages);
       } catch (error) {
         console.error(error);
@@ -45,13 +42,13 @@ const AdminReportPage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [page]);
 
   if (isLoading) {
     return null;
   }
   return (
-    <div className="flex flex-col gap-5 w-full h-full p-6">
+    <div className="flex flex-col gap-6 w-full h-full p-6">
       <div className="flex items-center gap-3">
         <Select
           value={searchType}
@@ -94,43 +91,46 @@ const AdminReportPage = () => {
           setInputValue={setKeyword}
         />
       </div>
-      <table className="w-full text-normal-700 text-center">
-        <thead className="bg-positive-300 text-white">
-          <tr>
-            <th scope="col" className="p-2">
-              신고 번호
-            </th>
-            <th scope="col" className="p-2">
-              구분
-            </th>
-            <th scope="col" className="p-2">
-              닉네임
-            </th>
-            <th scope="col" className="p-2">
-              처리 상태
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {reportList.map((item) => (
-            <tr
-              key={item.id}
-              className="bg-white border-b border-normal-100 hover:bg-positive-50 cursor-pointer"
-            >
-              <td className="p-2">{item.id}</td>
-              <td className="p-2">{item.categoryName}</td>
-              <td className="p-2">{item.nickname}</td>
-              <td
-                className={`p-2 ${item.status === "미완료" ? "text-negative-400 " : "text-positive-400"}`}
-              >
-                {item.status}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
-      <Pagenation />
+      <div className="min-h-[450px] mb-10">
+        <table className="w-full text-normal-700 text-center">
+          <thead className="bg-positive-300 text-white">
+            <tr>
+              <th scope="col" className="p-2">
+                신고 번호
+              </th>
+              <th scope="col" className="p-2">
+                구분
+              </th>
+              <th scope="col" className="p-2">
+                닉네임
+              </th>
+              <th scope="col" className="p-2">
+                처리 상태
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {reportList.map((item) => (
+              <tr
+                key={item.id}
+                className="bg-white border-b border-normal-100 hover:bg-positive-50 cursor-pointer"
+              >
+                <td className="p-2">{item.id}</td>
+                <td className="p-2">{item.categoryName}</td>
+                <td className="p-2">{item.nickname}</td>
+                <td
+                  className={`p-2 ${item.status === "미완료" ? "text-negative-400 " : "text-positive-400"}`}
+                >
+                  {item.status}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <Pagenation page={page} setPage={setPage} totalPage={totalPage} />
     </div>
   );
 };
