@@ -17,13 +17,15 @@ client-build:
   services:
     - name: docker:dind
       command: ["--tls=false"]
+      alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
     DOCKER_BUILDKIT: 1
+    DOCKER_DRIVER: overlay2
   before_script:
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_ACCESS_TOKEN
-    - docker buildx create --use
+    - docker buildx create --use --driver docker-container
   script:
     - docker buildx build --platform linux/amd64 -t $CLIENT_DOCKER_IMAGE ./damul-client --push
   rules:
@@ -40,13 +42,15 @@ server-build:
   services:
     - name: docker:dind
       command: ["--tls=false"]
+      alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
     DOCKER_BUILDKIT: 1
+    DOCKER_DRIVER: overlay2
   before_script:
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_ACCESS_TOKEN
-    - docker buildx create --use
+    - docker buildx create --use --driver docker-container
   script:
     - docker buildx build --platform linux/amd64 -t $SERVER_DOCKER_IMAGE ./damul-server --push
   rules:
@@ -60,7 +64,7 @@ client-test:
   tags:
     - docker
   stage: test
-  image: node:16
+  image: node:latest
   script:
     - cd damul-client
     - npm ci
