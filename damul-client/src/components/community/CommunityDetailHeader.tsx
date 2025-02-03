@@ -1,16 +1,18 @@
-import AlarmIcon from "../svg/AlarmIcon";
+import BookMarkIcon from "../svg/BookMarkIcon";
 
 interface RecipeHeaderProps {
   title: string;
   createdAt: string;
   type: string;
   status?: string;
+  isBookmarked?: boolean;
 }
 const CommunityDetailHeader = ({
   title,
   createdAt,
   type,
   status,
+  isBookmarked,
 }: RecipeHeaderProps) => {
   const StatusMarker = () =>
     status === "ACTIVE" ? (
@@ -34,8 +36,12 @@ const CommunityDetailHeader = ({
         <h3 className="text-lg font-semibold">{title}</h3>
       </div>
       {type === "recipe" ? (
-        <div className="flex flex-col justify-between items-end py-0.5">
-          <AlarmIcon className="w-5 h-5" />
+        <div className="flex flex-col justify-between items-end py-0.5 cursor-pointer">
+          {isBookmarked ? (
+            <BookMarkIcon className="w-5 h-5 fill-positive-300 stroke-positive-300" />
+          ) : (
+            <BookMarkIcon className="w-5 h-5 stroke-positive-300   " />
+          )}
           <p className="text-xs text-neutral-500">{createdAt}</p>
         </div>
       ) : (

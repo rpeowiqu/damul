@@ -4,6 +4,15 @@ import useManageRecentSearches from "@/hooks/useManageRecentSearches";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import RecentSearches from "@/components/common/RecentSearches";
 import PostButton from "@/components/community/PostButton";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CommunitySearch {
   placeholder: string;
@@ -21,20 +30,48 @@ const CommunitySearch = ({ placeholder, title, postTo }: CommunitySearch) => {
   const navigate = useNavigate();
 
   const [inputValue, setInputValue] = useState("");
+  const [sortType, setSortType] = useState("title");
 
   return (
     <>
       <div className="flex justify-between gap-2">
-        <div className="flex-grow">
-          <DamulSearchBox
-            placeholder={placeholder}
-            onButtonClick={(content) => {
-              handleAddSearch(content);
-              navigate(`${content}`);
-            }}
-            inputValue={inputValue}
-            setInputValue={setInputValue}
-          />
+        <div className="flex w-full justify-between gap-1">
+          <Select
+            value={sortType}
+            onValueChange={(value) => setSortType(value)}
+          >
+            <SelectTrigger className="w-28">
+              <SelectValue placeholder="정렬 방식" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>검색 조건</SelectLabel>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="title"
+                >
+                  제목+내용
+                </SelectItem>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="author"
+                >
+                  작성자
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <div className="flex-grow">
+            <DamulSearchBox
+              placeholder={placeholder}
+              onButtonClick={(content) => {
+                handleAddSearch(content);
+                navigate(`${content}`);
+              }}
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+            />
+          </div>
         </div>
       </div>
       <RecentSearches

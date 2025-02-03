@@ -9,11 +9,11 @@ interface PostCardsProps {
 const PostCard = ({ title, description, isEmpty }: PostCardsProps) => {
   return (
     <div
-      className={`flex items-center justify-between gap-5 p-7 border-2 rounded-lg border-positive-300 hover:bg-positive-50 active:bg-positive-100 font-semibold shadow-md ${!isEmpty ? "bg-positive-200" : ""}`}
+      className={`flex flex-1 items-center justify-between gap-5 p-7 border-2 rounded-lg border-positive-300 hover:bg-positive-50 active:bg-positive-100 font-semibold shadow-md ${!isEmpty ? "bg-positive-200" : ""}`}
     >
-      <div className="flex items-center gap-5">
-        <AlarmIcon />
-        <div>{title}</div>
+      <div className="flex items-center gap-8 w-28">
+        <AlarmIcon className="w-10 h-10" />
+        <div className="w-full">{title}</div>
       </div>
       <div className="flex w-48 pc:w-64">
         {!isEmpty ? (

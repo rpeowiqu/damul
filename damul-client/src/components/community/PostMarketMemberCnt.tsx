@@ -20,7 +20,7 @@ const PostMarketMemberCnt = ({
 
   return (
     <div className="p-6">
-      <h3 className="text-lg font-semibold text-gray-700 mb-4">
+      <h3 className="text-lg text-center font-semibold text-gray-700 mb-4">
         공구/나눔 최대 참여 인원수를 입력해주세요
       </h3>
       <div className="flex items-center gap-3">

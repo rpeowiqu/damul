@@ -1,4 +1,5 @@
 import CommunitySearch from "@/components/community/CommunitySearch";
+import DamulCarousel from "@/components/common/DamulCarousel";
 
 const CommunityMarketSearchPage = () => {
   return (
@@ -8,6 +9,7 @@ const CommunityMarketSearchPage = () => {
         title="인기 급상승 게시글"
         postTo="market"
       />
+      <DamulCarousel />
     </main>
   );
 };
