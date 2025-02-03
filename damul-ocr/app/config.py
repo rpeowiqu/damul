@@ -1,8 +1,11 @@
 # 환경 설정
+from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
+class Settings(BaseSettings):
+    OPENAI_KEY1: str
+    OPENAI_KEY2: str
 
-OPENAI_KEY1 = os.getenv('OPENAI_KEY1')
-OPENAI_KEY2 = os.getenv('OPENAI_KEY2')
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+settings = Settings()
