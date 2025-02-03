@@ -2,8 +2,8 @@ package com.damul.api.auth.service;
 
 import com.damul.api.auth.dto.request.AdminLoginRequest;
 import com.damul.api.auth.dto.request.SignupRequest;
-import com.damul.api.auth.dto.response.TermsResponse;
 import com.damul.api.auth.dto.response.UserConsent;
+import com.damul.api.auth.entity.Terms;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
@@ -19,7 +19,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -153,7 +152,7 @@ public class AuthService {
         log.info("닉네임 조회 - nickname: {}", defaultNickname);
         log.info("이메일 조회 - email: {}", email);
 
-        List<TermsResponse> terms = termsRepository.findAll();
+        List<Terms> terms = termsRepository.findAll();
         if(terms.isEmpty()) {
             log.error("약관 데이터가 없음");
             throw new RuntimeException("약관 데이터가 존재하지 않습니다.");

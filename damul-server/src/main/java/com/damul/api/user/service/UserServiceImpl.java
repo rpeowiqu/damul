@@ -61,8 +61,11 @@ public class UserServiceImpl implements UserService {
     public void updateSetting(int userId, SettingUpdate setting) {
         log.info("설정 수정 시작");
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-        user.updateSettings(setting);
+                .orElseThrow(() -> {
+                    log.error("해당 유저를 찾을 수 없습니다. - userId: {}", userId);
+                    return new BusinessException(ErrorCode.USER_NOT_FOUND);
+                        });
+        userRepository.updateUserSettings(userId, setting);
         log.info("설정 수정 완료");
     }
 
