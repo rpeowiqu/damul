@@ -1,6 +1,5 @@
 package com.damul.api.config;
 
-
 import com.damul.api.auth.oauth2.handler.OAuth2FailureHandler;
 import com.damul.api.auth.oauth2.handler.OAuth2SuccessHandler;
 import com.damul.api.auth.oauth2.service.CustomOAuth2UserService;

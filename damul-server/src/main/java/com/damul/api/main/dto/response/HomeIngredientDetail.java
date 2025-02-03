@@ -16,7 +16,6 @@ public class HomeIngredientDetail {
     private int ingredientQuantity;
     private LocalDateTime ingredientUp;
     private String ingredientName;
-    private LocalDateTime dueDate;
-    private boolean warning;
+    private int expirationDate;
 
 }
