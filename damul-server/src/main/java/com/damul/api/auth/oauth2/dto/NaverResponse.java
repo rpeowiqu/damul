@@ -17,9 +17,8 @@ public class NaverResponse implements OAuth2Response, Serializable {
     private String profileImage;
     private String providerId;
 
-    @JsonIgnore
     public Provider getProvider() {
-        return "naver";
+        return Provider.NAVER;
     }
 
     public NaverResponse(Map<String, Object> attribute) {

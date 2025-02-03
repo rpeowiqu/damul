@@ -17,7 +17,7 @@ public class GoogleResponse implements OAuth2Response, Serializable {
     private String providerId;
 
     public Provider getProvider() {
-        return "google";
+        return Provider.GOOGLE;
     }
 
     public GoogleResponse(Map<String, Object> attribute) {
