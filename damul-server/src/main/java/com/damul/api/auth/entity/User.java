@@ -57,15 +57,4 @@ public class User {
 
     @Column(name = "warningEnabled", nullable = false)
     private boolean warningEnabled;
-
-
-    public void updateSettings(SettingUpdate settingUpdate) {
-        this.nickname = settingUpdate.getNickname();
-        this.selfIntroduction = settingUpdate.getSelfIntroduction();
-        this.profileImageUrl = settingUpdate.getProfileImageUrl();
-        this.profileBackgroundImageUrl = settingUpdate.getProfileBackgroundImageUrl();
-        this.accessRange = settingUpdate.getAccessRange();
-        this.warningEnabled = settingUpdate.isWarningEnabled();
-    }
-
 }

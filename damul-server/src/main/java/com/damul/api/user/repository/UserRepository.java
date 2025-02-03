@@ -7,7 +7,9 @@ import com.damul.api.user.dto.response.SettingResponse;
 import com.damul.api.user.dto.response.UserList;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +24,16 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findById(@Param("id") int userId);
 
     // 설정 수정
-    void updateUserSettings(@Param("userId") int userId, @Param("dto")SettingUpdate settingUpdate);
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.nickname = :#{#settingUpdate.nickname}, " +
+            "u.selfIntroduction = :#{#settingUpdate.selfIntroduction}, " +
+            "u.profileImageUrl = :#{#settingUpdate.profileImageUrl}, " +
+            "u.profileBackgroundImageUrl = :#{#settingUpdate.profileBackgroundImageUrl}, " +
+            "u.accessRange = :#{#settingUpdate.accessRange}, " +
+            "u.warningEnabled = :#{#settingUpdate.warningEnabled} " +
+            "WHERE u.id = :userId")
+    void updateUserSettings(@Param("userId") int userId, @Param("settingUpdate")SettingUpdate settingUpdate);
 
     // ADMIN으로 조회
     Optional<User> findByRole(Role role);
