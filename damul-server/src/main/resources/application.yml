@@ -11,6 +11,8 @@ spring:
       port: ${REDIS_PORT:6379}
 
   security:
+    admin:
+      password: ${admin.password}
     oauth2:
       client:
         registration:
@@ -92,6 +94,11 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.type: trace
     org.springframework.security: debug
+
+redirect:
+  frontUrl: ${FRONT_URL}
+  main: ${MAIN_URL}
+  terms: ${TERMS_URL}
 
 ---
 spring:
