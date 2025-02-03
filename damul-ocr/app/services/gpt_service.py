@@ -24,7 +24,7 @@ SYSTEM_MSG1 = """
 						"productPrice": number, // 가격
 						"dueDate": "string", // 유통기한
 						"expiration_date": "string", // 소비기한 
-						"ingredientStorage": ENUM('FREEZER', 'FRIDGE', 'ROOMTEMP')// 식자재 저장 위치(냉동, 냉장, 실온)
+						"ingredientStorage": ENUM('FREEZER', 'FRIDGE', 'ROOM_TEMPERATUER')// 식자재 저장 위치(냉동, 냉장, 실온)
 				}, ...
 		]
 }
