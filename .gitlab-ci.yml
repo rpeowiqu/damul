@@ -15,12 +15,17 @@ client-build:
   image: docker:latest
   stage: build
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_BUILDKIT: 1
   before_script:
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_ACCESS_TOKEN
+    - docker buildx create --use
   script:
-    - docker build -t $CLIENT_DOCKER_IMAGE ./damul-client
-    - docker push $CLIENT_DOCKER_IMAGE
+    - docker buildx build --platform linux/amd64 -t $CLIENT_DOCKER_IMAGE ./damul-client --push
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^(Client|client-develop|master)$/'
       changes:
@@ -33,16 +38,22 @@ server-build:
   image: docker:latest
   stage: build
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_BUILDKIT: 1
   before_script:
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_ACCESS_TOKEN
+    - docker buildx create --use
   script:
-    - docker build -t $SERVER_DOCKER_IMAGE ./damul-server
-    - docker push $SERVER_DOCKER_IMAGE
+    - docker buildx build --platform linux/amd64 -t $SERVER_DOCKER_IMAGE ./damul-server --push
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^(Server|server-develop|master)$/'
       changes:
         - "damul-server/**/*"
+
 
 # 클라이언트 테스트 작업
 client-test:

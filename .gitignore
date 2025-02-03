@@ -19,6 +19,8 @@ bin/
 
 ### IntelliJ IDEA ###
 .idea
+.idea/**
+**/.idea/**
 *.iws
 *.iml
 *.ipr
@@ -51,6 +53,7 @@ local.properties
 ### Environment Variables ###
 src/main/resources/env.properties
 src/main/resources/application-*.yml
+.env
 
 ### Logs ###
 logs
