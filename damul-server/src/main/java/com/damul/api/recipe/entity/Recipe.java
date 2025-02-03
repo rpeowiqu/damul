@@ -19,7 +19,7 @@ public class Recipe {
 
     @Id
     @Column(name = "id")
-    private int userIngredientId;
+    private int recipeId;
 
     @Column(name = "title", length=200, nullable = false)
     private String title;
