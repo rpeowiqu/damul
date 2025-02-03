@@ -5,7 +5,7 @@ import ContentSection from "@/components/community/ContentSection";
 import IngredientsSection from "@/components/community/IngredientsSection";
 import CookingOrdersSection from "@/components/community/CookingOrderSection";
 import CommentsSection from "@/components/community/CommentsSection";
-import FixedCommentInput from "@/components/community/FixedCommentInput";
+import FixedCommentInput from "@/components/community/FixedCommentInfo";
 import { Comment } from "@/types/interfaces";
 
 const CommunityRecipeDetailPage = () => {
@@ -83,7 +83,11 @@ const CommunityRecipeDetailPage = () => {
   return (
     <div className="flex">
       <main className="relative flex flex-col justify-center w-full text-center p-5 pc:p-6 mb-12">
-        <CommunityDetailHeader title={mockData.title} createdAt={mockData.createdAt} type="recipe"/>
+        <CommunityDetailHeader
+          title={mockData.title}
+          createdAt={mockData.createdAt}
+          type="recipe"
+        />
         <AuthorInfo
           profileImageUrl={mockData.profileImageUrl}
           authorName={mockData.authorName}

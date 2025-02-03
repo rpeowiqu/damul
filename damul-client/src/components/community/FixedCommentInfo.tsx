@@ -1,19 +1,19 @@
 import { Dispatch, SetStateAction } from "react";
-import DamulCommentInput from "../common/DamulCommentInput";
-import { Comment } from "@/types/interfaces";
+import CommentInput from "../common/CommentInput";
+import { Comment } from "@/types/community";
 
-interface FixedCommentInputProps {
+interface FixedCommentInfoProps {
   replyingTo: Comment | null;
   comment: string;
   setComment: Dispatch<SetStateAction<string>>;
   cancelReply: () => void;
 }
-const FixedCommentInput = ({
+const FixedCommentInfo = ({
   replyingTo,
   comment,
   setComment,
   cancelReply,
-}: FixedCommentInputProps) => {
+}: FixedCommentInfoProps) => {
   return (
     <div className="fixed bottom-16 left-0 w-full pc:w-[598px] pc:left-1/2 pc:-translate-x-1/2 bg-white border-t p-2 shadow-md">
       {replyingTo && (
@@ -22,12 +22,15 @@ const FixedCommentInput = ({
             <p className="text-sm font-bold">{replyingTo.nickname}</p>
             <p className="text-sm">{replyingTo.comment}</p>
           </div>
-          <div onClick={cancelReply} className="text-xs w-16 text-end pr-2 text-red-500 cursor-pointer">
+          <div
+            onClick={cancelReply}
+            className="text-xs w-16 text-end pr-2 text-red-500 cursor-pointer"
+          >
             취소
           </div>
         </div>
       )}
-      <DamulCommentInput
+      <CommentInput
         placeholder={
           replyingTo ? "대댓글을 입력해주세요" : "댓글을 입력해주세요"
         }
@@ -38,4 +41,4 @@ const FixedCommentInput = ({
   );
 };
 
-export default FixedCommentInput;
+export default FixedCommentInfo;

@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { IngredientProps } from "@/types/interfaces";
+import { IngredientProps } from "@/types/community";
 import PostDrawer from "@/components/community/PostDrawer";
 import PostRecipeIngrediantForm from "@/components/community/PostRecipeIngrediantForm";
 import SubmitButton from "./SubmitButton";
@@ -19,7 +19,9 @@ const PostRecipeIngrediants = ({
 
   // 재료 삭제
   const handleRemoveIngredient = (id: number) => {
-    setTempIngredients(tempIngredients.filter((ingredient) => ingredient.id !== id));
+    setTempIngredients(
+      tempIngredients.filter((ingredient) => ingredient.id !== id),
+    );
   };
 
   const handleSubmit = () => {
