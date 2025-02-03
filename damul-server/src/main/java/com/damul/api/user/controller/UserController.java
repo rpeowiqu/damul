@@ -14,6 +14,7 @@ import com.damul.api.user.service.FollowService;
 import com.damul.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,7 +62,14 @@ public class UserController {
                                           @PathVariable int userId) {
         log.info("팔로워 목록 조회 요청");
         ScrollResponse<UserList> userList = followService.getFollowers(scrollRequest, userId);
-        return null;
+
+        if(userList.getData().isEmpty() || userList.getData().size() == 0) {
+            log.info("팔로워 목록 조회 성공 - 데이터없음");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        log.info("팔로워 목록 조회 성공, 개수: {}", userList.getData().size());
+        return ResponseEntity.ok(userList);
     }
 
     

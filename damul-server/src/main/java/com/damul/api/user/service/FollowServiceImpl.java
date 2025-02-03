@@ -4,13 +4,18 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.common.dto.request.ScrollRequest;
 import com.damul.api.common.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.dto.response.ScrollResponse;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.user.dto.response.FollowResponse;
 import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.entity.Follow;
 import com.damul.api.user.repository.FollowRepository;
 import com.damul.api.user.repository.UserRepository;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,26 +34,42 @@ public class FollowServiceImpl implements FollowService {
     @Transactional
     public FollowResponse toggleFollow(int userId, int targetId) {
         log.info("팔로우/언팔로우 시작");
-        User currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("현재 유저가 존재하지 않습니다."));
-        User targetUser = userRepository.findById(targetId)
-                .orElseThrow(() -> new RuntimeException(("타겟 유저가 존재하지 않습니다.")));
 
-        Optional<Follow> existingFollow = followRepository.findByFollowerAndFollowing(currentUser, targetUser);
-        if(existingFollow.isPresent()) {
-            log.info("팔로우 중입니다, 언팔로우 합니다.");
-            followRepository.delete(existingFollow.get());
-            return new FollowResponse(false);
-        } else {
-            log.info("언팔로우 중입니다. 팔로우 합니다.");
-            // 팔로우 처리
-            Follow newFollow = Follow.builder()
-                    .follower(currentUser)
-                    .following(targetUser)
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            followRepository.save(newFollow);
-            return new FollowResponse(true);
+        // 자기 자신을 팔로우 하는 경우 체크
+        if(userId == targetId) {
+            log.error("자기 자신을 팔로우 할 수 없습니다.");
+            throw new BusinessException(ErrorCode.INVALED_TARGETID);
+        }
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User targetUser = userRepository.findById(targetId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        try {
+            Optional<Follow> existingFollow = followRepository.findByFollowerAndFollowing(currentUser, targetUser);
+
+            if(existingFollow.isPresent()) {
+                log.info("팔로우 중입니다, 언팔로우 합니다.");
+                followRepository.delete(existingFollow.get());
+                return new FollowResponse(false);
+            } else {
+                log.info("언팔로우 중입니다. 팔로우 합니다.");
+                Follow newFollow = Follow.builder()
+                        .follower(currentUser)
+                        .following(targetUser)
+                        .createdAt(LocalDateTime.now())
+                        .build();
+                followRepository.save(newFollow);
+                return new FollowResponse(true);
+            }
+        } catch (DataIntegrityViolationException e) {
+            log.error("팔로우 처리 중 데이터베이스 제약조건 위반", e);
+            // ErrorCode에 DATABASE_ERROR 추가 필요
+            throw new BusinessException(ErrorCode.DATABASE_ERROR, "팔로우 처리 중 데이터베이스 오류가 발생했습니다.");
+        } catch (DataAccessException e) {
+            log.error("팔로우 처리 중 데이터베이스 오류", e);
+            throw new BusinessException(ErrorCode.DATABASE_ERROR, "팔로우 처리 중 데이터베이스 오류가 발생했습니다.");
         }
     }
 
