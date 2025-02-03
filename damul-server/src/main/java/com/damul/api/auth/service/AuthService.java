@@ -1,46 +1,93 @@
 package com.damul.api.auth.service;
 
+import com.damul.api.auth.dto.request.AdminLoginRequest;
 import com.damul.api.auth.dto.request.SignupRequest;
+import com.damul.api.auth.dto.response.TermsResponse;
+import com.damul.api.auth.dto.response.UserConsent;
 import com.damul.api.auth.entity.User;
+import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.repository.AuthRepository;
+import com.damul.api.auth.repository.TermsRepository;
+import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+    @Value("${admin.password}")
+    private String hashedAdminPassword;
+
     private final AuthRepository authRepository;
+    private final UserRepository userRepository;
+    private final TermsRepository termsRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final CookieUtil cookieUtil;
 
 
+    // 로그아웃
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            log.info("로그아웃 요청");
+            Optional<Cookie> accessTokenCookie = cookieUtil.getCookie(request, "access_token");
+
+            if (accessTokenCookie.isPresent()) {
+                String accessToken = accessTokenCookie.get().getValue();
+                String email = jwtTokenProvider.getUserEmailFromToken(accessToken);
+                removeRefreshToken(email);
+            }
+
+            cookieUtil.deleteCookie(response, "access_token");
+            cookieUtil.deleteCookie(response, "refresh_token");
+            SecurityContextHolder.clearContext();
+        } catch (Exception e) {
+            log.error("로그아웃 처리 중 오류 발생", e);
+            throw new RuntimeException("로그아웃 처리 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    // 회원가입
     @Transactional
-    public Map<String, String> processSignup(String tempToken, SignupRequest signupRequest) {
-            log.info("임시 토큰에서 OAuth2 인증 정보 추출 시작");
-            // 1. 임시 토큰에서 OAuth2 인증 정보 추출
+    public void signup(String tempToken, SignupRequest signupRequest, HttpServletResponse response) {
+        // 1. 토큰 검증
+        if(!jwtTokenProvider.validateToken(tempToken)) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        try {
+            // 2. 임시 토큰에서 정보 추출
             Claims claims = jwtTokenProvider.getClaims(tempToken);
             String email = claims.get("email", String.class);
-
             log.info("이메일 - email: {}", email);
 
-            log.info("Redis 조회");
-            // 2. Redis에서 저장된 유저 정보 가져오기
+            // 3. Redis에서 유저 정보 가져오기
             String sessionKey = "oauth2:user:" + RequestContextHolder.currentRequestAttributes().getSessionId();
             String jsonString = redisTemplate.opsForValue().get(sessionKey);
 
@@ -48,52 +95,76 @@ public class AuthService {
                 throw new RuntimeException("유저 정보를 찾을 수 없습니다.");
             }
 
-            try {
+            // 4. 유저 정보 파싱 및 저장
+            User user = objectMapper.readValue(jsonString, User.class);
+            user.builder()
+                    .nickname(signupRequest.getNickname())
+                    .selfIntroduction(signupRequest.getSelfIntroduction());
 
-                // Redis에 저장된 User 정보 파싱
-                User user = objectMapper.readValue(jsonString, User.class);
-                log.info("닉네임 적용 전 - nickname: {}", user.getNickname());
+            User savedUser = authRepository.save(user);
 
-                // 수정된 닉네임 적용
-                user.builder()
-                        .nickname(signupRequest.getNickname())
-                        .selfIntroduction(signupRequest.getSelfIntroduction());
+            // 5. 토큰 생성
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    user.getEmail(),
+                    null,
+                    Collections.singletonList(new SimpleGrantedAuthority(savedUser.getRole().name()))
+            );
 
-                log.info("닉네임 적용 완료 - nickname: {}", user.getNickname());
+            String accessToken = jwtTokenProvider.generateAccessToken(authentication);
+            String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
 
-                // DB에 저장
-                User savedUser = authRepository.save(user);
-                log.info("회원 가입 완료: {}", email);
+            // 6. Refresh Token Redis에 저장
+            redisTemplate.opsForValue().set(
+                    "RT:" + savedUser.getEmail(),
+                    refreshToken,
+                    jwtTokenProvider.getRefreshTokenExpire(),
+                    TimeUnit.MILLISECONDS
+            );
 
-                // 토큰 생성
-                Authentication authentication = new UsernamePasswordAuthenticationToken(
-                        user.getEmail(),
-                        null,
-                        Collections.singletonList(new SimpleGrantedAuthority(savedUser.getRole().name()))
-                );
+            // 7. 임시 OAuth 정보 삭제
+            redisTemplate.delete(sessionKey);
 
-                String accessToken = jwtTokenProvider.generateAccessToken(authentication);
-                String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
+            // 8. 쿠키 설정
+            cookieUtil.addCookie(response, "access_token", accessToken,
+                    (int) jwtTokenProvider.getAccessTokenExpire() / 1000);
+            cookieUtil.addCookie(response, "refresh_token", refreshToken,
+                    (int) jwtTokenProvider.getRefreshTokenExpire() / 1000);
+            cookieUtil.deleteCookie(response, "temp_token");
 
-                // Refresh Token Redis에 저장
-                redisTemplate.opsForValue().set(
-                        "RT:" + savedUser.getEmail(),
-                        refreshToken,
-                        jwtTokenProvider.getRefreshTokenExpire(),
-                        TimeUnit.MILLISECONDS
-                );
-
-                // 임시 저장된 OAuth 정보 삭제
-                redisTemplate.delete(sessionKey);
-
-                return Map.of(
-                        "accessToken", accessToken,
-                        "refreshToken", refreshToken
-                );
         } catch (Exception e) {
             log.error("회원가입 처리 중 오류 발생", e);
-            throw new RuntimeException("유저 정보 파싱 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("회원가입 처리 중 오류가 발생했습니다.", e);
         }
+    }
+
+    // 약관동의 및 이메일,닉네임 조회
+    public UserConsent getConsent(String tempToken) {
+        log.info("약관동의 및 이메일, 닉네임 조회 시작");
+        if(!jwtTokenProvider.validateToken(tempToken)) {
+            log.error("유효하지 않은 토큰입니다");
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        Claims claims = jwtTokenProvider.getClaims(tempToken);
+        String defaultNickname = claims.get("nickname", String.class);
+        String email = claims.get("email", String.class);
+
+
+        log.info("닉네임 조회 - nickname: {}", defaultNickname);
+        log.info("이메일 조회 - email: {}", email);
+
+        List<TermsResponse> terms = termsRepository.findAll();
+        if(terms.isEmpty()) {
+            log.error("약관 데이터가 없음");
+            throw new RuntimeException("약관 데이터가 존재하지 않습니다.");
+        }
+
+        log.info("약관 데이터 조회 성공, size: {}", terms.size());
+        return UserConsent.builder()
+                .email(email)
+                .nickname(defaultNickname)
+                .terms(terms)
+                .build();
     }
 
     public Map<String, String> generateTokens(Authentication authentication) {
@@ -113,6 +184,37 @@ public class AuthService {
                 "accessToken", accessToken,
                 "refreshToken", refreshToken
         );
+    }
+
+
+    // 관리자 로그인
+    public void adminLogin(AdminLoginRequest request, HttpServletResponse response) {
+        // 관리자 존재 확인
+        User admin = userRepository.findByRole(Role.ADMIN)
+                .orElseThrow(() -> new IllegalArgumentException("관리자 계정이 존재하지 않습니다."));
+
+        // 비밀번호 검증
+        if (!BCrypt.checkpw(request.getPassword(), hashedAdminPassword)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 인증 객체 생성
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                admin.getEmail(),
+                null,
+                Collections.singletonList(new SimpleGrantedAuthority(Role.ADMIN.name()))
+        );
+
+        // 토큰 생성
+        Map<String, String> tokens = generateTokens(authentication);
+
+        // 쿠키 설정
+        cookieUtil.addCookie(response, "access_token", tokens.get("accessToken"),
+                (int) jwtTokenProvider.getAccessTokenExpire() / 1000);
+        cookieUtil.addCookie(response, "refresh_token", tokens.get("refreshToken"),
+                (int) jwtTokenProvider.getRefreshTokenExpire() / 1000);
+
+        log.info("관리자 로그인 성공: {}", admin.getEmail());
     }
 
     public String findRefreshToken(String userId) {

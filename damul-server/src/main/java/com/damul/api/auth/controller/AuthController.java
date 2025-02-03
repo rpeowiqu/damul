@@ -2,7 +2,6 @@ package com.damul.api.auth.controller;
 
 import com.amazonaws.Response;
 import com.damul.api.auth.dto.request.AdminLoginRequest;
-import com.damul.api.auth.dto.request.AdminRequest;
 import com.damul.api.auth.dto.request.SignupRequest;
 import com.damul.api.auth.dto.response.TermsResponse;
 import com.damul.api.auth.dto.response.UserConsent;
@@ -23,10 +22,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,36 +50,18 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+
+
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
-            // 액세스 토큰 추출
-            String accessToken = cookieUtil.getCookie(request, "access_token")
-                    .map(Cookie::getValue)
-                    .orElse(null);
-
-            if (accessToken != null) {
-                // 토큰에서 이메일 추출
-                String email = jwtTokenProvider.getUserEmailFromToken(accessToken);
-
-                // Redis에서 리프레시 토큰 제거
-                authService.removeRefreshToken(email);
-            }
-
-            // 쿠키 삭제
-            cookieUtil.deleteCookie(response, "access_token");
-            cookieUtil.deleteCookie(response, "refresh_token");
-
-            // Spring Security 로그아웃
-            SecurityContextHolder.clearContext();
-
+            authService.logout(request, response);
             return ResponseEntity.ok()
                     .body(Map.of(
                             "success", true,
                             "message", "로그아웃 되었습니다."
                     ));
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "로그아웃 처리 중 오류가 발생했습니다."));
@@ -88,31 +74,14 @@ public class AuthController {
                                     @RequestBody SignupRequest signupRequest,
                                     HttpServletResponse response) {
         try {
-            // 임시 토큰 검증
-            if(!jwtTokenProvider.validateToken(tempToken)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", "유효하지 않은 토큰입니다."));
-            }
-
-            // 토큰에서 정보 가지고 오기
-            Claims claims = jwtTokenProvider.getClaims(tempToken);
-            String email = claims.get("email", String.class);
-
-            // 회원가입 시작
-            log.info("회원가입 요청 - email: {}", email);
-            Map<String, String> tokens = authService.processSignup(tempToken, signupRequest);
-
-            log.info("쿠키 설정");
-            cookieUtil.addCookie(response, "access_token", tokens.get("accessToken"),
-                    (int) jwtTokenProvider.getAccessTokenExpire() / 1000);
-            cookieUtil.addCookie(response, "refresh_token", tokens.get("refreshToken"),
-                    (int) jwtTokenProvider.getRefreshTokenExpire() / 1000);
-
-            // 임시 토큰 쿠키 삭제
-            cookieUtil.deleteCookie(response, "temp_token");
-
-            return ResponseEntity.ok().build();
-        } catch(Exception e) {
+            authService.signup(tempToken, signupRequest, response);
+            return ResponseEntity.ok()
+                    .body(Map.of("message", "회원가입이 완료되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            log.error("회원가입 처리 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "회원가입 처리 중 오류가 발생했습니다."));
         }
@@ -157,13 +126,20 @@ public class AuthController {
 
     // 관리자 로그인
     @PostMapping("/admin/login")
-    public ResponseEntity adminLogin(@RequestBody AdminLoginRequest adminRequest, HttpServletResponse response) {
+    public ResponseEntity adminLogin(@RequestBody AdminLoginRequest request, HttpServletResponse response) {
         log.info("관리자 로그인 요청");
-        User admin = userRepository.findByRole(Role.ADMIN)
-                .orElseThrow(() -> new IllegalArgumentException());
-
-        if (!passwordEncoder.matches(adminRequest.getPassword(), ) {
-            throw new InvalidPasswordException();
+        try {
+            log.info("관리자 로그인 요청");
+            authService.adminLogin(request, response);
+            return ResponseEntity.ok()
+                    .body(Map.of("message", "관리자 로그인 성공"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "인증에 실패했습니다."));
+        } catch (Exception e) {
+            log.error("관리자 로그인 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "로그인 처리 중 오류가 발생했습니다."));
         }
     }
 }
