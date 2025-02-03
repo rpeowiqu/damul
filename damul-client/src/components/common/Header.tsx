@@ -9,7 +9,7 @@ const Header = () => {
         <ul className="flex justify-between items-center w-full h-full px-5">
           <li className="flex items-center">
             <button>
-              <AlarmIcon className="stroke-normal-700" />
+              <AlarmIcon className="w-6 stroke-normal-700" />
             </button>
           </li>
           <li className="flex items-center">
@@ -19,7 +19,7 @@ const Header = () => {
           </li>
           <li className="flex items-center">
             <Link to={"/setting"}>
-              <OptionIcon className="stroke-normal-700 stroke-2" />
+              <OptionIcon className="w-6 stroke-normal-700 stroke-2" />
             </Link>
           </li>
         </ul>
