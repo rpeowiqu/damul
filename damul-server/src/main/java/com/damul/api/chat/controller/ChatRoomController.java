@@ -5,6 +5,7 @@ import com.damul.api.chat.dto.response.ChatRoomList;
 import com.damul.api.chat.service.ChatRoomService;
 import com.damul.api.common.dto.request.ScrollRequest;
 import com.damul.api.common.dto.response.ScrollResponse;
+import com.damul.api.common.user.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
