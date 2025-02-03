@@ -19,6 +19,8 @@ public enum ErrorCode {
 
     // 팔로우 관련 에러
     FOLLOW_ERROR(HttpStatus.BAD_REQUEST, "팔로우 처리 중 오류가 발생했습니다."),
+    FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "팔로우 관계가 존재하지 않습니다."),
+
 
     // 유저 관련 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저 ID가 존재하지 않습니다"),

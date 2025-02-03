@@ -34,7 +34,7 @@ public class UserController {
     }
 
     // 설정 수정 - file 저장 구현 후 할 것!
-    @PatchMapping("/{userId}/settings")
+    @PutMapping("/{userId}/settings")
     public ResponseEntity updateSetting(@PathVariable("userId") int userId,
                                         @RequestPart("settingUpdate") SettingUpdate setting,
                                         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
@@ -103,8 +103,28 @@ public class UserController {
     }
 
     // 팔로워 삭제
-    @DeleteMapping
+    @DeleteMapping("/{userId}/force-unfollow/{followId}")
+    public ResponseEntity<?> unfollow(@PathVariable int userId, @PathVariable int followId) {
+        log.info("팔로워 강제 삭제 요청 - userId: {}, followId: {}", userId, followId);
+        followService.deleteFollower(userId, followId);
+
+        log.info("팔로워 강제 삭제 성공");
+        return ResponseEntity.ok().build();
+    }
+
     // 사용자 목록 검색/조회
-
-
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@PathVariable int userId,
+                                    @RequestParam String keyword,
+                                    @RequestBody ScrollRequest scrollRequest) {
+        log.info("사용자 목록 검색/조회 요청 - userId: {}, keyword: {}", userId, keyword);
+        ScrollResponse<UserList> userList = null;
+        if(keyword == null || keyword.length() == 0) {
+            log.info("검색어 없음 - 전체조회 시작");
+            userList = userService.getUserList(scrollRequest);
+        } else {
+            log.info("검색어 있음 - nickname: {}", keyword);
+            userList = userService.getSearchUserList(scrollRequest, keyword);
+        }
+    }
 }

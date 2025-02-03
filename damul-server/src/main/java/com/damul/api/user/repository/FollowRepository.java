@@ -34,4 +34,12 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
     List<UserList> findFollowingsByUserIdAndCursorId(@Param("userId") int userId,
                                                 @Param("cursorId") int cursorId,
                                                 @Param("size") int size);
+
+    // 팔로우 관계를 확인
+    Optional<Follow> findByUserIdAndFollowId(@Param("userId") int userId,
+                                               @Param("followId") int followId);
+
+    // 팔로워 강제 삭제
+    void deleteByUserIdAndFollowId(@Param("userId") int userId,
+                                   @Param("followId") int followId);
 }
