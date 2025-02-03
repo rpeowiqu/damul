@@ -1,5 +1,6 @@
 package com.damul.api.auth.entity;
 
+import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.auth.entity.type.Provider;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.user.dto.request.SettingUpdate;
@@ -42,8 +43,8 @@ public class User {
     @Column(name = "updated_at")
     private DateTime updatedAt;
 
-    @Column(name = "is_active")
-    private boolean isActive;
+    @Column(name = "active")
+    private boolean active;
 
     @Column(name = "report_count")
     private int reportCount;
@@ -51,11 +52,11 @@ public class User {
     @Column(name = "self_introduction")
     private String selfIntroduction;
 
-    @Column(name = "is_fridge_public", nullable = false)
-    private boolean isFridgePublic;
+    @Column(name = "accessRange", nullable = false)
+    private AccessRange accessRange;
 
-    @Column(name = "is_warning", nullable = false)
-    private boolean warning;
+    @Column(name = "warningEnabled", nullable = false)
+    private boolean warningEnabled;
 
 
     public void updateSettings(SettingUpdate settingUpdate) {
@@ -63,8 +64,8 @@ public class User {
         this.selfIntroduction = settingUpdate.getSelfIntroduction();
         this.profileImageUrl = settingUpdate.getProfileImageUrl();
         this.profileBackgroundImageUrl = settingUpdate.getProfileBackgroundImageUrl();
-        this.isFridgePublic = settingUpdate.isFridgeVisible();
-        this.warning = settingUpdate.isWarningEnabled();
+        this.accessRange = settingUpdate.getAccessRange();
+        this.warningEnabled = settingUpdate.isWarningEnabled();
     }
 
 }

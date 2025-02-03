@@ -11,7 +11,7 @@ public interface UserService {
     boolean checkNicknameDuplication(String email);
 
     // 설정 조회
-    SettingResponse getSetting();
+    SettingResponse getSetting(int userId);
 
     // 설정 수정
     void updateSetting(int userId, SettingUpdate setting);
