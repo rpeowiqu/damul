@@ -94,19 +94,36 @@ public class FollowServiceImpl implements FollowService {
         return createScrollResponse(userLists, request);
     }
 
+    // 팔로워 강제 삭제
+    @Override
+    public void deleteFollower(int userId, int followId) {
+        log.info("팔로워 강제 삭제 시작 - userId: {}, followId: {}", userId, followId);
+
+        // 팔로우 관계 찾기
+        Follow follow = followRepository.findByUserIdAndFollowId(userId, followId)
+                .orElseThrow(() -> {
+                    log.error("팔로우 관계가 아닙니다.");
+                    return new BusinessException(ErrorCode.FOLLOW_NOT_FOUND);
+                        });
+
+        // 팔로우 관계가 존재하면 삭제
+        followRepository.delete(follow);
+        log.info("팔로워 강제 삭제 성공 - userId: {}, followId: {}", userId, followId);
+    }
+
     // 무한스크롤 응답 데이터를 생성
-    private ScrollResponse<UserList> createScrollResponse(List<UserList> userLists, ScrollRequest request) {
+    private ScrollResponse<UserList> createScrollResponse(List<UserList> userList, ScrollRequest request) {
         log.info("무한 스크롤 생성 시작");
         // 다음 페이지 존재 여부 확인
         // size + 1개를 조회했으므로, size보다 크다면 다음 데이터가 존재한다는 의미
-        boolean hasNextData = userLists.size() > request.getSize();
+        boolean hasNextData = userList.size() > request.getSize();
 
         log.info("다음 데이터 존재 여부: {}", hasNextData);
         // 실제 응답할 데이터 리스트 생성
         // 다음 데이터가 있다면 요청한 size만큼만 잘라서 반환, 없다면 전체 리스트 반환
         List<UserList> resultList = hasNextData
-                ? userLists.subList(0, request.getSize())
-                : userLists;
+                ? userList.subList(0, request.getSize())
+                : userList;
 
 
         // 다음 커서 값 계산

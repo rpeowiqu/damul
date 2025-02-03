@@ -13,4 +13,7 @@ public interface FollowService {
 
     // 팔로잉 목록 조회
     ScrollResponse<UserList> getFollowings(ScrollRequest request, int userId);
+
+    // 팔로워 삭제
+    void deleteFollower(int userId, int followId);
 }
