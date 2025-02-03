@@ -5,3 +5,15 @@ export interface Report {
   description: string;
   status: string;
 }
+
+export interface User {
+  userId: number;
+  nickname: string;
+  email: "string";
+}
+
+export interface Post {
+  id: number;
+  nickname: string;
+  description: string;
+}

@@ -1,9 +1,9 @@
 import { Link, NavLink } from "react-router-dom";
 
 const NavigationTab = [
-  { to: "report", name: "신고함" },
-  { to: "user", name: "유저 관리" },
-  { to: "post", name: "게시글 관리" },
+  { to: "reports", name: "신고함" },
+  { to: "users", name: "유저 관리" },
+  { to: "posts", name: "게시글 관리" },
 ];
 
 const Header = () => {
