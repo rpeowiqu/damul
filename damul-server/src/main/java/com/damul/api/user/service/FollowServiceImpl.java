@@ -73,10 +73,10 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public ScrollResponse<UserList> getFollowers(ScrollRequest request, int userId) {
+    public ScrollResponse<UserList> getFollowers(ScrollRequest request, int followingId ) {
         log.info("팔로워 목록 조회 시작");
         List<UserList> userLists = followRepository.findFollowersByUserIdAndCursorId(
-                userId,
+                followingId ,
                 request.getCursorId(),
                 request.getSize() + 1
         );
@@ -84,10 +84,10 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public ScrollResponse<UserList> getFollowings(ScrollRequest request, int userId) {
+    public ScrollResponse<UserList> getFollowings(ScrollRequest request, int followerId) {
         log.info("팔로잉 목록 조회 시작");
         List<UserList> userLists = followRepository.findFollowingsByUserIdAndCursorId(
-                userId,
+                followerId,
                 request.getCursorId(),
                 request.getSize() + 1
         );
@@ -96,19 +96,18 @@ public class FollowServiceImpl implements FollowService {
 
     // 팔로워 강제 삭제
     @Override
-    public void deleteFollower(int userId, int followId) {
-        log.info("팔로워 강제 삭제 시작 - userId: {}, followId: {}", userId, followId);
-
-        // 팔로우 관계 찾기
-        Follow follow = followRepository.findByUserIdAndFollowId(userId, followId)
+    public void deleteFollower(int followingId, int followerId) {
+        log.info("팔로워 강제 삭제 시작 - userId: {}, followId: {}", followingId, followerId);
+// followingId: 팔로우 당하는 사람 (나)
+        // followerId: 팔로우 하는 사람 (삭제하고 싶은 팔로워)
+        Follow follow = followRepository.findByFollower_IdAndFollowing_Id(followerId, followingId)
                 .orElseThrow(() -> {
-                    log.error("팔로우 관계가 아닙니다.");
+                    log.error("팔로우 관계가 존재하지 않습니다. followingId: {}, followerId: {}", followingId, followerId);
                     return new BusinessException(ErrorCode.FOLLOW_NOT_FOUND);
-                        });
+                });
 
-        // 팔로우 관계가 존재하면 삭제
         followRepository.delete(follow);
-        log.info("팔로워 강제 삭제 성공 - userId: {}, followId: {}", userId, followId);
+        log.info("팔로워 강제 삭제 성공 - followingId: {}, followerId: {}", followingId, followerId);
     }
 
     // 무한스크롤 응답 데이터를 생성

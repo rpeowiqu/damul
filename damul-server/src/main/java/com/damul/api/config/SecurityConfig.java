@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -30,6 +33,17 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
 
+    @Bean
+    @Primary
+    public ObjectPostProcessor<Object> objectPostProcessor() {
+        return new ObjectPostProcessor<Object>() {
+            @Override
+            public <O> O postProcess(O object) {
+                return object;
+            }
+        };
+    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -46,6 +60,7 @@ public class SecurityConfig {
                             .requestMatchers("/", "/login", "/admin/login").permitAll() // 누구나 접근 가능
                             .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
                             .requestMatchers("/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
+                            .requestMatchers("/ws/**").permitAll()  // WebSocket 엔드포인트 허용
                             .anyRequest().authenticated();                              // 나머지는 인증 필요
                 })
                 // JWT 토큰 기반의 리소스 서버 설정
