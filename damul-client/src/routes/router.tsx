@@ -32,6 +32,8 @@ import HomePage from "@/pages/home/HomePage";
 import ReportList from "@/components/admin/ReportList";
 import ReportDetail from "@/components/admin/ReportDetail";
 import UserDetail from "@/components/admin/UserDetail";
+import AdminPostRecipePage from "@/pages/admin/AdminPostRecipePage";
+import AdminPostSharePage from "@/pages/admin/AdminPostSharePage";
 
 const router = createBrowserRouter([
   {
@@ -223,19 +225,23 @@ const router = createBrowserRouter([
         element: <AdminPostPage />,
         children: [
           {
+            index: true,
+            element: <Navigate to={"recipe"} />,
+          },
+          {
             path: "recipe",
-            element: <div></div>,
+            element: <AdminPostRecipePage />,
           },
           {
             path: "recipe/:id",
             element: <div></div>,
           },
           {
-            path: "shared",
-            element: <div></div>,
+            path: "share",
+            element: <AdminPostSharePage />,
           },
           {
-            path: "shared/:id",
+            path: "share/:id",
             element: <div></div>,
           },
         ],

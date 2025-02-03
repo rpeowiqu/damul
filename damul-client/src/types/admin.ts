@@ -12,8 +12,16 @@ export interface User {
   email: "string";
 }
 
-export interface Post {
+export interface RecipePost {
   id: number;
   nickname: string;
   description: string;
+}
+
+export interface SharePost {
+  id: number;
+  title: string;
+  nickname: string;
+  postType: string;
+  status: string;
 }
