@@ -74,8 +74,8 @@ const ProfilePage = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <DamulTab tabList={tabItems} />
       <ProfileBanner nickname={header.nickname} />
+      <DamulTab tabList={tabItems} />
       <div className="flex-1 bg-normal-50">
         <Outlet context={{ user: header }} />
       </div>

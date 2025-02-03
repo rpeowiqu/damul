@@ -15,7 +15,11 @@ client-build:
   image: docker:latest
   stage: build
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
   before_script:
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_ACCESS_TOKEN
   script:
@@ -49,7 +53,7 @@ client-test:
   tags:
     - docker
   stage: test
-  image: node:latest
+  image: node:16
   script:
     - cd damul-client
     - npm ci
@@ -62,17 +66,23 @@ client-test:
         - "damul-client/**/*"
 
 # 서버 테스트 작업
-server-test:
+server-build:
   tags:
     - docker
-  stage: test
-  image: gradle:8.12-jdk17
+  image: docker:latest
+  stage: build
+  services:
+    - name: docker:dind
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_ACCESS_TOKEN
   script:
-    - cd damul-server
-    - gradle clean test
+    - docker build -t $SERVER_DOCKER_IMAGE ./damul-server
+    - docker push $SERVER_DOCKER_IMAGE
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(Server|server-develop|master)$/'
-      when: always
     - if: '$CI_COMMIT_BRANCH =~ /^(Server|server-develop|master)$/'
       changes:
         - "damul-server/**/*"
