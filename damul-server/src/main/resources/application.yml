@@ -10,6 +10,11 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
   main:
     allow-bean-definition-overriding: true
 
@@ -102,6 +107,10 @@ redirect:
   frontUrl: ${FRONT_URL}
   main: ${MAIN_URL}
   terms: ${TERMS_URL}
+
+
+file:
+  upload-dir: ${UPLOAD-DIR}
 
 ---
 spring:

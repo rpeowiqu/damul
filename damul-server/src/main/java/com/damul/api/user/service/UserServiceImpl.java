@@ -63,8 +63,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> {
                     log.error("해당 유저를 찾을 수 없습니다. - userId: {}", userId);
                     return new BusinessException(ErrorCode.USER_NOT_FOUND);
-                        });
-        userRepository.updateUserSettings(userId, setting);
+                });
+        user.updateSettings(setting);
         log.info("설정 수정 완료");
     }
 
