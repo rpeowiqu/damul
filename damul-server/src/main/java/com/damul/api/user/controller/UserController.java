@@ -1,10 +1,7 @@
 package com.damul.api.user.controller;
 
-import com.damul.api.auth.entity.User;
-import com.damul.api.auth.repository.AuthRepository;
-import com.damul.api.common.dto.request.ScrollRequest;
-import com.damul.api.common.dto.response.ScrollResponse;
-import com.damul.api.common.user.CurrentUser;
+import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.user.dto.request.CheckNicknameRequest;
 import com.damul.api.user.dto.request.FollowRequest;
 import com.damul.api.user.dto.request.SettingUpdate;
