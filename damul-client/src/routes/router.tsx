@@ -30,6 +30,7 @@ import AdminUserPage from "@/pages/admin/AdminUserPage";
 import AdminPostPage from "@/pages/admin/AdminPostPage";
 import HomePage from "@/pages/home/HomePage";
 import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPage";
+import ReportPage from "@/pages/report/ReportPage";
 
 const router = createBrowserRouter([
   {
@@ -179,6 +180,10 @@ const router = createBrowserRouter([
       {
         path: "setting",
         element: <SettingPage />,
+      },
+      {
+        path: "report",
+        element: <ReportPage />,
       },
     ],
   },
