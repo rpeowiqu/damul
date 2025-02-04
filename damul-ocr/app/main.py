@@ -19,7 +19,7 @@ async def user_ingredients_ocr(image: UploadFile = File(...)):
         if not extracted_text[0]:
             return { 'ERROR' : extracted_text[1] }
         extracted_text = " ".join(extracted_text)
-        # print(extracted_text)
+        print(extracted_text)
 
         # gpt
         result_json = await gpt_service_execution(extracted_text)
