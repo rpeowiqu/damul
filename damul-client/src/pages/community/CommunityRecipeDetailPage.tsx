@@ -6,7 +6,7 @@ import IngredientsSection from "@/components/community/IngredientsSection";
 import CookingOrdersSection from "@/components/community/CookingOrderSection";
 import CommentsSection from "@/components/community/CommentsSection";
 import FixedCommentInput from "@/components/community/FixedCommentInfo";
-import { Comment } from "@/types/interfaces";
+import { Comment } from "@/types/community";
 
 const CommunityRecipeDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
@@ -19,7 +19,7 @@ const CommunityRecipeDetailPage = () => {
     isLiked: false,
     createdAt: "2024-01-19 23:23",
     authorId: 2,
-    authorName: "요리사서히",
+    authorName: "요리사서히인데요",
     profileImageUrl: "string",
     viewCnt: 152,
     likeCnt: 32,
@@ -86,6 +86,7 @@ const CommunityRecipeDetailPage = () => {
         <CommunityDetailHeader
           title={mockData.title}
           createdAt={mockData.createdAt}
+          isBookmarked={mockData.isBookmarked}
           type="recipe"
         />
         <AuthorInfo
@@ -93,6 +94,7 @@ const CommunityRecipeDetailPage = () => {
           authorName={mockData.authorName}
           viewCnt={mockData.viewCnt}
           likeCnt={mockData.likeCnt}
+          isLiked={mockData.isLiked}
           id={mockData.id}
           type="recipe"
         />

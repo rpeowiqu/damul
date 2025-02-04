@@ -1,6 +1,6 @@
 import Image from "../common/Image";
 import ReplyItem from "./ReplyItem";
-import { Comment } from "@/types/interfaces";
+import { Comment } from "@/types/community";
 
 interface CommentItemProps {
   comment: Comment;
@@ -20,8 +20,8 @@ const CommentItem = ({ comment, replies, onReply }: CommentItemProps) => {
           <p className="text-xs text-neutral-500">{comment.createdAt}</p>
         </div>
       </div>
-      <p className="text-sm ml-12 pb-2">{comment.comment}</p>
-      <div className="flex justify-start gap-2 ml-12 cursor-pointer">
+      <p className="text-sm ml-12 pb-1">{comment.comment}</p>
+      <div className="flex justify-start gap-2 ml-12 cursor-pointer text-neutral-500">
         <div className="flex items-center gap-1">
           <p className="text-xs">신고하기</p>
         </div>

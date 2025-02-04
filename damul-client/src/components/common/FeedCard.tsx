@@ -24,7 +24,7 @@ const FeedCard = ({
   const navigate = useNavigate();
 
   const pathTo = (id: number) => {
-    if (pathname.endsWith("recipe")) {
+    if (pathname.startsWith("/community/recipe")) {
       navigate(`/community/recipe/${id}`);
     } else {
       navigate(`/community/market/${id}`);
