@@ -23,7 +23,7 @@ const PostDrawer = ({
   return (
     <Drawer>
       <DrawerTrigger>{trigerConent}</DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="bottom-16 z-40">
         <DrawerHeader>{headerContent}</DrawerHeader>
         <DrawerFooter onClick={onFooterClick}>{footerContent}</DrawerFooter>
       </DrawerContent>

@@ -78,7 +78,7 @@ const DrawerFooter = ({
     <div
       className={cn(
         "mt-auto flex flex-col gap-2 p-4 bg-background cursor-pointer",
-        className
+        className,
       )}
       {...props}
     />
