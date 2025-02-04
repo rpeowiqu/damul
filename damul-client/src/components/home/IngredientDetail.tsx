@@ -10,7 +10,7 @@ const IngredientDetail = () => {
         식자재 상세보기
       </p>
       <div className="flex items-center justify-center w-full p-6">
-        <div className="flex items-center justify-center w-full">
+        <div className="flex items-center justify-center w-full border-2 rounded-full border-normal-50 h-24 w-24">
           <MeatIcon className="scale-[3]" />
         </div>
 
