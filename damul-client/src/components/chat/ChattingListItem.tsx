@@ -1,4 +1,5 @@
 import Image from "../common/Image";
+import ChatAlarm from "../footer/ChatAlram";
 
 interface ChattingListItemProps {
   title: string;
@@ -22,18 +23,15 @@ const ChattingListItem = ({
       <Image src={thumbnailUrl} className="w-10 h-10 rounded-full" />
       <div className="flex w-full justify-between">
         <div className="flex flex-col text-start justify-between">
-          <p className="text-sm">
-            {title} ({memberNum})
-          </p>
-          <p className="text-xs text-neutral-600">{lastMessage}</p>
+          <div className="flex text-sm gap-1">
+            <p className="line-clamp-1">{title}</p>
+            <p>({memberNum})</p>
+          </div>
+          <p className="text-xs text-neutral-600 line-clamp-1">{lastMessage}</p>
         </div>
-        <div className="flex flex-col justify-between items-end ">
+        <div className="flex flex-col justify-between items-end min-w-16">
           <p className="text-xs text-neutral-500">{lastMessageTime}</p>
-          {unReadNum > 0 && (
-            <div className="flex w-4 h-4 bg-red-500 text-xxs text-white rounded-full text-center">
-              {unReadNum}
-            </div>
-          )}
+          {unReadNum > 0 && (<ChatAlarm chatAlarmNum={unReadNum}/>)}
         </div>
       </div>
     </div>

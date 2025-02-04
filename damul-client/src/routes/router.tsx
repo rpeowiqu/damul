@@ -31,6 +31,7 @@ import AdminPostPage from "@/pages/admin/AdminPostPage";
 import HomePage from "@/pages/home/HomePage";
 import ChattingMainPage from "@/pages/chat/ChattingMainPage";
 import ChattingSearchPage from "@/pages/chat/ChattingSearchPage";
+import ChattingStartPage from "@/pages/chat/ChattingStartPage";
 
 const router = createBrowserRouter([
   {
@@ -184,6 +185,10 @@ const router = createBrowserRouter([
             path: "search",
             element: <ChattingSearchPage />,
           },
+          {
+            path: "create",
+            element: <ChattingStartPage/>,
+          }
         ],
       },
       {

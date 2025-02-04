@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import FeedList from "@/components/common/FeedList";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import PostButton from "@/components/community/PostButton";
+import WriteIcon from "@/components/svg/WriteIcon";
 
 const CommunityMarketMainPage = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const CommunityMarketMainPage = () => {
         className="cursor-pointer"
       />
       <FeedList />
-      <PostButton to="market" />
+      <PostButton to="/community/market/post" icon={<WriteIcon/>}/>
     </main>
   );
 };
