@@ -8,7 +8,7 @@ const AdminPostPage = () => {
         <NavLink
           to={"recipe"}
           className={({ isActive }) =>
-            clsx("text-lg font-bold text-normal-200", {
+            clsx("xs:text-base pc_admin:text-lg font-bold text-normal-200", {
               "text-positive-400 border-b-2 border-positive-400": isActive,
             })
           }
@@ -18,7 +18,7 @@ const AdminPostPage = () => {
         <NavLink
           to={"share"}
           className={({ isActive }) =>
-            clsx("text-lg font-bold text-normal-200", {
+            clsx("xs:text-base pc_admin:text-lg font-bold text-normal-200", {
               "text-positive-400 border-b-2 border-positive-400": isActive,
             })
           }

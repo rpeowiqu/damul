@@ -51,7 +51,7 @@ const AdminPostSharePage = () => {
     return null;
   }
   return (
-    <div className="flex flex-col gap-6 w-full h-full p-6">
+    <div className="flex flex-col gap-6 w-full h-full">
       <div className="flex items-center gap-3">
         <Select
           value={searchType}
@@ -96,7 +96,7 @@ const AdminPostSharePage = () => {
       </div>
 
       <div className="min-h-[450px] mb-10">
-        <table className="w-full text-normal-700 text-center">
+        <table className="w-full text-normal-700 text-center xs:text-xs pc:text-sm pc_admin:text-base">
           <thead className="bg-positive-300 text-white">
             <tr>
               <th scope="col" className="p-2">

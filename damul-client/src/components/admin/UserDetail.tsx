@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Image from "../common/Image";
 import DamulButton from "../common/DamulButton";
 
@@ -48,8 +48,20 @@ const UserDetail = () => {
         <div className="grid grid-cols-[1fr_5fr] items-center gap-4">
           <p className="text-center font-extrabold">프로필 이미지</p>
           <div className="flex flex-col">
-            <Image className="w-24" />
-            <p>profile.png</p>
+            <Image
+              className="w-24"
+              src={
+                "https://images.dog.ceo/breeds/terrier-patterdale/patterdale-terrier-287612805105275kBT.jpg"
+              }
+            />
+            <a
+              href={
+                "https://images.dog.ceo/breeds/terrier-patterdale/patterdale-terrier-287612805105275kBT.jpg"
+              }
+              target="_blank"
+            >
+              profile.png
+            </a>
           </div>
         </div>
 

@@ -51,7 +51,7 @@ const AdminPostRecipePage = () => {
     return null;
   }
   return (
-    <div className="flex flex-col gap-6 w-full h-full p-6">
+    <div className="flex flex-col gap-6 w-full h-full">
       <div className="flex items-center gap-3">
         <Select
           value={searchType}
@@ -102,7 +102,7 @@ const AdminPostRecipePage = () => {
       </div>
 
       <div className="min-h-[450px] mb-10">
-        <table className="w-full text-normal-700 text-center">
+        <table className="w-full text-normal-700 text-center xs:text-xs pc:text-sm pc_admin:text-base">
           <thead className="bg-positive-300 text-white">
             <tr>
               <th scope="col" className="p-2">
@@ -121,7 +121,7 @@ const AdminPostRecipePage = () => {
               <tr
                 key={item.id}
                 className="bg-white border-b border-normal-100 hover:bg-positive-50 cursor-pointer"
-                onClick={() => nav(`${item.id}`)}
+                onClick={() => nav(`/community/recipe/1`)}
               >
                 <td className="p-2">{item.id}</td>
                 <td className="p-2">{item.description}</td>
