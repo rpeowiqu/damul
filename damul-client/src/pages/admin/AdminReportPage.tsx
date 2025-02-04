@@ -102,7 +102,7 @@ const AdminReportPage = () => {
       </div>
 
       <div className="min-h-[450px] mb-10">
-        <table className="w-full text-normal-700 text-center xs:text-xs pc:text-sm pc_admin:text-base">
+        <table className="w-full text-normal-700 text-center text-xs pc:text-sm pc_admin:text-base">
           <thead className="bg-positive-300 text-white">
             <tr>
               <th scope="col" className="p-2">

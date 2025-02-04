@@ -18,16 +18,16 @@ const Pagenation = ({ page, setPage, totalPage }: PagenationProps) => {
     page >= Math.floor((totalPage - 1) / NAVIGATION_SIZE) * NAVIGATION_SIZE + 1;
 
   return (
-    <nav className="flex justify-center">
-      <ul className="flex gap-6">
+    <nav className="flex justify-center text-xs pc:text-sm">
+      <ul className="flex gap-3">
         <li
-          className="p-1 text-sm text-normal-600 font-bold rounded-full cursor-pointer hover:bg-normal-50"
+          className="p-1 text-normal-600 font-bold rounded-full cursor-pointer hover:bg-normal-50"
           onClick={() => setPage(1)}
         >
           처음
         </li>
         <li
-          className="p-1 text-sm text-normal-600 font-bold rounded-full cursor-pointer hover:bg-normal-50"
+          className="p-1 text-normal-600 font-bold rounded-full cursor-pointer hover:bg-normal-50"
           onClick={() =>
             setPage(curRangeStartPage === 1 ? 1 : curRangeStartPage - 1)
           }
@@ -40,7 +40,7 @@ const Pagenation = ({ page, setPage, totalPage }: PagenationProps) => {
           (_, index) => (
             <li
               key={index}
-              className={`p-1 text-sm font-bold rounded-full cursor-pointer hover:bg-normal-50 ${curRangeStartPage + index === page ? "text-positive-400" : "text-normal-600"}`}
+              className={`p-1 font-bold rounded-full cursor-pointer hover:bg-normal-50 ${curRangeStartPage + index === page ? "text-positive-400" : "text-normal-600"}`}
               onClick={() => setPage(curRangeStartPage + index)}
             >
               {curRangeStartPage + index}
@@ -49,7 +49,7 @@ const Pagenation = ({ page, setPage, totalPage }: PagenationProps) => {
         )}
 
         <li
-          className="p-1 text-sm text-normal-600 font-bold rounded-full cursor-pointer hover:bg-normal-50"
+          className="p-1 text-normal-600 font-bold rounded-full cursor-pointer hover:bg-normal-50"
           onClick={() =>
             setPage(isInEndRange ? totalPage : curRangeEndPage + 1)
           }
@@ -57,7 +57,7 @@ const Pagenation = ({ page, setPage, totalPage }: PagenationProps) => {
           다음
         </li>
         <li
-          className="p-1 text-sm text-normal-600 font-bold rounded-full cursor-pointer hover:bg-normal-50"
+          className="p-1 text-normal-600 font-bold rounded-full cursor-pointer hover:bg-normal-50"
           onClick={() => setPage(totalPage)}
         >
           끝

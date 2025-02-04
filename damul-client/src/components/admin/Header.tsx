@@ -54,22 +54,22 @@ const Header = () => {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>설정</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={() => nav("/admin/login", { replace: true })}
-                >
-                  로그아웃
-                </DropdownMenuItem>
                 {NavigationTab.map((item, index) => (
                   <DropdownMenuItem
                     key={index}
                     onSelect={() => nav(`${item.to}`)}
-                    className="data-[highlighted=true]:bg-red-50"
+                    className="hover:!bg-positive-50"
                   >
                     {item.name}
                   </DropdownMenuItem>
                 ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => nav("/admin/login", { replace: true })}
+                  className="text-normal-500 hover:!text-normal-500 hover:!bg-positive-50"
+                >
+                  로그아웃
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </li>
