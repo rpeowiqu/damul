@@ -1,5 +1,6 @@
 package com.damul.api.auth.dto.response;
 
+import com.damul.api.auth.entity.Terms;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,5 +15,5 @@ import java.util.List;
 public class UserConsent {
     private String email;
     private String nickname;
-    List<TermsResponse> terms;
+    List<Terms> terms;
 }
