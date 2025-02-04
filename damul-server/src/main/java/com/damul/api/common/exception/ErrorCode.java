@@ -31,6 +31,9 @@ public enum ErrorCode {
     INVALED_TARGETID(HttpStatus.BAD_REQUEST, "자기 자신을 팔로우할 수 없습니다."),
 
 
+    // 파일 관련 에러
+    FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 중 오류가 발생했습니다."),
+
     // 게시글 관련 에러
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다.");
 

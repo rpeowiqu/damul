@@ -2,6 +2,8 @@ package com.damul.api.user.controller;
 
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.file.dto.type.FileType;
+import com.damul.api.file.service.FileService;
 import com.damul.api.user.dto.request.CheckNicknameRequest;
 import com.damul.api.user.dto.request.FollowRequest;
 import com.damul.api.user.dto.request.SettingUpdate;
@@ -24,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
     private final UserService userService;
     private final FollowService followService;
+    private final FileService fileService;
 
     // 설정 조회
     @GetMapping("/{userId}/settings")
@@ -41,9 +44,22 @@ public class UserController {
                                         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
                                         @RequestPart(value = "backgroundImage", required = false) MultipartFile backgroundImage) {
 
+        // FileType enum을 사용하여 파일 업로드
+        String profileImageUrl = fileService.uploadFile(profileImage, FileType.USER_PROFILE);
+        String backgroundImageUrl = fileService.uploadFile(backgroundImage, FileType.USER_BACKGROUND);
 
+        // 업로드된 이미지 URL을 setting 객체에 설정
+        if (profileImageUrl != null) {
+            setting.setProfileImageUrl(profileImageUrl);
+        }
+        if (backgroundImageUrl != null) {
+            setting.setBackgroundImageUrl(backgroundImageUrl);
+        }
 
-        return null;
+        // UserService를 통해 설정 업데이트
+        userService.updateSetting(userId, setting);
+
+        return ResponseEntity.ok().build();
     }
 
     // 닉네임 중복 확인
