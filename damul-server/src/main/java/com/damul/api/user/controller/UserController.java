@@ -2,15 +2,20 @@ package com.damul.api.user.controller;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.repository.AuthRepository;
+import com.damul.api.common.dto.request.ScrollRequest;
+import com.damul.api.common.dto.response.ScrollResponse;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.user.dto.request.CheckNicknameRequest;
 import com.damul.api.user.dto.request.FollowRequest;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.FollowResponse;
+import com.damul.api.user.dto.response.SettingResponse;
+import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.service.FollowService;
 import com.damul.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,11 +31,14 @@ public class UserController {
     // 설정 조회
     @GetMapping("/{userId}/settings")
     public ResponseEntity<?> getSetting(@PathVariable int userId) {
-        return null;
+        log.info("설정 조회 요청 - userId: {}", userId);
+        SettingResponse settingResponse = userService.getSetting(userId);
+        log.info("설정 조회 완료 - userId: {}", userId);
+        return ResponseEntity.ok(settingResponse);
     }
 
     // 설정 수정 - file 저장 구현 후 할 것!
-    @PatchMapping("/{userId}/settings")
+    @PutMapping("/{userId}/settings")
     public ResponseEntity updateSetting(@PathVariable("userId") int userId,
                                         @RequestPart("settingUpdate") SettingUpdate setting,
                                         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
@@ -54,17 +62,35 @@ public class UserController {
 
     // 팔로워 목록 조회
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<?> getFollowers(@PathVariable int userId) {
+    public ResponseEntity<?> getFollowers(@RequestBody ScrollRequest scrollRequest,
+                                          @PathVariable int userId) {
+        log.info("팔로워 목록 조회 요청");
+        ScrollResponse<UserList> userList = followService.getFollowers(scrollRequest, userId);
 
-        return null;
+        if(userList.getData().isEmpty() || userList.getData().size() == 0) {
+            log.info("팔로워 목록 조회 성공 - 데이터없음");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        log.info("팔로워 목록 조회 성공, 개수: {}", userList.getData().size());
+        return ResponseEntity.ok(userList);
     }
 
     
     // 팔로잉 목록 조회
     @GetMapping("/{userId}/follwings")
-    public ResponseEntity<?> getFollwings(@PathVariable int userId) {
+    public ResponseEntity<?> getFollwings(@RequestBody ScrollRequest scrollRequest,
+                                          @PathVariable int userId) {
+        log.info("팔로잉 목록 조회 요청");
+        ScrollResponse<UserList> userList = followService.getFollowings(scrollRequest, userId);
 
-        return null;
+        if(userList.getData().isEmpty() || userList.getData().size() == 0) {
+            log.info("팔로잉 목록 조회 성공 - 데이터없음");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        log.info("팔로잉 목록 조회 성공, 개수: {}", userList.getData().size());
+        return ResponseEntity.ok(userList);
     }
 
     // 팔로우/언팔로우
@@ -80,9 +106,29 @@ public class UserController {
         return ResponseEntity.ok(followResponse);
     }
 
-    // 친구 삭제
-    
+    // 팔로워 삭제
+    @DeleteMapping("/{userId}/force-unfollow/{followId}")
+    public ResponseEntity<?> unfollow(@PathVariable int userId, @PathVariable int followId) {
+        log.info("팔로워 강제 삭제 요청 - userId: {}, followId: {}", userId, followId);
+        followService.deleteFollower(userId, followId);
+
+        log.info("팔로워 강제 삭제 성공");
+        return ResponseEntity.ok().build();
+    }
+
     // 사용자 목록 검색/조회
-
-
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@PathVariable int userId,
+                                    @RequestParam String keyword,
+                                    @RequestBody ScrollRequest scrollRequest) {
+        log.info("사용자 목록 검색/조회 요청 - userId: {}, keyword: {}", userId, keyword);
+        ScrollResponse<UserList> userList = userService.getSearchUserList(scrollRequest, keyword);
+        if(userList.getData().isEmpty() || userList.getData().size() == 0) {
+            log.info("사용자 목록 검색/조회 완료 - 데이터 없음");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } else {
+            log.info("사용자 목록 검색/조회 완료 - 개수: {}", userList.getData().size());
+            return ResponseEntity.ok(userList);
+        }
+    }
 }

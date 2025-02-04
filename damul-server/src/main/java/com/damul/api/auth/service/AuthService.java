@@ -2,14 +2,16 @@ package com.damul.api.auth.service;
 
 import com.damul.api.auth.dto.request.AdminLoginRequest;
 import com.damul.api.auth.dto.request.SignupRequest;
-import com.damul.api.auth.dto.response.TermsResponse;
 import com.damul.api.auth.dto.response.UserConsent;
+import com.damul.api.auth.entity.Terms;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -19,7 +21,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -78,7 +79,7 @@ public class AuthService {
     public void signup(String tempToken, SignupRequest signupRequest, HttpServletResponse response) {
         // 1. 토큰 검증
         if(!jwtTokenProvider.validateToken(tempToken)) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         try {
@@ -88,11 +89,14 @@ public class AuthService {
             log.info("이메일 - email: {}", email);
 
             // 3. Redis에서 유저 정보 가져오기
-            String sessionKey = "oauth2:user:" + RequestContextHolder.currentRequestAttributes().getSessionId();
+            String sessionKey = "oauth2:user:" + email;
+            log.info("Redis 세션 키: {}", sessionKey);
+
             String jsonString = redisTemplate.opsForValue().get(sessionKey);
+            log.info("Redis에서 가져온 JSON 문자열: {}", jsonString);
 
             if (jsonString == null) {
-                throw new RuntimeException("유저 정보를 찾을 수 없습니다.");
+                throw new BusinessException(ErrorCode.USER_NOT_FOUND);
             }
 
             // 4. 유저 정보 파싱 및 저장
@@ -153,7 +157,7 @@ public class AuthService {
         log.info("닉네임 조회 - nickname: {}", defaultNickname);
         log.info("이메일 조회 - email: {}", email);
 
-        List<TermsResponse> terms = termsRepository.findAll();
+        List<Terms> terms = termsRepository.findAll();
         if(terms.isEmpty()) {
             log.error("약관 데이터가 없음");
             throw new RuntimeException("약관 데이터가 존재하지 않습니다.");
@@ -195,7 +199,7 @@ public class AuthService {
 
         // 비밀번호 검증
         if (!BCrypt.checkpw(request.getPassword(), hashedAdminPassword)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new BusinessException(ErrorCode.ADMIN_NOT_FOUND);
         }
 
         // 인증 객체 생성

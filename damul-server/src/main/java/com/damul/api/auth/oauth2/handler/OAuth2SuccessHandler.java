@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.util.Map;
@@ -26,6 +27,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
+    @Value("${redirect.frontUrl}")
+    private String frontUrl;
+
+    @Value("${redirect.main}")
+    private String main;
+
+    @Value("${redirect.terms}")
+    private String terms;
 
     private final AuthService authService;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -59,17 +68,17 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             log.info("Access Token 쿠키 설정: {}", tokens.get("accessToken"));
             log.info("Refresh Token 쿠키 설정: {}", tokens.get("refreshToken"));
 
-            response.sendRedirect("http://localhost:3000");
+            response.sendRedirect(frontUrl + main);
 
         } else if(oAuth2User instanceof DefaultOAuth2User) {
             log.info("신규 회원입니다.");
             String tempToken = oAuth2User.getAttribute("tempToken");
 
             // 쿠키로 전달
-            cookieUtil.addCookie(response, "temp_token", tempToken, 1800); // 30분 유지
+            cookieUtil.addCookie(response, "tempToken", tempToken, 1800); // 30분 유지
 
             // 신규 회원이면 약관동의 페이지로 Redirect
-            response.sendRedirect("http://localhost:3000/");
+            response.sendRedirect(frontUrl+terms);
         }
     }
 }

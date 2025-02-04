@@ -1,4 +1,4 @@
-package com.damul.api.auth.dto.response;
+package com.damul.api.user.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TermsResponse {
-    private int id;
-    private String title;
-    private String content;
+public class UserList {
+    private int userId;
+    private String profileImageUrl;
+    private String nickname;
 }
