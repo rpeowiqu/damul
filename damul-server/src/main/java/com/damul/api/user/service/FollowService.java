@@ -1,7 +1,7 @@
 package com.damul.api.user.service;
 
-import com.damul.api.common.dto.request.ScrollRequest;
-import com.damul.api.common.dto.response.ScrollResponse;
+import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.user.dto.response.FollowResponse;
 import com.damul.api.user.dto.response.UserList;
 
