@@ -29,6 +29,8 @@ import AdminReportPage from "@/pages/admin/AdminReportPage";
 import AdminUserPage from "@/pages/admin/AdminUserPage";
 import AdminPostPage from "@/pages/admin/AdminPostPage";
 import HomePage from "@/pages/home/HomePage";
+import ChattingMainPage from "@/pages/chat/ChattingMainPage";
+import ChattingSearchPage from "@/pages/chat/ChattingSearchPage";
 
 const router = createBrowserRouter([
   {
@@ -168,6 +170,19 @@ const router = createBrowserRouter([
           {
             path: "following",
             element: <FriendFollowingPage />,
+          },
+        ],
+      },
+      {
+        path: "chatting",
+        children: [
+          {
+            index: true,
+            element: <ChattingMainPage />,
+          },
+          {
+            path: "search",
+            element: <ChattingSearchPage />,
           },
         ],
       },
