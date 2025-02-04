@@ -40,20 +40,20 @@ const CommunitySearch = ({ placeholder, title, postTo }: CommunitySearch) => {
             value={sortType}
             onValueChange={(value) => setSortType(value)}
           >
-            <SelectTrigger className="w-28">
+            <SelectTrigger className="w-24 pc:w-28 text-xs pc:text-sm">
               <SelectValue placeholder="정렬 방식" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>검색 조건</SelectLabel>
+                <SelectLabel className="text-xs pc:text-sm">검색 조건</SelectLabel>
                 <SelectItem
-                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500 text-xs pc:text-sm"
                   value="title"
                 >
                   제목+내용
                 </SelectItem>
                 <SelectItem
-                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500 text-xs pc:text-sm"
                   value="author"
                 >
                   작성자

@@ -8,7 +8,7 @@ import PostContent from "@/components/community/PostContent";
 import PostRecipeIngrediants from "@/components/community/PostRecipeIngrediants";
 import PostRecipeOrders from "@/components/community/PostRecipeOrders";
 import DamulButton from "@/components/common/DamulButton";
-import { IngredientProps, OrderProps } from "@/types/interfaces";
+import { IngredientProps, OrderProps } from "@/types/community";
 
 const CommunityRecipePostPage = () => {
   const [title, setTitle] = useState<string>("");
@@ -57,7 +57,7 @@ const CommunityRecipePostPage = () => {
         <span>{"<"}</span>
         <span className="space-y-4">나만의 레시피 작성</span>
       </div>
-      <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-5">
         <PostDrawer
           trigerConent={
             <PostCard

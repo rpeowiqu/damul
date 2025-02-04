@@ -1,5 +1,5 @@
 import Image from "../common/Image";
-import { Comment } from "@/types/interfaces";
+import { Comment } from "@/types/community";
 
 interface ReplyItemProps {
   reply: Comment;
@@ -15,9 +15,9 @@ const ReplyItem = ({ reply, onReply }: ReplyItemProps) => {
           <p className="text-xs text-neutral-500">{reply.createdAt}</p>
         </div>
       </div>
-      <p className="text-sm ml-12 pb-2">{reply.comment}</p>
+      <p className="text-sm ml-12 pb-1">{reply.comment}</p>
       <div
-        className="flex justify-start gap-2 ml-12 cursor-pointer"
+        className="flex justify-start gap-2 ml-12 cursor-pointer text-neutral-500"
         onClick={() => onReply(reply)}
       >
         <div className="flex items-center gap-1">

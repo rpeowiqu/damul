@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import PostDrawer from "@/components/community/PostDrawer";
 import PostRecipeOrderForm from "./PostRecipeOrderForm";
 import SubmitButton from "./SubmitButton";
-import { OrderProps } from "@/types/interfaces";
+import { OrderProps } from "@/types/community";
 
 interface PostRecipeStepsProps {
   setTempOrders: Dispatch<SetStateAction<OrderProps[]>>;
@@ -48,13 +48,13 @@ const PostRecipeSteps = ({ setTempOrders, tempOrders }: PostRecipeStepsProps) =>
   };
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden flex flex-col">
       <table className="min-w-full">
         <thead>
           <tr>
             <th className="text-left"></th>
             <th className="text-center">이미지</th>
-            <th className="text-left">조리 단계</th>
+            <th className="text-center">조리 단계</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-neutral-300">
@@ -69,7 +69,7 @@ const PostRecipeSteps = ({ setTempOrders, tempOrders }: PostRecipeStepsProps) =>
                   -
                 </button>
               </td>
-              <td className="p-2">
+              <td className="p-1 text-center">
                 {order.image ? (
                   <img
                     src={URL.createObjectURL(order.image)}

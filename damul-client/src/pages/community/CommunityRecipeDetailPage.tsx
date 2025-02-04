@@ -19,7 +19,7 @@ const CommunityRecipeDetailPage = () => {
     isLiked: false,
     createdAt: "2024-01-19 23:23",
     authorId: 2,
-    authorName: "요리사서히",
+    authorName: "요리사서히인데요",
     profileImageUrl: "string",
     viewCnt: 152,
     likeCnt: 32,

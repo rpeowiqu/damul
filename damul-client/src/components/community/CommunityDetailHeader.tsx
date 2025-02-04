@@ -45,7 +45,7 @@ const CommunityDetailHeader = ({
           <p className="text-xs text-neutral-500">{createdAt}</p>
         </div>
       ) : (
-        <div className="flex flex-col justify-end items-end py-0.5">
+        <div className="flex flex-col justify-between items-end">
           <StatusMarker />
           <p className="text-xs text-neutral-500">{createdAt}</p>
         </div>
