@@ -3,11 +3,13 @@ import datetime
 from app.config import settings
 import json
 
+from PIL import Image   # 이미지 크기 조절
+import numpy as np
 
 def get_settings():
     return settings
 
-OPENAI_KEY = settings.OPENAI_KEY1
+OPENAI_KEY = settings.OPENAI_KEY2
 
 MODEL1 = "gpt-4o-mini"
 MODEL2 ="gpt-4o"
@@ -24,7 +26,7 @@ SYSTEM_MSG1 = """
 						"productPrice": number, // 가격
 						"dueDate": "string", // 유통기한
 						"expiration_date": "string", // 소비기한 
-						"ingredientStorage": ENUM('FREEZER', 'FRIDGE', 'ROOM_TEMPERATUER')// 식자재 저장 위치(냉동, 냉장, 실온)
+						"ingredientStorage": ENUM('FREEZER', 'FRIDGE', 'ROOMTEMP')// 식자재 저장 위치(냉동, 냉장, 실온)
 				}, ...
 		]
 }
@@ -35,6 +37,8 @@ SYSTEM_MSG2 = f"\n오늘 날짜는 {datetime.date.today()}입니다.\n"
 SYSTEM_MSG3 = """
 다음은 주의 사항입니다!
 
+식료품이 아닌 것 같은 품목은 제외해주세요!
+
 구매일의 경우 없으면 오늘로 해주세요.
 가게의 경우 없으면 "없음"이라고 해주세요.
 
@@ -43,12 +47,9 @@ SYSTEM_MSG3 = """
 
 식자재 저장 위치는 대체로 'FRIDGE'입니다. 그러나 실온이나 냉동 보관해도 되는 것이라면 'ROOMTEMP', 'FREEZER'로 해주세요.
 
-유통기한과 소비기한은 모두 식자재 저장 위치를 기반으로 합니다!
-
-유통기한은 상품명을 보고 구매일(없으면 오늘)을 기준으로 일반적인 유통기한을 알려주세요.
-
-소비기한은 일반적으로 유통기한보다 조금 더 깁니다.
-소비기한은 상품명을 보고 구매일(없으면 오늘)을 기준으로 일반적인 소비기한을 추천해주세요.
+소비기한과 유통기한은 동일합니다.
+각 식자재는 어디에 보관하고 얼마나 보관할 수 있을까요?
+소비기한은 상품명과 식자재 저장 위치를 확인하고 구매일(없으면 오늘)을 기준으로 추천해주세요.
 
 결과는 요구 자료 형태로 출력해야 합니다!!
 
