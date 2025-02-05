@@ -1,5 +1,4 @@
 pipeline {
-    agent any
     
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
@@ -26,7 +25,6 @@ pipeline {
             }
         }
 
-        stage('Setup & Build') {
             agent {
                 docker {
                     image 'docker:24.0-dind'
@@ -37,14 +35,14 @@ pipeline {
             steps {
                 script {
                     def branch = env.BRANCH_NAME
-                    
+
                     sh '''
                         docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
                         docker buildx rm builder || true
                         docker buildx create --name builder --driver docker-container --use
                         docker buildx inspect builder --bootstrap
                     '''
-                    
+
                     if (env.CHANGE_ID == null) {
                         if (branch == 'master') {
                             sh """
@@ -146,11 +144,11 @@ pipeline {
                     ssh-keyscan ${EC2_HOST} >> /root/.ssh/known_hosts
                     chmod 600 /root/.ssh/known_hosts # 추가
                 """
-                
+
                 script {
                     def branch = env.BRANCH_NAME
                     def deployCmd = "cd $DEPLOY_PATH && docker compose -f docker-compose.prod.yml pull server && docker compose -f docker-compose.prod.yml up -d server && docker image prune -f"
-                    
+
                     switch(branch) {
                         case 'Client':
                             deployCmd = "cd $DEPLOY_PATH && docker compose -f docker-compose.prod.yml pull client && docker compose -f docker-compose.prod.yml up -d client && docker image prune -f"
