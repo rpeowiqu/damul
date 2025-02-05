@@ -1,9 +1,9 @@
 package com.damul.api.user.service;
 
 import com.damul.api.auth.entity.User;
-import com.damul.api.common.dto.request.ScrollRequest;
-import com.damul.api.common.dto.response.CursorPageMetaInfo;
-import com.damul.api.common.dto.response.ScrollResponse;
+import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
+import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.user.dto.request.SettingUpdate;
@@ -12,7 +12,6 @@ import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,8 +63,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> {
                     log.error("해당 유저를 찾을 수 없습니다. - userId: {}", userId);
                     return new BusinessException(ErrorCode.USER_NOT_FOUND);
-                        });
-        userRepository.updateUserSettings(userId, setting);
+                });
+        user.updateSettings(setting);
         log.info("설정 수정 완료");
     }
 
