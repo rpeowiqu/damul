@@ -1,5 +1,5 @@
 import { useState, Dispatch, SetStateAction, ChangeEvent } from "react";
-import AlarmIcon from "../svg/AlarmIcon";
+import ImageUploadIcon from "../svg/ImageUploadIcon";
 
 interface PostImageProps {
   setTempImage: Dispatch<SetStateAction<File | null>>;
@@ -46,7 +46,7 @@ const PostImage = ({ setTempImage }: PostImageProps) => {
           htmlFor="file-upload"
           className="flex flex-col items-center justify-center w-full h-48 pc:h-64 gap-1 border-2 border-dashed border-normal-400 rounded-lg cursor-pointer hover:bg-normal-50"
         >
-          <AlarmIcon className="size-10 stroke-normal-500" />
+          <ImageUploadIcon className="size-10 stroke-normal-500" />
           <span className="text-normal-500 text-md">이미지 업로드</span>
         </label>
       )}
