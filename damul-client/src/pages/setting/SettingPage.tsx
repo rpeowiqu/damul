@@ -183,7 +183,7 @@ const SettingPage = () => {
               />
             </div>
 
-            <DamulButton variant="positive" onClick={() => {}}>
+            <DamulButton variant="positive" className="text-sm">
               중복 확인
             </DamulButton>
           </div>
@@ -289,12 +289,7 @@ const SettingPage = () => {
           </Link>
         </div>
 
-        <DamulButton
-          variant="positive"
-          size="full"
-          textSize="base"
-          onClick={() => {}}
-        >
+        <DamulButton type="submit" variant="positive">
           수정하기
         </DamulButton>
       </form>
