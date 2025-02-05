@@ -149,18 +149,22 @@ const CommunityRecipePostPage = () => {
           }}
         />
       </div>
-      {title && image && content && ingredients[0].name && orders[0].description && (
-        <div className="absolute bottom-16 left-0 w-full p-6">
-          <DamulButton
-            variant="positive-outline"
-            size="full"
-            textSize="lg"
-            onClick={() => {}}
-          >
-            레시피 작성하기
-          </DamulButton>
-        </div>
-      )}
+      {title &&
+        image &&
+        content &&
+        ingredients[0].name &&
+        orders[0].description && (
+          <div className="absolute bottom-16 left-0 w-full p-6">
+            <DamulButton
+              variant="positive-outline"
+              size="full"
+              textSize="sm"
+              onClick={() => {}}
+            >
+              레시피 작성하기
+            </DamulButton>
+          </div>
+        )}
     </main>
   );
 };
