@@ -106,7 +106,7 @@ const AdminUserPage = () => {
           <thead className="bg-positive-300 text-white">
             <tr>
               <th scope="col" className="p-2">
-                유저 아이디
+                유저 번호
               </th>
               <th scope="col" className="p-2">
                 닉네임

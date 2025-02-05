@@ -1,5 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
-import Image from "../common/Image";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import DamulButton from "../common/DamulButton";
 
 const ReportDetail = () => {
@@ -19,13 +18,27 @@ const ReportDetail = () => {
         </div>
 
         <div className="grid grid-cols-[1fr_5fr] items-center gap-4">
-          <p className="text-center font-extrabold">신고번호</p>
+          <p className="text-center font-extrabold">신고 번호</p>
           <p>{reportId}</p>
         </div>
 
         <div className="grid grid-cols-[1fr_5fr] items-center gap-4">
-          <p className="text-center font-extrabold">닉네임</p>
-          <p>토마토러버전종우</p>
+          <p className="text-center font-extrabold">작성자</p>
+          <p>토마토헤이터12</p>
+        </div>
+
+        <div className="grid grid-cols-[1fr_5fr] items-center gap-4">
+          <p className="text-center font-extrabold">신고 대상</p>
+          <div>
+            <Link to={"/admin/users/1"} className="text-blue-400 underline">
+              토마토러버전종우
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-[1fr_5fr] items-center gap-4">
+          <p className="text-center font-extrabold">게시글 분류</p>
+          <p>레시피 게시판</p>
         </div>
 
         <div className="grid grid-cols-[1fr_5fr] items-center gap-4">
@@ -34,17 +47,19 @@ const ReportDetail = () => {
         </div>
 
         <div className="grid grid-cols-[1fr_5fr] items-center gap-4">
-          <p className="text-center font-extrabold">내용</p>
-          <p>
-            토맛토마토토맛토맛토마토토맛토맛토마토토맛토맛토마토토맛토맛토마토토맛토맛토마토토맛
-          </p>
+          <p className="text-center font-extrabold">신고 사유</p>
+          <p>토마토를 자꾸 도배하네요;; 제재 좀 부탁드립니다.</p>
         </div>
 
         <div className="grid grid-cols-[1fr_5fr] items-center gap-4">
-          <p className="text-center font-extrabold">첨부 파일</p>
-          <div className="flex flex-col">
-            <Image className="w-24" />
-            <p>evidence.png</p>
+          <p className="text-center font-extrabold">URL</p>
+          <div>
+            <Link
+              to={"/community/recipe/1"}
+              className="text-blue-400 underline"
+            >
+              바로가기
+            </Link>
           </div>
         </div>
 

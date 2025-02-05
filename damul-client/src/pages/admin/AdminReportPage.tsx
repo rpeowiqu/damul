@@ -109,7 +109,7 @@ const AdminReportPage = () => {
                 신고 번호
               </th>
               <th scope="col" className="p-2">
-                닉네임
+                작성자
               </th>
               <th scope="col" className="p-2">
                 구분

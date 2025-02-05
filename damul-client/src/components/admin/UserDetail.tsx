@@ -19,7 +19,7 @@ const UserDetail = () => {
         </div>
 
         <div className="grid grid-cols-[1fr_5fr] items-center gap-4">
-          <p className="text-center font-extrabold">유저 아이디</p>
+          <p className="text-center font-extrabold">유저 번호</p>
           <p>{userId}</p>
         </div>
 
