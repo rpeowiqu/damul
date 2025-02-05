@@ -18,6 +18,18 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+        s3:
+          bucket: ${AWS_S3_BUCKET}
+        region:
+          static: ap-northeast-2
+        stack:
+          auto: false
+
   security:
     admin:
       password: ${admin.password}

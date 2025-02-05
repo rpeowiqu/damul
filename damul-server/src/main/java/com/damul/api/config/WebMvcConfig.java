@@ -16,17 +16,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final CurrentUserArgumentResolver currentUserArgumentResolver;
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(currentUserArgumentResolver);
-    }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadDir + "/");
     }
 }
