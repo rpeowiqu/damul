@@ -1,4 +1,4 @@
-package com.damul.api.damulserver;
+package com.damul.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
