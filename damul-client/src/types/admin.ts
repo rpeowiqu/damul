@@ -18,7 +18,7 @@ export interface RecipePost {
   description: string;
 }
 
-export interface SharePost {
+export interface MarketPost {
   id: number;
   title: string;
   nickname: string;

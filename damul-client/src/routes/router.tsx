@@ -29,11 +29,10 @@ import AdminReportPage from "@/pages/admin/AdminReportPage";
 import AdminUserPage from "@/pages/admin/AdminUserPage";
 import AdminPostPage from "@/pages/admin/AdminPostPage";
 import HomePage from "@/pages/home/HomePage";
-import ReportList from "@/components/admin/ReportList";
 import ReportDetail from "@/components/admin/ReportDetail";
 import UserDetail from "@/components/admin/UserDetail";
 import AdminPostRecipePage from "@/pages/admin/AdminPostRecipePage";
-import AdminPostSharePage from "@/pages/admin/AdminPostSharePage";
+import AdminPostMarketPage from "@/pages/admin/AdminPostMarketPage";
 
 const router = createBrowserRouter([
   {
@@ -237,8 +236,8 @@ const router = createBrowserRouter([
             element: <div></div>,
           },
           {
-            path: "share",
-            element: <AdminPostSharePage />,
+            path: "market",
+            element: <AdminPostMarketPage />,
           },
           {
             path: "share/:id",

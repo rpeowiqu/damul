@@ -106,10 +106,10 @@ const AdminPostRecipePage = () => {
           <thead className="bg-positive-300 text-white">
             <tr>
               <th scope="col" className="p-2">
-                게시글 아이디
+                게시글 번호
               </th>
               <th scope="col" className="p-2">
-                소개
+                제목
               </th>
               <th scope="col" className="p-2">
                 작성자
@@ -121,7 +121,7 @@ const AdminPostRecipePage = () => {
               <tr
                 key={item.id}
                 className="bg-white border-b border-normal-100 hover:bg-positive-50 cursor-pointer"
-                onClick={() => nav(`/community/recipe/1`)}
+                onClick={() => nav(`/community/recipe/${item.id}`)}
               >
                 <td className="p-2">{item.id}</td>
                 <td className="p-2">{item.description}</td>

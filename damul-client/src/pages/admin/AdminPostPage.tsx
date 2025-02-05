@@ -16,7 +16,7 @@ const AdminPostPage = () => {
           레시피 게시판
         </NavLink>
         <NavLink
-          to={"share"}
+          to={"market"}
           className={({ isActive }) =>
             clsx("xs:text-base pc_admin:text-lg font-bold text-normal-200", {
               "text-positive-400 border-b-2 border-positive-400": isActive,

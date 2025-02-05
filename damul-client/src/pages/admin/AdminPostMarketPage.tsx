@@ -11,13 +11,13 @@ import {
 import { useEffect, useState } from "react";
 import Pagenation from "@/components/common/Pagenation";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { SharePost } from "@/types/admin";
+import { MarketPost } from "@/types/admin";
 
-const AdminPostSharePage = () => {
+const AdminPostMarketPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [keyword, setKeyword] = useState<string>("");
   const [totalPage, setTotalPage] = useState<number>(0);
-  const [sharePostList, setSharePostList] = useState<SharePost[]>([]);
+  const [marketPostList, setMarketPostList] = useState<MarketPost[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const nav = useNavigate();
 
@@ -29,13 +29,13 @@ const AdminPostSharePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/mocks/admin/admin-share_${page}.json`);
+        const response = await fetch(`/mocks/admin/admin-market_${page}.json`);
         if (!response.ok) {
           throw new Error("데이터를 불러오지 못했습니다.");
         }
 
         const data = await response.json();
-        setSharePostList(data.content);
+        setMarketPostList(data.content);
         setTotalPage(data.pageInfo.totalPages);
       } catch (error) {
         console.error(error);
@@ -100,13 +100,13 @@ const AdminPostSharePage = () => {
           <thead className="bg-positive-300 text-white">
             <tr>
               <th scope="col" className="p-2">
-                게시글 아이디
+                게시글 번호
               </th>
               <th scope="col" className="p-2">
-                게시글 제목
+                제목
               </th>
               <th scope="col" className="p-2">
-                게시글 종류
+                종류
               </th>
               <th scope="col" className="p-2">
                 작성자
@@ -117,11 +117,11 @@ const AdminPostSharePage = () => {
             </tr>
           </thead>
           <tbody>
-            {sharePostList.map((item: SharePost) => (
+            {marketPostList.map((item: MarketPost) => (
               <tr
                 key={item.id}
                 className="bg-white border-b border-normal-100 hover:bg-positive-50 cursor-pointer"
-                onClick={() => nav(`${item.id}`)}
+                onClick={() => nav(`/community/market/${item.id}`)}
               >
                 <td className="p-2">{item.id}</td>
                 <td className="p-2">{item.title}</td>
@@ -152,4 +152,4 @@ const AdminPostSharePage = () => {
   );
 };
 
-export default AdminPostSharePage;
+export default AdminPostMarketPage;
