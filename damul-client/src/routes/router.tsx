@@ -18,9 +18,9 @@ import ProfileRecipePage from "@/pages/profile/ProfileRecipePage";
 import ProfileBookmarkPage from "@/pages/profile/ProfileBookmarkPage";
 import ProfileIngredientsPage from "@/pages/profile/ProfileIngredientsPage";
 import CommunityPage from "@/pages/community/CommunityPage";
-import FriendPage from "@/pages/friend/FriendPage";
-import FriendFollowerPage from "@/pages/friend/FriendFollowerPage";
-import FriendFollowingPage from "@/pages/friend/FriendFollowingPage";
+import ProfileFriendPage from "@/pages/profile/ProfileFriendPage";
+import ProfileFriendFollowerPage from "@/pages/profile/ProfileFriendFollowerPage";
+import ProfileFriendFollowingPage from "@/pages/profile/ProfileFriendFollowingPage";
 import NotFoundPage from "@/pages/notFound/NotFoundPage";
 import SettingPage from "@/pages/setting/SettingPage";
 import AdminPage from "@/pages/admin/AdminPage";
@@ -76,6 +76,24 @@ const router = createBrowserRouter([
           {
             path: "ingredients",
             element: <ProfileIngredientsPage />,
+          },
+        ],
+      },
+      {
+        path: "profile/:userId/friend",
+        element: <ProfileFriendPage />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="follower" replace />,
+          },
+          {
+            path: "follower",
+            element: <ProfileFriendFollowerPage />,
+          },
+          {
+            path: "following",
+            element: <ProfileFriendFollowingPage />,
           },
         ],
       },
@@ -157,24 +175,6 @@ const router = createBrowserRouter([
       {
         path: "community/market/:id/edit",
         element: <CommunityMarketPostPage />,
-      },
-      {
-        path: "friend",
-        element: <FriendPage />,
-        children: [
-          {
-            index: true,
-            element: <Navigate to="follower" replace />,
-          },
-          {
-            path: "follower",
-            element: <FriendFollowerPage />,
-          },
-          {
-            path: "following",
-            element: <FriendFollowingPage />,
-          },
-        ],
       },
       {
         path: "setting",

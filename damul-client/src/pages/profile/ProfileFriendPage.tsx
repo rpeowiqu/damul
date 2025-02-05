@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useParams } from "react-router-dom";
 
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import clsx from "clsx";
 
-const FriendPage = () => {
+const ProfileFriendPage = () => {
+  const { userId } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
 
   return (
@@ -19,7 +20,7 @@ const FriendPage = () => {
       <div className="flex-1">
         <div className="flex">
           <NavLink
-            to={"/friend/follower"}
+            to={`/profile/${userId}/friend/follower`}
             className={({ isActive }) =>
               clsx(
                 "flex-1 text-center py-3 rounded-tr-lg font-bold text-normal-600",
@@ -32,7 +33,7 @@ const FriendPage = () => {
             팔로워
           </NavLink>
           <NavLink
-            to={"/friend/following"}
+            to={`/profile/${userId}/friend/following`}
             className={({ isActive }) =>
               clsx(
                 "flex-1 text-center py-3 rounded-tl-lg font-bold text-normal-600",
@@ -52,4 +53,4 @@ const FriendPage = () => {
   );
 };
 
-export default FriendPage;
+export default ProfileFriendPage;

@@ -90,7 +90,7 @@ const ProfileInfoPage = () => {
     <div className="flex flex-col gap-3 h-full">
       <div className="flex font-bold py-6 bg-white">
         <Link
-          to={"/friend/follower"}
+          to={`/profile/${user.userId}/friend/follower`}
           className="flex flex-col items-center flex-1 border-r border-normal-50"
         >
           <p className="text-sm">팔로워</p>
@@ -99,7 +99,7 @@ const ProfileInfoPage = () => {
           </p>
         </Link>
         <Link
-          to={"/friend/following"}
+          to={`/profile/${user.userId}/friend/following`}
           className="flex flex-col items-center flex-1 border-r border-normal-50"
         >
           <p className="text-sm">팔로잉</p>

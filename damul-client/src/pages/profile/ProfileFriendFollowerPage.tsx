@@ -52,7 +52,7 @@ const followerDummyData = [
   },
 ];
 
-const FriendFollowerPage = () => {
+const ProfileFriendFollowerPage = () => {
   const { searchTerm } = useOutletContext();
 
   return (
@@ -89,4 +89,4 @@ const FriendFollowerPage = () => {
   );
 };
 
-export default FriendFollowerPage;
+export default ProfileFriendFollowerPage;

@@ -12,7 +12,7 @@ const followingDummyData = [
   },
 ];
 
-const FriendFollowingPage = () => {
+const ProfileFriendFollowingPage = () => {
   const { searchTerm } = useOutletContext();
 
   return (
@@ -44,4 +44,4 @@ const FriendFollowingPage = () => {
   );
 };
 
-export default FriendFollowingPage;
+export default ProfileFriendFollowingPage;
