@@ -3,6 +3,7 @@ package com.damul.api.config;
 import com.damul.api.auth.oauth2.handler.OAuth2FailureHandler;
 import com.damul.api.auth.oauth2.handler.OAuth2SuccessHandler;
 import com.damul.api.auth.oauth2.service.CustomOAuth2UserService;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,12 +17,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 @Slf4j
@@ -29,6 +34,8 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
 
     @Value("${redirect.frontUrl}")
@@ -56,6 +63,8 @@ public class SecurityConfig {
                     log.info("URL 접근 권한 설정");
                     auth
                             .requestMatchers("/", "/login", "/admin/login").permitAll() // 누구나 접근 가능
+                            .requestMatchers("/test-token").permitAll()
+                            .requestMatchers("/api/protected-endpoint").authenticated()
                             .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
                             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
                             .requestMatchers("/ws/**").permitAll()  // WebSocket 엔드포인트 허용
@@ -65,7 +74,7 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oauth2 -> {
                     log.info("OAuth2 리소스 서버 설정");
                     oauth2.jwt(jwt ->
-                            jwt.jwtAuthenticationConverter(new JwtAuthenticationConverter())
+                            jwt.decoder(jwtDecoder())
                     );
                 })
                 // OAuth2 로그인 설정
@@ -104,6 +113,14 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        return NimbusJwtDecoder
+                .withSecretKey(secretKey)
+                .build();
     }
 
 

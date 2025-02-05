@@ -6,8 +6,9 @@ import com.damul.api.auth.entity.type.Role;
 import com.damul.api.user.dto.request.SettingUpdate;
 import jakarta.persistence.*;
 import lombok.*;
-import org.joda.time.DateTime;
-import org.springframework.stereotype.Service;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -37,11 +38,13 @@ public class User {
     @Builder.Default
     private boolean termsAgreed = false;
 
-    @Column(name = "created_at")
-    private DateTime createdAt;
+    @Column(name = "created_at", updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private DateTime updatedAt;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     @Column(name = "active")
     private boolean active;

@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+  jwt:
+    secret: ${JWT_SECRET}  # 실제 운영 환경의 시크릿 키 사용
+    access-token-expiration: 3600000  # 1시간 (밀리초)
+
+logging:
+  level:
+    org.springframework.security: DEBUG
