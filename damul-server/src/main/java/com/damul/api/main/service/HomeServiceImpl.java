@@ -1,5 +1,6 @@
 package com.damul.api.main.service;
 
+import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.HomeIngredientDetail;
 import com.damul.api.main.dto.response.IngredientResponse;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,40 +30,29 @@ public class HomeServiceImpl implements HomeService {
     @Transactional(readOnly = true)
     public IngredientResponse getUserIngredientList(int userId) {
         log.info("사용자 식자재 전체 가져오기 시작");
-        // 1. 사용자의 재료 목록 조회
         List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(userId);
 
-        // 2. Entity를 DTO로 변환
         List<UserIngredientList> ingredientDtos = userIngredients.stream()
                 .map(UserIngredientList::from)
                 .collect(Collectors.toList());
 
-        log.info("사용자 식자재 전체 가져오기 성공");
-        // 3. HomeResponse 생성 및 반환
-        return new IngredientResponse(ingredientDtos);
+        return categorizeIngredients(ingredientDtos);
     }
 
     @Override
-    public IngredientResponse getSearchUserIngredientList(int userId, String keyword, String orderByDir, String orderBy) {
+    @Transactional(readOnly = true)
+    public IngredientResponse getSearchUserIngredientList(int userId, String keyword,
+                                                          String orderByDir, String orderBy) {
         log.info("사용자 식자재 검색 가져오기 시작");
-        // 여기 parameter들이 null인지 validation하기 프론트에서 무조건 받는걸로
-        Sort.Direction direction = (orderByDir != null && orderByDir.equalsIgnoreCase("desc"))
-                ? Sort.Direction.DESC
-                : Sort.Direction.ASC;
 
-        String sortBy = "ingredientName"; // 기본값
-        if (orderBy != null) {
-            switch (orderBy.toLowerCase()) {
-                case "quantity":
-                    sortBy = "ingredientQuantity";
-                    break;
-                case "date":
-                    sortBy = "dueDate";
-                    break;
-            }
+        Sort.Direction direction = Sort.Direction.ASC;
+        if (orderByDir != null && orderByDir.equalsIgnoreCase("desc")) {
+            direction = Sort.Direction.DESC;
         }
 
+        String sortBy = determineSortField(orderBy);
         Sort sort = Sort.by(direction, sortBy);
+
         List<UserIngredient> userIngredients = userIngredientRepository
                 .findByUserIdAndIngredientNameContaining(userId, keyword, sort);
 
@@ -69,8 +60,7 @@ public class HomeServiceImpl implements HomeService {
                 .map(UserIngredientList::from)
                 .collect(Collectors.toList());
 
-        log.info("사용자 식자재 검색 가져오기 성공");
-        return new IngredientResponse(ingredientDtos);
+        return categorizeIngredients(ingredientDtos);
     }
 
     @Override
@@ -115,5 +105,36 @@ public class HomeServiceImpl implements HomeService {
         ingredient.delete();  // 논리적 삭제 처리
     }
 
+    private IngredientResponse categorizeIngredients(List<UserIngredientList> ingredients) {
+        List<UserIngredientList> freezer = new ArrayList<>();
+        List<UserIngredientList> fridge = new ArrayList<>();
+        List<UserIngredientList> roomTemp = new ArrayList<>();
+
+        for (UserIngredientList ingredient : ingredients) {
+            IngredientStorage storage = determineStorage(ingredient.getCategoryId());
+            switch (storage) {
+                case FREEZER -> freezer.add(ingredient);
+                case FRIDGE -> fridge.add(ingredient);
+                case ROOM_TEMPARATURE -> roomTemp.add(ingredient);
+            }
+        }
+
+        return new IngredientResponse(freezer, fridge, roomTemp);
+    }
+
+    private IngredientStorage determineStorage(int categoryId) {
+        if (categoryId <= 10) return IngredientStorage.FREEZER;
+        else if (categoryId <= 20) return IngredientStorage.FRIDGE;
+        else return IngredientStorage.ROOM_TEMPARATURE;
+    }
+
+    private String determineSortField(String orderBy) {
+        if (orderBy == null) return "ingredientName";
+        return switch (orderBy.toLowerCase()) {
+            case "quantity" -> "ingredientQuantity";
+            case "date" -> "dueDate";
+            default -> "ingredientName";
+        };
+    }
 
 }
