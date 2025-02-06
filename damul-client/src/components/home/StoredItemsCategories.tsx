@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import IngredientsButton from "./ingredientsButton";
+import IngredientButton from "./IngredientButton";
 import { CATEGORYNUMBER } from "@/constants/category";
 import { STORAGE_ICON, STORAGE_TYPE } from "@/constants/storage";
 
@@ -61,11 +61,11 @@ const StoredItemsCategories = ({
     <div className="pt-[10px] my-3 border border-normal-100 rounded-xl min-h-[100px]">
       <div className="flex items-center gap-1 px-2 text-sm">
         <IconComponent />
-        <p>{STORAGE_TYPE[title]}</p>
+        <p className="font-bold">{STORAGE_TYPE[title]}</p>
       </div>
       <div className="grid grid-cols-2 gap-2 p-2 mt-2 mb-3 pc:grid-cols-5 sm:grid-cols-4 xs:grid-cols-3">
         {visibleItems.map((item, idx) => (
-          <IngredientsButton
+          <IngredientButton
             key={idx}
             variant={CATEGORYNUMBER[item.categoryId]}
             name={item.ingredientName}

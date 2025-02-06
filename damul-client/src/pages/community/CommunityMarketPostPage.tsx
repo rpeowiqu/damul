@@ -27,7 +27,7 @@ const CommunityMarketPostPage = () => {
         <span>{"<"}</span>
         <span className="space-y-4">공구/나눔 게시글 작성</span>
       </div>
-      <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-5">
         <PostDrawer
           trigerConent={
             <PostCard

@@ -19,7 +19,7 @@ const CookingOrdersSection = ({ cookingOrders }: CookingOrdersSectionProps) => {
             key={order.id}
             className="flex justify-between text-center bg-neutral-100 p-3"
           >
-            <p className="pr-2">{order.content}</p>
+            <p className="pr-2 text-sm">{order.content}</p>
             <Image src={order.imageUrl} className="w-32 h-24" />
           </div>
         ))}

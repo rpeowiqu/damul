@@ -2,14 +2,18 @@ import { Dispatch, SetStateAction, useState } from "react";
 import PostDrawer from "@/components/community/PostDrawer";
 import PostRecipeOrderForm from "./PostRecipeOrderForm";
 import SubmitButton from "./SubmitButton";
-import { OrderProps } from "@/types/interfaces";
+import { OrderProps } from "@/types/community";
+import Image from "../common/Image";
 
 interface PostRecipeStepsProps {
   setTempOrders: Dispatch<SetStateAction<OrderProps[]>>;
   tempOrders: OrderProps[];
 }
 
-const PostRecipeSteps = ({ setTempOrders, tempOrders }: PostRecipeStepsProps) => {
+const PostRecipeSteps = ({
+  setTempOrders,
+  tempOrders,
+}: PostRecipeStepsProps) => {
   const [orderDescription, setOrderDescription] = useState("");
   const [orderImage, setOrderImage] = useState<File | null>(null);
   const [preImage, setPreImage] = useState<string>("");
@@ -48,13 +52,13 @@ const PostRecipeSteps = ({ setTempOrders, tempOrders }: PostRecipeStepsProps) =>
   };
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden flex flex-col">
       <table className="min-w-full">
         <thead>
           <tr>
             <th className="text-left"></th>
             <th className="text-center">이미지</th>
-            <th className="text-left">조리 단계</th>
+            <th className="text-center">조리 단계</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-neutral-300">
@@ -69,17 +73,22 @@ const PostRecipeSteps = ({ setTempOrders, tempOrders }: PostRecipeStepsProps) =>
                   -
                 </button>
               </td>
-              <td className="p-2">
+              <td className="p-1 text-center">
                 {order.image ? (
-                  <img
+                  <Image
                     src={URL.createObjectURL(order.image)}
                     alt={`Step ${index + 1}`}
-                    className="w-full h-20 object-cover rounded-lg"
+                    className="w-full h-20 object-cover rounded-sm"
                   />
                 ) : (
-                  <span className="text-gray-400">사진 없음</span>
+                  <Image
+                    src=""
+                    alt={`Step ${index + 1}`}
+                    className="w-full h-20 object-cover rounded-sm"
+                  />
                 )}
               </td>
+
               <td className="p-2">
                 <textarea
                   value={order.description}
