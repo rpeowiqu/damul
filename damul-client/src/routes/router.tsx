@@ -29,6 +29,10 @@ import AdminReportPage from "@/pages/admin/AdminReportPage";
 import AdminUserPage from "@/pages/admin/AdminUserPage";
 import AdminPostPage from "@/pages/admin/AdminPostPage";
 import HomePage from "@/pages/home/HomePage";
+import ReportDetail from "@/components/admin/ReportDetail";
+import UserDetail from "@/components/admin/UserDetail";
+import AdminPostRecipePage from "@/pages/admin/AdminPostRecipePage";
+import AdminPostMarketPage from "@/pages/admin/AdminPostMarketPage";
 import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPage";
 
 const router = createBrowserRouter([
@@ -205,16 +209,46 @@ const router = createBrowserRouter([
     element: <AdminPage />,
     children: [
       {
-        path: "report",
+        path: "reports",
         element: <AdminReportPage />,
       },
       {
-        path: "user",
+        path: "reports/:reportId",
+        element: <ReportDetail />,
+      },
+      {
+        path: "users",
         element: <AdminUserPage />,
       },
       {
-        path: "post",
+        path: "users/:userId",
+        element: <UserDetail />,
+      },
+      {
+        path: "posts",
         element: <AdminPostPage />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to={"recipe"} />,
+          },
+          {
+            path: "recipe",
+            element: <AdminPostRecipePage />,
+          },
+          {
+            path: "recipe/:id",
+            element: <div></div>,
+          },
+          {
+            path: "market",
+            element: <AdminPostMarketPage />,
+          },
+          {
+            path: "share/:id",
+            element: <div></div>,
+          },
+        ],
       },
     ],
   },
