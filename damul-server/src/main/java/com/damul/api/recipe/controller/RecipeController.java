@@ -2,6 +2,7 @@ package com.damul.api.recipe.controller;
 
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.recipe.dto.request.RecipeRequest;
+import com.damul.api.recipe.dto.response.RecipeDetail;
 import com.damul.api.recipe.entity.Recipe;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class RecipeController {
 
     // 레시피 상세 조회
     @GetMapping("{recipeId}")
-    public ResponseEntity<?> getRecipe(@PathVariable int recipeId) {
+    public ResponseEntity<RecipeDetail> getRecipe(@PathVariable int recipeId) {
         return null;
     }
 
@@ -67,7 +68,7 @@ public class RecipeController {
 
     // 레시피 좋아요
     @PostMapping("/{recipeId}/likes")
-    public ResponseEntity<?> updateFamous(@RequestParam int famous) {
+    public ResponseEntity<?> updateFamous(@PathVariable int recipeId) {
         return null;
     }
 
