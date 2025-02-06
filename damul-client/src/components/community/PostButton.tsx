@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import DamulButton from "../common/DamulButton";
+import WriteIcon from "../svg/WriteIcon";
 
 interface PostButtonProps {
   to: string;
-  icon: JSX.Element;
 }
 
-const PostButton = ({ to, icon }: PostButtonProps) => {
+const PostButton = ({ to }: PostButtonProps) => {
   const navigate = useNavigate();
 
   return (
