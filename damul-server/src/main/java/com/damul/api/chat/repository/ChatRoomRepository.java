@@ -51,4 +51,13 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
             @Param("keyword") String keyword
     );
 
+    // 검색 결과 총 개수 조회
+    @Query(value = """
+            SELECT COUNT(*) 
+            FROM chat_rooms cr 
+            WHERE cr.status = 'ACTIVE' 
+            AND (:keyword IS NULL OR cr.room_name LIKE CONCAT('%', :keyword, '%'))
+            """, nativeQuery = true)
+    int countByKeyword(@Param("keyword") String keyword);
+
 }

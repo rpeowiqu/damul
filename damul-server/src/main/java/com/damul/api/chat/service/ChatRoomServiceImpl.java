@@ -10,6 +10,7 @@ import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.common.scroll.dto.response.SearchResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -39,11 +40,18 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public ScrollResponse<ChatRoomList> searchChatRooms(String keyword, ScrollRequest request, int userId) {
+    public SearchResponse<ChatRoomList> searchChatRooms(String keyword, ScrollRequest request, int userId) {
+        // 검색 결과 조회
         List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursorAndKeyword(
                 request.getCursorId(), keyword, request.getSize());
 
-        return processRoomResults(rooms, userId);
+        // 총 검색 결과 개수 조회
+        int totalCount = chatRoomRepository.countByKeyword(keyword);
+
+        // 스크롤 응답 생성
+        ScrollResponse<ChatRoomList> scrollResponse = processRoomResults(rooms, userId);
+
+        return new SearchResponse<>(scrollResponse, totalCount);
     }
 
     private ScrollResponse<ChatRoomList> processRoomResults(List<ChatRoom> rooms, int userId) {
