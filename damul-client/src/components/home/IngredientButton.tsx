@@ -1,11 +1,11 @@
 import { CATEGORY } from "@/constants/category";
 
-interface IngredientsButtonProps {
+interface IngredientButtonProps {
   variant: keyof typeof CATEGORY;
   name: string;
 }
 
-const IngredientsButton = ({ variant, name }: IngredientsButtonProps) => {
+const IngredientButton = ({ variant, name }: IngredientButtonProps) => {
   const IconComponent = CATEGORY[variant];
   return (
     <button className="flex items-center justify-center py-2 shadow-md border-1 border-normal-100 rounded-xl hover:bg-normal-100 focus:outline-none">
@@ -20,4 +20,4 @@ const IngredientsButton = ({ variant, name }: IngredientsButtonProps) => {
   );
 };
 
-export default IngredientsButton;
+export default IngredientButton;

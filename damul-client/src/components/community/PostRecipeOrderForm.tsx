@@ -1,4 +1,5 @@
 import { useState, ChangeEvent, Dispatch, SetStateAction } from "react";
+import ImageUploadIcon from "../svg/ImageUploadIcon";
 
 interface PostRecipeOrderFormProps {
   orderDescription: string;
@@ -57,16 +58,18 @@ const PostRecipeOrderForm = ({
               className="w-full h-32 pc:h-36 object-cover rounded-lg"
             />
             <button
-            className="absolute top-2 right-2 bg-normal-800 text-white p-1 w-8 h-8 rounded-full"
-            onClick={handleImageRemove}
-          >
-            X
-          </button>
+              className="absolute top-2 right-2 bg-normal-800 text-white p-1 w-8 h-8 rounded-full"
+              onClick={handleImageRemove}
+            >
+              X
+            </button>
           </label>
         ) : (
           <label
             htmlFor="file-upload"
-            className="flex flex-col items-center justify-center w-full h-32 pc:h-36 gap-1 border-2 border-dashed border-normal-400 rounded-lg cursor-pointer hover:bg-normal-50"          >
+            className="flex flex-col items-center justify-center w-full h-32 pc:h-36 gap-1 border-2 border-dashed border-normal-400 rounded-lg cursor-pointer hover:bg-normal-50"
+          >
+            <ImageUploadIcon className="size-7 stroke-normal-500" />
             <span className="text-gray-500">이미지 업로드</span>
           </label>
         )}

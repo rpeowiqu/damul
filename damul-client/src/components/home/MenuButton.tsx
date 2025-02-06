@@ -1,6 +1,8 @@
 import DamulButton from "@/components/common/DamulButton";
 import MenuIcon from "@/components/svg/MenuIcon";
 import { useEffect, useRef, useState } from "react";
+import PlusIcon from "../svg/PlusIcon";
+import EditIcon from "../svg/EditIcon";
 
 const MenuButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,11 +38,24 @@ const MenuButton = () => {
           </div>
           <div className="mt-1 text-center text-xxs">식자재 정리하기</div>
         </div>
+
         <div
-          className={`absolute z-50 border-1 p-1 bg-white rounded-xl shadow-md bottom-32 right-16 flex gap-3 ${!isOpen && "hidden"}`}
+          className={`absolute z-50 border-1 p-1 bg-white rounded-xl shadow-md bottom-32 right-16 flex ${!isOpen && "hidden"}`}
         >
-          <div className="w-10 h-10">식자재 추가</div>
-          <div className="w-10 h-10">식자재 일괄수정</div>
+          <button
+            className="flex flex-col justify-center items-center w-20 rounded-lg transition duration-200 
+          hover:bg-normal-50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-normal-200 p-2"
+          >
+            <PlusIcon />
+            <p className="text-xxs">식자재 추가</p>
+          </button>
+          <button
+            className="flex flex-col justify-center items-center w-20 rounded-lg transition duration-200 
+          hover:bg-normal-50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-normal-200 p-2"
+          >
+            <EditIcon className="w-6" />
+            <p className="text-xxs">식자재 일괄수정</p>
+          </button>
         </div>
       </div>
     </div>

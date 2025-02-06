@@ -4,6 +4,7 @@ import UserGreeting from "@/components/home/UserGreeting";
 import MenuButton from "@/components/home/MenuButton";
 import StoredItemsCategories from "@/components/home/StoredItemsCategories";
 import { STORAGE_TYPE } from "@/constants/storage";
+import IngredientCategoryFilter from "@/components/home/IngredientCategoryFilter";
 
 // 더미데이터 타입(임시)
 type DATATYPE = {
@@ -251,9 +252,15 @@ const HomePage = () => {
       <UserGreeting />
       <DamulCarousel />
 
-      <div className="p-3">
-        <div>보유 중인 식자재</div>
-        <DamulSearchBox placeholder="찾으시는 식자재를 검색해보세요." />
+      <div className="p-[10px]">
+        <p className="py-[10px] font-bold">보유 중인 식자재</p>
+        <div className="flex gap-4">
+          <DamulSearchBox
+            className="w-full"
+            placeholder="찾으시는 식자재를 검색해보세요."
+          />
+          <IngredientCategoryFilter />
+        </div>
         {storageOrder.map((storage) => {
           const items = groupedData[storage];
           return items ? (

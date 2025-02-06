@@ -11,7 +11,7 @@ const Footer = () => {
   // Zustand에서 사용자의 userId를 가져온다.
   const myId = useUserStore((state) => state.myId);
   const tabs = [
-    { to: "/", label: "홈", icon: HomeIcon },
+    { to: "/home", label: "홈", icon: HomeIcon },
     { to: "/statistics", label: "통계", icon: StatisticsIcon },
     { to: "/community", label: "커뮤니티", icon: CommunityIcon },
     { to: "/chatting", label: "채팅", icon: ChattingIcon },
