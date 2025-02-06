@@ -16,10 +16,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
     Optional<ChatMessage> findFirstByRoomIdOrderByCreatedAtDesc(int roomId);
 
     // 안 읽은 메시지 수 조회
-    @Query("SELECT COUNT(m) FROM ChatMessage m WHERE m.roomId = :roomId AND m.id > :lastReadId")
+    @Query("SELECT COUNT(m) FROM ChatMessage m WHERE m.room.id = :roomId AND m.id > :lastReadId")
     int countUnreadMessages(@Param("roomId") int roomId, @Param("lastReadId") int lastReadId);
 
-    @Query("SELECT cm FROM ChatMessage cm WHERE cm.roomId = :roomId AND cm.id < :cursorId " +
+    @Query("SELECT cm FROM ChatMessage cm WHERE cm.room.id = :roomId AND cm.id < :cursorId " +
             "ORDER BY cm.id DESC LIMIT :size")
     List<ChatMessage> findByRoomIdAndIdLessThanOrderByIdDesc(
             @Param("roomId") int roomId,
@@ -27,7 +27,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
             @Param("size") int size
     );
 
-    @Query("SELECT cm FROM ChatMessage cm WHERE cm.roomId = :roomId " +
+    @Query("SELECT cm FROM ChatMessage cm WHERE cm.room.id = :roomId " +
             "ORDER BY cm.id DESC LIMIT :size")
     List<ChatMessage> findFirstPageByRoomId(
             @Param("roomId") int roomId,

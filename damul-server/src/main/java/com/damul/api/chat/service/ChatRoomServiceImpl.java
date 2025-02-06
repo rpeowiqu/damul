@@ -73,7 +73,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         // 멤버 정보 변환
         List<ChatMember> chatMembers = members.stream()
                 .map(member -> {
-                    User user = userRepository.findById(member.getUserId())
+                    User user = userRepository.findById(member.getUser().getId())
                             .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
 
                     return ChatMember.builder()
