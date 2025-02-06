@@ -6,6 +6,7 @@ import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.user.dto.response.FollowResponse;
 import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.entity.Follow;
@@ -75,11 +76,18 @@ public class FollowServiceImpl implements FollowService {
     public ScrollResponse<UserList> getFollowers(ScrollRequest request, int followingId ) {
         log.info("팔로워 목록 조회 시작");
         List<UserList> userLists = followRepository.findFollowersByUserIdAndCursorId(
-                followingId ,
+                followingId,
                 request.getCursorId(),
                 request.getSize() + 1
         );
-        return createScrollResponse(userLists, request);
+
+        // 마지막 하나를 더 조회했으므로 size보다 큰 경우 다음 데이터가 있다는 의미
+        if (userLists.size() > request.getSize()) {
+            userLists = userLists.subList(0, request.getSize());
+        }
+
+        log.info("팔로워 목록 조회 완료");
+        return ScrollUtil.createScrollResponse(userLists, request);
     }
 
     @Override
@@ -90,7 +98,12 @@ public class FollowServiceImpl implements FollowService {
                 request.getCursorId(),
                 request.getSize() + 1
         );
-        return createScrollResponse(userLists, request);
+
+        if (userLists.size() > request.getSize()) {
+            userLists = userLists.subList(0, request.getSize());
+        }
+        log.info("팔로잉 목록 조회 완료");
+        return ScrollUtil.createScrollResponse(userLists, request);
     }
 
     // 팔로워 강제 삭제
@@ -107,35 +120,5 @@ public class FollowServiceImpl implements FollowService {
 
         followRepository.delete(follow);
         log.info("팔로워 강제 삭제 성공 - followingId: {}, followerId: {}", followingId, followerId);
-    }
-
-    // 무한스크롤 응답 데이터를 생성
-    private ScrollResponse<UserList> createScrollResponse(List<UserList> userList, ScrollRequest request) {
-        log.info("무한 스크롤 생성 시작");
-        // 다음 페이지 존재 여부 확인
-        // size + 1개를 조회했으므로, size보다 크다면 다음 데이터가 존재한다는 의미
-        boolean hasNextData = userList.size() > request.getSize();
-
-        log.info("다음 데이터 존재 여부: {}", hasNextData);
-        // 실제 응답할 데이터 리스트 생성
-        // 다음 데이터가 있다면 요청한 size만큼만 잘라서 반환, 없다면 전체 리스트 반환
-        List<UserList> resultList = hasNextData
-                ? userList.subList(0, request.getSize())
-                : userList;
-
-
-        // 다음 커서 값 계산
-        // 결과 리스트가 비어있지 않다면 마지막 항목의 userId를 다음 커서 값으로 사용
-        // 비어있다면 현재 커서값 유지
-        int nextCursor = !resultList.isEmpty()
-                ? resultList.get(resultList.size() - 1).getUserId()
-                : request.getCursorId();
-
-
-        // 최종 스크롤 응답 생성 및 반환
-        return new ScrollResponse<>(
-                resultList,
-                new CursorPageMetaInfo(nextCursor, hasNextData)
-        );
     }
 }

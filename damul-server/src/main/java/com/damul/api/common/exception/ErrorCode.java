@@ -11,6 +11,9 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "리프레시 토큰을 찾을 수 없습니다."),
 
+    // 검색 관련 에러
+    SEARCHTYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "검색타입이 존재하지 않습니다"),
+
     // 중복 관련 에러
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 등록된 이메일입니다."),
 

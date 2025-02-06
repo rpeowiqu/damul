@@ -1,5 +1,6 @@
 package com.damul.api.recipe.service;
 
+import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.RecipeDetail;
@@ -13,12 +14,22 @@ import java.util.List;
 public interface RecipeService {
 
     // 레시피 전체 조회 및 검색
-    ScrollResponse<List<RecipeList>> getRecipeList();
+    ScrollResponse<RecipeList> getRecipes(ScrollRequest scrollRequest,
+                                                   String searchType,
+                                                   String keyword,
+                                                   String orderByDir,
+                                                   String orderBy);
 
     // 레시피 상세 조회
     RecipeDetail getRecipeDetail(int recipeId);
 
     // 인기 레시피 조회
+
+    RecipeDetail getRecipeDetail(ScrollRequest scrollRequest,
+                                 String searchType,
+                                 String keyword,
+                                 String orderByDir,
+                                 String orderBy);
 
     // 레시피 작성
     void addRecipe(RecipeRequest recipeRequest,

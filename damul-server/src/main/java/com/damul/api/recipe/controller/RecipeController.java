@@ -32,7 +32,7 @@ public class RecipeController {
 
 
     // 레시피 상세 조회
-    @GetMapping("{recipeId}")
+    @GetMapping("/{recipeId}")
     public ResponseEntity<RecipeDetail> getRecipe(@PathVariable int recipeId) {
         return null;
     }
@@ -52,7 +52,7 @@ public class RecipeController {
     }
 
     // 레시피 수정
-    @PutMapping("{recipeId}")
+    @PutMapping("/{recipeId}")
     public ResponseEntity<?> updateRecipe(@PathVariable int recipeId,
                                           @RequestPart("recipeRequest") RecipeRequest recipeRequest,
                                           @RequestPart("mainImage") MultipartFile mainImage,
@@ -61,7 +61,7 @@ public class RecipeController {
     }
 
     // 레시피 삭제
-    @DeleteMapping("{recipeId}")
+    @DeleteMapping("/{recipeId}")
     public ResponseEntity<?> deleteRecipe(@RequestParam int recipeId) {
         return null;
     }
@@ -73,7 +73,7 @@ public class RecipeController {
     }
 
     // 댓글 작성
-    @PostMapping("{/{recipeId}/comments")
+    @PostMapping("/{recipeId}/comments")
     public ResponseEntity<?> addComment(@PathVariable int recipeId, @RequestBody Comment comment) {
         return null;
     }
