@@ -22,7 +22,7 @@ public class RecipeComment {
     private Recipe recipe;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writer_id")
+    @JoinColumn(name = "author_id")
     private User writer;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Recipe {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writer_id", referencedColumnName = "id")
+    @JoinColumn(name = "author_id", referencedColumnName = "id")
     private User user;
 
     @Id
