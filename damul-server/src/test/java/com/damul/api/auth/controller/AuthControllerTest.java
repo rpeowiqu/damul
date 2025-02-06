@@ -59,7 +59,7 @@ class AuthControllerTest {
 
     @Test
     public void testProtectedEndpoint() throws Exception {
-        mockMvc.perform(get("/api/protected-endpoint")
+        mockMvc.perform(get("/protected-endpoint")
                         .header("Authorization", "Bearer " + testToken))
                 .andExpect(status().isOk());
     }

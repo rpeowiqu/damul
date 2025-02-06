@@ -38,7 +38,7 @@ public class User {
     @Builder.Default
     private boolean termsAgreed = false;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, columnDefinition = "DATETIME")
     @CreationTimestamp
     private LocalDateTime createdAt;
 

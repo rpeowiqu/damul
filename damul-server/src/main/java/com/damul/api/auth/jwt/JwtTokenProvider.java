@@ -90,10 +90,11 @@ public class JwtTokenProvider {
         String email = authentication.getName();
 
         return Jwts.builder()
-                .setSubject(email)    // 사용자 식별자만 포함
-                .setIssuedAt(new Date())                        // 발행 시간
-                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpire))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)  // HS512 알고리즘으로 암호화
+                .setSubject(email)
+                .claim("role", authentication.getAuthorities())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpire))
+                .signWith(getSigninKey(), SignatureAlgorithm.HS512)  // 일관된 키와 알고리즘 사용
                 .compact();
     }
 
