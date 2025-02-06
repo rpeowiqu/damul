@@ -10,7 +10,7 @@ const ViewIcon = ({ className }: SVGProps) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_412_13096)">
+      <g clipPath="url(#clip0_412_13096)">
         <path
           className={className}
           d="M0.982422 7.12001C0.982422 7.12001 3.22242 2.64001 7.14242 2.64001C11.0624 2.64001 13.3024 7.12001 13.3024 7.12001C13.3024 7.12001 11.0624 11.6 7.14242 11.6C3.22242 11.6 0.982422 7.12001 0.982422 7.12001Z"
