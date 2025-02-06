@@ -11,7 +11,7 @@ const AdminLoginPage = () => {
     e.preventDefault();
 
     if (password === "50days") {
-      nav("/admin/report");
+      nav("/admin/reports");
     }
   };
 
@@ -20,7 +20,7 @@ const AdminLoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col gap-3 items-center min-h-screen pt-20">
+    <div className="flex flex-col gap-5 items-center min-h-screen pt-20">
       <Link to={"/"}>
         <img className="w-16" src="/logo.svg" alt="" />
       </Link>

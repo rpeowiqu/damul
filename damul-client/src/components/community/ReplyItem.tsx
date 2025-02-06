@@ -1,5 +1,6 @@
 import Image from "../common/Image";
 import { Comment } from "@/types/community";
+import ReportButton from "../common/ReportButton";
 
 interface ReplyItemProps {
   reply: Comment;
@@ -20,9 +21,9 @@ const ReplyItem = ({ reply, onReply }: ReplyItemProps) => {
         className="flex justify-start gap-2 ml-12 cursor-pointer text-neutral-500"
         onClick={() => onReply(reply)}
       >
-        <div className="flex items-center gap-1">
+        <ReportButton className="flex items-center gap-1">
           <p className="text-xs">신고하기</p>
-        </div>
+        </ReportButton>
         <div className="flex items-center gap-1">
           <p className="text-xs">답글</p>
         </div>
