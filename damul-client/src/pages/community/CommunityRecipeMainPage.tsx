@@ -59,8 +59,6 @@ const CommunityRecipeMainPage = () => {
         </Select>
       </div>
       <FeedList type="community/recipe" />
-      <PostButton to="recipe" />
-      <FeedList />
       <PostButton to="/community/recipe/post" icon={<WriteIcon />} />
     </main>
   );
