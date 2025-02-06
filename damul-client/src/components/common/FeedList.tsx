@@ -1,10 +1,20 @@
-import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import FeedCard from "@/components/common/FeedCard";
 
-const FeedList = () => {
-  const location = useLocation();
-  const { pathname } = location;
+interface FeedListProps {
+  type: string;
+}
 
+interface Feed {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  author: string;
+  image: string;
+}
+
+const FeedList = ({ type }: FeedListProps) => {
   const mockDataRecipe = [
     {
       id: 1,
@@ -119,10 +129,37 @@ const FeedList = () => {
     },
   ];
 
-  // pathname이 "recipe"로 끝나면 recipe 데이터를, "market"으로 끝나면 market 데이터를 사용
-  const mockData = pathname.endsWith("recipe")
-    ? mockDataRecipe
-    : mockDataMarket;
+  const [mockData, setMockData] = useState<Feed[] | undefined>(undefined);
+
+  useEffect(() => {
+    let dataToSet: Feed[] | undefined = undefined;
+
+    switch (type) {
+      case "community/market":
+        dataToSet = mockDataMarket;
+        break;
+      case "community/recipe":
+        dataToSet = mockDataRecipe;
+        break;
+      case "community/market/search":
+        dataToSet = mockDataMarket;
+        break;
+      case "community/recipe/search":
+        dataToSet = mockDataRecipe;
+        break;
+      case "profile/recipe":
+        dataToSet = mockDataRecipe;
+        break;
+      case "profile/bookmark":
+        dataToSet = mockDataRecipe;
+        break;
+    }
+
+    setMockData(dataToSet);
+  }, [type]);
+  if (!mockData) {
+    return <div>게시물이 없어요</div>;
+  }
 
   return (
     <div className="space-y-3">

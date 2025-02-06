@@ -13,8 +13,8 @@ const MenuIcon = ({ className }: SVGProps) => {
       <path
         d="M20.5 18H4.5M20.5 12H4.5M20.5 6H4.5"
         stroke="#939393"
-        stroke-width="2"
-        stroke-linecap="round"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
     </svg>
   );
