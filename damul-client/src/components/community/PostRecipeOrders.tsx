@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import PostDrawer from "@/components/community/PostDrawer";
+import PostDrawer from "@/components/common/DamulDrawer";
 import PostRecipeOrderForm from "./PostRecipeOrderForm";
 import SubmitButton from "./SubmitButton";
 import { OrderProps } from "@/types/community";
@@ -100,7 +100,7 @@ const PostRecipeSteps = ({
           ))}
         </tbody>
       </table>
-      <PostDrawer
+      {/* <PostDrawer
         trigerConent={
           <button
             type="button"
@@ -120,7 +120,7 @@ const PostRecipeSteps = ({
         }
         footerContent={<SubmitButton />}
         onFooterClick={handleSubmit}
-      />
+      /> */}
     </div>
   );
 };

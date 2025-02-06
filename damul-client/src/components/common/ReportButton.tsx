@@ -1,5 +1,3 @@
-import { SVGProps } from "@/types/svg";
-import ReportIcon from "../svg/ReportIcon";
 import DamulModal from "./DamulModal";
 import { Label } from "@/components/ui/label";
 import {
@@ -56,7 +54,7 @@ const ReportButton = ({ className, children }: ReportButtonProps) => {
 
       <DamulModal
         isOpen={isOpen}
-        setIsOpen={() => {
+        onOpenChange={() => {
           if (isOpen) {
             history.back();
           }

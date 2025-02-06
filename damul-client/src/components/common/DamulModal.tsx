@@ -12,7 +12,7 @@ import {
 
 interface DamulModalProps {
   isOpen: boolean; // 모달의 열림 상태
-  setIsOpen: Dispatch<SetStateAction<boolean>>; // 부모에서 모달 상태를 제어하는 함수
+  onOpenChange: () => void; // 부모에서 모달 상태를 제어하는 함수
   contentStyle?: string; // 모달창 전체 스타일
   headerStyle?: string; // 모달창 헤더 부분 스타일
   titleStyle?: string; // 모달창 제목 텍스트 스타일
@@ -23,11 +23,11 @@ interface DamulModalProps {
 
 const defaultContentStyle = "p-5 max-w-88 pc:max-w-96 rounded-xl";
 const defaultHeaderStyle = "pb-3 border-b border-b-normal-100";
-const defaultTitleStyle = "text-positive-300 text-xl";
+const defaultTitleStyle = "text-positive-300 text-xl text-center";
 
 const DamulModal = ({
   isOpen,
-  setIsOpen,
+  onOpenChange,
   contentStyle,
   headerStyle,
   titleStyle,
@@ -36,7 +36,7 @@ const DamulModal = ({
   footerComponent,
 }: DamulModalProps) => {
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className={clsx(defaultContentStyle, contentStyle)}>
         {title && (
           <DialogHeader className={clsx(defaultHeaderStyle, headerStyle)}>

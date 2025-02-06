@@ -3,10 +3,11 @@ import { useState, useEffect } from "react";
 import Badge from "./Badge";
 import DamulModal from "../common/DamulModal";
 import { BadgeList } from "@/types/profile";
+import useCloseOnBack from "@/hooks/useCloseOnBack";
 
 const BadgeShowcase = ({ list }: BadgeList) => {
   const [currentBadgeIndex, setCurrentBadgeIndex] = useState(-1);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentBadgeIndex(-1));
 
   useEffect(() => {
     if (currentBadgeIndex > -1) {
@@ -41,15 +42,13 @@ const BadgeShowcase = ({ list }: BadgeList) => {
       {currentBadgeIndex > -1 && (
         <DamulModal
           isOpen={isOpen}
-          setIsOpen={() => {
+          onOpenChange={() => {
             if (isOpen) {
-              setIsOpen(false);
-              setCurrentBadgeIndex(-1);
+              history.back();
             }
           }}
           title={"뱃지 상세보기"}
-          contentStyle="max-w-80"
-          triggerComponent={null}
+          contentStyle="pc:max-w-80"
         >
           <div className="flex flex-col justify-center gap-5 px-3">
             <div className="flex items-center gap-3">

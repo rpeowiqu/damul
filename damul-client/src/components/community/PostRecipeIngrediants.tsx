@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { IngredientProps } from "@/types/community";
-import PostDrawer from "@/components/community/PostDrawer";
+import PostDrawer from "@/components/common/DamulDrawer";
 import PostRecipeIngrediantForm from "@/components/community/PostRecipeIngrediantForm";
 import SubmitButton from "./SubmitButton";
 
