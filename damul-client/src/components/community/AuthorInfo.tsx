@@ -5,6 +5,7 @@ import LikesIcon from "../svg/LikesIcon";
 import ReportIcon from "../svg/ReportIcon";
 import WriteIcon from "../svg/WriteIcon";
 import DeleteIcon from "../svg/DeleteIcon";
+import ReportButton from "../common/ReportButton";
 
 interface AuthorInfoProps {
   profileImageUrl: string;
@@ -54,8 +55,10 @@ const AuthorInfo = ({
       </div>
       <div className="flex gap-2 justify-end">
         <div className="flex items-center gap-0.5 cursor-pointer">
-          <ReportIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5" />
-          <p className="text-xs pc:text-sm">신고하기</p>
+          <ReportButton className="flex items-center gap-0.5 cursor-pointer">
+            <ReportIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5" />
+            <p className="text-xs pc:text-sm">신고하기</p>
+          </ReportButton>
         </div>
         <div
           className="flex items-center gap-0.5 cursor-pointer"
