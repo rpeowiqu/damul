@@ -21,7 +21,7 @@ const ChattingListInfo = ({ chattingCnt }: ChattingListInfoProps) => {
       <div className="flex items-center text-sm">채팅 ({chattingCnt}개)</div>
       <div>
         <Select value={sortType} onValueChange={(value) => setSortType(value)}>
-          <SelectTrigger className="w-40 text-xs pc:text-sm">
+          <SelectTrigger className="w-40 h-8 text-xs pc:text-sm">
             <SelectValue placeholder="채팅 보기" />
           </SelectTrigger>
           <SelectContent>

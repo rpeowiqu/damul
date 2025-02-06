@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import ChattingListInfo from "@/components/chat/ChattingListInfo";
 import ChattingList from "@/components/chat/ChattingList";
+import PostButton from "@/components/community/PostButton";
+import PlusIcon from "@/components/svg/PlusIcon";
 
 const ChattingMainPage = () => {
   const navigate = useNavigate();
@@ -23,6 +25,7 @@ const ChattingMainPage = () => {
         <ChattingListInfo chattingCnt={mockData.cnt} />
       </div>
       <ChattingList />
+      <PostButton to="/chatting/create" icon={<PlusIcon/>}/>
     </main>
   );
 };
