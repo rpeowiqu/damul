@@ -12,13 +12,43 @@ import java.util.List;
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
 
     // 커서 기반 채팅방 목록 조회
-    @Query(value = "SELECT cr.* FROM chat_rooms cr " +
-            "WHERE cr.id < :cursorId AND cr.status = 'ACTIVE' " +
-            "ORDER BY cr.id DESC " +
-            "LIMIT :size", nativeQuery = true)
-    List<ChatRoom> findRoomsWithCursor(@Param("cursorId") int cursorId, @Param("size") int size);
+    @Query(value = """
+            SELECT cr.* 
+            FROM chat_rooms cr 
+            WHERE cr.id < :cursorId 
+            AND cr.status = 'ACTIVE' 
+            ORDER BY cr.id DESC 
+            LIMIT :size""", nativeQuery = true)
+    List<ChatRoom> findRoomsWithCursor(
+            @Param("cursorId") int cursorId,
+            @Param("size") int size);
 
-    // 다음 데이터 존재 여부 확인
-    boolean existsByIdLessThan(int id);
+    // 키워드로 채팅방 검색 (무한 스크롤)
+    @Query(value = """
+            SELECT cr.* 
+            FROM chat_rooms cr 
+            WHERE cr.status = 'ACTIVE' 
+            AND (:cursorId IS NULL OR cr.id < :cursorId)
+            AND (:keyword IS NULL OR cr.room_name LIKE CONCAT('%', :keyword, '%'))
+            ORDER BY cr.id DESC 
+            LIMIT :size""", nativeQuery = true)
+    List<ChatRoom> findRoomsWithCursorAndKeyword(
+            @Param("cursorId") Integer cursorId,
+            @Param("keyword") String keyword,
+            @Param("size") int size
+    );
+
+    // 다음 페이지 존재 여부 확인
+    @Query(value = """
+            SELECT EXISTS(
+                SELECT 1 FROM chat_rooms cr 
+                WHERE cr.status = 'ACTIVE' 
+                AND cr.id < :id 
+                AND (:keyword IS NULL OR cr.room_name LIKE CONCAT('%', :keyword, '%'))
+            )""", nativeQuery = true)
+    boolean existsByIdLessThanAndKeyword(
+            @Param("id") int id,
+            @Param("keyword") String keyword
+    );
 
 }

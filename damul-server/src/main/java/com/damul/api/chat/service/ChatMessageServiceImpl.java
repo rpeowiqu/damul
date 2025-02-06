@@ -2,9 +2,9 @@ package com.damul.api.chat.service;
 
 import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.repository.ChatMessageRepository;
-import com.damul.api.common.dto.request.ScrollRequest;
-import com.damul.api.common.dto.response.CursorPageMetaInfo;
-import com.damul.api.common.dto.response.ScrollResponse;
+import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
+import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

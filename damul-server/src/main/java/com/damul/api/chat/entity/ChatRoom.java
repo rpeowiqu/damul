@@ -30,6 +30,9 @@ public class ChatRoom {
     @Column(name = "room_type", nullable = false)
     private RoomType roomType;
 
+    @Column(name = "thumbnail_url", length = 255)
+    private String thumbnailUrl;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

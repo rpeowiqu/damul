@@ -8,4 +8,6 @@ public interface ChatRoomService {
 
     public ScrollResponse<ChatRoomList> getChatRooms(ScrollRequest request, int userId);
 
+    public ScrollResponse<ChatRoomList> searchChatRooms(String keyword, ScrollRequest request, int userId);
+
 }
