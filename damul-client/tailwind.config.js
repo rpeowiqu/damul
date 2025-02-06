@@ -115,6 +115,9 @@ module.exports = {
       borderWidth: {
         1: "1px",
       },
+      maxWidth: {
+        88: "21rem",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
