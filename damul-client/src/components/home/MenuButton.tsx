@@ -46,7 +46,7 @@ const MenuButton = () => {
             className="flex flex-col justify-center items-center w-20 rounded-lg transition duration-200 
           hover:bg-normal-50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-normal-200 p-2"
           >
-            <PlusIcon />
+            <PlusIcon className="w-6" />
             <p className="text-xxs">식자재 추가</p>
           </button>
           <button

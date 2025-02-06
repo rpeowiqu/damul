@@ -66,9 +66,9 @@ const AuthorInfo = ({
           <WriteIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5" />
           <p className="text-xs pc:text-sm">수정하기</p>
         </div>
-        <div className="flex items-center gap-0.5 cursor-pointer">
-          <DeleteIcon className="w-3 h-3 pc:w-4 pc:h-4 fill-neutral-700 pb-0.5" />
-          <p className="text-xs pc:text-sm">삭제</p>
+        <div className="flex items-center gap-0 cursor-pointer">
+          <DeleteIcon className="w-3 h-3 pc:w-6 pc:h-6 fill-neutral-700 pb-0.5" />
+          <p className="text-xs pc:text-sm ">삭제</p>
         </div>
       </div>
     </div>
