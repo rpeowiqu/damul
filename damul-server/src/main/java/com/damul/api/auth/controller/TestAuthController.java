@@ -4,11 +4,12 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,4 +44,13 @@ public class TestAuthController {
 
         return tokenProvider.generateAccessToken(authentication);
     }
+
+    @GetMapping("/protected-endpoint")
+    public ResponseEntity<String> protectedEndpoint() {
+        // 인증된 사용자의 정보를 가져올 수 있다는 것을 보여주기 위해
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = auth.getName();
+        return ResponseEntity.ok("Authenticated user: " + userEmail);
+    }
+
 }

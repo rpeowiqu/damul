@@ -33,6 +33,9 @@ public enum ErrorCode {
 
     // 파일 관련 에러
     FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 중 오류가 발생했습니다."),
+    FILE_SIZE_EXCEEDED(HttpStatus.EXPECTATION_FAILED, "파일 사이즈가 너무 큽니다."),
+    INVALID_FILE_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "파일 타입을 확인해주세요."),
+    FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제를 실패하였습니다."),
 
     // 게시글 관련 에러
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다.");

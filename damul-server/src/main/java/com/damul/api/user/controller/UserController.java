@@ -10,6 +10,8 @@ import com.damul.api.user.dto.response.SettingResponse;
 import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.service.FollowService;
 import com.damul.api.user.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,15 +36,14 @@ public class UserController {
         return ResponseEntity.ok(settingResponse);
     }
 
-    // 설정 수정 - file 저장 구현 후 할 것!
     @PutMapping("/{userId}/settings")
     public ResponseEntity updateSetting(@PathVariable("userId") int userId,
                                         @RequestPart("settingUpdate") SettingUpdate setting,
                                         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
-                                        @RequestPart(value = "backgroundImage", required = false) MultipartFile backgroundImage) {
+                                        @RequestPart(value = "backgroundImage", required = false) MultipartFile backgroundImage)
+            throws JsonProcessingException {
 
-
-
+        userService.updateUserSettings(userId, setting, profileImage, backgroundImage);
         return ResponseEntity.ok().build();
     }
 

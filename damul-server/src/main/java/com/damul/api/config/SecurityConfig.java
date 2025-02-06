@@ -15,8 +15,10 @@ import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -28,6 +30,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -62,20 +67,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> {
                     log.info("URL 접근 권한 설정");
                     auth
-                            .requestMatchers("/", "/login", "/admin/login").permitAll() // 누구나 접근 가능
-                            .requestMatchers("/test-token").permitAll()
-                            .requestMatchers("/api/protected-endpoint").authenticated()
+                            .requestMatchers("/", "/login", "/admin/login", "/test-token").permitAll() // 누구나 접근 가능
                             .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
-                            .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
                             .requestMatchers("/ws/**").permitAll()  // WebSocket 엔드포인트 허용
+                            .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
                             .anyRequest().authenticated();                              // 나머지는 인증 필요
                 })
                 // JWT 토큰 기반의 리소스 서버 설정
                 .oauth2ResourceServer(oauth2 -> {
                     log.info("OAuth2 리소스 서버 설정");
-                    oauth2.jwt(jwt ->
-                            jwt.decoder(jwtDecoder())
-                    );
+                    oauth2.jwt(jwt -> {
+                        jwt.decoder(jwtDecoder())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter());
+                    });
                 })
                 // OAuth2 로그인 설정
                 .oauth2Login(oauth2 -> {
@@ -117,10 +121,26 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-        return NimbusJwtDecoder
-                .withSecretKey(secretKey)
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        return NimbusJwtDecoder.withSecretKey(key)
+                .macAlgorithm(MacAlgorithm.HS512)  // HS512 알고리즘 명시
                 .build();
+    }
+
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            List<String> roles = jwt.getClaimAsStringList("roles");
+            if (roles == null) {
+                roles = Collections.emptyList();
+            }
+            return roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .collect(Collectors.toList());
+        });
+        return converter;
     }
 
 
