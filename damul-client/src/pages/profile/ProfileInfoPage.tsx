@@ -88,7 +88,7 @@ const ProfileInfoPage = () => {
 
   return (
     <div className="flex flex-col gap-3 h-full">
-      <div className="flex font-bold py-6 bg-white">
+      <div className="flex items-center font-bold py-4 bg-white">
         <Link
           to={`/profile/${user.userId}/friend/follower`}
           className="flex flex-col items-center flex-1 border-r border-normal-50"
@@ -108,12 +108,20 @@ const ProfileInfoPage = () => {
           </p>
         </Link>
         {user.userId !== myId && (
-          <div className="flex items-center flex-1 gap-2 border-r border-transparent">
-            <DamulButton variant="positive" onClick={() => {}}>
-              팔로우
+          <div className="flex flex-col flex-1 justify-center items-center gap-2">
+            <DamulButton
+              variant="positive"
+              className="w-20 sm:w-24 h-8 text-sm"
+              onClick={() => {}}
+            >
+              채팅 시작
             </DamulButton>
-            <DamulButton variant="positive" onClick={() => {}}>
-              채팅하기
+            <DamulButton
+              variant="positive"
+              className="w-20 sm:w-24 h-8 text-sm"
+              onClick={() => {}}
+            >
+              팔로우
             </DamulButton>
           </div>
         )}
