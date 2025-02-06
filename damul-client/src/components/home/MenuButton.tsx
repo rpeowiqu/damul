@@ -1,8 +1,8 @@
 import DamulButton from "@/components/common/DamulButton";
 import MenuIcon from "@/components/svg/MenuIcon";
+import PlusIcon from "@/components/svg/PlusIcon";
+import EditIcon from "@/components/svg/EditIcon";
 import { useEffect, useRef, useState } from "react";
-import PlusIcon from "../svg/PlusIcon";
-import EditIcon from "../svg/EditIcon";
 
 const MenuButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,7 +46,7 @@ const MenuButton = () => {
             className="flex flex-col justify-center items-center w-20 rounded-lg transition duration-200 
           hover:bg-normal-50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-normal-200 p-2"
           >
-            <PlusIcon className="w-6" />
+            <PlusIcon className="w-6 h-full" />
             <p className="text-xxs">식자재 추가</p>
           </button>
           <button
