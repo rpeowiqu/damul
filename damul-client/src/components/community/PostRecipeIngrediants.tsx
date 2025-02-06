@@ -1,8 +1,9 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { IngredientProps } from "@/types/community";
-import PostDrawer from "@/components/common/DamulDrawer";
 import PostRecipeIngrediantForm from "@/components/community/PostRecipeIngrediantForm";
 import SubmitButton from "./SubmitButton";
+import useCloseOnBack from "@/hooks/useCloseOnBack";
+import DamulDrawer from "@/components/common/DamulDrawer";
 
 interface PostRecipeIngrediantsProps {
   setTempIngredients: Dispatch<SetStateAction<IngredientProps[]>>;
@@ -16,6 +17,7 @@ const PostRecipeIngrediants = ({
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
+  const [isOpen, setIsOpen] = useCloseOnBack();
 
   // 재료 삭제
   const handleRemoveIngredient = (id: number) => {
@@ -58,7 +60,7 @@ const PostRecipeIngrediants = ({
   };
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden flex flex-col">
       <table className="min-w-full">
         <thead>
           <tr>
@@ -111,14 +113,15 @@ const PostRecipeIngrediants = ({
           ))}
         </tbody>
       </table>
-      <PostDrawer
-        trigerConent={
-          <button
-            type="button"
-            className="text-blue-500 hover:text-blue-700 text-xl"
-          >
-            +
-          </button>
+      <DamulDrawer
+        isOpen={isOpen}
+        onOpenChange={() => {
+          if (isOpen) {
+            history.back();
+          }
+        }}
+        triggerContent={
+          <div className="text-blue-400 hover:text-blue-700 text-2xl">+</div>
         }
         headerContent={
           <PostRecipeIngrediantForm
@@ -132,6 +135,7 @@ const PostRecipeIngrediants = ({
         }
         footerContent={<SubmitButton />}
         onFooterClick={handleSubmit}
+        onTriggerClick={() => setIsOpen(true)}
       />
     </div>
   );

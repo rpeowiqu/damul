@@ -199,12 +199,7 @@ const CommunityRecipePostPage = () => {
         ingredients[0].name &&
         orders[0].description && (
           <div className="absolute bottom-16 left-0 w-full p-6">
-            <DamulButton
-              variant="positive-outline"
-              size="full"
-              textSize="sm"
-              onClick={() => {}}
-            >
+            <DamulButton variant="positive-outline" className="w-full">
               레시피 작성하기
             </DamulButton>
           </div>

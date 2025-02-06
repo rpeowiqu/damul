@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import PostDrawer from "@/components/common/DamulDrawer";
 import PostRecipeOrderForm from "./PostRecipeOrderForm";
 import SubmitButton from "./SubmitButton";
 import { OrderProps } from "@/types/community";
 import Image from "../common/Image";
+import useCloseOnBack from "@/hooks/useCloseOnBack";
+import DamulDrawer from "@/components/common/DamulDrawer";
 
 interface PostRecipeStepsProps {
   setTempOrders: Dispatch<SetStateAction<OrderProps[]>>;
@@ -17,6 +18,7 @@ const PostRecipeSteps = ({
   const [orderDescription, setOrderDescription] = useState("");
   const [orderImage, setOrderImage] = useState<File | null>(null);
   const [preImage, setPreImage] = useState<string>("");
+  const [isOpen, setIsOpen] = useCloseOnBack();
 
   // 단계 삭제
   const handleRemoveStep = (id: number) => {
@@ -100,14 +102,15 @@ const PostRecipeSteps = ({
           ))}
         </tbody>
       </table>
-      {/* <PostDrawer
-        trigerConent={
-          <button
-            type="button"
-            className="text-blue-500 hover:text-blue-700 text-xl"
-          >
-            +
-          </button>
+      <DamulDrawer
+        isOpen={isOpen}
+        onOpenChange={() => {
+          if (isOpen) {
+            history.back();
+          }
+        }}
+        triggerContent={
+          <div className="text-blue-400 hover:text-blue-700 text-2xl">+</div>
         }
         headerContent={
           <PostRecipeOrderForm
@@ -120,7 +123,11 @@ const PostRecipeSteps = ({
         }
         footerContent={<SubmitButton />}
         onFooterClick={handleSubmit}
-      /> */}
+        onTriggerClick={() => {
+          console.log("추가");
+          setIsOpen(true);
+        }}
+      />
     </div>
   );
 };
