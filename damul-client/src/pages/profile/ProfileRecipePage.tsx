@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 
 import {
   Select,
@@ -9,55 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Image from "@/components/common/Image";
-import { useOutletContext } from "react-router-dom";
-
-const dummyRecipeData = [
-  {
-    id: 1,
-    title: "한 입 먹는 순간 일본 현지인줄 알고 착각하는 돈까스",
-    description: "돈까스 만드는 법",
-    date: "2025-01-17",
-    author: "토마토러버전종우",
-  },
-  {
-    id: 2,
-    title: "우동동 오동동",
-    description: "우동 만드는 법",
-    date: "2025-01-20",
-    author: "토마토러버전종우",
-  },
-  {
-    id: 3,
-    title: "입에 넣으면 녹아버리는 사케동",
-    description: "사케동은 어쩌구 저쩌구 저쩌구 어쩌구",
-    date: "2025-01-22",
-    author: "토마토러버전종우",
-  },
-  {
-    id: 4,
-    title: "(극비문서) GS25 12,000원 레시피",
-    description:
-      "본 레시피는 1급 기밀에 준하는 문서로, 12,000원으로 미슐랭 3스타급 요리를 만들 수 있습니다.",
-    date: "2025-01-25",
-    author: "토마토러버전종우",
-  },
-];
+import FeedList from "@/components/common/FeedList";
 
 const ProfileRecipePage = () => {
   const { user } = useOutletContext();
   const [sortType, setSortType] = useState("date");
-
-  const sortedData = useMemo(() => {
-    return dummyRecipeData.slice().sort((a, b) => {
-      if (sortType === "date") {
-        return a.date > b.date ? -1 : 1;
-      } else if (sortType === "title") {
-        return a.title > b.title ? 1 : -1;
-      }
-      return 0;
-    });
-  }, [sortType]);
 
   return (
     <div className="flex flex-col gap-2 p-5 bg-white">
@@ -92,30 +49,7 @@ const ProfileRecipePage = () => {
           </SelectContent>
         </Select>
       </div>
-
-      <div className="flex flex-col gap-3">
-        {sortedData.map((recipe) => (
-          <div
-            key={recipe.id}
-            className="flex h-28 border border-normal-100 rounded-lg hover:border-positive-300 cursor-pointer"
-          >
-            <Image className="h-full rounded-l-lg" />
-            <div className="flex flex-col justify-between flex-1 p-2">
-              <div>
-                <p className="font-bold line-clamp-1">{recipe.title}</p>
-                <p className="text-sm text-normal-600 line-clamp-2">
-                  {recipe.description}
-                </p>
-              </div>
-
-              <div className="flex justify-between text-sm text-normal-300">
-                <p>{recipe.date}</p>
-                <p>{recipe.author}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <FeedList type="profile/recipe" />
     </div>
   );
 };

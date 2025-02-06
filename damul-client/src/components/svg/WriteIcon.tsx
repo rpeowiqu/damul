@@ -3,7 +3,7 @@ import { SVGProps } from "@/types/svg";
 const WriteIcon = ({ className }: SVGProps) => {
   return (
     <svg
-      className={`${className}`}
+      className={className}
       width="600"
       height="600"
       viewBox="0 0 600 600"
