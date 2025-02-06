@@ -1,5 +1,6 @@
 package com.damul.api.chat.entity;
 
+import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MessageType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -14,15 +15,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessage {
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", referencedColumnName = "id")
+    private ChatRoom room;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id", referencedColumnName = "id")
+    private User sender;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(name = "room_id", nullable = false)
-    private Integer roomId;
-
-    @Column(name = "sender_id", nullable = false)
-    private Integer senderId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "message_type", nullable = false)

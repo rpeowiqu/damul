@@ -1,5 +1,8 @@
 package com.damul.api.chat.service;
 
+import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.response.ChatMember;
+import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
 import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.entity.ChatRoom;
@@ -11,6 +14,7 @@ import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
+import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -30,6 +34,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ScrollResponse<ChatRoomList> getChatRooms(ScrollRequest request, int userId) {
@@ -52,6 +57,37 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ScrollResponse<ChatRoomList> scrollResponse = processRoomResults(rooms, userId);
 
         return new SearchResponse<>(scrollResponse, totalCount);
+    }
+
+    @Override
+    public ChatMembersResponse getChatRoomMembers(int roomId) {
+        log.info("서비스: 채팅방 멤버 목록 조회 시작 - roomId: {}", roomId);
+
+        // 채팅방 멤버 조회
+        List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(roomId);
+
+        if (members.isEmpty()) {
+            return new ChatMembersResponse(Collections.emptyList(), 0);
+        }
+
+        // 멤버 정보 변환
+        List<ChatMember> chatMembers = members.stream()
+                .map(member -> {
+                    User user = userRepository.findById(member.getUserId())
+                            .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
+
+                    return ChatMember.builder()
+                            .id(user.getId())
+                            .nickname(user.getNickname())
+                            .profileImageUrl(user.getProfileImageUrl())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return ChatMembersResponse.builder()
+                .content(chatMembers)
+                .totalMembers(chatMembers.size())
+                .build();
     }
 
     private ScrollResponse<ChatRoomList> processRoomResults(List<ChatRoom> rooms, int userId) {
