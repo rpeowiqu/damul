@@ -1,12 +1,12 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
-import ChattingListInfo from "@/components/chat/ChattingListInfo";
 import ChattingList from "@/components/chat/ChattingList";
 import PostButton from "@/components/community/PostButton";
 import PlusIcon from "@/components/svg/PlusIcon";
 
-const ChattingMainPage = () => {
+const ChattingSearchResultPage = () => {
   const navigate = useNavigate();
+  const { keyword } = useParams<{ keyword: string }>();
 
   const mockData = {
     cnt: 3,
@@ -14,20 +14,24 @@ const ChattingMainPage = () => {
 
   return (
     <main className="h-full text-center py-6 space-y-2">
-      <div className="px-4 space-y-2">
+      <div className="px-4 space-y-4">
         <DamulSearchBox
-          placeholder="채팅방 검색"
+          placeholder={keyword}
           onInputClick={() => {
             navigate("/chatting/search");
           }}
           className="cursor-pointer"
         />
-        <ChattingListInfo chattingCnt={mockData.cnt} />
+        <div className="flex items-center text-sm gap-1">
+          <p className="text-positive-500">"{keyword}"</p>
+          <p>에 대한</p>
+          {mockData.cnt}개의 검색 결과
+        </div>
       </div>
-      <ChattingList />
+      <ChattingList keyword={keyword} />
       <PostButton to="/chatting/create" icon={<PlusIcon />} />
     </main>
   );
 };
 
-export default ChattingMainPage;
+export default ChattingSearchResultPage;

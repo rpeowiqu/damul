@@ -18,27 +18,29 @@ const ChattingSearchPage = () => {
   const navigate = useNavigate();
 
   return (
-    <main className="h-full px-4 py-6 pc:px-6 space-y-6">
-      <div className="flex-grow">
-        <DamulSearchBox
-          placeholder="채팅방 검색"
-          onButtonClick={(content) => {
+    <main className="h-full py-6">
+      <div className="px-4 space-y-6">
+        <div className="flex-grow">
+          <DamulSearchBox
+            placeholder="채팅방 검색"
+            onButtonClick={(content) => {
+              handleAddSearch(content);
+              navigate(`${content}`);
+            }}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+          />
+        </div>
+        <RecentSearches
+          recentSearches={recentSearches}
+          onRemoveSearch={handleRemoveSearch}
+          onRemoveSearchAll={handleRemoveSearchAll}
+          onSearch={(content) => {
             handleAddSearch(content);
             navigate(`${content}`);
           }}
-          inputValue={inputValue}
-          setInputValue={setInputValue}
         />
       </div>
-      <RecentSearches
-        recentSearches={recentSearches}
-        onRemoveSearch={handleRemoveSearch}
-        onRemoveSearchAll={handleRemoveSearchAll}
-        onSearch={(content) => {
-          handleAddSearch(content);
-          navigate(`${content}`);
-        }}
-      />
       <PostButton to="/chatting/create" icon={<PlusIcon />} />
     </main>
   );

@@ -36,6 +36,8 @@ import AdminPostMarketPage from "@/pages/admin/AdminPostMarketPage";
 import ChattingMainPage from "@/pages/chat/ChattingMainPage";
 import ChattingSearchPage from "@/pages/chat/ChattingSearchPage";
 import ChattingStartPage from "@/pages/chat/ChattingStartPage";
+import ChattingSearchResultPage from "@/pages/chat/ChattingSearchResultPage";
+import ChattingRoomPage from "@/pages/chat/ChattingRoomPage";
 
 const router = createBrowserRouter([
   {
@@ -190,8 +192,16 @@ const router = createBrowserRouter([
             element: <ChattingMainPage />,
           },
           {
+            path: ":roomId",
+            element: <ChattingRoomPage />,
+          },
+          {
             path: "search",
             element: <ChattingSearchPage />,
+          },
+          {
+            path: "search/:keyword",
+            element: <ChattingSearchResultPage />,
           },
           {
             path: "create",
