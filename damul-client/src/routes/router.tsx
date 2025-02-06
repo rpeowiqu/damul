@@ -1,7 +1,7 @@
 import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import Layout from "@/components/common/Layout";
 import LoginPage from "@/pages/login/LoginPage";
-import SignUpPage from "@/pages/SignUp/SignUpPage";
+import SignUpPage from "@/pages/signUp/SignUpPage";
 import CommunityRecipeMainPage from "@/pages/community/CommunityRecipeMainPage";
 import CommunityRecipeSearchPage from "@/pages/community/CommunityRecipeSearchPage";
 import CommunityRecipePostPage from "@/pages/community/CommunityRecipePostPage";
@@ -33,6 +33,9 @@ import ReportDetail from "@/components/admin/ReportDetail";
 import UserDetail from "@/components/admin/UserDetail";
 import AdminPostRecipePage from "@/pages/admin/AdminPostRecipePage";
 import AdminPostMarketPage from "@/pages/admin/AdminPostMarketPage";
+import ChattingMainPage from "@/pages/chat/ChattingMainPage";
+import ChattingSearchPage from "@/pages/chat/ChattingSearchPage";
+import ChattingStartPage from "@/pages/chat/ChattingStartPage";
 import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPage";
 
 const router = createBrowserRouter([
@@ -52,6 +55,7 @@ const router = createBrowserRouter([
         path: "home",
         element: <HomePage />,
       },
+      { path: "home", element: <HomePage /> },
       {
         path: "profile/:userId",
         element: <ProfilePage />,
@@ -176,6 +180,23 @@ const router = createBrowserRouter([
           {
             path: "following",
             element: <FriendFollowingPage />,
+          },
+        ],
+      },
+      {
+        path: "chatting",
+        children: [
+          {
+            index: true,
+            element: <ChattingMainPage />,
+          },
+          {
+            path: "search",
+            element: <ChattingSearchPage />,
+          },
+          {
+            path: "create",
+            element: <ChattingStartPage />,
           },
         ],
       },

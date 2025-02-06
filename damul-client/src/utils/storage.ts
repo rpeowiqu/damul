@@ -1,5 +1,9 @@
 export const getRecentSearchKey = (pathname: string) => {
-  return pathname.endsWith("recipe/search")
-    ? "recentSearches_recipe"
-    : "recentSearches_market";
+  if (pathname.endsWith("recipe/search")) {
+    return "recentSearches_recipe";
+  } else if (pathname.endsWith("market/search")) {
+    return "recentSearches_market";
+  } else if (pathname.endsWith("chatting/search"))
+    return "recentSearches_chatting";
+  return "";
 };

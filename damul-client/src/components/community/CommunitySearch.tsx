@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useManageRecentSearches from "@/hooks/useManageRecentSearches";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import RecentSearches from "@/components/common/RecentSearches";
-import PostButton from "@/components/community/PostButton";
+
 import {
   Select,
   SelectContent,
@@ -20,7 +20,7 @@ interface CommunitySearch {
   postTo: string;
 }
 
-const CommunitySearch = ({ placeholder, title, postTo }: CommunitySearch) => {
+const CommunitySearch = ({ placeholder, title }: CommunitySearch) => {
   const {
     recentSearches,
     handleAddSearch,
@@ -84,7 +84,6 @@ const CommunitySearch = ({ placeholder, title, postTo }: CommunitySearch) => {
         }}
       />
       <h3 className="px-2 font-semibold text-md">{title}</h3>
-      <PostButton to={postTo} />
     </>
   );
 };
