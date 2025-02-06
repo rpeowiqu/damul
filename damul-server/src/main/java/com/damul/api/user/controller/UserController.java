@@ -116,10 +116,9 @@ public class UserController {
 
     // 사용자 목록 검색/조회
     @GetMapping("/search")
-    public ResponseEntity<?> search(@PathVariable int userId,
-                                    @RequestParam String keyword,
+    public ResponseEntity<?> search(@RequestParam(required = false) String keyword,
                                     @RequestBody ScrollRequest scrollRequest) {
-        log.info("사용자 목록 검색/조회 요청 - userId: {}, keyword: {}", userId, keyword);
+        log.info("사용자 목록 검색/조회 요청 - keyword: {}", keyword);
         ScrollResponse<UserList> userList = userService.getSearchUserList(scrollRequest, keyword);
         if(userList.getData().isEmpty() || userList.getData().size() == 0) {
             log.info("사용자 목록 검색/조회 완료 - 데이터 없음");
