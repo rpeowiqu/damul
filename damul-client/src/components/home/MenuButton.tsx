@@ -3,9 +3,12 @@ import MenuIcon from "@/components/svg/MenuIcon";
 import PlusIcon from "@/components/svg/PlusIcon";
 import EditIcon from "@/components/svg/EditIcon";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const MenuButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -43,6 +46,7 @@ const MenuButton = () => {
           className={`absolute z-50 border-1 p-1 bg-white rounded-xl shadow-md bottom-32 right-16 flex ${!isOpen && "hidden"}`}
         >
           <button
+            onClick={() => navigate("/home/register")}
             className="flex flex-col justify-center items-center w-20 rounded-lg transition duration-200 
           hover:bg-normal-50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-normal-200 p-2"
           >

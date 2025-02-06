@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import WriteIcon from "@/components/svg/WriteIcon";
 
 const CommunityRecipeMainPage = () => {
   const navigate = useNavigate();
