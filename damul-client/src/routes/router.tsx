@@ -33,7 +33,6 @@ import ReportDetail from "@/components/admin/ReportDetail";
 import UserDetail from "@/components/admin/UserDetail";
 import AdminPostRecipePage from "@/pages/admin/AdminPostRecipePage";
 import AdminPostMarketPage from "@/pages/admin/AdminPostMarketPage";
-import ReportPage from "@/pages/report/ReportPage";
 
 const router = createBrowserRouter([
   {
@@ -182,10 +181,6 @@ const router = createBrowserRouter([
       {
         path: "setting",
         element: <SettingPage />,
-      },
-      {
-        path: "report",
-        element: <ReportPage />,
       },
     ],
   },

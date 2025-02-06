@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode, SetStateAction } from "react";
+import { Dispatch, ReactNode, SetStateAction, useEffect } from "react";
 import clsx from "clsx";
 
 import {
@@ -21,7 +21,7 @@ interface DamulModalProps {
   footerComponent?: ReactNode; // 모달창 하단 컴포넌트 요소
 }
 
-const defaultContentStyle = "p-5 max-w-96 rounded-xl";
+const defaultContentStyle = "p-5 max-w-88 pc:max-w-96 rounded-xl";
 const defaultHeaderStyle = "pb-3 border-b border-b-normal-100";
 const defaultTitleStyle = "text-positive-300 text-xl";
 
@@ -38,11 +38,13 @@ const DamulModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className={clsx(defaultContentStyle, contentStyle)}>
-        <DialogHeader className={clsx(defaultHeaderStyle, headerStyle)}>
-          <DialogTitle className={clsx(defaultTitleStyle, titleStyle)}>
-            {title}
-          </DialogTitle>
-        </DialogHeader>
+        {title && (
+          <DialogHeader className={clsx(defaultHeaderStyle, headerStyle)}>
+            <DialogTitle className={clsx(defaultTitleStyle, titleStyle)}>
+              {title}
+            </DialogTitle>
+          </DialogHeader>
+        )}
         <DialogDescription>{children}</DialogDescription>
         {footerComponent && <DialogFooter>{footerComponent}</DialogFooter>}
       </DialogContent>
