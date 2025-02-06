@@ -39,7 +39,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByRole(Role role);
 
     // 사용자 조회
-    @Query("SELECT u.id, u.profileImageUrl, u.nickname " +
+    @Query("SELECT new com.damul.api.user.dto.response.UserList(u.id, u.profileImageUrl, u.nickname) " +
             "FROM User u " +
             "WHERE u.id > :cursorId " +
             "ORDER BY u.id LIMIT :size")
@@ -47,7 +47,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
                                @Param("size") int size);
 
     // 사용자 검색
-    @Query("SELECT u.id, u.profileImageUrl, u.nickname " +
+    @Query("SELECT new com.damul.api.user.dto.response.UserList(u.id, u.profileImageUrl, u.nickname) " +
             "FROM User u " +
             "WHERE u.nickname LIKE %:keyword% " +
             "AND u.id > :cursorId " +

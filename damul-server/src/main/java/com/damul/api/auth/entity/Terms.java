@@ -18,5 +18,5 @@ public class Terms {
     private int id;
 
     private String title;
-    private String description;
+    private String content;
 }
