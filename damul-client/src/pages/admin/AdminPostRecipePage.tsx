@@ -11,13 +11,13 @@ import {
 import { useEffect, useState } from "react";
 import Pagenation from "@/components/common/Pagenation";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Report } from "@/types/admin";
+import { RecipePost } from "@/types/admin";
 
-const AdminReportPage = () => {
+const AdminPostRecipePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [keyword, setKeyword] = useState<string>("");
   const [totalPage, setTotalPage] = useState<number>(0);
-  const [reportList, setReportList] = useState<Report[]>([]);
+  const [recipePostList, setRecipePostList] = useState<RecipePost[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const nav = useNavigate();
 
@@ -29,13 +29,13 @@ const AdminReportPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/mocks/admin/admin-report_${page}.json`);
+        const response = await fetch(`/mocks/admin/admin-recipe_${page}.json`);
         if (!response.ok) {
           throw new Error("데이터를 불러오지 못했습니다.");
         }
 
         const data = await response.json();
-        setReportList(data.content);
+        setRecipePostList(data.content);
         setTotalPage(data.pageInfo.totalPages);
       } catch (error) {
         console.error(error);
@@ -51,11 +51,11 @@ const AdminReportPage = () => {
     return null;
   }
   return (
-    <div className="flex flex-col gap-6 w-full h-full p-6">
+    <div className="flex flex-col gap-6 w-full h-full">
       <div className="flex items-center gap-3">
         <Select
           value={searchType}
-          onValueChange={(value: "all" | "reportId" | "nickname") =>
+          onValueChange={(value: "all" | "recipeId" | "nickname") =>
             setSearchParams((prev) => {
               prev.set("searchType", value);
               return prev;
@@ -76,9 +76,9 @@ const AdminReportPage = () => {
               </SelectItem>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="reportId"
+                value="recipeId"
               >
-                신고 번호
+                레시피 아이디
               </SelectItem>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
@@ -106,34 +106,26 @@ const AdminReportPage = () => {
           <thead className="bg-positive-300 text-white">
             <tr>
               <th scope="col" className="p-2">
-                신고 번호
+                게시글 번호
+              </th>
+              <th scope="col" className="p-2">
+                제목
               </th>
               <th scope="col" className="p-2">
                 작성자
               </th>
-              <th scope="col" className="p-2">
-                구분
-              </th>
-              <th scope="col" className="p-2">
-                처리 상태
-              </th>
             </tr>
           </thead>
           <tbody>
-            {reportList.map((item: Report) => (
+            {recipePostList.map((item: RecipePost) => (
               <tr
                 key={item.id}
                 className="bg-white border-b border-normal-100 hover:bg-positive-50 cursor-pointer"
-                onClick={() => nav(`${item.id}`)}
+                onClick={() => nav(`/community/recipe/${item.id}`)}
               >
                 <td className="p-2">{item.id}</td>
+                <td className="p-2">{item.description}</td>
                 <td className="p-2">{item.nickname}</td>
-                <td className="p-2">{item.categoryName}</td>
-                <td
-                  className={`p-2 ${item.status === "미완료" ? "text-negative-400 " : "text-positive-400"}`}
-                >
-                  {item.status}
-                </td>
               </tr>
             ))}
           </tbody>
@@ -154,4 +146,4 @@ const AdminReportPage = () => {
   );
 };
 
-export default AdminReportPage;
+export default AdminPostRecipePage;
