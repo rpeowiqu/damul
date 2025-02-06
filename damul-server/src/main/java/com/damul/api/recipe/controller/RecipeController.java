@@ -1,11 +1,13 @@
 package com.damul.api.recipe.controller;
 
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.entity.Recipe;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.stream.events.Comment;
 import java.util.List;
@@ -42,18 +44,23 @@ public class RecipeController {
 
     // 레시피 작성
     @PostMapping
-    public ResponseEntity<?> addRecipe(@RequestBody Recipe recipe) {
+    public ResponseEntity<?> addRecipe(@RequestPart("recipeRequest") RecipeRequest recipeRequest,
+                                       @RequestPart("mainImage") MultipartFile mainImage,
+                                       @RequestPart("cookingImages") List<MultipartFile> cookingImages) {
         return null;
     }
 
     // 레시피 수정
-    @PutMapping
-    public ResponseEntity<?> updateRecipe(@RequestBody Recipe recipe) {
+    @PutMapping("{recipeId}")
+    public ResponseEntity<?> updateRecipe(@PathVariable int recipeId,
+                                          @RequestPart("recipeRequest") RecipeRequest recipeRequest,
+                                          @RequestPart("mainImage") MultipartFile mainImage,
+                                          @RequestPart("cookingImages") List<MultipartFile> cookingImages) {
         return null;
     }
 
     // 레시피 삭제
-    @DeleteMapping
+    @DeleteMapping("{recipeId}")
     public ResponseEntity<?> deleteRecipe(@RequestParam int recipeId) {
         return null;
     }
