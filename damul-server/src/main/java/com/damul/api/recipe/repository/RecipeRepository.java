@@ -3,6 +3,7 @@ package com.damul.api.recipe.repository;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -109,4 +110,10 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             @Param("keyword") String keyword,
             @Param("orderBy") String orderBy
     );
+
+
+    // 레시피 상세조회 시 조회수증가
+    @Modifying
+    @Query("UPDATE Recipe r SET r.viewCnt = :viewCount WHERE r.recipeId = :recipeId")
+    void updateViewCount(@Param("recipeId") int recipeId, @Param("viewCount") int viewCount);
 }

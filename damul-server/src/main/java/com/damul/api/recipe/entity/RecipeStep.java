@@ -14,7 +14,7 @@ public class RecipeStep {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipe_id")
+    @JoinColumn(name = "recipe_id", referencedColumnName = "id")
     private Recipe recipe;
 
     @Column(name = "step_number", nullable = false)

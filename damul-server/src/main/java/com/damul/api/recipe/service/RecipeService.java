@@ -23,10 +23,7 @@ public interface RecipeService {
     // 인기 레시피 조회
 
     // 레시피 상세 조회
-    RecipeDetail getRecipeDetail(ScrollRequest scrollRequest,
-                                 String searchType,
-                                 String keyword,
-                                 String orderBy);
+    RecipeDetail getRecipeDetail(int recipeId, int userId);
 
     // 레시피 작성
     void addRecipe(RecipeRequest recipeRequest,

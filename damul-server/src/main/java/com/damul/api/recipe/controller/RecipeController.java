@@ -1,10 +1,12 @@
 package com.damul.api.recipe.controller;
 
+import com.damul.api.auth.entity.User;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollCursor;
+import com.damul.api.common.user.CurrentUser;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.RecipeDetail;
 import com.damul.api.recipe.dto.response.RecipeList;
@@ -49,8 +51,16 @@ public class RecipeController {
 
     // 레시피 상세 조회
     @GetMapping("/{recipeId}")
-    public ResponseEntity<RecipeDetail> getRecipe(@PathVariable int recipeId) {
-        return null;
+    public ResponseEntity<RecipeDetail> getRecipe(@PathVariable int recipeId,
+                                                  @CurrentUser User user) {
+        log.info("레시피 상세 조회 시작");
+        RecipeDetail detail = recipeService.getRecipeDetail(recipeId, user.getId());
+        if(detail == null) {
+            log.error("레시피 상세 조회 실패 - recipeId: {}", recipeId);
+            throw new BusinessException(ErrorCode.BOARD_NOT_FOUND);
+        }
+
+        return ResponseEntity.ok(detail);
     }
 
     // 인기 레시피 조회
