@@ -16,8 +16,8 @@ const PlusIcon = ({ className }: SVGProps) => {
       <path
         className={className}
         d="M12.0002 7.69995L12.0002 17.3M16.8002 12.5L7.2002 12.5"
-        stroke-width="2"
-        stroke-linecap="round"
+        strokeWidth="2"
+        strokeLinecap="round"
         stroke="#5f6368"
       />
     </svg>
