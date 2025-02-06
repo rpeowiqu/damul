@@ -1,9 +1,15 @@
 package com.damul.api.recipe.controller;
 
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.common.scroll.util.ScrollCursor;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.RecipeDetail;
+import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
+import com.damul.api.recipe.service.RecipeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,16 +24,26 @@ import java.util.List;
 @RequestMapping("api/v1/recipes")
 @RequiredArgsConstructor
 public class RecipeController {
+    private final RecipeService recipeService;
 
     // 레시피 검색 및 전체 조회
     @GetMapping
     public ResponseEntity<?> getAllRecipes(@RequestBody ScrollRequest scrollRequest,
                                            @RequestParam(required = false) String searchType,
                                            @RequestParam(required = false) String keyword,
-                                           @RequestParam(required = false) String orderByDir,
                                            @RequestParam(required = false) String orderBy) {
+        log.info("레시피 검색 및 전체 조회 시작");
+        log.info("검색타입 - searchType: {}, 검색어 - keyword: {} " + searchType, keyword);
+        log.info("정렬 조건 - orderBy: {} " + orderBy);
 
-        return null;
+        ScrollResponse<RecipeList> scrollResponse = recipeService.getRecipes(scrollRequest, searchType, keyword, orderBy);
+        if(scrollResponse.getData() != null || scrollResponse.getData().size() > 0) {
+            log.info("레시피 검색 및 전체 조회 완료 - 데이터 없음");
+            return ResponseEntity.noContent().build();
+        }
+
+
+        return ResponseEntity.ok(scrollResponse);
     }
 
 
