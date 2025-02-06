@@ -97,7 +97,7 @@ const ChattingStartPage = () => {
         {mockData.data.map((user) => (
           <div
             key={user.id}
-            className="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-neutral-100"
+            className="flex items-center justify-between p-2 pc:p-3 rounded-lg cursor-pointer hover:bg-neutral-100"
             onClick={() => toggleSelection(user.id)}
           >
             <div className="flex items-center gap-3">
@@ -108,7 +108,7 @@ const ChattingStartPage = () => {
               type="radio"
               readOnly
               checked={selectedFriends.includes(user.id)}
-              className="w-5 h-5 text-primary-500 cursor-pointer"
+              className="w-4 h-4 pc:w-5 pc:h-5 text-primary-500 cursor-pointer"
             />
           </div>
         ))}
