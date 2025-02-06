@@ -27,7 +27,7 @@ public class TestAuthController {
 
     @GetMapping("/test-token")
     public String generateTestToken() {
-        User testUser = userRepository.findById(7)
+        User testUser = userRepository.findById(3)
                 .orElseThrow(() -> new RuntimeException("Test user not found"));
 
         // 명시적으로 권한 생성

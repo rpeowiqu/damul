@@ -25,6 +25,7 @@ public enum ErrorCode {
     FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "팔로우 관계가 존재하지 않습니다."),
 
 
+
     // 유저 관련 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저 ID가 존재하지 않습니다"),
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "관리자 계정이 존재하지 않습니다"),
@@ -42,6 +43,7 @@ public enum ErrorCode {
 
     // 게시글 관련 에러
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다.");
+
 
     private final HttpStatus status;
     private final String message;

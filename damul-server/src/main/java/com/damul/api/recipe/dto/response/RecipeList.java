@@ -1,5 +1,6 @@
 package com.damul.api.recipe.dto.response;
 
+import com.damul.api.common.scroll.util.ScrollCursor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecipeList {
+public class RecipeList implements ScrollCursor {
     private int recipeId;
     private String title;
     private String thumbnailUrl;
@@ -19,4 +20,9 @@ public class RecipeList {
     private LocalDateTime createdAt;
     private int authorId;
     private String authorName;
+
+    @Override
+    public int getId() {
+        return this.recipeId;
+    }
 }

@@ -112,10 +112,6 @@ redirect:
   main: ${MAIN_URL}
   terms: ${TERMS_URL}
 
-
-file:
-  upload-dir: ${UPLOAD-DIR}
-
 ---
 spring:
   config:
