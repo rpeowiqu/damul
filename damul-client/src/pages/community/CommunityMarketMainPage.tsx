@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import WriteIcon from "@/components/svg/WriteIcon";
 
 const CommunityMarketMainPage = () => {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ const CommunityMarketMainPage = () => {
         </Select>
       </div>
       <FeedList type="community/market" />
-      <PostButton to="market" />
+      <PostButton to="/community/market/post" icon={<WriteIcon />} />
     </main>
   );
 };

@@ -1,5 +1,7 @@
 import CommunitySearch from "@/components/community/CommunitySearch";
 import DamulCarousel from "@/components/common/DamulCarousel";
+import PostButton from "@/components/community/PostButton";
+import WriteIcon from "@/components/svg/WriteIcon";
 
 const CommunityRecipeSearchPage = () => {
   return (
@@ -10,6 +12,7 @@ const CommunityRecipeSearchPage = () => {
         postTo="recipe"
       />
       <DamulCarousel />
+      <PostButton to="/community/recipe/post" icon={<WriteIcon/>}/>
     </main>
   );
 };

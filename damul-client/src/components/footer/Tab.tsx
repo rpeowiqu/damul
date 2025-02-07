@@ -27,7 +27,7 @@ const Tab = ({
         {Icon && <Icon iconFill={iconFill} iconStroke={menuColor} />}
         <p className={`text-xxs text-${menuColor} font-bold`}>{label}</p>
         {label === "채팅" && chatAlarmNum > 0 && (
-          <ChatAlarm chatAlarmNum={chatAlarmNum} />
+          <ChatAlarm chatAlarmNum={chatAlarmNum} className="absolute"/>
         )}
       </div>
     </div>
