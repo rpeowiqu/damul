@@ -9,27 +9,41 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-
-// import noImage from "@/assets/noImage.jpeg";
-import foodImage from "@/assets/foodImage.png";
+import { UserRecipes } from "@/types/recipe";
+import { useNavigate } from "react-router-dom";
 
 const DamulCarousel = () => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
 
+  const [suggestedRecipe, setsuggestedRecipe] = useState<UserRecipes>();
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (!api) {
       return;
     }
-
-    setCount(api.scrollSnapList().length);
+    setCount(suggestedRecipe ? suggestedRecipe.suggestedRecipes.length : 0);
     setCurrent(api.selectedScrollSnap() + 1);
 
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap() + 1);
     });
-  }, [api]);
+  }, [api, suggestedRecipe?.suggestedRecipes.length]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/mocks/home/suggested-recipe-list.json");
+        const data = await response.json();
+        setsuggestedRecipe(data);
+      } catch (err: any) {
+        console.log("레시피 데이터를 받아오지 못했습니다.");
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <Carousel
@@ -39,14 +53,29 @@ const DamulCarousel = () => {
       className="relative w-full"
     >
       <CarouselContent>
-        {Array.from({ length: 100 }).map((_, index) => (
-          <CarouselItem key={index} className="h-36">
-            <div className="absolute w-full p-6 text-white">
-              <div className="font-thin text-xxs">#국민 반찬 #한끼 뚝딱</div>
-              <div className="text-2xl">제육볶음</div>
+        {suggestedRecipe?.suggestedRecipes.map((recipe, idx) => (
+          <CarouselItem
+            key={`${idx}-${recipe.recipeId}`}
+            className="h-36 cursor-pointer"
+            onClick={() => {
+              navigate("/community/recipe/1");
+            }}
+          >
+            <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
+              <div className="flex gap-1 ">
+                {recipe.recipeTags.map((tag, index) => {
+                  return (
+                    <div
+                      key={`${index}-${tag.tagId}`}
+                      className="font-thin text-xxs"
+                    >{`#${tag.tagName}`}</div>
+                  );
+                })}
+              </div>
+              <div className="font-bold text-2xl">{recipe.title}</div>
             </div>
             <img
-              src={foodImage}
+              src={recipe.thumbnailUrl}
               className="object-cover w-full h-full"
               alt="캐러셀이미지"
             />
