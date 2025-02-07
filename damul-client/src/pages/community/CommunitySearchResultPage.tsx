@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 const CommunitySearchResultPage = () => {
   const navigate = useNavigate();
@@ -18,9 +19,10 @@ const CommunitySearchResultPage = () => {
   const location = useLocation();
 
   // 현재 URL에서 마지막 `/` 이후의 부분을 제거하여 base path 생성
-  const basePath = location.pathname.replace(/\/[^/]+$/, "");
+  const basePath = location.pathname.replace(/\/[^/]+$/, "").replace(/^\//, "");
 
   const [sortType, setSortType] = useState("latest");
+  const [filterActive, setFlterActive] = useState(false);
 
   return (
     <main className="h-full px-4 py-6 pc:px-6 space-y-2">
@@ -31,7 +33,28 @@ const CommunitySearchResultPage = () => {
           className="cursor-pointer"
         />
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-between">
+        {basePath.endsWith("/market/search") ? (
+          <div className="flex items-center gap-3">
+            <Switch
+              id="warning"
+              checked={filterActive}
+              onCheckedChange={() => {
+                setFlterActive(!filterActive);
+              }}
+              className="data-[state=checked]:bg-positive-200"
+            />
+            <p
+              className={`text-sm ${filterActive ? "text-positive-400" : "text-normal-400"}`}
+            >
+              {filterActive
+                ? "진행중인 공구/나눔만 보기"
+                : "모든 공구/나눔 보기"}
+            </p>
+          </div>
+        ) : (
+          <div></div>
+        )}
         <Select value={sortType} onValueChange={(value) => setSortType(value)}>
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
@@ -51,17 +74,17 @@ const CommunitySearchResultPage = () => {
                     className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
                     value="likes"
                   >
-                    좋아요 많은순
+                    좋아요순
                   </SelectItem>
                   <SelectItem
                     className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
                     value="views"
                   >
-                    조회수 높은순
+                    조회수순
                   </SelectItem>
                 </>
               ) : (
-                <>
+                <div className="flex flex-col">
                   <SelectItem
                     className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
                     value="latest"
@@ -72,27 +95,15 @@ const CommunitySearchResultPage = () => {
                     className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
                     value="views"
                   >
-                    조회수 높은순
+                    조회수순
                   </SelectItem>
-                  <SelectItem
-                    className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                    value="activated"
-                  >
-                    미완료만
-                  </SelectItem>
-                  <SelectItem
-                    className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                    value="completed"
-                  >
-                    완료만
-                  </SelectItem>
-                </>
+                </div>
               )}
             </SelectGroup>
           </SelectContent>
         </Select>
       </div>
-      <FeedList />
+      <FeedList type={`${basePath}`} />
     </main>
   );
 };

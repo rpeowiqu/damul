@@ -12,18 +12,20 @@ const HomeIngredientsRegisterPage = () => {
       <p className="p-4 text-positive-300 font-bold">
         오늘은 이런 품목을 구매하셨네요!
       </p>
-      <button className="flex items-center justify-end text-normal-300 text-sm gap-1">
-        <PlusIcon className="text-normal-300 w-4 fill-normal-200 stroke-2 stroke-normal-200" />
-        <p>영수증으로 입력하기</p>
-      </button>
+      <div className="flex justify-end">
+        <button className="flex items-center justify-end text-normal-300 text-sm gap-1">
+          <PlusIcon className="w-6 h-full text-normal-300 fill-normal-200 stroke-2 stroke-normal-200" />
+          <p>영수증으로 입력하기</p>
+        </button>
+      </div>
 
       <div className="my-4 flex flex-col gap-4">
-        <div className="flex w-full justify-between">
-          <div>
+        <div className="flex w-full gap-2">
+          <div className="w-full">
             <p>매장명</p>
-            <input type="text" className="border-1" />
+            <input type="text" className="border-1 w-full" />
           </div>
-          <div>
+          <div className="w-full">
             <p>날짜</p>
             <input type="date" className="border-1" />
           </div>
@@ -34,12 +36,10 @@ const HomeIngredientsRegisterPage = () => {
           })}
         </div>
       </div>
-      <div className="flex justify-end gap-2 font-bold">
+      <div className="flex justify-end gap-2 font-bold ">
         총 구매 금액: <span className="text-positive-300">25,400</span>원
       </div>
-      <button className="flex justify-center text-normal-300 text-sm gap-1">
-        <PlusIcon className="w-20 stroke-positive-400 fill-positive-400" />
-      </button>
+      <div className="flex justify-center py-3"></div>
       <SubmitButton></SubmitButton>
     </div>
   );

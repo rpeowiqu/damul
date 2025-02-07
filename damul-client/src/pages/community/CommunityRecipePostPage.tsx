@@ -1,5 +1,5 @@
-import { useState } from "react";
-import PostDrawer from "@/components/community/PostDrawer";
+import { useEffect, useState } from "react";
+import DamulDrawer from "@/components/common/DamulDrawer";
 import PostCard from "@/components/community/PostCard";
 import SubmitButton from "@/components/community/SubmitButton";
 import PostRecipeTitle from "@/components/community/PostTitle";
@@ -9,6 +9,7 @@ import PostRecipeIngrediants from "@/components/community/PostRecipeIngrediants"
 import PostRecipeOrders from "@/components/community/PostRecipeOrders";
 import DamulButton from "@/components/common/DamulButton";
 import { IngredientProps, OrderProps } from "@/types/community";
+import useCloseOnBack from "@/hooks/useCloseOnBack";
 
 const CommunityRecipePostPage = () => {
   const [title, setTitle] = useState<string>("");
@@ -47,6 +48,14 @@ const CommunityRecipePostPage = () => {
       image: null,
     },
   ]);
+  const [currentDrawerIndex, setCurrentDrawerIndex] = useState<number>(-1);
+  const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentDrawerIndex(-1));
+
+  useEffect(() => {
+    if (currentDrawerIndex > -1) {
+      setIsOpen(true);
+    }
+  }, [currentDrawerIndex]);
 
   return (
     <main className="flex flex-col px-7 py-4 pc:p-6 gap-5">
@@ -58,8 +67,14 @@ const CommunityRecipePostPage = () => {
         <span className="space-y-4">나만의 레시피 작성</span>
       </div>
       <div className="flex flex-col gap-5">
-        <PostDrawer
-          trigerConent={
+        <DamulDrawer
+          isOpen={currentDrawerIndex === 0}
+          onOpenChange={() => {
+            if (isOpen) {
+              history.back();
+            }
+          }}
+          triggerContent={
             <PostCard
               title="제목"
               description="제목을 입력해주세요"
@@ -76,9 +91,16 @@ const CommunityRecipePostPage = () => {
           onFooterClick={() => {
             setTitle(tempTitle);
           }}
+          onTriggerClick={() => setCurrentDrawerIndex(0)}
         />
-        <PostDrawer
-          trigerConent={
+        <DamulDrawer
+          isOpen={currentDrawerIndex === 1}
+          onOpenChange={() => {
+            if (isOpen) {
+              history.back();
+            }
+          }}
+          triggerContent={
             <PostCard
               title="사진"
               description="사진을 업로드해주세요"
@@ -90,9 +112,16 @@ const CommunityRecipePostPage = () => {
           onFooterClick={() => {
             setImage(tempImage);
           }}
+          onTriggerClick={() => setCurrentDrawerIndex(1)}
         />
-        <PostDrawer
-          trigerConent={
+        <DamulDrawer
+          isOpen={currentDrawerIndex === 2}
+          onOpenChange={() => {
+            if (isOpen) {
+              history.back();
+            }
+          }}
+          triggerContent={
             <PostCard
               title="소개"
               description="소개글을 입력해주세요"
@@ -109,9 +138,16 @@ const CommunityRecipePostPage = () => {
           onFooterClick={() => {
             setContent(tempContent);
           }}
+          onTriggerClick={() => setCurrentDrawerIndex(2)}
         />
-        <PostDrawer
-          trigerConent={
+        <DamulDrawer
+          isOpen={currentDrawerIndex === 3}
+          onOpenChange={() => {
+            if (isOpen) {
+              history.back();
+            }
+          }}
+          triggerContent={
             <PostCard
               title="재료"
               description="재료를 입력해주세요"
@@ -128,9 +164,16 @@ const CommunityRecipePostPage = () => {
           onFooterClick={() => {
             setIngredients(tempIngredients);
           }}
+          onTriggerClick={() => setCurrentDrawerIndex(3)}
         />
-        <PostDrawer
-          trigerConent={
+        <DamulDrawer
+          isOpen={currentDrawerIndex === 4}
+          onOpenChange={() => {
+            if (isOpen) {
+              history.back();
+            }
+          }}
+          triggerContent={
             <PostCard
               title="조리순서"
               description="조리순서를 입력해주세요"
@@ -147,6 +190,7 @@ const CommunityRecipePostPage = () => {
           onFooterClick={() => {
             setOrders(tempOrders);
           }}
+          onTriggerClick={() => setCurrentDrawerIndex(4)}
         />
       </div>
       {title &&
@@ -155,12 +199,7 @@ const CommunityRecipePostPage = () => {
         ingredients[0].name &&
         orders[0].description && (
           <div className="absolute bottom-16 left-0 w-full p-6">
-            <DamulButton
-              variant="positive-outline"
-              size="full"
-              textSize="sm"
-              onClick={() => {}}
-            >
+            <DamulButton variant="positive-outline" className="w-full">
               레시피 작성하기
             </DamulButton>
           </div>

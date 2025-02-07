@@ -4,6 +4,7 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
     screens: {
+      pc_admin: "800px",
       pc: "600px",
       sm: "480px",
       xs: "360px",
@@ -103,11 +104,19 @@ module.exports = {
       width: {
         22: "5.5rem",
       },
+      maxWidth: {
+        100: "26rem",
+        104: "28rem",
+      },
+
       height: {
         22: "5.5rem",
       },
       borderWidth: {
         1: "1px",
+      },
+      maxWidth: {
+        88: "21rem",
       },
     },
   },
