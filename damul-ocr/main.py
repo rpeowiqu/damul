@@ -1,13 +1,13 @@
 from fastapi import FastAPI, File, UploadFile
-from app.services.ocr_service import ocr_service_execution
-from app.services.gpt_service import gpt_service_execution
+from services.ocr_service import ocr_service_execution
+from services.gpt_service import gpt_service_execution
 
 app = FastAPI() # 인스턴스 생성
 
 # 오류 방지용 엔드포인트
 # @app.get("/")
 # def root():
-#     return 'Hello World!' + ' 동기 비동기 문제가 힘듭니다...'
+#     return 'Hello World!'
 
 @app.post('/api/v1/ocr')
 async def user_ingredients_ocr(image: UploadFile = File(...)):
