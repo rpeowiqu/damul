@@ -82,7 +82,11 @@ const CommunityRecipeDetailPage = () => {
 
   return (
     <div className="flex">
-      <main className="relative flex flex-col justify-center w-full text-center p-5 pc:p-6 mb-12">
+      <main
+        className={`relative flex flex-col justify-center w-full text-center p-6 ${
+          replyingTo ? "pc:pb-24" : "pc:pb-6"
+        } mb-8`}
+      >
         <CommunityDetailHeader
           title={mockData.title}
           createdAt={mockData.createdAt}

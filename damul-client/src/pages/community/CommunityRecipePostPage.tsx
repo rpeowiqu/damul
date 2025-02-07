@@ -16,6 +16,7 @@ const CommunityRecipePostPage = () => {
   const [tempTitle, setTempTitle] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [tempImage, setTempImage] = useState<File | null>(null);
+  const [preImage, setPreImage] = useState("");
   const [content, setContent] = useState<string>("");
   const [tempContent, setTempContent] = useState<string>("");
   const [ingredients, setIngredients] = useState<IngredientProps[]>([
@@ -87,7 +88,7 @@ const CommunityRecipePostPage = () => {
               tempTitle={tempTitle}
             />
           }
-          footerContent={<SubmitButton />}
+          footerContent={<SubmitButton disabled={tempTitle.length <= 0 || tempTitle.length > 50}/>}
           onFooterClick={() => {
             setTitle(tempTitle);
           }}
@@ -107,8 +108,14 @@ const CommunityRecipePostPage = () => {
               isEmpty={!image}
             />
           }
-          headerContent={<PostRecipeImage setTempImage={setTempImage} />}
-          footerContent={<SubmitButton />}
+          headerContent={
+            <PostRecipeImage
+              setTempImage={setTempImage}
+              preImage={preImage}
+              setPreImage={setPreImage}
+            />
+          }
+          footerContent={<SubmitButton disabled={!tempImage}/>}
           onFooterClick={() => {
             setImage(tempImage);
           }}
@@ -134,7 +141,7 @@ const CommunityRecipePostPage = () => {
               tempContent={tempContent}
             />
           }
-          footerContent={<SubmitButton />}
+          footerContent={<SubmitButton disabled={tempContent.length <= 0 || tempContent.length > 500}/>}
           onFooterClick={() => {
             setContent(tempContent);
           }}
@@ -199,7 +206,11 @@ const CommunityRecipePostPage = () => {
         ingredients[0].name &&
         orders[0].description && (
           <div className="absolute bottom-16 left-0 w-full p-6">
-            <DamulButton variant="positive-outline" className="w-full">
+            <DamulButton
+              variant="positive-outline"
+              className="w-full"
+              onClick={() => {}}
+            >
               레시피 작성하기
             </DamulButton>
           </div>

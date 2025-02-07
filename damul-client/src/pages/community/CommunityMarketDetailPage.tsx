@@ -69,40 +69,42 @@ const CommunityMarketDetailPage = () => {
   };
 
   return (
-    <div className="flex">
-      <main className="relative flex flex-col justify-center w-full text-center p-5 pc:p-6 mb-12">
-        <CommunityDetailHeader
-          title={mockData.title}
-          createdAt={mockData.createdAt}
-          status={mockData.status}
-          type="market"
-        />
-        <AuthorInfo
-          profileImageUrl={mockData.profileImageUrl}
-          authorName={mockData.authorName}
-          id={mockData.id}
-          type="market"
-        />
-        <ContentSection
-          contentImageUrl={mockData.contentImageUrl}
-          content={mockData.content}
-          type="market"
-        />
-        <CommentsSection
-          comments={mockData.comments}
-          onReply={(comment) => setReplyingTo(comment)}
-          currentMemberNum={mockData.currentMemberNum}
-          maxMemberSize={mockData.maxMemberSize}
-          type="market"
-        />
-      </main>
+    <main
+      className={`relative flex flex-col justify-center w-full text-center p-6 ${
+        replyingTo ? "pc:pb-24" : "pc:pb-6"
+      } mb-8`}
+    >
+      <CommunityDetailHeader
+        title={mockData.title}
+        createdAt={mockData.createdAt}
+        status={mockData.status}
+        type="market"
+      />
+      <AuthorInfo
+        profileImageUrl={mockData.profileImageUrl}
+        authorName={mockData.authorName}
+        id={mockData.id}
+        type="market"
+      />
+      <ContentSection
+        contentImageUrl={mockData.contentImageUrl}
+        content={mockData.content}
+        type="market"
+      />
+      <CommentsSection
+        comments={mockData.comments}
+        onReply={(comment) => setReplyingTo(comment)}
+        currentMemberNum={mockData.currentMemberNum}
+        maxMemberSize={mockData.maxMemberSize}
+        type="market"
+      />
       <FixedCommentInfo
         replyingTo={replyingTo}
         comment={comment}
         setComment={setComment}
         cancelReply={cancelReply}
       />
-    </div>
+    </main>
   );
 };
 

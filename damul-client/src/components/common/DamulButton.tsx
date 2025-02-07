@@ -15,6 +15,8 @@ interface ButtonProps {
   className?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   children?: ReactNode;
+  disabled?: boolean;
+  required?: boolean;
 }
 
 const DamulButton = ({
@@ -23,6 +25,7 @@ const DamulButton = ({
   className,
   onClick,
   children,
+  disabled
 }: ButtonProps) => {
   return (
     <Button
@@ -47,6 +50,7 @@ const DamulButton = ({
         className,
       )}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </Button>

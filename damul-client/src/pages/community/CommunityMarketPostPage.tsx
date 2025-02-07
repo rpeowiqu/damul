@@ -14,6 +14,7 @@ const CommunityMarketPostPage = () => {
   const [tempTitle, setTempTitle] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [tempImage, setTempImage] = useState<File | null>(null);
+  const [preImage, setPreImage] = useState("");
   const [content, setContent] = useState<string>("");
   const [tempContent, setTempContent] = useState<string>("");
   const [memberCnt, setMemberCnt] = useState<number>(0);
@@ -54,7 +55,11 @@ const CommunityMarketPostPage = () => {
           headerContent={
             <PostTitle setTempTitle={setTempTitle} tempTitle={tempTitle} />
           }
-          footerContent={<SubmitButton />}
+          footerContent={
+            <SubmitButton
+            disabled={tempTitle.length <= 0 || tempTitle.length > 50}
+            />
+          }
           onFooterClick={() => {
             setTitle(tempTitle);
           }}
@@ -74,8 +79,14 @@ const CommunityMarketPostPage = () => {
               isEmpty={!image}
             />
           }
-          headerContent={<PostImage setTempImage={setTempImage} />}
-          footerContent={<SubmitButton />}
+          headerContent={
+            <PostImage
+              setTempImage={setTempImage}
+              preImage={preImage}
+              setPreImage={setPreImage}
+            />
+          }
+          footerContent={<SubmitButton disabled={!tempImage}/>}
           onFooterClick={() => {
             setImage(tempImage);
           }}
@@ -101,7 +112,7 @@ const CommunityMarketPostPage = () => {
               tempContent={tempContent}
             />
           }
-          footerContent={<SubmitButton />}
+          footerContent={<SubmitButton disabled={!tempContent}/>}
           onFooterClick={() => {
             setContent(tempContent);
           }}
@@ -127,7 +138,7 @@ const CommunityMarketPostPage = () => {
               tempMemberCnt={tempMemberCnt}
             />
           }
-          footerContent={<SubmitButton />}
+          footerContent={<SubmitButton disabled={memberCnt == 0}/>}
           onFooterClick={() => {
             setMemberCnt(tempMemberCnt);
           }}
@@ -138,8 +149,7 @@ const CommunityMarketPostPage = () => {
         <div className="absolute bottom-16 left-0 w-full p-6">
           <DamulButton
             variant="positive-outline"
-            size="full"
-            textSize="lg"
+            className="w-full"
             onClick={() => {}}
           >
             공구/나눔 게시글 작성하기
