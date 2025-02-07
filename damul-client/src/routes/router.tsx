@@ -33,6 +33,12 @@ import ReportDetail from "@/components/admin/ReportDetail";
 import UserDetail from "@/components/admin/UserDetail";
 import AdminPostRecipePage from "@/pages/admin/AdminPostRecipePage";
 import AdminPostMarketPage from "@/pages/admin/AdminPostMarketPage";
+import ChattingMainPage from "@/pages/chat/ChattingMainPage";
+import ChattingSearchPage from "@/pages/chat/ChattingSearchPage";
+import ChattingStartPage from "@/pages/chat/ChattingStartPage";
+import ChattingSearchResultPage from "@/pages/chat/ChattingSearchResultPage";
+import ChattingRoomPage from "@/pages/chat/ChattingRoomPage";
+import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPage";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +57,7 @@ const router = createBrowserRouter([
         path: "home",
         element: <HomePage />,
       },
+      { path: "home/register", element: <HomeIngredientsRegisterPage /> },
       {
         path: "profile/:userId",
         element: <ProfilePage />,
@@ -175,6 +182,31 @@ const router = createBrowserRouter([
           {
             path: "following",
             element: <FriendFollowingPage />,
+          },
+        ],
+      },
+      {
+        path: "chatting",
+        children: [
+          {
+            index: true,
+            element: <ChattingMainPage />,
+          },
+          {
+            path: ":roomId",
+            element: <ChattingRoomPage />,
+          },
+          {
+            path: "search",
+            element: <ChattingSearchPage />,
+          },
+          {
+            path: "search/:keyword",
+            element: <ChattingSearchResultPage />,
+          },
+          {
+            path: "create",
+            element: <ChattingStartPage />,
           },
         ],
       },
