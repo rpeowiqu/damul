@@ -15,7 +15,7 @@ public class RecipeBookmark {
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipe_id",  referencedColumnName = "id")
+    @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
     @ManyToOne(fetch = FetchType.LAZY)

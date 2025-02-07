@@ -39,7 +39,7 @@ public class RecipeController {
         log.info("정렬 조건 - orderBy: {} " + orderBy);
 
         ScrollResponse<RecipeList> scrollResponse = recipeService.getRecipes(scrollRequest, searchType, keyword, orderBy);
-        if(scrollResponse.getData() != null || scrollResponse.getData().size() > 0) {
+        if(scrollResponse.getData() != null || scrollResponse.getData().size() <= 0) {
             log.info("레시피 검색 및 전체 조회 완료 - 데이터 없음");
             return ResponseEntity.noContent().build();
         }
