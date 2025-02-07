@@ -223,7 +223,7 @@ const ChattingRoomPage = () => {
     <main className="h-full text-center py-6 space-y-2">
       <div className="fixed flex top-14 p-5 items-center justify-between border-b-1 border-neutral-200 bg-white font-semibold text-start h-12 pc:h-16 w-full pc:w-[598px]">
         <p>토마토러버전종우 (4)</p>
-        <ChattingMenuButton/>
+        <ChattingMenuButton />
       </div>
       <div className="flex-1 overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
         {mockData.data.map((msg) => {
@@ -310,7 +310,7 @@ const ChattingRoomPage = () => {
         />
         {image ? (
           <div className="flex-1 border-1 p-3 rounded-lg relative">
-            <div className="relative h-24 w-32 bg-red-200">
+            <div className="relative h-24 w-24">
               <img
                 src={image}
                 alt="Preview"
