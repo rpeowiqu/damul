@@ -46,4 +46,12 @@ public class ChatMessage {
         messageType = MessageType.TEXT;
     }
 
+    public static ChatMessage createSystemMessage(ChatRoom room, String content) {
+        ChatMessage message = new ChatMessage();
+        message.room = room;
+        message.messageType = MessageType.SYSTEM;
+        message.content = content;
+        return message;
+    }
+
 }

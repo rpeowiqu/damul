@@ -1,6 +1,7 @@
 package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.MessageType;
 import com.damul.api.chat.dto.response.ChatMember;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
@@ -102,15 +103,95 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 채팅방입니다."));
 
-        // 채팅방 멤버인지 확인
+        // 채팅방 멤버 확인
         ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
                 .orElseThrow(() -> new IllegalStateException("채팅방 멤버가 아닙니다."));
 
-        // 채팅방 상태를 INACTIVE로 변경
-        chatRoom.setStatus("INACTIVE");
-        chatRoomRepository.save(chatRoom);
+        if (chatRoom.getRoomType() == ChatRoom.RoomType.PRIVATE) {
+            handlePrivateRoomDeletion(chatRoom, userId);
+        } else {
+            handleGroupRoomDeletion(chatRoom, member);
+        }
 
         log.info("서비스: 채팅방 삭제 완료 - roomId: {}", roomId);
+    }
+
+    @Override
+    @Transactional
+    public void kickMember(int roomId, int memberId, int adminId) {
+        log.info("서비스: 채팅방 멤버 추방 시작 - roomId: {}, memberId: {}", roomId, memberId);
+
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 채팅방입니다."));
+
+        // 개인 채팅방은 추방 불가
+        if (chatRoom.getRoomType() == ChatRoom.RoomType.PRIVATE) {
+            throw new IllegalStateException("개인 채팅방에서는 추방할 수 없습니다.");
+        }
+
+        // 방장 권한 확인
+        ChatRoomMember admin = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, adminId)
+                .orElseThrow(() -> new IllegalStateException("채팅방 멤버가 아닙니다."));
+
+        if (!admin.getRole().equals("ADMIN")) {
+            throw new IllegalStateException("방장만 멤버를 추방할 수 있습니다.");
+        }
+
+        // 추방할 멤버 확인
+        ChatRoomMember memberToKick = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, memberId)
+                .orElseThrow(() -> new IllegalStateException("추방할 멤버가 존재하지 않습니다."));
+
+        // 방장은 추방할 수 없음
+        if (memberToKick.getRole().equals("ADMIN")) {
+            throw new IllegalStateException("방장은 추방할 수 없습니다.");
+        }
+
+        // 시스템 메시지 생성
+        String kickMessage = String.format("%s님이 추방되었습니다.", memberToKick.getNickname());
+        createSystemMessage(chatRoom, kickMessage);
+
+        // 멤버 삭제
+        chatRoomMemberRepository.delete(memberToKick);
+
+        log.info("서비스: 채팅방 멤버 추방 완료 - roomId: {}, memberId: {}", roomId, memberId);
+    }
+
+    private void createSystemMessage(ChatRoom chatRoom, String content) {
+        ChatMessage systemMessage = ChatMessage.createSystemMessage(chatRoom, content);
+        chatMessageRepository.save(systemMessage);
+    }
+
+    private void handlePrivateRoomDeletion(ChatRoom chatRoom, int userId) {
+        // 개인 채팅방의 경우 양쪽 다 나가야 삭제
+        List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(chatRoom.getId());
+
+        // 현재 사용자의 멤버십만 INACTIVE로 변경
+        ChatRoomMember currentMember = members.stream()
+                .filter(m -> m.getUser().getId() == userId)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("채팅방 멤버가 아닙니다."));
+
+        chatRoomMemberRepository.delete(currentMember);
+
+        // 모든 멤버가 나갔는지 확인
+        if (chatRoomMemberRepository.countByRoomId(chatRoom.getId()) == 0) {
+            chatRoom.deactivate();
+            chatRoomRepository.save(chatRoom);
+        }
+    }
+
+    private void handleGroupRoomDeletion(ChatRoom chatRoom, ChatRoomMember member) {
+        // 그룹 채팅방의 경우 방장만 삭제 가능
+        if (!member.getRole().equals("ADMIN")) {
+            throw new IllegalStateException("방장만 채팅방을 삭제할 수 있습니다.");
+        }
+
+        // 모든 멤버 삭제
+        chatRoomMemberRepository.deleteAllByRoomId(chatRoom.getId());
+
+        // 채팅방 상태 변경
+        chatRoom.deactivate();
+        chatRoomRepository.save(chatRoom);
     }
 
     private ScrollResponse<ChatRoomList> processRoomResults(List<ChatRoom> rooms, int userId) {

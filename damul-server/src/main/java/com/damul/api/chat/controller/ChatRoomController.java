@@ -90,4 +90,16 @@ public class ChatRoomController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/rooms/{roomId}/members/{memberId}")
+    public ResponseEntity<?> kickMember(
+            @PathVariable int roomId,
+            @PathVariable int memberId,
+            @CurrentUser User user) {
+        log.info("컨트롤러: 채팅방 멤버 추방 시작 - roomId: {}, memberId: {}", roomId, memberId);
+
+        chatRoomService.kickMember(roomId, memberId, user.getId());
+
+        return ResponseEntity.ok().build();
+    }
+
 }

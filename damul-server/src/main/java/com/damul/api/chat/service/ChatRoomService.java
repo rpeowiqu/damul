@@ -16,4 +16,6 @@ public interface ChatRoomService {
 
     void deleteChatRoom(int roomId, int userId);
 
+    void kickMember(int roomId, int memberId, int adminId);
+
 }

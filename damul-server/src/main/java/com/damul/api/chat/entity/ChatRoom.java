@@ -60,4 +60,12 @@ public class ChatRoom {
     public enum Status {
         ACTIVE, INACTIVE
     }
+
+    public void deactivate() {
+        this.status = Status.INACTIVE;
+    }
+
+    public void activate() {
+        this.status = Status.ACTIVE;
+    }
 }
