@@ -13,7 +13,7 @@ const Header = () => {
             </button>
           </li>
           <li className="flex items-center">
-            <Link to={"/"}>
+            <Link to={"/home"}>
               <img className="w-14" src="/logo.svg" alt="" />
             </Link>
           </li>
