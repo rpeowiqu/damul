@@ -39,6 +39,7 @@ import ChattingStartPage from "@/pages/chat/ChattingStartPage";
 import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPage";
 import ChattingSearchResultPage from "@/pages/chat/ChattingSearchResultPage";
 import ChattingRoomPage from "@/pages/chat/ChattingRoomPage";
+import AlarmPage from "@/pages/alarm/AlarmPage";
 
 const router = createBrowserRouter([
   {
@@ -213,6 +214,10 @@ const router = createBrowserRouter([
       {
         path: "setting",
         element: <SettingPage />,
+      },
+      {
+        path: "alarm",
+        element: <AlarmPage />,
       },
     ],
   },
