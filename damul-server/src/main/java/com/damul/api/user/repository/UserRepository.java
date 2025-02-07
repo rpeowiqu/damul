@@ -23,6 +23,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // 설정 조회
     Optional<User> findById(@Param("id") int userId);
 
+
+    Optional<User> findByEmail(String email);
+
     // 설정 수정
     @Modifying
     @Transactional

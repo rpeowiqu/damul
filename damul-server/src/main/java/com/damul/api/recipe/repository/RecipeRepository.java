@@ -2,6 +2,7 @@ package com.damul.api.recipe.repository;
 
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -114,6 +115,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
 
     // 레시피 상세조회 시 조회수증가
     @Modifying
+    @Transactional
     @Query("UPDATE Recipe r SET r.viewCnt = :viewCount WHERE r.id = :recipeId")
     void updateViewCount(@Param("recipeId") int recipeId, @Param("viewCount") int viewCount);
 }

@@ -42,6 +42,8 @@ public class CustomUserDetails implements OAuth2User {
         return userInfo.getId();
     }
 
+    public String getEmail() { return userInfo.getEmail(); }
+
     public String getNickname() {
         return userInfo.getNickname();
     }

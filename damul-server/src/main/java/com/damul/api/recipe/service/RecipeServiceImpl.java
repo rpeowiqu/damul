@@ -14,9 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.stream.events.Comment;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -114,11 +116,13 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional
     public RecipeDetail getRecipeDetail(int recipeId, int userId) {
         log.info("레시피 상세조회 및 조회수 증가 시작 - recipeId: {}, userId: {}", recipeId, userId);
 
         // 1. Redis에서 조회수 확인 및 증가
         String redisKey = VIEW_COUNT_KEY + recipeId;
+        String userViewKey = VIEW_COUNT_KEY + recipeId + ":user:" + userId;
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
 
 
@@ -131,10 +135,21 @@ public class RecipeServiceImpl implements RecipeService {
             redisTemplate.expire(redisKey, REDIS_DATA_EXPIRE_TIME, TimeUnit.SECONDS);
         }
 
+        // 사용자별 중복 조회 방지
+        Boolean alreadyViewed = redisTemplate.opsForValue().setIfAbsent(
+                userViewKey,
+                "viewed",
+                Duration.ofHours(24) // 24시간 동안 중복 조회 방지
+        );
 
-        // 조회수 증가 (Redis의 atomic increment 사용)
-        Long newViewCount = ops.increment(redisKey);
-        log.info("조회수 증가 - newViewCount: {}", newViewCount);
+        // 처음 조회하는 경우에만 조회수 증가
+        Long newViewCount = null;
+        if (Boolean.TRUE.equals(alreadyViewed)) {
+            newViewCount = ops.increment(redisKey);
+            // 즉시 데이터베이스 업데이트 (소규모 서비스에 적합)
+            recipeRepository.updateViewCount(recipeId, newViewCount.intValue());
+            log.info("조회수 증가 - newViewCount: {}", newViewCount);
+        }
 
         // 2. Recipe 정보 조회
         Recipe recipe = recipeRepository.findById(recipeId)

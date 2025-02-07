@@ -1,5 +1,6 @@
 package com.damul.api.recipe.controller;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
@@ -51,9 +52,10 @@ public class RecipeController {
     // 레시피 상세 조회
     @GetMapping("/{recipeId}")
     public ResponseEntity<RecipeDetail> getRecipe(@PathVariable int recipeId,
-                                                  @CurrentUser User user) {
+                                                  @CurrentUser UserInfo userInfo) {
         log.info("레시피 상세 조회 시작");
-        RecipeDetail detail = recipeService.getRecipeDetail(recipeId, user.getId());
+        int userId = userInfo != null ? userInfo.getId() : 0;
+        RecipeDetail detail = recipeService.getRecipeDetail(recipeId, userId);
         if(detail == null) {
             log.error("레시피 상세 조회 실패 - recipeId: {}", recipeId);
             throw new BusinessException(ErrorCode.BOARD_NOT_FOUND);
