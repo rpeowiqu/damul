@@ -11,6 +11,9 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "리프레시 토큰을 찾을 수 없습니다."),
 
+    // 검색 관련 에러
+    SEARCHTYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "검색타입이 존재하지 않습니다"),
+
     // 중복 관련 에러
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 등록된 이메일입니다."),
 
@@ -20,6 +23,7 @@ public enum ErrorCode {
     // 팔로우 관련 에러
     FOLLOW_ERROR(HttpStatus.BAD_REQUEST, "팔로우 처리 중 오류가 발생했습니다."),
     FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "팔로우 관계가 존재하지 않습니다."),
+
 
 
     // 유저 관련 에러
@@ -33,9 +37,13 @@ public enum ErrorCode {
 
     // 파일 관련 에러
     FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 중 오류가 발생했습니다."),
+    FILE_SIZE_EXCEEDED(HttpStatus.EXPECTATION_FAILED, "파일 사이즈가 너무 큽니다."),
+    INVALID_FILE_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "파일 타입을 확인해주세요."),
+    FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제를 실패하였습니다."),
 
     // 게시글 관련 에러
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다.");
+
 
     private final HttpStatus status;
     private final String message;

@@ -6,8 +6,10 @@ import com.damul.api.auth.entity.type.Role;
 import com.damul.api.user.dto.request.SettingUpdate;
 import jakarta.persistence.*;
 import lombok.*;
-import org.joda.time.DateTime;
-import org.springframework.stereotype.Service;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Entity
 @Builder
@@ -34,17 +36,17 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;         // ENUM
 
-    @Builder.Default
-    private boolean termsAgreed = false;
+    @Column(name = "created_at", updatable = false, columnDefinition = "DATETIME")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    @Column(name = "created_at")
-    private DateTime createdAt;
-
-    @Column(name = "updated_at")
-    private DateTime updatedAt;
+    @Column(name = "updated_at", columnDefinition = "DATETIME")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     @Column(name = "active")
-    private boolean active;
+    @Builder.Default
+    private boolean active = true;
 
     @Column(name = "report_count")
     private int reportCount;
@@ -52,11 +54,14 @@ public class User {
     @Column(name = "self_introduction")
     private String selfIntroduction;
 
-    @Column(name = "access_range")
-    private AccessRange accessRange;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private AccessRange accessRange = AccessRange.PUBLIC;
 
     @Column(name = "warning_enabled")
-    private boolean warningEnabled;
+    @Builder.Default
+    private boolean warningEnabled = true;
 
     public void updateSettings(SettingUpdate settingUpdate) {
         this.nickname = settingUpdate.getNickname();

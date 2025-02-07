@@ -1,12 +1,18 @@
 package com.damul.api.auth.jwt;
 
+import com.damul.api.auth.entity.User;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
@@ -47,8 +53,13 @@ public class JwtTokenProvider {
                 .claim("roles", authentication.getAuthorities()) // 사용자 권한 정보 포함
                 .setIssuedAt(new Date())                        // 토큰 발행 시간
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpire))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)  // HS512 알고리즘으로 암호화
+                .signWith(getSigninKey(), Jwts.SIG.HS512)  // Base64 디코딩 키 사용
                 .compact();
+    }
+
+
+    private SecretKey getSigninKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -79,10 +90,11 @@ public class JwtTokenProvider {
         String email = authentication.getName();
 
         return Jwts.builder()
-                .setSubject(email)    // 사용자 식별자만 포함
-                .setIssuedAt(new Date())                        // 발행 시간
-                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpire))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)  // HS512 알고리즘으로 암호화
+                .setSubject(email)
+                .claim("role", authentication.getAuthorities())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpire))
+                .signWith(getSigninKey(), SignatureAlgorithm.HS512)  // 일관된 키와 알고리즘 사용
                 .compact();
     }
 

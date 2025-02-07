@@ -10,6 +10,13 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
 
+  jpa:
+    hibernate:
+      ddl-auto: none    # 스키마 자동 생성/수정 비활성화
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
   servlet:
     multipart:
       max-file-size: 10MB
@@ -23,12 +30,12 @@ spring:
       credentials:
         access-key: ${AWS_ACCESS_KEY}
         secret-key: ${AWS_SECRET_ACCESS_KEY}
-        s3:
-          bucket: ${AWS_S3_BUCKET}
-        region:
-          static: ap-northeast-2
-        stack:
-          auto: false
+      s3:
+        bucket: ${AWS_S3_BUCKET}
+      region:
+        static: ap-northeast-2
+      stack:
+        auto: false
 
   security:
     admin:
@@ -93,15 +100,15 @@ spring:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
-  jpa:
-    hibernate:
-      ddl-auto: update  # 테이블 변경사항만 반영
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+
+
 
 jwt:
   secret: ${JWT_SECRET}
@@ -119,10 +126,6 @@ redirect:
   frontUrl: ${FRONT_URL}
   main: ${MAIN_URL}
   terms: ${TERMS_URL}
-
-
-file:
-  upload-dir: ${UPLOAD-DIR}
 
 ---
 spring:

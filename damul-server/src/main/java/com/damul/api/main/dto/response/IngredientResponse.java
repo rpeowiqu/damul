@@ -11,6 +11,10 @@ import java.util.List;
 @AllArgsConstructor
 public class IngredientResponse {
 
-    private List<UserIngredientList> userIngredients;
+    private List<UserIngredientList> freezer;
+
+    private List<UserIngredientList> fridge;
+
+    private List<UserIngredientList> roomTemp;
 
 }

@@ -1,0 +1,28 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+
+  jspring:
+    jpa:
+      hibernate:
+        ddl-auto: create  # validate에서 create로 변경
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.MySQL8Dialect
+
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiration: ${JWT_ACCESS_VALIDITY}
+    refresh-token-expiration: ${JWT_REFRESH_VALIDITY}
+    temporary-token-expiration: ${JWT_TEMPORARY_VALIDITY}
+
+logging:
+  level:
+    org.springframework.security: DEBUG
