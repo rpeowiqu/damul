@@ -53,7 +53,10 @@ export const CATEGORYNUMBER: Record<number, CategoryKey> = {
 };
 
 // 카테고리 아이콘
-export const CATEGORY: Record<CategoryKey, React.ComponentType> = {
+export const CATEGORY: Record<
+  CategoryKey,
+  React.ComponentType<{ className?: string }>
+> = {
   grains: GrainsIcon,
   vegetable: VegetableIcon,
   fruit: FruitIcon,

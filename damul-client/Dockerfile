@@ -8,7 +8,7 @@ RUN npm install
 
 # 소스 코드 복사 및 빌드
 COPY . .
-RUN npm run build
+RUN npx vite build
 
 # Production stage
 FROM nginx:alpine
@@ -16,6 +16,9 @@ WORKDIR /usr/share/nginx/html
 
 # 빌드 결과물 복사
 COPY --from=build /app/dist .
+
+# Nginx 설정 파일 복사
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # 포트 설정
 EXPOSE 80
