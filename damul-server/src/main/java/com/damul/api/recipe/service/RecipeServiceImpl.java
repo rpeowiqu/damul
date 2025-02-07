@@ -42,6 +42,9 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public ScrollResponse getRecipes(ScrollRequest scrollRequest, String searchType, String keyword, String orderBy) {
 
+        log.debug("=== Recipe Search Start ===");
+        log.debug("Parameters: cursorId={}, size={}, searchType={}, keyword={}, orderBy={}", scrollRequest.getCursorId(),
+                scrollRequest.getSize(), searchType, keyword, orderBy);
         // 검색어가 있는데 검색 타입이 없는 경우 예외 처리
         if (keyword != null && searchType == null) {
             log.error("검색어는 존재, 검색타입 없음");
@@ -181,7 +184,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         // 6. RecipeDetail 객체 생성 및 반환
         return RecipeDetail.builder()
-                .recipeId(recipe.getRecipeId())
+                .recipeId(recipe.getId())
                 .title(recipe.getTitle())
                 .bookmarked(isBookmarked)
                 .liked(isLiked)

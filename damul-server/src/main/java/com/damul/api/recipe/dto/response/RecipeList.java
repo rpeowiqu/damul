@@ -11,18 +11,38 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class RecipeList implements ScrollCursor {
-    private int recipeId;
+    private int id;
     private String title;
     private String thumbnailUrl;
     private String content;
     private LocalDateTime createdAt;
-    private int authorId;
-    private String authorName;
+    private int userId;
+    private String nickname;
 
     @Override
     public int getId() {
-        return this.recipeId;
+        return this.id;
     }
+
+    // JPQL의 SELECT 절과 정확히 동일한 순서로 생성자 작성
+    public RecipeList(
+            int id,
+            String title,
+            String thumbnailUrl,
+            String content,
+            LocalDateTime createdAt,
+            int userId,         // r.user.id
+            String nickname     // r.user.nickname
+    ) {
+        this.id = id;
+        this.title = title;
+        this.thumbnailUrl = thumbnailUrl;
+        this.content = content;
+        this.createdAt = createdAt;
+        this.userId = userId;
+        this.nickname = nickname;
+    }
+
 }
+

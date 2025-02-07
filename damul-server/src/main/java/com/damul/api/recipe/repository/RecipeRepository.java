@@ -16,13 +16,13 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     // 기본 조회 (정렬, 검색 조건 없음)
     @Query("""
             SELECT new com.damul.api.recipe.dto.response.RecipeList(
-                r.recipeId, r.title, r.thumbnailUrl, r.content, r.createdAt,
+                r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
                 r.user.id, r.user.nickname)
             FROM Recipe r
             JOIN r.user u
             WHERE r.isDeleted = false
-            AND (:cursorId = 0 OR r.recipeId < :cursorId)
-            ORDER BY r.recipeId DESC
+            AND (:cursorId = 0 OR r.id < :cursorId)
+            ORDER BY r.id DESC
             LIMIT :size
             """)
     List<RecipeList> findAllRecipes(
@@ -33,15 +33,15 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     // 검색 조건만 있는 경우
     @Query("""
             SELECT new com.damul.api.recipe.dto.response.RecipeList(
-                r.recipeId, r.title, r.thumbnailUrl, r.content, r.createdAt,
+                r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
                 r.user.id, r.user.nickname)
             FROM Recipe r
             JOIN r.user u
             WHERE r.isDeleted = false
-            AND (:cursorId = 0 OR r.recipeId < :cursorId)
+            AND (:cursorId = 0 OR r.id < :cursorId)
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
                 OR :searchType = 'content' AND (r.title LIKE %:keyword% OR r.content LIKE %:keyword%))
-            ORDER BY r.recipeId DESC
+            ORDER BY r.id DESC
             LIMIT :size
             """)
     List<RecipeList> findBySearch(
@@ -54,23 +54,23 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     // 정렬 조건만 있는 경우
     @Query("""
             SELECT new com.damul.api.recipe.dto.response.RecipeList(
-                r.recipeId, r.title, r.thumbnailUrl, r.content, r.createdAt,
+                r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
                 r.user.id, r.user.nickname)
             FROM Recipe r
             JOIN r.user u
-            LEFT JOIN Recipe prev ON prev.recipeId = :cursorId
+            LEFT JOIN Recipe prev ON prev.id = :cursorId
             WHERE r.isDeleted = false
             AND (:cursorId = 0 OR 
-                ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.recipeId < prev.recipeId)))
-                OR (:orderBy = 'views' AND (r.viewCnt < prev.viewCnt OR (r.viewCnt = prev.viewCnt AND r.recipeId < prev.recipeId)))
-                OR (:orderBy NOT IN ('likes', 'views') AND r.recipeId < :cursorId)))
+                ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
+                OR (:orderBy = 'views' AND (r.viewCnt < prev.viewCnt OR (r.viewCnt = prev.viewCnt AND r.id < prev.id)))
+                OR (:orderBy NOT IN ('likes', 'views') AND r.id < :cursorId)))
             ORDER BY
             CASE 
                 WHEN :orderBy = 'likes' THEN r.likeCnt
                 WHEN :orderBy = 'views' THEN r.viewCnt
-                ELSE r.recipeId
+                ELSE r.id
             END DESC,
-            r.recipeId DESC
+            r.id DESC
             LIMIT :size
             """)
     List<RecipeList> findAllWithOrder(
@@ -82,25 +82,25 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     // 검색 조건과 정렬 조건이 모두 있는 경우
     @Query("""
             SELECT new com.damul.api.recipe.dto.response.RecipeList(
-                r.recipeId, r.title, r.thumbnailUrl, r.content, r.createdAt,
+                r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
                 r.user.id, r.user.nickname)
             FROM Recipe r
             JOIN r.user u
-            LEFT JOIN Recipe prev ON prev.recipeId = :cursorId
+            LEFT JOIN Recipe prev ON prev.id = :cursorId
             WHERE r.isDeleted = false
             AND (:cursorId = 0 OR 
-                ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.recipeId < prev.recipeId)))
-                OR (:orderBy = 'views' AND (r.viewCnt < prev.viewCnt OR (r.viewCnt = prev.viewCnt AND r.recipeId < prev.recipeId)))
-                OR (:orderBy NOT IN ('likes', 'views') AND r.recipeId < :cursorId)))
+                ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
+                OR (:orderBy = 'views' AND (r.viewCnt < prev.viewCnt OR (r.viewCnt = prev.viewCnt AND r.id < prev.id)))
+                OR (:orderBy NOT IN ('likes', 'views') AND r.id < :cursorId)))
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
                 OR :searchType = 'content' AND (r.title LIKE %:keyword% OR r.content LIKE %:keyword%))
             ORDER BY
             CASE 
                 WHEN :orderBy = 'likes' THEN r.likeCnt
                 WHEN :orderBy = 'views' THEN r.viewCnt
-                ELSE r.recipeId
+                ELSE r.id
             END DESC,
-            r.recipeId DESC
+            r.id DESC
             LIMIT :size
             """)
     List<RecipeList> findBySearchWithOrder(
@@ -114,6 +114,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
 
     // 레시피 상세조회 시 조회수증가
     @Modifying
-    @Query("UPDATE Recipe r SET r.viewCnt = :viewCount WHERE r.recipeId = :recipeId")
+    @Query("UPDATE Recipe r SET r.viewCnt = :viewCount WHERE r.id = :recipeId")
     void updateViewCount(@Param("recipeId") int recipeId, @Param("viewCount") int viewCount);
 }
