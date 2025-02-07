@@ -1,5 +1,6 @@
 package com.damul.api.post.dto.response;
 
+import com.damul.api.post.dto.PostStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,5 @@ public class PostList {
     private LocalDateTime createdAt;
     private int authorId;
     private String authorName;
+    private PostStatus postStatus;
 }
