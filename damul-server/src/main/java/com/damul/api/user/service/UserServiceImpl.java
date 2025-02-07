@@ -6,6 +6,7 @@ import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.config.service.S3Service;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
@@ -130,28 +131,18 @@ public class UserServiceImpl implements UserService {
 
         if(keyword == null || keyword.isEmpty()) {
             log.info("검색어 없음 - 전체 조회 시작");
-            userList = userRepository.findUserAll(request.getCursorId(), request.getSize()+1);
+            userList = userRepository.findUserAll(request.getCursorId(), request.getSize() + 1);
         } else {
             log.info("검색어 있음 - 검색어: {}", keyword);
-            userList = userRepository.findUserByNickname(request.getCursorId(), request.getSize()+1, keyword);
+            userList = userRepository.findUserByNickname(request.getCursorId(), request.getSize() + 1, keyword);
         }
 
-        boolean hasNextData = userList.size() > request.getSize();
-        log.info("다음 데이터 존재 여부: {}", hasNextData);
+        // size + 1개를 조회했으므로, 마지막 하나를 제거
+        if (userList.size() > request.getSize()) {
+            userList = userList.subList(0, request.getSize());
+        }
 
-        List<UserList> resultList = hasNextData
-                ? userList.subList(0, request.getSize())
-                : userList;
-
-        int nextCursor = !resultList.isEmpty()
-                ? resultList.get(resultList.size() - 1).getUserId()
-                : request.getCursorId();
-
-
-        return new ScrollResponse<>(
-                resultList,
-                new CursorPageMetaInfo(nextCursor, hasNextData)
-        );
+        return ScrollUtil.createScrollResponse(userList, request);
     }
 
 
