@@ -1,7 +1,7 @@
 import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import Layout from "@/components/common/Layout";
 import LoginPage from "@/pages/login/LoginPage";
-import SignUpPage from "@/pages/signUp/SignUpPage";
+import SignUpPage from "@/pages/Signup/SignUpPage";
 import CommunityRecipeMainPage from "@/pages/community/CommunityRecipeMainPage";
 import CommunityRecipeSearchPage from "@/pages/community/CommunityRecipeSearchPage";
 import CommunityRecipePostPage from "@/pages/community/CommunityRecipePostPage";
@@ -36,9 +36,9 @@ import AdminPostMarketPage from "@/pages/admin/AdminPostMarketPage";
 import ChattingMainPage from "@/pages/chat/ChattingMainPage";
 import ChattingSearchPage from "@/pages/chat/ChattingSearchPage";
 import ChattingStartPage from "@/pages/chat/ChattingStartPage";
+import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPage";
 import ChattingSearchResultPage from "@/pages/chat/ChattingSearchResultPage";
 import ChattingRoomPage from "@/pages/chat/ChattingRoomPage";
-import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPage";
 
 const router = createBrowserRouter([
   {

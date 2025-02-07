@@ -15,8 +15,6 @@ const PostButton = ({ to, icon }: PostButtonProps) => {
         <div className="absolute z-40 flex flex-col items-center w-20 bottom-20 right-0">
           <div>
             <DamulButton
-              variant="round"
-              px={3}
               onClick={() => {
                 navigate(`${to}`);
               }}
