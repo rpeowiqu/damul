@@ -6,9 +6,10 @@ import com.damul.api.recipe.entity.RecipeBookmark;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface RecipeBookmarkRepository extends JpaRepository<RecipeBookmark, Integer> {
-    boolean existsByRecipeAndUser(Recipe recipe, User user);
-
     boolean existsByRecipe_IdAndUser_Id(int recipeId, int userId);
+    Optional<RecipeBookmark> findByRecipe_IdAndUser_Id(int recipeId, int userId);
 }

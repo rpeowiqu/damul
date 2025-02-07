@@ -12,6 +12,7 @@ import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.RecipeDetail;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
+import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.recipe.service.RecipeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecipeController {
     private final RecipeService recipeService;
+    private final RecipeRepository recipeRepository;
 
     // 레시피 검색 및 전체 조회
     @GetMapping
@@ -54,8 +56,7 @@ public class RecipeController {
     public ResponseEntity<RecipeDetail> getRecipe(@PathVariable int recipeId,
                                                   @CurrentUser UserInfo userInfo) {
         log.info("레시피 상세 조회 시작");
-        int userId = userInfo != null ? userInfo.getId() : 0;
-        RecipeDetail detail = recipeService.getRecipeDetail(recipeId, userId);
+        RecipeDetail detail = recipeService.getRecipeDetail(recipeId, userInfo);
         if(detail == null) {
             log.error("레시피 상세 조회 실패 - recipeId: {}", recipeId);
             throw new BusinessException(ErrorCode.BOARD_NOT_FOUND);
@@ -90,13 +91,20 @@ public class RecipeController {
     // 레시피 삭제
     @DeleteMapping("/{recipeId}")
     public ResponseEntity<?> deleteRecipe(@RequestParam int recipeId) {
-        return null;
+        log.info("레시피 삭제 조회 시작 - recipeId: {}", recipeId);
+        recipeService.deleteRecipe(recipeId);
+        log.info("레시피 삭제 성공");
+        return ResponseEntity.ok().build();
     }
 
     // 레시피 좋아요
     @PostMapping("/{recipeId}/likes")
-    public ResponseEntity<?> updateFamous(@PathVariable int recipeId) {
-        return null;
+    public ResponseEntity<?> updateFamous(@PathVariable int recipeId,
+                                          @CurrentUser UserInfo userInfo) {
+        log.info("레시피 좋아요/좋아요취소 요청");
+        boolean isLiked = recipeService.toggleRecipeLike(recipeId, userInfo);
+        log.info("레시피 좋아요/좋아요취소 성공");
+        return ResponseEntity.ok(isLiked);
     }
 
     // 댓글 작성
@@ -106,9 +114,13 @@ public class RecipeController {
     }
 
     // 레시피 북마크 추가/삭제
-    @PostMapping("/{recipeId}/bookmark")
-    public ResponseEntity<?> addBookmark(@PathVariable int recipeId) {
-        return null;
+    @PostMapping("/{recipeId}/bookmarks")
+    public ResponseEntity<?> addBookmark(@PathVariable int recipeId,
+                                         @CurrentUser UserInfo userInfo) {
+        log.info("레시피 북마크 추가/삭제 시작 - recipeId: {}", recipeId);
+        boolean isBookmarked = recipeService.toggleRecipeBookmark(recipeId, userInfo);
+        log.info("레시피 북마크 추가/삭제 완료");
+        return ResponseEntity.ok(isBookmarked);
     }
 
 }

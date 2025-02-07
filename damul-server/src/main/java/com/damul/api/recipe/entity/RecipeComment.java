@@ -23,7 +23,7 @@ public class RecipeComment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
-    private User writer;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -39,7 +39,7 @@ public class RecipeComment {
     private LocalDateTime createdAt;
 
     @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
+    private boolean deleted;
 
     @OneToMany(mappedBy = "parent")
     private List<RecipeComment> children;

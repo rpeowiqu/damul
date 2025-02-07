@@ -1,5 +1,7 @@
 package com.damul.api.recipe.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.auth.entity.User;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
@@ -8,7 +10,10 @@ import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.*;
 import com.damul.api.recipe.entity.Recipe;
+import com.damul.api.recipe.entity.RecipeBookmark;
+import com.damul.api.recipe.entity.RecipeLike;
 import com.damul.api.recipe.repository.*;
+import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,6 +26,7 @@ import javax.xml.stream.events.Comment;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -39,6 +45,9 @@ public class RecipeServiceImpl implements RecipeService {
 
     private static final String VIEW_COUNT_KEY = "recipe:view";
     private static final long REDIS_DATA_EXPIRE_TIME = 60 * 60 * 24; // 24시간
+    private final UserRepository userRepository;
+    private final RecipeLikeRepository recipeLikeRepository;
+    private final RecipeBookmarkRepository recipeBookmarkRepository;
 
     // 레시피 전체 조회 및 검색
     @Override
@@ -117,8 +126,14 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     @Transactional
-    public RecipeDetail getRecipeDetail(int recipeId, int userId) {
-        log.info("레시피 상세조회 및 조회수 증가 시작 - recipeId: {}, userId: {}", recipeId, userId);
+    public RecipeDetail getRecipeDetail(int recipeId, UserInfo userInfo) {
+        log.info("레시피 상세조회 및 조회수 증가 시작 - recipeId: {}, userId: {}", recipeId, userInfo.getId());
+        int userId = checkUserInfo(userInfo);
+        if(userId == 0) {
+            log.error("UserInfo Id값 조회 불가 - userId: {}", userId);
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+
 
         // 1. Redis에서 조회수 확인 및 증가
         String redisKey = VIEW_COUNT_KEY + recipeId;
@@ -139,7 +154,7 @@ public class RecipeServiceImpl implements RecipeService {
         Boolean alreadyViewed = redisTemplate.opsForValue().setIfAbsent(
                 userViewKey,
                 "viewed",
-                Duration.ofHours(24) // 24시간 동안 중복 조회 방지
+                Duration.ofDays(1) // 1일 동안만 유효
         );
 
         // 처음 조회하는 경우에만 조회수 증가
@@ -243,11 +258,47 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public void deleteRecipe(int recipeId) {
-
+        log.info("레시피 삭제 시작 - recipeId: {}", recipeId);
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+        recipeRepository.delete(recipe);
+        log.info("레시피 삭제 완료");
     }
 
+    // 레시피 좋아요
     @Override
-    public void toggleRecipeLike(int recipeId) {
+    public boolean toggleRecipeLike(int recipeId, UserInfo userInfo) {
+        log.info("레시피 좋아요 시작");
+        int userId = checkUserInfo(userInfo);
+        if(userId == 0) {
+            log.error("UserInfo Id값 조회 불가 - userId: {}", userId);
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        log.info("레시피 존재 유무 확인");
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+        log.info("레시피 좋아요 유무 확인");
+        Optional<RecipeLike> recipeLike = recipeLikeRepository.findByRecipe_IdAndUser_Id(recipeId, userId);
+
+        log.info("레시피 존재함");
+        // 좋아요 있으면 삭제 -> 없으면 생성
+        if (recipeLike.isPresent()) {
+            log.info("좋아요 했음 -> 좋아요 취소");
+            recipeLikeRepository.delete(recipeLike.get());
+            return false;
+        } else {
+            log.info("좋아요 추가");
+            RecipeLike newLike = RecipeLike.builder()
+                    .recipe(recipe)
+                    .user(userRepository.getReferenceById(userId))  // 실제 조회 없이 참조만 가져옴
+                    .build();
+            recipeLikeRepository.save(newLike);
+            return true;
+        }
+
+
 
     }
 
@@ -257,7 +308,36 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public void toggleRecipeBookmark(int recipeId) {
+    public boolean toggleRecipeBookmark(int recipeId, UserInfo userInfo) {
+        log.info("레시피 북마크 시작");
+        int userId = checkUserInfo(userInfo);
+        if(userId == 0) {
+            log.error("UserInfo Id값 조회 불가 - userId: {}", userId);
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        log.info("레시피 존재 확인");
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+
+        Optional<RecipeBookmark> recipeBookmark = recipeBookmarkRepository.findByRecipe_IdAndUser_Id(recipeId, userId);
+        
+        log.info("레시피 존재함");
+        // 북마크 있으면 삭제 -> 없으면 생성
+        if (recipeBookmark.isPresent()) {
+            log.info("북마크 했음 -> 북마크 취소");
+            recipeBookmarkRepository.delete(recipeBookmark.get());
+            return false;
+        } else {
+            log.info("북마크 추가");
+            RecipeBookmark newBookmark = RecipeBookmark.builder()
+                    .recipe(recipe)
+                    .user(userRepository.getReferenceById(userId))
+                    .build();
+            recipeBookmarkRepository.save(newBookmark);
+            return true;
+        }
 
     }
 
@@ -269,4 +349,6 @@ public class RecipeServiceImpl implements RecipeService {
     private boolean checkOrderBy(String orderByDir, String orderBy) {
         return orderByDir != null && orderBy != null;
     }
+
+    private int checkUserInfo(UserInfo userInfo) { return userInfo != null ? userInfo.getId() : 0; }
 }
