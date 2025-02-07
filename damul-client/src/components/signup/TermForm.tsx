@@ -78,7 +78,7 @@ const TermsForm = ({ userInput, setUserInput, onNext }: SignUpFormProps) => {
 
   return (
     <div className="px-10">
-      <h1 className="text-xl font-black text-normal-700 mt-36">
+      <h1 className="text-xl font-black text-normal-700 mt-10">
         서비스 이용약관에 동의해 주세요.
       </h1>
 
@@ -133,12 +133,7 @@ const TermsForm = ({ userInput, setUserInput, onNext }: SignUpFormProps) => {
           <p className="text-negative-400 text-sm min-h-5 mt-5">{infoText}</p>
         </div>
 
-        <DamulButton
-          variant="positive"
-          size="full"
-          textSize="base"
-          onClick={() => {}}
-        >
+        <DamulButton type="submit" variant="positive" className="w-full">
           다음
         </DamulButton>
       </form>
@@ -151,12 +146,11 @@ const TermsForm = ({ userInput, setUserInput, onNext }: SignUpFormProps) => {
 
       <DamulModal
         isOpen={isOpen}
-        setIsOpen={() => {
+        onOpenChange={() => {
           if (isOpen) {
             setTermContent("");
           }
         }}
-        triggerComponent={<div></div>}
         contentStyle="max-w-96"
         title="이용약관"
       >

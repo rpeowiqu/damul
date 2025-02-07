@@ -45,7 +45,7 @@ const InfoForm = ({ userInput, setUserInput, onPrev }: SignUpFormProps) => {
 
   return (
     <div className="px-10">
-      <div className="flex gap-5 mt-36">
+      <div className="flex gap-5 mt-10">
         <button
           className="font-black"
           onClick={() => {
@@ -120,12 +120,7 @@ const InfoForm = ({ userInput, setUserInput, onPrev }: SignUpFormProps) => {
           </p>
         </div>
 
-        <DamulButton
-          variant="positive"
-          size="full"
-          textSize="base"
-          onClick={() => {}}
-        >
+        <DamulButton type="submit" variant="positive" className="w-full">
           가입하기
         </DamulButton>
       </form>
