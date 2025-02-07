@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import WriteIcon from "@/components/svg/WriteIcon";
 
 const CommunityRecipeMainPage = () => {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ const CommunityRecipeMainPage = () => {
         </Select>
       </div>
       <FeedList type="community/recipe" />
-      <PostButton to="recipe" />
+      <PostButton to="/community/recipe/post" icon={<WriteIcon />} />
     </main>
   );
 };

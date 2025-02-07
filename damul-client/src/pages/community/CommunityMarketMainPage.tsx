@@ -69,7 +69,7 @@ const CommunityMarketMainPage = () => {
         </Select>
       </div>
       <FeedList type="community/market" />
-      <PostButton to="market" />
+      <PostButton to="/community/market/post" icon={<WriteIcon />} />
     </main>
   );
 };
