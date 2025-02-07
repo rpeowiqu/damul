@@ -1,15 +1,19 @@
 package com.damul.api.recipe.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.auth.entity.User;
+import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.*;
 import com.damul.api.recipe.entity.Recipe;
 import com.damul.api.recipe.entity.RecipeBookmark;
+import com.damul.api.recipe.entity.RecipeComment;
 import com.damul.api.recipe.entity.RecipeLike;
 import com.damul.api.recipe.repository.*;
 import com.damul.api.user.repository.UserRepository;
@@ -23,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.stream.events.Comment;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -139,8 +144,6 @@ public class RecipeServiceImpl implements RecipeService {
         String userViewKey = VIEW_COUNT_KEY + recipeId + ":user:" + userId;
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
 
-
-        log.info("Redis에서 해당 키 찾기 - 키: {}", redisKey);
         // Redis에 해당 키가 없으면 DB에서 조회수를 가져와서 설정
         if (!Boolean.TRUE.equals(redisTemplate.hasKey(redisKey))) {
             Recipe recipe = recipeRepository.findById(recipeId)
@@ -303,9 +306,32 @@ public class RecipeServiceImpl implements RecipeService {
 
     }
 
+    // 댓글 작성
     @Override
-    public void addRecipeComment(int recipeId, Comment comment) {
+    public CreateResponse addRecipeComment(int recipeId, CommentCreate commentCreate, UserInfo userInfo) {
+        log.info("댓글 작성 시작");
+        User user = userRepository.findById(commentCreate.getAuthorId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+        RecipeComment parent = null;
+        if(commentCreate.getParentId() != 0) {
+            parent = recipeCommentRepository.findById(commentCreate.getParentId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.PARENT_ID_NOT_FOUND));
+        }
+
+
+        RecipeComment comment = RecipeComment.builder()
+                .recipe(recipe)
+                .user(user)
+                .parent(parent)
+                .comment(commentCreate.getComment())
+                .build();
+
+        RecipeComment savedComment = recipeCommentRepository.save(comment);
+        return new CreateResponse(savedComment.getId());
     }
 
     @Override

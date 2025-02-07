@@ -2,9 +2,11 @@ package com.damul.api.recipe.controller;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollCursor;
 import com.damul.api.common.user.CurrentUser;
@@ -110,8 +112,14 @@ public class RecipeController {
 
     // 댓글 작성
     @PostMapping("/{recipeId}/comments")
-    public ResponseEntity<?> addComment(@PathVariable int recipeId, @RequestBody Comment comment) {
-        return null;
+    public ResponseEntity<?> addComment(@PathVariable int recipeId,
+                                        @RequestBody CommentCreate comment,
+                                        @CurrentUser UserInfo userInfo) {
+        log.info("레시피 댓글 작성 요청 - recipeId: {}", recipeId);
+        CreateResponse createResponse = recipeService.addRecipeComment(recipeId, comment, userInfo);
+        log.info("레시피 댓글 작성 성공");
+
+        return ResponseEntity.ok(createResponse);
     }
 
     // 레시피 북마크 추가/삭제
