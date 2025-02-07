@@ -20,12 +20,12 @@ const HomeIngredientsRegisterPage = () => {
       </div>
 
       <div className="my-4 flex flex-col gap-4">
-        <div className="flex w-full justify-between">
-          <div>
+        <div className="flex w-full gap-2">
+          <div className="w-full">
             <p>매장명</p>
-            <input type="text" className="border-1" />
+            <input type="text" className="border-1 w-full" />
           </div>
-          <div>
+          <div className="w-full">
             <p>날짜</p>
             <input type="date" className="border-1" />
           </div>
