@@ -1,0 +1,57 @@
+{
+  "followerCount": 450,
+  "followingCount": 328,
+  "selfIntroduction": "요즘들어 집밥이 땡깁니다",
+  "foodPreference": [
+    {
+      "categoryId": 0,
+      "categoryName": "달걀류",
+      "categoryPreference": 50
+    },
+    {
+      "categoryId": 1,
+      "categoryName": "유제품",
+      "categoryPreference": 28
+    },
+    {
+      "categoryId": 2,
+      "categoryName": "과일류",
+      "categoryPreference": 58
+    },
+    {
+      "categoryId": 3,
+      "categoryName": "육류",
+      "categoryPreference": 60
+    },
+    {
+      "categoryId": 4,
+      "categoryName": "채소류",
+      "categoryPreference": 72
+    },
+    {
+      "categoryId": 5,
+      "categoryName": "수산물",
+      "categoryPreference": 83
+    },
+    {
+      "categoryId": 6,
+      "categoryName": "양념류",
+      "categoryPreference": 15
+    },
+    {
+      "categoryId": 7,
+      "categoryName": "기름류",
+      "categoryPreference": 0
+    },
+    {
+      "categoryId": 8,
+      "categoryName": "곡물류",
+      "categoryPreference": 0
+    },
+    {
+      "categoryId": 9,
+      "categoryName": "기타",
+      "categoryPreference": 0
+    }
+  ]
+}

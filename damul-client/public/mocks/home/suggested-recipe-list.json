@@ -1,0 +1,141 @@
+{
+  "userId": 523452345,
+  "suggestedRecipes": [
+    {
+      "recipeId": 66634345,
+      "title": "제육볶음",
+      "thumbnailUrl": "/foodImage.png",
+      "recipeTags": [
+        {
+          "tagId": 235346324235,
+          "tagName": "국민 반찬"
+        },
+        {
+          "tagId": 2353432432466,
+          "tagName": "한끼뚝딱"
+        }
+      ]
+    },
+    {
+      "recipeId": 66634345,
+      "title": "그릴드 치킨 샐러드",
+      "thumbnailUrl": "/그릴드치킨샐러드.jpg",
+      "recipeTags": [
+        {
+          "tagId": 2353465,
+          "tagName": "건강"
+        },
+        {
+          "tagId": 2353466,
+          "tagName": "다이어트"
+        }
+      ]
+    },
+    {
+      "recipeId": 66634346,
+      "title": "스파게티 알리오 올리오",
+      "thumbnailUrl": "/스파게티알리오올리오.jpg",
+      "recipeTags": [
+        {
+          "tagId": 2353467,
+          "tagName": "이탈리안"
+        },
+        {
+          "tagId": 2353468,
+          "tagName": "간단한"
+        }
+      ]
+    },
+    {
+      "recipeId": 66634347,
+      "title": "비빔밥",
+      "thumbnailUrl": "비빔밥.jpg",
+      "recipeTags": [
+        {
+          "tagId": 2353469,
+          "tagName": "한식"
+        },
+        {
+          "tagId": 2353470,
+          "tagName": "매운"
+        }
+      ]
+    },
+    {
+      "recipeId": 66634348,
+      "title": "떡볶이",
+      "thumbnailUrl": "/떡볶이.jpg",
+      "recipeTags": [
+        {
+          "tagId": 2353471,
+          "tagName": "간식"
+        },
+        {
+          "tagId": 2353472,
+          "tagName": "매운"
+        }
+      ]
+    },
+    {
+      "recipeId": 66634349,
+      "title": "샐러드",
+      "thumbnailUrl": "/샐러드.jpg",
+      "recipeTags": [
+        {
+          "tagId": 2353473,
+          "tagName": "건강"
+        },
+        {
+          "tagId": 2353474,
+          "tagName": "다이어트"
+        }
+      ]
+    },
+
+    {
+      "recipeId": 66634351,
+      "title": "된장찌개",
+      "thumbnailUrl": "/된장찌개.jpg",
+      "recipeTags": [
+        {
+          "tagId": 2353477,
+          "tagName": "한식"
+        },
+        {
+          "tagId": 2353478,
+          "tagName": "국물"
+        }
+      ]
+    },
+    {
+      "recipeId": 66634352,
+      "title": "연어 덮밥",
+      "thumbnailUrl": "/연어덮밥.jpg",
+      "recipeTags": [
+        {
+          "tagId": 2353479,
+          "tagName": "일식"
+        },
+        {
+          "tagId": 2353480,
+          "tagName": "간단한"
+        }
+      ]
+    },
+    {
+      "recipeId": 66634353,
+      "title": "불고기",
+      "thumbnailUrl": "/불고기.jpg",
+      "recipeTags": [
+        {
+          "tagId": 2353481,
+          "tagName": "한식"
+        },
+        {
+          "tagId": 2353482,
+          "tagName": "고기"
+        }
+      ]
+    }
+  ]
+}

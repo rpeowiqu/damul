@@ -1,0 +1,53 @@
+{
+  "list": [
+    {
+      "badgeId": 1,
+      "badgeName": "육식 공룡",
+      "badgeLevel": 5,
+      "condition": "육류 식자재 500회 이상 등록",
+      "description": "“육식 공룡은 커다란 머리, 강한 턱, 날카로운 이빨을 주로 사용하였습니다.”"
+    },
+    {
+      "badgeId": 2,
+      "badgeName": "Divider",
+      "badgeLevel": 5,
+      "condition": "나눔 게시글 500회 이상 작성",
+      "description": "“나눔은 여유가 있어야만 할 수 있는게 아니야.”"
+    },
+    {
+      "badgeId": 3,
+      "badgeName": "농부의 피땀을 아는 자",
+      "badgeLevel": 4,
+      "condition": "곡류 식자재 100회 이상 등록",
+      "description": "“밥그릇에 밥알 하나 남기지 않는다.”"
+    },
+    {
+      "badgeId": 4,
+      "badgeName": "포세이돈",
+      "badgeLevel": 3,
+      "condition": "수산물 식자재 50회 이상 등록",
+      "description": "“Under the sea, under the sea~”"
+    },
+    {
+      "badgeId": 5,
+      "badgeName": "넌 부화할 수 없다",
+      "badgeLevel": 2,
+      "condition": "달걀류 식자재 10회 이상 등록",
+      "description": "“단지 껍질 까는 시간조차 아까웠을 뿐이다.”"
+    },
+    {
+      "badgeId": 6,
+      "badgeName": "간장공장공장장",
+      "badgeLevel": 1,
+      "condition": "양념류 1회 이상 등록",
+      "description": "“간장공장공장장이 간ㅈ...그만 하입시다.”"
+    },
+    {
+      "badgeId": 7,
+      "badgeName": "목표키 2m",
+      "badgeLevel": 1,
+      "condition": "유제품 식자재 1회 이상 등록",
+      "description": "“그래서 성장판 오픈일이 언제라구요?”"
+    }
+  ]
+}

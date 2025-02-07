@@ -1,0 +1,57 @@
+{
+  "followerCount": 2335,
+  "followingCount": 3435,
+  "selfIntroduction": "안녕하세요오오오오",
+  "foodPreference": [
+    {
+      "categoryId": 0,
+      "categoryName": "달걀류",
+      "categoryPreference": 31
+    },
+    {
+      "categoryId": 1,
+      "categoryName": "유제품",
+      "categoryPreference": 8
+    },
+    {
+      "categoryId": 2,
+      "categoryName": "과일류",
+      "categoryPreference": 18
+    },
+    {
+      "categoryId": 3,
+      "categoryName": "육류",
+      "categoryPreference": 10
+    },
+    {
+      "categoryId": 4,
+      "categoryName": "채소류",
+      "categoryPreference": 25
+    },
+    {
+      "categoryId": 5,
+      "categoryName": "수산물",
+      "categoryPreference": 20
+    },
+    {
+      "categoryId": 6,
+      "categoryName": "양념류",
+      "categoryPreference": 10
+    },
+    {
+      "categoryId": 7,
+      "categoryName": "기름류",
+      "categoryPreference": 2
+    },
+    {
+      "categoryId": 8,
+      "categoryName": "곡물류",
+      "categoryPreference": 8
+    },
+    {
+      "categoryId": 9,
+      "categoryName": "기타",
+      "categoryPreference": 22
+    }
+  ]
+}
