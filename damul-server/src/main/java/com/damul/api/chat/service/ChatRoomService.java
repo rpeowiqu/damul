@@ -8,10 +8,12 @@ import com.damul.api.common.scroll.dto.response.SearchResponse;
 
 public interface ChatRoomService {
 
-    public ScrollResponse<ChatRoomList> getChatRooms(ScrollRequest request, int userId);
+    ScrollResponse<ChatRoomList> getChatRooms(ScrollRequest request, int userId);
 
-    public SearchResponse<ChatRoomList> searchChatRooms(String keyword, ScrollRequest request, int userId);
+    SearchResponse<ChatRoomList> searchChatRooms(String keyword, ScrollRequest request, int userId);
 
-    public ChatMembersResponse getChatRoomMembers(int roomId);
+    ChatMembersResponse getChatRoomMembers(int roomId);
+
+    void deleteChatRoom(int roomId, int userId);
 
 }

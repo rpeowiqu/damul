@@ -94,6 +94,25 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .build();
     }
 
+    @Override
+    @Transactional
+    public void deleteChatRoom(int roomId, int userId) {
+        log.info("서비스: 채팅방 삭제 시작 - roomId: {}", roomId);
+
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 채팅방입니다."));
+
+        // 채팅방 멤버인지 확인
+        ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
+                .orElseThrow(() -> new IllegalStateException("채팅방 멤버가 아닙니다."));
+
+        // 채팅방 상태를 INACTIVE로 변경
+        chatRoom.setStatus("INACTIVE");
+        chatRoomRepository.save(chatRoom);
+
+        log.info("서비스: 채팅방 삭제 완료 - roomId: {}", roomId);
+    }
+
     private ScrollResponse<ChatRoomList> processRoomResults(List<ChatRoom> rooms, int userId) {
         if (rooms.isEmpty()) {
             return new ScrollResponse<>(Collections.emptyList(),
