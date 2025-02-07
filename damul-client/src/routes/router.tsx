@@ -1,7 +1,7 @@
 import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import Layout from "@/components/common/Layout";
 import LoginPage from "@/pages/login/LoginPage";
-import SignUpPage from "@/pages/Signup/SignUpPage";
+import SignUpPage from "@/pages/signUp/SignUpPage";
 import CommunityRecipeMainPage from "@/pages/community/CommunityRecipeMainPage";
 import CommunityRecipeSearchPage from "@/pages/community/CommunityRecipeSearchPage";
 import CommunityRecipePostPage from "@/pages/community/CommunityRecipePostPage";
@@ -184,6 +184,31 @@ const router = createBrowserRouter([
       {
         path: "community/market/:id/edit",
         element: <CommunityMarketPostPage />,
+      },
+      {
+        path: "chatting",
+        children: [
+          {
+            index: true,
+            element: <ChattingMainPage />,
+          },
+          {
+            path: ":roomId",
+            element: <ChattingRoomPage />,
+          },
+          {
+            path: "search",
+            element: <ChattingSearchPage />,
+          },
+          {
+            path: "search/:keyword",
+            element: <ChattingSearchResultPage />,
+          },
+          {
+            path: "create",
+            element: <ChattingStartPage />,
+          },
+        ],
       },
       {
         path: "setting",
