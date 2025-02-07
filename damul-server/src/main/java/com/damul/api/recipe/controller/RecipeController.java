@@ -83,9 +83,10 @@ public class RecipeController {
     @PutMapping("/{recipeId}")
     public ResponseEntity<?> updateRecipe(@PathVariable int recipeId,
                                           @RequestPart("recipeRequest") RecipeRequest recipeRequest,
-                                          @RequestPart("mainImage") MultipartFile mainImage,
+                                          @RequestPart("thumbnailImage") MultipartFile thumbnailImage,
                                           @RequestPart("cookingImages") List<MultipartFile> cookingImages) {
-        return null;
+        recipeService.updateRecipe(recipeRequest, thumbnailImage, cookingImages);
+        return ResponseEntity.ok().build();
     }
 
     // 레시피 삭제
@@ -122,5 +123,4 @@ public class RecipeController {
         log.info("레시피 북마크 추가/삭제 완료");
         return ResponseEntity.ok(isBookmarked);
     }
-
 }

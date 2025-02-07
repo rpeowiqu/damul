@@ -1,4 +1,4 @@
-package com.damul.api.recipe.dto.response;
+package com.damul.api.common.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CookingOrderList {
-    private int id;
-    private String content;
-    private String imageUrl;
+public class CommentCreate {
+    private int authorId;
+    private String comment;
+    private int parentId;
 }

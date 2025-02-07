@@ -27,11 +27,11 @@ public interface RecipeService {
 
     // 레시피 작성
     void addRecipe(RecipeRequest recipeRequest,
-                   MultipartFile mainImage, List<MultipartFile> cookingImages);
+                   MultipartFile thumbnailImage, List<MultipartFile> cookingImages);
 
     // 레시피 수정
     void updateRecipe(RecipeRequest recipeRequest,
-                      MultipartFile mainImage, List<MultipartFile> cookingImages);
+                      MultipartFile thumbnailImage, List<MultipartFile> cookingImages);
 
     // 레시피 삭제
     void deleteRecipe(int recipeId);

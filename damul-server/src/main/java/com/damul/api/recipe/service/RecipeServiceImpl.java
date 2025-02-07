@@ -1,7 +1,6 @@
 package com.damul.api.recipe.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
-import com.damul.api.auth.entity.User;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
@@ -215,9 +214,9 @@ public class RecipeServiceImpl implements RecipeService {
                 .stream()
                 .map(comment -> CommentList.builder()
                         .id(comment.getId())
-                        .userId(comment.getWriter().getId())
-                        .nickname(comment.getWriter().getNickname())
-                        .profileImageUrl(comment.getWriter().getProfileImageUrl())
+                        .userId(comment.getUser().getId())
+                        .nickname(comment.getUser().getNickname())
+                        .profileImageUrl(comment.getUser().getProfileImageUrl())
                         .comment(comment.getComment())
                         .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
                         .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
@@ -247,12 +246,14 @@ public class RecipeServiceImpl implements RecipeService {
 
     // 레시피 작성
     @Override
-    public void addRecipe(RecipeRequest recipeRequest, MultipartFile mainImage, List<MultipartFile> cookingImages) {
+    public void addRecipe(RecipeRequest recipeRequest, MultipartFile thumbnailImage, List<MultipartFile> cookingImages) {
+        log.info("레시피 작성 시작");
 
     }
 
+    // 레시피 수정
     @Override
-    public void updateRecipe(RecipeRequest recipeRequest, MultipartFile mainImage, List<MultipartFile> cookingImages) {
+    public void updateRecipe(RecipeRequest recipeRequest, MultipartFile thumbnailImage, List<MultipartFile> cookingImages) {
 
     }
 
@@ -351,4 +352,27 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     private int checkUserInfo(UserInfo userInfo) { return userInfo != null ? userInfo.getId() : 0; }
+
+
+    // 이미지 유효성 검사 메서드
+    private void validateImageFile(MultipartFile file) {
+        // 파일 크기 제한 (예: 10MB)
+        if (file.getSize() > 10 * 1024 * 1024) {
+            log.error("파일 사이즈 ERROR - fileSize: {}", file.getSize());
+            throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED);
+        }
+
+        // 파일 이름에서 확장자 추출
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null) {
+            throw new BusinessException(ErrorCode.INVALID_FILE_TYPE);
+        }
+
+        String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+        List<String> allowedExtensions = List.of("jpg", "jpeg", "png", "gif", "bmp", "webp");
+
+        if (!allowedExtensions.contains(extension)) {
+            throw new BusinessException(ErrorCode.INVALID_FILE_TYPE);
+        }
+    }
 }
