@@ -1,5 +1,5 @@
 # Build stage
-FROM registry.baidubce.com/device/paddle-dcu:dtk23.10.1-kylinv10-gcc73-py310
+FROM ccr-2vdh3abv-pub.cnc.bj.baidubce.com/paddlepaddle/paddle:3.0.0b2
 WORKDIR /app
 
 # 기본 패키지 설치
