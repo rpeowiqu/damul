@@ -1,5 +1,5 @@
 # Build stage
-FROM node:latest AS build
+FROM node:22.12.0 AS build
 WORKDIR /app
 
 # 의존성 파일 복사 및 설치
