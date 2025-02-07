@@ -3,7 +3,7 @@ import { Input } from "../ui/input";
 import { Label } from "@radix-ui/react-label";
 import { Textarea } from "../ui/textarea";
 import { isValidNickname } from "@/utils/regex";
-import { SignUpFormProps } from "@/pages/signUp/SignUpPage";
+import { SignUpFormProps } from "@/pages/signup/SignUpPage";
 import DamulButton from "../common/DamulButton";
 
 const InfoForm = ({ userInput, setUserInput, onPrev }: SignUpFormProps) => {
