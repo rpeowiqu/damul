@@ -4,7 +4,7 @@ import { Label } from "../ui/label";
 import DamulButton from "../common/DamulButton";
 import DamulModal from "../common/DamulModal";
 import termList from "@/constants/terms";
-import { SignUpFormProps } from "@/pages/signUp/SignUpPage";
+import { SignUpFormProps } from "@/pages/signup/SignUpPage";
 
 const checkList = [
   {
