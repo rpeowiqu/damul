@@ -20,11 +20,14 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
-    private int authorId;
+    private int postId;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, targetEntity = User.class)
-    @JoinColumn(name = "user_id", updatable = false)
+    @JoinColumn(name = "author_id", updatable = false)
     private User user;
+
+    @Column(length = 255)
+    private String thumbnailUrl;
 
     @Column(length = 200, nullable = false)
     private String title;
