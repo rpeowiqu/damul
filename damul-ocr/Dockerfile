@@ -3,8 +3,7 @@ FROM python:3.9-slim AS build
 WORKDIR /app
 
 # 의존성 파일 복사 및 설치
-COPY ./main.py /app/
-COPY ./requirements.txt /app/
+COPY . /app/
 
 RUN pip install -r requirements.txt
 
