@@ -79,4 +79,15 @@ public class ChatRoomController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/rooms/{roomId}")
+    public ResponseEntity<?> deleteChatRoom(
+            @PathVariable int roomId,
+            @CurrentUser User user) {
+        log.info("컨트롤러: 채팅방 삭제 시작 - roomId: {}", roomId);
+
+        chatRoomService.deleteChatRoom(roomId, user.getId());
+
+        return ResponseEntity.ok().build();
+    }
+
 }

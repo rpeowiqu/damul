@@ -41,11 +41,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         log.info("서비스: 채팅 목록 가져오기 시작");
         List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursor(request.getCursorId(), request.getSize());
 
+        log.info("서비스: 채팅 목록 가져오기 성공");
         return processRoomResults(rooms, userId);
     }
 
     @Override
     public SearchResponse<ChatRoomList> searchChatRooms(String keyword, ScrollRequest request, int userId) {
+        log.info("서비스: 채팅 목록 검색 시작");
         // 검색 결과 조회
         List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursorAndKeyword(
                 request.getCursorId(), keyword, request.getSize());
@@ -55,6 +57,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         // 스크롤 응답 생성
         ScrollResponse<ChatRoomList> scrollResponse = processRoomResults(rooms, userId);
+        log.info("서비스: 채팅 목록 검색 성공");
 
         return new SearchResponse<>(scrollResponse, totalCount);
     }
@@ -83,6 +86,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                             .build();
                 })
                 .collect(Collectors.toList());
+        log.info("서비스: 채팅방 멤버 목록 조회 성공 - roomId: {}", roomId);
 
         return ChatMembersResponse.builder()
                 .content(chatMembers)
