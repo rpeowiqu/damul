@@ -8,7 +8,8 @@ interface IngredientButtonProps {
   name: string;
   quantity: number;
   expirationDate: number;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
+  onClick: MouseEventHandler<HTMLButtonElement>;
+  onEdit: boolean;
 }
 
 const IngredientButton = ({
@@ -17,16 +18,17 @@ const IngredientButton = ({
   quantity,
   expirationDate,
   onClick,
+  onEdit,
 }: IngredientButtonProps) => {
   const IconComponent = CATEGORY[variant];
   return (
     <DamulButton
       onClick={onClick}
-      className={`${expirationDate < 0 && "opacity-40"} bg-white h-full text-black flex items-center justify-center py-2 shadow-md border-1 border-normal-100 rounded-xl hover:bg-normal-100 focus:outline-none`}
+      className={`${expirationDate < 0 && "opacity-40"} bg-white h-full text-black flex items-center justify-center py-2 shadow-md border-1 border-normal-100 rounded-xl hover:bg-normal-100 focus:outline-none ${onEdit && "border-2 border-positive-300"}`}
     >
       <div className="relative">
         {expirationDate <= 7 && expirationDate > 0 && (
-          <AlertCircleIcon className="stroke-negative-500 absolute scale-110 -left-4 bottom-4 z-10" />
+          <AlertCircleIcon className="stroke-negative-500 absolute scale-110 -left-4 bottom-4" />
         )}
       </div>
       <IconComponent className="scale-150" />

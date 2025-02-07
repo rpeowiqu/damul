@@ -10,9 +10,16 @@ import IngredientCategoryFilter from "@/components/home/IngredientCategoryFilter
 import { STORAGE_TYPE } from "@/constants/storage";
 import { ITEM_STATUS } from "@/constants/itemStatus";
 import { IngredientData, Ingredient } from "@/types/Ingredient";
+import IngredientEditOverview from "@/components/home/IngredientEditOverview";
 
 const HomePage = () => {
   const [ingredientData, setIngredientData] = useState<IngredientData>();
+
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const handleEditClick = () => {
+    setIsEditMode((prev) => !prev);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +53,7 @@ const HomePage = () => {
     ["expiringSoon", "freezer", "fridge", "roomTemp"];
 
   return (
-    <div>
+    <div className={`${isEditMode && "pb-32"}`}>
       <UserGreeting />
       <DamulCarousel />
 
@@ -66,11 +73,16 @@ const HomePage = () => {
               key={storage}
               title={storage}
               items={items}
+              onEdit={isEditMode}
             />
           ) : null;
         })}
       </div>
-      <MenuButton />
+      {isEditMode ? (
+        <IngredientEditOverview />
+      ) : (
+        <MenuButton onClick={handleEditClick} setIsEditMode={setIsEditMode} />
+      )}
     </div>
   );
 };

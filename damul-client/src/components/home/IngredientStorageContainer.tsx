@@ -11,6 +11,7 @@ import ConfirmDeleteModal from "./ConfirmDeleteModal";
 interface IngredientStorageContainerProps {
   title: keyof typeof STORAGE_TYPE | keyof typeof ITEM_STATUS;
   items: Ingredient[];
+  onEdit: boolean;
 }
 
 const COLUMN_SIZE = {
@@ -23,6 +24,7 @@ const COLUMN_SIZE = {
 const IngredientStorageContainer = ({
   title,
   items,
+  onEdit,
 }: IngredientStorageContainerProps) => {
   const IconComponent =
     title === "expiringSoon" ? ITEM_STATUS_ICON[title] : STORAGE_ICON[title];
@@ -111,6 +113,7 @@ const IngredientStorageContainer = ({
               quantity={item.ingredientQuantity}
               expirationDate={item.expirationDate}
               onClick={() => handleOnIngredientBtn(item)}
+              onEdit={onEdit}
             />
           );
         })}
