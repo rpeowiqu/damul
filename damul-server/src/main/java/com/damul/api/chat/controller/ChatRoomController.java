@@ -42,8 +42,13 @@ public class ChatRoomController {
     @GetMapping("/{roomId}")
     public ResponseEntity<ScrollResponse<ChatMessage>> getChatMessages(
             @PathVariable int roomId,
-            @RequestBody ScrollRequest scrollRequest) {
-        ScrollResponse<ChatMessage> response = chatMessageService.getChatMessages(roomId, scrollRequest);
+            @RequestBody ScrollRequest scrollRequest,
+            @CurrentUser User user) {
+        ScrollResponse<ChatMessage> response = chatMessageService.getChatMessages(
+                roomId,
+                scrollRequest,
+                user.getId()
+        );
 
         if (response.getData().isEmpty()) {
             return ResponseEntity.noContent().build();

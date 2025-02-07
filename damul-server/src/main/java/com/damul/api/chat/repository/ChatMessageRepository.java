@@ -36,4 +36,26 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
 
     boolean existsByRoomIdAndIdLessThan(int roomId, int id);
 
+    // 첫 로딩을 위한 쿼리
+    @Query("SELECT cm FROM ChatMessage cm WHERE cm.room.id = :roomId " +
+            "AND ((cm.id >= :lastReadId) OR " +  // 마지막 읽은 메시지부터 최신까지
+            "(cm.id < :lastReadId AND cm.id >= :lastReadId - :beforeSize)) " + // 이전 메시지 10개
+            "ORDER BY cm.id DESC")
+    List<ChatMessage> findInitialMessages(
+            @Param("roomId") int roomId,
+            @Param("lastReadId") int lastReadId,
+            @Param("beforeSize") int beforeSize
+    );
+
+    // 스크롤을 위한 이전 메시지 조회
+    @Query("SELECT cm FROM ChatMessage cm " +
+            "WHERE cm.room.id = :roomId AND cm.id < :cursorId " +
+            "ORDER BY cm.id DESC " +
+            "LIMIT :size")
+    List<ChatMessage> findPreviousMessages(
+            @Param("roomId") int roomId,
+            @Param("cursorId") int cursorId,
+            @Param("size") int size
+    );
+
 }
