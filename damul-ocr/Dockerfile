@@ -15,7 +15,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # 빌드 스테이지에서 설치된 패키지 복사
-COPY --from=build /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=build /root/.local /root/.local
 COPY --from=build /app .
 
 # 환경변수 설정
