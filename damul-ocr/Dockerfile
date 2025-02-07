@@ -1,5 +1,5 @@
 # Build stage
-FROM python:3.9-slim AS build
+FROM registry.baidubce.com/device/paddle-dcu:dtk23.10.1-kylinv10-gcc73-py310
 WORKDIR /app
 
 # 기본 패키지 설치
