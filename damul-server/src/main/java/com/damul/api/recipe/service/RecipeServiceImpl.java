@@ -57,6 +57,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         // 1. 기본 전체 조회
         if (!hasSearch && !hasOrder) {
+            log.info("기본 전체 조회");
             recipes = recipeRepository.findAllRecipes(
                     scrollRequest.getCursorId(),
                     scrollRequest.getSize() + 1
@@ -64,6 +65,7 @@ public class RecipeServiceImpl implements RecipeService {
         }
         // 2. 검색어만 있는 경우
         else if (hasSearch && !hasOrder) {
+            log.info("검색어만 존재");
             recipes = recipeRepository.findBySearch(
                     scrollRequest.getCursorId(),
                     scrollRequest.getSize() + 1,
@@ -74,6 +76,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         // 3. 정렬 조건만 있는 경우
         else if (!hasSearch && hasOrder) {
+            log.info("정렬 조건만 존재");
             recipes = recipeRepository.findAllWithOrder(
                     scrollRequest.getCursorId(),
                     scrollRequest.getSize() + 1,
@@ -83,6 +86,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         // 4. 검색어와 정렬 조건이 모두 있는 경우
         else {
+            log.info("모두 존재");
             recipes = recipeRepository.findBySearchWithOrder(
                     scrollRequest.getCursorId(),
                     scrollRequest.getSize() + 1,
@@ -94,6 +98,16 @@ public class RecipeServiceImpl implements RecipeService {
 
         if (recipes.size() > scrollRequest.getSize()) {
             recipes = recipes.subList(0, scrollRequest.getSize());
+        }
+
+        if (recipes.isEmpty()) {
+            log.debug("No recipes found in JPA query result");
+        } else {
+            log.debug("Found {} recipes in JPA query", recipes.size());
+            log.debug("First recipe data: id={}, title={}, userId={}",
+                    recipes.get(0).getId(),
+                    recipes.get(0).getTitle(),
+                    recipes.get(0).getUserId());
         }
 
         return ScrollUtil.createScrollResponse(recipes, scrollRequest);

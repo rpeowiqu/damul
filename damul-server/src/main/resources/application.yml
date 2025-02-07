@@ -121,6 +121,8 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.type: trace
     org.springframework.security: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.damul.api.recipe: DEBUG    # 레시피 관련 패키지 로깅
 
 redirect:
   frontUrl: ${FRONT_URL}

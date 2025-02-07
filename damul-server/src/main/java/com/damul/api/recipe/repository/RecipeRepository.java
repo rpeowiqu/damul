@@ -15,12 +15,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
 
     // 기본 조회 (정렬, 검색 조건 없음)
     @Query("""
-            SELECT new com.damul.api.recipe.dto.response.RecipeList(
+            SELECT DISTINCT new com.damul.api.recipe.dto.response.RecipeList(
                 r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
                 r.user.id, r.user.nickname)
             FROM Recipe r
             JOIN r.user u
-            WHERE r.isDeleted = false
+            WHERE r.deleted = false
             AND (:cursorId = 0 OR r.id < :cursorId)
             ORDER BY r.id DESC
             LIMIT :size
@@ -37,7 +37,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
                 r.user.id, r.user.nickname)
             FROM Recipe r
             JOIN r.user u
-            WHERE r.isDeleted = false
+            WHERE r.deleted = false
             AND (:cursorId = 0 OR r.id < :cursorId)
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
                 OR :searchType = 'content' AND (r.title LIKE %:keyword% OR r.content LIKE %:keyword%))
@@ -59,7 +59,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             FROM Recipe r
             JOIN r.user u
             LEFT JOIN Recipe prev ON prev.id = :cursorId
-            WHERE r.isDeleted = false
+            WHERE r.deleted = false
             AND (:cursorId = 0 OR 
                 ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
                 OR (:orderBy = 'views' AND (r.viewCnt < prev.viewCnt OR (r.viewCnt = prev.viewCnt AND r.id < prev.id)))
@@ -87,7 +87,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             FROM Recipe r
             JOIN r.user u
             LEFT JOIN Recipe prev ON prev.id = :cursorId
-            WHERE r.isDeleted = false
+            WHERE r.deleted = false
             AND (:cursorId = 0 OR 
                 ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
                 OR (:orderBy = 'views' AND (r.viewCnt < prev.viewCnt OR (r.viewCnt = prev.viewCnt AND r.id < prev.id)))
