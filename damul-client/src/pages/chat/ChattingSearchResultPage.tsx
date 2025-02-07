@@ -22,8 +22,8 @@ const ChattingSearchResultPage = () => {
           }}
           className="cursor-pointer"
         />
-        <div className="flex items-center text-sm gap-1">
-          <p className="text-positive-500">"{keyword}"</p>
+        <div className="flex items-center text-sm pc:text-md gap-1">
+          <p className="text-positive-500 pc:text-lg">"{keyword}"</p>
           <p>에 대한</p>
           {mockData.cnt}개의 검색 결과
         </div>

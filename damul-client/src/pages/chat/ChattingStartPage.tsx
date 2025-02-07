@@ -93,7 +93,7 @@ const ChattingStartPage = () => {
         </button>
       </div>
 
-      <div className="space-y-4 mt-8">
+      <div className="space-y-2 mt-8">
         {mockData.data.map((user) => (
           <div
             key={user.id}

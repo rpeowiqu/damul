@@ -20,7 +20,7 @@ const ChattingListItem = ({
   unReadNum,
   keyword,
 }: ChattingListItemProps) => {
-  const highlightTitle = (title: string, keyword?: string) => {
+  const highlightTitle = (title: string) => {
     if (!keyword) return title;
 
     const regex = new RegExp(`(${keyword})`, "gi"); // 대소문자 구분 없이 keyword에 맞는 부분 찾기
@@ -43,7 +43,7 @@ const ChattingListItem = ({
       <div className="flex w-full justify-between">
         <div className="flex flex-col text-start justify-between">
           <div className="flex text-sm gap-1">
-            <p className="line-clamp-1">{highlightTitle(title, keyword)}</p>
+            <p className="line-clamp-1">{highlightTitle(title)}</p>
             <p>({memberNum})</p>
           </div>
           <p className="text-xs text-neutral-600 line-clamp-1">{lastMessage}</p>
