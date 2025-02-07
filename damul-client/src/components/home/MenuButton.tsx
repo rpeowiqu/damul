@@ -28,22 +28,22 @@ const MenuButton = () => {
   return (
     <div className="fixed w-full flex justify-end bottom-0 max-w-[600px]">
       <div ref={menuRef} className="relative">
-        <div className="absolute z-40 flex flex-col items-center w-20 bottom-20 right-5">
-          <div>
+        <div className="absolute z-40 flex flex-col items-center w-12 bottom-20 right-5">
+          <div className="flex justify-center w-full">
             <DamulButton
               variant="shadow"
               onClick={() => {
                 setIsOpen((preState) => !preState);
               }}
+              className="w-full"
             >
               <MenuIcon className="scale-150" />
             </DamulButton>
           </div>
-          <div className="mt-1 text-center text-xxs">식자재 정리하기</div>
         </div>
 
         <div
-          className={`absolute z-50 border-1 p-1 bg-white rounded-xl shadow-md bottom-32 right-16 flex ${!isOpen && "hidden"}`}
+          className={`absolute z-50 border-1 p-1 bg-white rounded-xl shadow-md bottom-28 right-14 flex ${!isOpen && "hidden"}`}
         >
           <button
             onClick={() => navigate("/home/register")}

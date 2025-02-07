@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import DamulButton from "../common/DamulButton";
-import WriteIcon from "../svg/WriteIcon";
 
 interface PostButtonProps {
   to: string;
+  icon: JSX.Element;
 }
 
-const PostButton = ({ to }: PostButtonProps) => {
+const PostButton = ({ to, icon }: PostButtonProps) => {
   const navigate = useNavigate();
 
   return (
@@ -15,8 +15,6 @@ const PostButton = ({ to }: PostButtonProps) => {
         <div className="absolute z-40 flex flex-col items-center w-20 bottom-20 right-0">
           <div>
             <DamulButton
-              variant="round"
-              px={3}
               onClick={() => {
                 navigate(`${to}`);
               }}
