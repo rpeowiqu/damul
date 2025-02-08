@@ -1,4 +1,3 @@
-import { removeCookie } from "@/utils/cookies";
 import { apiClient, apiRequest } from "./http";
 
 export const adminLogin = async (provider: string) => {
@@ -8,10 +7,6 @@ export const adminLogin = async (provider: string) => {
 export const logout = async () => {
   return apiRequest(
     () => apiClient.post("/auth/admin/logout"),
-    () => {
-      removeCookie("accessToken");
-      removeCookie("refreshToken");
-    },
     (error) => {
       if (error.status === 401) {
         console.log("401에러");
