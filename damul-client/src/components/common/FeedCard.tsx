@@ -3,20 +3,22 @@ import Image from "./Image";
 
 interface FeedCardProps {
   id: number;
-  title?: string;
-  description?: string;
-  date?: string;
-  author?: string;
-  image?: string;
+  title: string;
+  thumbnailUrl: string;
+  content: string;
+  createdAt: string;
+  authorId: number;
+  authorname: string;
 }
 
 const FeedCard = ({
   id,
   title,
-  description,
-  date,
-  author,
-  image,
+  thumbnailUrl,
+  content,
+  createdAt,
+  authorId,
+  authorname
 }: FeedCardProps) => {
   const location = useLocation();
   const { pathname } = location;
@@ -38,15 +40,15 @@ const FeedCard = ({
         pathTo(id);
       }}
     >
-      <Image src={image} alt="썸네일 이미지" className="rounded-s-lg" />
+      <Image src={thumbnailUrl} alt="썸네일 이미지" className="rounded-s-lg" />
       <div className="flex flex-col justify-between flex-1 p-2">
         <div className="text-left">
           <h3 className="font-bold line-clamp-1">{title}</h3>
-          <p className="text-xs pc:text-sm line-clamp-2">{description}</p>
+          <p className="text-xs pc:text-sm line-clamp-2">{content}</p>
         </div>
         <div className="flex justify-between pt-2 text-xxs pc:text-xs text-normal-500">
-          <span>{date}</span>
-          <span>{author}</span>
+          <span>{createdAt}</span>
+          <span>{authorname}</span>
         </div>
       </div>
     </div>

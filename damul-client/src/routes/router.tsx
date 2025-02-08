@@ -153,7 +153,7 @@ const router = createBrowserRouter([
                 element: <CommunityMarketSearchPage />,
               },
               {
-                path: "search/:keyword",
+                path: "search/result",
                 element: <CommunitySearchResultPage />,
               },
             ],
@@ -166,7 +166,7 @@ const router = createBrowserRouter([
         element: <CommunityRecipePostPage />,
       },
       {
-        path: "community/recipe/:id",
+        path: "community/recipe/:recipeId",
         element: <CommunityRecipeDetailPage />,
       },
       {

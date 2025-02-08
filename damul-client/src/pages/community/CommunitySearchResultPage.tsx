@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import FeedList from "@/components/common/FeedList";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import {
@@ -14,22 +14,37 @@ import {
 import { Switch } from "@/components/ui/switch";
 
 const CommunitySearchResultPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [sortType, setSortType] = useState("latest");
+  const [filterActive, setFlterActive] = useState(false);
   const navigate = useNavigate();
-  const { keyword } = useParams<{ keyword: string }>();
+
+  // 특정 쿼리 값 가져오기
+  const keyword = searchParams.get("keyword") || "";
+  const searchType = searchParams.get("searchType");
+  const orderBy = searchParams.get("orderBy");
+
+
+  const addSortParams = () => {
+    searchParams.set("orderBy", sortType);
+    setSearchParams(searchParams);
+  };
+
+  useEffect(() => {
+    addSortParams();
+  }, [sortType]);
+
   const location = useLocation();
 
   // 현재 URL에서 마지막 `/` 이후의 부분을 제거하여 base path 생성
   const basePath = location.pathname.replace(/\/[^/]+$/, "").replace(/^\//, "");
-
-  const [sortType, setSortType] = useState("latest");
-  const [filterActive, setFlterActive] = useState(false);
 
   return (
     <main className="h-full px-4 py-6 pc:px-6 space-y-2">
       <div className="flex-grow">
         <DamulSearchBox
           placeholder={keyword}
-          onInputClick={() => navigate(basePath)}
+          onInputClick={() => navigate(`/${basePath}`)}
           className="cursor-pointer"
         />
       </div>
