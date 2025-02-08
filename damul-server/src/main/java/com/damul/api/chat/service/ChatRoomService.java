@@ -1,8 +1,11 @@
 package com.damul.api.chat.service;
 
+import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
+import com.damul.api.chat.dto.response.ChatRoomLimitResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
 
@@ -17,5 +20,11 @@ public interface ChatRoomService {
     void deleteChatRoom(int roomId, int userId);
 
     void kickMember(int roomId, int memberId, int adminId);
+
+    CreateResponse enterChatRoom(int roomId, ChatRoomEntryExitCreate request);
+
+    CreateResponse createDirectChatRoom(int targetUserId, int currentUserId);
+
+    ChatRoomLimitResponse updateMemberLimit(int roomId, int newLimit, int userId);
 
 }
