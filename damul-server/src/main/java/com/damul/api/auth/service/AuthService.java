@@ -101,9 +101,8 @@ public class AuthService {
 
             // 4. 유저 정보 파싱 및 저장
             User user = objectMapper.readValue(jsonString, User.class);
-            user.builder()
-                    .nickname(signupRequest.getNickname())
-                    .selfIntroduction(signupRequest.getSelfIntroduction());
+            user.setNickname(signupRequest.getNickname());
+            user.setSelfIntroduction(signupRequest.getSelfIntroduction());
 
             User savedUser = authRepository.save(user);
 

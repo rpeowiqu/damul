@@ -126,23 +126,18 @@ public class UserServiceImpl implements UserService {
 
     // 사용자 목록 조회 및 검색
     @Override
-    public ScrollResponse<UserList> getSearchUserList(ScrollRequest request, String keyword) {
-        List<UserList> userList;
+    public UserList getSearchUserList(String keyword) {
+        UserList userList;
 
         if(keyword == null || keyword.isEmpty()) {
             log.info("검색어 없음 - 전체 조회 시작");
-            userList = userRepository.findUserAll(request.getCursorId(), request.getSize() + 1);
+            userList = userRepository.findUser();
         } else {
             log.info("검색어 있음 - 검색어: {}", keyword);
-            userList = userRepository.findUserByNickname(request.getCursorId(), request.getSize() + 1, keyword);
+            userList = userRepository.findUserByNickname(keyword);
         }
 
-        // size + 1개를 조회했으므로, 마지막 하나를 제거
-        if (userList.size() > request.getSize()) {
-            userList = userList.subList(0, request.getSize());
-        }
-
-        return ScrollUtil.createScrollResponse(userList, request);
+        return userList;
     }
 
 

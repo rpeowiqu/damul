@@ -1,21 +1,29 @@
 package com.damul.api.common.user.resolver;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.common.user.CustomUserDetails;
+import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.Optional;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
+    private final UserRepository userRepository;
 
     /**
      * 주어진 파라미터가 이 리졸버에 의해 처리될 수 있는지 확인합니다.
@@ -28,7 +36,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         // 2. parameter.getParameterType().equals(User.class): 파라미터의 타입이 User 클래스인지 확인
         // 두 조건이 모두 만족해야 이 리졸버가 해당 파라미터를 처리
         return parameter.hasParameterAnnotation(CurrentUser.class)
-                && parameter.getParameterType().equals(User.class);
+                && parameter.getParameterType().equals(UserInfo.class); // User 대신 UserInfo로 변경
     }
 
 
@@ -48,18 +56,31 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 
         // SecurityContext에서 현재 인증 정보를 가져옴
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Authentication 객체: {}", authentication);
+        log.info("Principal 타입: {}", authentication.getPrincipal().getClass());
+        log.info("Authentication Details: {}", authentication.getDetails());
+
         if (authentication == null) {
             return null;
         }
 
 
+        // 인증된 사용자의 이메일 또는 식별자 추출
+        String userIdentifier = authentication.getName();
 
-        // Principal이 CustomUserDetails 타입인지 확인하고
-        // CustomUserDetails에서 User 객체를 추출하여 반환
-        if (authentication.getPrincipal() instanceof CustomUserDetails) {
-            return ((CustomUserDetails) authentication.getPrincipal()).getUserInfo();
+        // 데이터베이스에서 사용자 정보 조회
+        Optional<User> userOptional = userRepository.findByEmail(userIdentifier);
+
+
+        if (userOptional.isEmpty()) {
+            log.warn("해당 이메일로 사용자를 찾을 수 없음: {}", userIdentifier);
+            return null;
         }
 
-        return null; // CustomUserDetails가 아닌 경우 null 반환
+        User user = userOptional.get();
+        log.info("찾은 사용자 정보 - ID: {}, Email: {}, Nickname: {}",
+                user.getId(), user.getEmail(), user.getNickname());
+
+        return new UserInfo(user.getId(), user.getEmail(), user.getNickname());
     }
 }
