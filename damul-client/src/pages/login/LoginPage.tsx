@@ -41,8 +41,7 @@ const LoginPage = () => {
           <KakaoIcon className="absolute w-6 left-12 top-2" />
           <DamulButton
             variant="shadow"
-            size="full"
-            textSize="base"
+            className="w-full"
             onClick={onClickKakaoLogin}
           >
             카카오로 시작하기
@@ -53,8 +52,7 @@ const LoginPage = () => {
           <GoogleIcon className="absolute w-6 left-12 top-2" />
           <DamulButton
             variant="shadow"
-            size="full"
-            textSize="base"
+            className="w-full"
             onClick={onClickGoogleLogin}
           >
             구글로 시작하기
@@ -65,8 +63,7 @@ const LoginPage = () => {
           <NaverIcon className="absolute w-6 left-12 top-2" />
           <DamulButton
             variant="shadow"
-            size="full"
-            textSize="base"
+            className="w-full"
             onClick={onClickNaverLogin}
           >
             네이버로 시작하기
