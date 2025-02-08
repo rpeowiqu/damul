@@ -5,5 +5,6 @@ public enum MessageType {
     IMAGE,
     FILE,
     ENTER,
-    LEAVE
+    LEAVE,
+    SYSTEM
 }
