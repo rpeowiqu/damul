@@ -54,4 +54,32 @@ public class ChatMessage {
         return message;
     }
 
+    public static ChatMessage createMessage(ChatRoom room, User sender, String content, MessageType messageType) {
+        ChatMessage message = new ChatMessage();
+        message.room = room;
+        message.sender = sender;
+        message.content = content;
+        message.messageType = messageType;
+        return message;
+    }
+
+    // ENTER, LEAVE 메시지용 팩토리 메서드
+    public static ChatMessage createEnterMessage(ChatRoom room, User sender) {
+        ChatMessage message = new ChatMessage();
+        message.room = room;
+        message.sender = sender;
+        message.messageType = MessageType.ENTER;
+        message.content = sender.getNickname() + "님이 입장하셨습니다.";
+        return message;
+    }
+
+    public static ChatMessage createLeaveMessage(ChatRoom room, User sender) {
+        ChatMessage message = new ChatMessage();
+        message.room = room;
+        message.sender = sender;
+        message.messageType = MessageType.LEAVE;
+        message.content = sender.getNickname() + "님이 퇴장하셨습니다.";
+        return message;
+    }
+
 }
