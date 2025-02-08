@@ -48,7 +48,6 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
                 if (!jwtTokenProvider.validateToken(accessToken) &&
                         jwtTokenProvider.validateToken(refreshToken)) {
                     log.info("토큰 재발급 시작");
-                    // ... 나머지 코드
                 }
             }
         } catch (Exception e) {
