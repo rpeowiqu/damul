@@ -66,15 +66,15 @@ const AuthorInfo = ({
           </div>
         )}
       </div>
-      <div className="flex gap-2 justify-end">
-        <div className="flex items-center gap-0.5 cursor-pointer">
+      <div className="flex justify-end">
+        <div className="flex items-center gap-0.5 cursor-pointer mr-2">
           <ReportButton className="flex items-center gap-0.5 cursor-pointer">
             <ReportIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5" />
             <p className="text-xs pc:text-sm">신고하기</p>
           </ReportButton>
         </div>
         <div
-          className="flex items-center gap-0.5 cursor-pointer"
+          className="flex items-center gap-0.5 cursor-pointer mr-1"
           onClick={() => {
             navigate(`/community/${type}/${recipeId}/edit`);
           }}
@@ -83,8 +83,8 @@ const AuthorInfo = ({
           <p className="text-xs pc:text-sm">수정하기</p>
         </div>
         <div className="flex items-center gap-0 cursor-pointer">
-          <DeleteIcon className="w-3 h-3 pc:w-6 pc:h-6 fill-neutral-700 pb-0.5" />
-          <p className="text-xs pc:text-sm ">삭제</p>
+          <DeleteIcon className="w-5 h-5 pc:w-7 pc:h-7 fill-neutral-700 pb-0.5" />
+          <p className="text-xs pc:text-sm ">삭제하기</p>
         </div>
       </div>
     </div>

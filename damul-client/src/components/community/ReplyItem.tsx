@@ -22,7 +22,7 @@ const ReplyItem = ({ reply, onReply }: ReplyItemProps) => {
         onClick={() => onReply(reply)}
       >
         <ReportButton className="flex items-center gap-1">
-          <p className="text-xs">신고하기</p>
+          <p className="text-xs">신고</p>
         </ReportButton>
         <div className="flex items-center gap-1">
           <p className="text-xs">답글</p>
