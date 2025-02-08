@@ -16,7 +16,6 @@ interface ButtonProps {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   children?: ReactNode;
   disabled?: boolean;
-  required?: boolean;
 }
 
 const DamulButton = ({
