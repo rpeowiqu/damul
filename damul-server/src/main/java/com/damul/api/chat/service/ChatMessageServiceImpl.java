@@ -1,5 +1,6 @@
 package com.damul.api.chat.service;
 
+import com.damul.api.chat.dto.response.UnReadResponse;
 import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.entity.ChatRoomMember;
 import com.damul.api.chat.repository.ChatMessageRepository;
@@ -37,6 +38,17 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
         log.info("서비스: 채팅 메시지 조회 성공 - roomId: {}", roomId);
         return createScrollResponse(messages, roomId);
+    }
+
+    @Override
+    public UnReadResponse getUnreadMessageCount(int userId) {
+        log.info("서비스: 전체 안 읽은 메시지 수 조회 시작 - userId: {}", userId);
+
+        int unreadCount = chatMessageRepository.countAllUnreadMessages(userId);
+
+        log.info("서비스: 전체 안 읽은 메시지 수 조회 완료 - count: {}", unreadCount);
+
+        return new UnReadResponse(unreadCount);
     }
 
     private ChatRoomMember validateAndGetMember(int roomId, int userId) {

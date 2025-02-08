@@ -1,12 +1,15 @@
 package com.damul.api.chat.controller;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
+import com.damul.api.chat.dto.response.UnReadResponse;
 import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.service.ChatMessageService;
 import com.damul.api.chat.service.ChatRoomService;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
 import com.damul.api.common.user.CurrentUser;
@@ -105,6 +108,30 @@ public class ChatRoomController {
         chatRoomService.kickMember(roomId, memberId, user.getId());
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/unreads")
+    public ResponseEntity<UnReadResponse> getUnreadMessages(@CurrentUser User user) {
+        log.info("컨트롤러: 전체 안 읽은 메시지 수 조회 시작 - userId: {}", user.getId());
+
+        UnReadResponse response = chatMessageService.getUnreadMessageCount(user.getId());
+
+        if (response.getUnReadMessageNum() == 0) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/rooms/{roomId}")
+    public ResponseEntity<CreateResponse> enterChatRoom(
+            @PathVariable int roomId,
+            @RequestBody ChatRoomEntryExitCreate request) {
+        log.info("컨트롤러: 채팅방 입장 요청 - roomId: {}", roomId);
+
+        CreateResponse response = chatRoomService.enterChatRoom(roomId, request);
+
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -2,6 +2,7 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MessageType;
+import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.response.ChatMember;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
@@ -12,10 +13,12 @@ import com.damul.api.chat.repository.ChatMessageRepository;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
 import com.damul.api.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -155,6 +158,49 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         log.info("서비스: 채팅방 멤버 추방 완료 - roomId: {}, memberId: {}", roomId, memberId);
     }
+
+    @Override
+    public CreateResponse enterChatRoom(int roomId, ChatRoomEntryExitCreate request) {
+        log.info("서비스: 채팅방 입장 시작 - roomId: {}, userId: {}", roomId, request.getId());
+
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 채팅방입니다."));
+
+        if (chatRoom.getStatus() == ChatRoom.Status.INACTIVE) {
+            throw new IllegalStateException("비활성화된 채팅방입니다.");
+        }
+
+        if (chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, request.getId())) {
+            throw new IllegalStateException("이미 채팅방에 참여중입니다.");
+        }
+
+        int currentMemberCount = chatRoomMemberRepository.countMembersByRoomId(roomId);
+        if (currentMemberCount >= chatRoom.getMemberLimit()) {
+            throw new IllegalStateException("채팅방 인원이 가득 찼습니다.");
+        }
+
+        User user = userRepository.getReferenceById(request.getId());
+
+        ChatMessage lastMessage = chatMessageRepository
+                .findFirstByRoomIdOrderByCreatedAtDesc(roomId)
+                .orElse(null);
+
+        int lastMessageId = lastMessage != null ? lastMessage.getId() : 0;
+
+        ChatRoomMember newMember = ChatRoomMember.create(
+                chatRoom,
+                user,
+                request.getNickname(),
+                lastMessageId
+        );
+
+        chatRoomMemberRepository.save(newMember);
+
+        log.info("서비스: 채팅방 입장 완료 - roomId: {}, userId: {}", roomId, request.getId());
+
+        return new CreateResponse(roomId);
+    }
+
 
     private void createSystemMessage(ChatRoom chatRoom, String content) {
         ChatMessage systemMessage = ChatMessage.createSystemMessage(chatRoom, content);

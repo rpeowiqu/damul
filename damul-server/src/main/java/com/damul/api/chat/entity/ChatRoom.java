@@ -18,9 +18,9 @@ public class ChatRoom {
     @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private User creator;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", referencedColumnName = "id")
-    private Post post;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "post_id", referencedColumnName = "id")
+//    private Post post;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

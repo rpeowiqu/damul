@@ -47,4 +47,13 @@ public class ChatRoomMember {
         lastReadMessageId = 0;
     }
 
+    public static ChatRoomMember create(ChatRoom room, User user, String nickname, Integer lastReadMessageId) {
+        ChatRoomMember member = new ChatRoomMember();
+        member.room = room;
+        member.user = user;
+        member.nickname = nickname;
+        member.lastReadMessageId = lastReadMessageId;
+        return member;
+    }
+
 }
