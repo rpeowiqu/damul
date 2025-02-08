@@ -18,9 +18,9 @@ public class ChatRoom {
     @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private User creator;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", referencedColumnName = "id")
-    private Post post;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "post_id", referencedColumnName = "id")
+//    private Post post;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,5 +67,18 @@ public class ChatRoom {
 
     public void activate() {
         this.status = Status.ACTIVE;
+    }
+
+    public void updateMemberLimit(int newLimit) {
+        this.memberLimit = newLimit;
+    }
+
+    public static ChatRoom createDirectRoom(User creator, String roomName) {
+        ChatRoom room = new ChatRoom();
+        room.creator = creator;
+        room.roomName = roomName;
+        room.roomType = RoomType.PRIVATE;
+        room.memberLimit = 2;
+        return room;
     }
 }

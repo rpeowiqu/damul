@@ -58,4 +58,11 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
             @Param("size") int size
     );
 
+    // 안 읽은 메세지 수 전체 조회
+    @Query("SELECT SUM(CASE WHEN cm.id > crm.lastReadMessageId THEN 1 ELSE 0 END) " +
+            "FROM ChatMessage cm " +
+            "JOIN ChatRoomMember crm ON cm.room = crm.room " +
+            "WHERE crm.user.id = :userId")
+    int countAllUnreadMessages(@Param("userId") int userId);
+
 }

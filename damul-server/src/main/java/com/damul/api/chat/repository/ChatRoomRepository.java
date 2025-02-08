@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
@@ -59,5 +60,25 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
             AND (:keyword IS NULL OR cr.room_name LIKE CONCAT('%', :keyword, '%'))
             """, nativeQuery = true)
     int countByKeyword(@Param("keyword") String keyword);
+
+    @Query("""
+            SELECT cr FROM ChatRoom cr
+            WHERE cr.roomType = 'PRIVATE'
+            AND cr.status = 'ACTIVE'
+            AND EXISTS (
+                SELECT crm1 FROM ChatRoomMember crm1
+                WHERE crm1.room = cr
+                AND crm1.user.id = :userId1
+            )
+            AND EXISTS (
+                SELECT crm2 FROM ChatRoomMember crm2
+                WHERE crm2.room = cr
+                AND crm2.user.id = :userId2
+            )
+            """)
+    Optional<ChatRoom> findExistingDirectChatRoom(
+            @Param("userId1") int userId1,
+            @Param("userId2") int userId2
+    );
 
 }

@@ -37,4 +37,7 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
             "WHERE m.room.id = :roomId AND m.user.id = :userId AND m.role = 'ADMIN'")
     boolean isAdmin(@Param("roomId") int roomId, @Param("userId") int userId);
 
+    @Query("SELECT COUNT(crm) FROM ChatRoomMember crm WHERE crm.room.id = :roomId")
+    int countMembersByRoomId(@Param("roomId") int roomId);
+
 }
