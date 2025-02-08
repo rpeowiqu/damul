@@ -22,4 +22,6 @@ public interface ChatRoomService {
 
     CreateResponse enterChatRoom(int roomId, ChatRoomEntryExitCreate request);
 
+    CreateResponse createDirectChatRoom(int targetUserId, int currentUserId);
+
 }

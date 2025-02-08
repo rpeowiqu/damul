@@ -134,4 +134,16 @@ public class ChatRoomController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/direct/{userId}")
+    public ResponseEntity<CreateResponse> createDirectChatRoom(
+            @PathVariable int userId,
+            @CurrentUser User currentUser) {
+        log.info("컨트롤러: 1:1 채팅방 생성 시작 - targetUserId: {}, currentUserId: {}",
+                userId, currentUser.getId());
+
+        CreateResponse response = chatRoomService.createDirectChatRoom(userId, currentUser.getId());
+
+        return ResponseEntity.ok(response);
+    }
+
 }

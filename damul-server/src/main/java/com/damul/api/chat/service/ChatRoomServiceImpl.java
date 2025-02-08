@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -201,6 +202,50 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return new CreateResponse(roomId);
     }
 
+    @Override
+    public CreateResponse createDirectChatRoom(int targetUserId, int currentUserId) {
+        log.info("서비스: 1:1 채팅방 생성 시작 - targetUserId: {}, currentUserId: {}",
+                targetUserId, currentUserId);
+
+        // 자기 자신과의 채팅방 생성 방지
+        if (targetUserId == currentUserId) {
+            throw new IllegalArgumentException("자기 자신과 채팅할 수 없습니다.");
+        }
+
+        // 이미 존재하는 1:1 채팅방 확인
+        Optional<ChatRoom> existingRoom = chatRoomRepository
+                .findExistingDirectChatRoom(currentUserId, targetUserId);
+
+        if (existingRoom.isPresent()) {
+            log.info("서비스: 이미 존재하는 채팅방 반환 - roomId: {}", existingRoom.get().getId());
+            return new CreateResponse(existingRoom.get().getId());
+        }
+
+        // 대화 상대 존재 확인
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+
+        User currentUser = userRepository.getReferenceById(currentUserId);
+
+        // 채팅방 생성
+        ChatRoom newRoom = ChatRoom.createDirectRoom(
+                currentUser,
+                String.format("%s,%s의 대화방", currentUser.getNickname(), targetUser.getNickname())
+        );
+
+        ChatRoom savedRoom = chatRoomRepository.save(newRoom);
+
+        // 채팅방 멤버 추가
+        ChatRoomMember currentMember = ChatRoomMember.create(savedRoom, currentUser, currentUser.getNickname(), 0);
+        ChatRoomMember targetMember = ChatRoomMember.create(savedRoom, targetUser, targetUser.getNickname(), 0);
+
+        chatRoomMemberRepository.save(currentMember);
+        chatRoomMemberRepository.save(targetMember);
+
+        log.info("서비스: 1:1 채팅방 생성 완료 - roomId: {}", savedRoom.getId());
+
+        return new CreateResponse(savedRoom.getId());
+    }
 
     private void createSystemMessage(ChatRoom chatRoom, String content) {
         ChatMessage systemMessage = ChatMessage.createSystemMessage(chatRoom, content);

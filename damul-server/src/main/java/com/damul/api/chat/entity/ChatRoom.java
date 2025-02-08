@@ -68,4 +68,13 @@ public class ChatRoom {
     public void activate() {
         this.status = Status.ACTIVE;
     }
+
+    public static ChatRoom createDirectRoom(User creator, String roomName) {
+        ChatRoom room = new ChatRoom();
+        room.creator = creator;
+        room.roomName = roomName;
+        room.roomType = RoomType.PRIVATE;
+        room.memberLimit = 2;
+        return room;
+    }
 }
