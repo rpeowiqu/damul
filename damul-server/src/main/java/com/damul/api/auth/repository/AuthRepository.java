@@ -13,7 +13,8 @@ public interface AuthRepository extends JpaRepository<User, Integer> {
     boolean existsByEmail(String email);
 // SELECT EXISTS(SELECT 1 FROM user WHERE email = ?) 쿼리 자동 생성
 
-    @Query("SELECT u.id, u.nickname FROM User u WHERE u.email = :email")
+    @Query("SELECT new com.damul.api.auth.dto.response.UserInfo(u.id, u.email, u.nickname) " +
+            "FROM User u WHERE u.email = :email")
     Optional<UserInfo> findByEmail(String email);
     // SELECT * FROM user WHERE email = ? 쿼리 자동 생성
 

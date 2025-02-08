@@ -49,7 +49,7 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
         LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
             AND ui.userReciept.user.id = :userId
             AND ui.isDeleted = false
-        WHERE r.isDeleted = false
+        WHERE r.deleted = false
         GROUP BY r.id
         HAVING COUNT(DISTINCT ui.userIngredientId) > 0
         ORDER BY COUNT(DISTINCT ui.userIngredientId) * 1.0 / COUNT(DISTINCT ri.id) DESC,

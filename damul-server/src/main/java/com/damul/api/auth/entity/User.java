@@ -23,6 +23,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "INT AUTO_INCREMENT")
     private int id;
+
+    @Setter
     private String nickname;
     private String email;
     private String profileImageUrl;
@@ -51,6 +53,7 @@ public class User {
     @Column(name = "report_count")
     private int reportCount;
 
+    @Setter
     @Column(name = "self_introduction")
     private String selfIntroduction;
 
