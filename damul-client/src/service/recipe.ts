@@ -1,5 +1,9 @@
 import { apiClient, apiRequest } from "./http";
 
+// 임시 토큰
+const token =
+  "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6eXUyMkBuYXZlci5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzkwMzA1OTMsImV4cCI6MTczOTAzNDE5M30.vDe5LdwLAmEjd3Ir_vxjCSKvYkkDWn3YKENU2a3qoYELejh5c0Y5lKkssg0LlICAmPwQnR7pb2ehTF_iFHvRrA";
+
 // 레시피 검색 및 전체조회
 export const getRecipes = async ({
   cursor = "0",
@@ -34,14 +38,7 @@ export const getRecipes = async ({
 
 // 레시피 상세조회
 export const getRecipeDetail = async (recipeId: string | undefined) => {
-  return apiRequest(() =>
-    apiClient.get(`/recipes/${recipeId}`, {
-      headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqMnkybDJAbmF2ZXIuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzM5MDIzNzYwLCJleHAiOjE3MzkwMjM3OTB9.7EkxUBDtvMgyw3VMOjZqC0jE3QFBI8KaqQBQL6xm1OsITnzum_cz1uvatp9fGQynz4V-4Y-wUX4DL_IWr7zOWw",
-      },
-    }),
-  );
+  return apiRequest(() => apiClient.get(`/recipes/${recipeId}`));
 };
 
 // 인기 레시피 조회
@@ -52,4 +49,9 @@ export const getPoppularRecipes = async () => {
 // 레시피 작성
 export const postRecipe = async () => {
   return apiRequest(() => apiClient.post("recipes"));
+};
+
+// 레시피 좋아요
+export const postRecipeLike = async (recipeId: string | undefined) => {
+  return apiRequest(() => apiClient.post(`recipes/${recipeId}/likes`));
 };

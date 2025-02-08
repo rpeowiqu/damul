@@ -6,6 +6,7 @@ import ReportIcon from "../svg/ReportIcon";
 import WriteIcon from "../svg/WriteIcon";
 import DeleteIcon from "../svg/DeleteIcon";
 import ReportButton from "../common/ReportButton";
+import { postRecipeLike } from "@/service/recipe";
 
 interface AuthorInfoProps {
   profileImageUrl: string;
@@ -14,7 +15,7 @@ interface AuthorInfoProps {
   likeCnt?: number;
   isLiked?: boolean;
   type: string;
-  id: number;
+  recipeId: string;
 }
 const AuthorInfo = ({
   profileImageUrl,
@@ -23,9 +24,18 @@ const AuthorInfo = ({
   likeCnt,
   isLiked,
   type,
-  id,
+  recipeId,
 }: AuthorInfoProps) => {
   const navigate = useNavigate();
+
+  const likeRecipe = async () => {
+    try {
+      const response = await postRecipeLike(recipeId);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex flex-col h-auto p-2">
@@ -41,11 +51,14 @@ const AuthorInfo = ({
                 <ViewIcon className="w-4 h-4 stroke-neutral-700" />
                 <p className="text-xs text-neutral-700">{viewCnt}</p>
               </div>
-              <div className="flex items-center gap-1 cursor-pointer">
+              <div
+                onClick={() => likeRecipe()}
+                className="flex items-center gap-1 cursor-pointer"
+              >
                 {isLiked ? (
-                  <LikesIcon className="w-4 h-4 fill-positive-300  stroke-neutral-700" />
+                  <LikesIcon className="w-5 h-5 fill-positive-300  stroke-neutral-700" />
                 ) : (
-                  <LikesIcon className="w-4 h-4   stroke-neutral-700" />
+                  <LikesIcon className="w-5 h-5   stroke-neutral-700" />
                 )}
                 <p className="text-xs text-neutral-700">{likeCnt}</p>
               </div>
@@ -63,7 +76,7 @@ const AuthorInfo = ({
         <div
           className="flex items-center gap-0.5 cursor-pointer"
           onClick={() => {
-            navigate(`/community/${type}/${id}/edit`);
+            navigate(`/community/${type}/${recipeId}/edit`);
           }}
         >
           <WriteIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5" />

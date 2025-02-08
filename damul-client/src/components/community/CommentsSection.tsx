@@ -10,7 +10,7 @@ interface CommentsSectionProps {
   type?: string;
 }
 const CommentsSection = ({
-  comments,
+  comments = [],
   onReply,
   currentMemberNum,
   maxMemberSize,

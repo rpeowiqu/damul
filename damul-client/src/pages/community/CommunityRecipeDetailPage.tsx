@@ -29,11 +29,11 @@ interface Comment {
   profileImageUrl: string;
   comment: string;
   createdAt: string;
-  parentId?: number; // 대댓글이 아닌 경우에는 없을 수 있으므로 optional로 설정
+  parentId?: number;
 }
 
 interface RecipeDetail {
-  id: number;
+  recipeId: string;
   title: string;
   isBookmarked: boolean;
   isLiked: boolean;
@@ -55,83 +55,37 @@ const CommunityRecipeDetailPage = () => {
   const [comment, setComment] = useState<string>("");
   const { recipeId } = useParams();
 
-  const [mockData, setMockData] = useState<RecipeDetail>({
-    id: 1,
-    title: "일본 현지 돈가스 만들기",
-    isBookmarked: true,
+  const initialRecipeDetail: RecipeDetail = {
+    recipeId: "0",
+    title: "",
+    isBookmarked: false,
     isLiked: false,
-    createdAt: "2024-01-19 23:23",
-    authorId: 2,
-    authorName: "요리사서히인데요",
-    profileImageUrl: "string",
-    viewCnt: 152,
-    likeCnt: 32,
-    content:
-      "돈가스는 오스트리아의 슈니첼을 원형으로, 서양의 커틀릿에서 유래한 일본 요리입니다. 돈가스는 오스트리아의 슈니첼을 원형으로, 서양의 커틀릿에서 유래한 일본 요리입니다.",
-    contentImageUrl: "string",
-    ingredients: [
-      { id: 1, name: "당근", amount: "1/2", unit: "개" },
-      { id: 2, name: "상추", amount: "100", unit: "g" },
-      { id: 3, name: "진간장", amount: "2", unit: "T" },
-    ],
-    cookingOrders: [
-      { id: 1, content: "당근 준비하숑", imageUrl: "string" },
-      { id: 2, content: "당근을 자릅니다", imageUrl: "string" },
-      { id: 3, content: "당근을 볶아요 아주그냥 볶아요", imageUrl: "string" },
-    ],
-    comments: [
-      {
-        id: 1,
-        userId: 1,
-        nickname: "요리사서히",
-        profileImageUrl: "string",
-        comment:
-          "우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당",
-        createdAt: "2025-01-29",
-      },
-      {
-        id: 2,
-        userId: 2,
-        nickname: "토마토러버전종우",
-        profileImageUrl: "string",
-        comment: "인정하는 부분",
-        parentId: 1,
-        createdAt: "2025-01-30",
-      },
-      {
-        id: 3,
-        userId: 1,
-        nickname: "요리사서히",
-        profileImageUrl: "string",
-        comment:
-          "우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당",
-        createdAt: "2025-01-29",
-      },
-      {
-        id: 4,
-        userId: 2,
-        nickname: "토마토러버전종우",
-        profileImageUrl: "string",
-        comment: "인정하는 부분",
-        parentId: 1,
-        createdAt: "2025-01-30",
-      },
-    ],
-  });
+    createdAt: "",
+    authorId: 0,
+    authorName: "",
+    profileImageUrl: "",
+    viewCnt: 0,
+    likeCnt: 0,
+    content: "",
+    contentImageUrl: "",
+    ingredients: [],
+    cookingOrders: [],
+    comments: [],
+  };
+
+  const [data, setData] = useState<RecipeDetail>(initialRecipeDetail);
+
   const fetchRecipeDetail = async () => {
     try {
       const response = await getRecipeDetail(recipeId);
-
-      if (response && response.data) {
-        setMockData(response.data as RecipeDetail);
-      }
+      console.log(response);
+      setData(response?.data as RecipeDetail);
     } catch (error) {
-      console.error("Failed to fetch recipe detail:", error);
+      console.error(error);
     }
   };
 
   useEffect(() => {
-    console.log(recipeId);
     fetchRecipeDetail();
   }, []);
 
@@ -143,29 +97,29 @@ const CommunityRecipeDetailPage = () => {
     <div className="flex">
       <main className="relative flex flex-col justify-center w-full text-center p-5 pc:p-6 mb-12">
         <CommunityDetailHeader
-          title={mockData.title}
-          createdAt={mockData.createdAt}
-          isBookmarked={mockData.isBookmarked}
+          title={data.title}
+          createdAt={data.createdAt}
+          isBookmarked={data.isBookmarked}
           type="recipe"
         />
         <AuthorInfo
-          profileImageUrl={mockData.profileImageUrl}
-          authorName={mockData.authorName}
-          viewCnt={mockData.viewCnt}
-          likeCnt={mockData.likeCnt}
-          isLiked={mockData.isLiked}
-          id={mockData.id}
+          profileImageUrl={data.profileImageUrl}
+          authorName={data.authorName}
+          viewCnt={data.viewCnt}
+          likeCnt={data.likeCnt}
+          isLiked={data.isLiked}
+          recipeId={data.recipeId}
           type="recipe"
         />
         <ContentSection
-          contentImageUrl={mockData.contentImageUrl}
-          content={mockData.content}
+          contentImageUrl={data.contentImageUrl}
+          content={data.content}
           type="recipe"
         />
-        <IngredientsSection ingredients={mockData.ingredients} />
-        <CookingOrdersSection cookingOrders={mockData.cookingOrders} />
+        <IngredientsSection ingredients={data.ingredients} />
+        <CookingOrdersSection cookingOrders={data.cookingOrders} />
         <CommentsSection
-          comments={mockData.comments}
+          comments={data.comments}
           onReply={(comment) => setReplyingTo(comment)}
           type="recipe"
         />
