@@ -43,8 +43,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     // 사용자 조회
     @Query("SELECT new com.damul.api.user.dto.response.UserList(u.id, u.profileImageUrl, u.nickname) " +
-            "FROM User u ")
-    UserList findUser();
+            "FROM User u " +
+            "WHERE u.nickname =:nickname")
+    UserList findUser(@Param("nickname") String nickname);
 
     // 사용자 검색
     @Query("SELECT new com.damul.api.user.dto.response.UserList(u.id, u.profileImageUrl, u.nickname) " +

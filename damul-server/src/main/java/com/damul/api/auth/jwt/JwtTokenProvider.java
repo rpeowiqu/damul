@@ -50,10 +50,10 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(email)    // 사용자 식별자로 이메일 사용
-                .claim("roles", authentication.getAuthorities()) // 사용자 권한 정보 포함
+                .claim("role", authentication.getAuthorities()) // 사용자 권한 정보 포함
                 .setIssuedAt(new Date())                        // 토큰 발행 시간
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpire))
-                .signWith(getSigninKey(), Jwts.SIG.HS512)  // Base64 디코딩 키 사용
+                .signWith(getSigninKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -93,7 +93,7 @@ public class JwtTokenProvider {
                 .setSubject(email)
                 .claim("role", authentication.getAuthorities())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpire))
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpire))
                 .signWith(getSigninKey(), SignatureAlgorithm.HS512)  // 일관된 키와 알고리즘 사용
                 .compact();
     }
@@ -131,10 +131,10 @@ public class JwtTokenProvider {
      */
     public Claims getClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .verifyWith(getSigninKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     /**
@@ -147,19 +147,13 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .setSigningKey(jwtSecret)
+                    .verifyWith(getSigninKey())  // verifyWith 사용
                     .build()
-                    .parseClaimsJws(token);
+                    .parseSignedClaims(token);   // parseSignedClaims 사용
             return true;
-        } catch (MalformedJwtException e) {
-            log.error("잘못된 JWT 토큰");
-        } catch (ExpiredJwtException e) {
-            log.error("만료된 JWT 토큰");
-        } catch (UnsupportedJwtException e) {
-            log.error("지원되지 않는 JWT 토큰");
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string이 비어있음");
+        } catch (Exception e) {
+            log.error("토큰 검증 실패", e);
+            return false;
         }
-        return false;
     }
 }
