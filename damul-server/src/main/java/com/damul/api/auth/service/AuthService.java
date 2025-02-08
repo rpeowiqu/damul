@@ -96,7 +96,7 @@ public class AuthService {
             log.info("Redis에서 가져온 JSON 문자열: {}", jsonString);
 
             if (jsonString == null) {
-                throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+                throw new BusinessException(ErrorCode.USER_FORBIDDEN);
             }
 
             // 4. 유저 정보 파싱 및 저장
@@ -198,7 +198,7 @@ public class AuthService {
 
         // 비밀번호 검증
         if (!BCrypt.checkpw(request.getPassword(), hashedAdminPassword)) {
-            throw new BusinessException(ErrorCode.ADMIN_NOT_FOUND);
+            throw new BusinessException(ErrorCode.ADMIN_FORBIDDEN);
         }
 
         // 인증 객체 생성

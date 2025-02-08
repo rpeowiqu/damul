@@ -13,7 +13,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class CookieUtil {
-    public void addCookie(HttpServletResponse response, String name,  String value, int maxAge) {
+    public void addCookie(HttpServletResponse response, String name,  String value, long maxAge) {
         log.debug("쿠키 생성 시작 - 이름: {}, 만료시간: {}초", name, maxAge);
 
 

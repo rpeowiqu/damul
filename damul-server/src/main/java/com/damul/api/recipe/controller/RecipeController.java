@@ -35,7 +35,8 @@ public class RecipeController {
 
     // 레시피 검색 및 전체 조회
     @GetMapping
-    public ResponseEntity<?> getAllRecipes(@RequestBody ScrollRequest scrollRequest,
+    public ResponseEntity<?> getAllRecipes(@RequestParam int cursor,
+                                           @RequestParam int size,
                                            @RequestParam(required = false) String searchType,
                                            @RequestParam(required = false) String keyword,
                                            @RequestParam(required = false) String orderBy) {
@@ -43,7 +44,7 @@ public class RecipeController {
         log.info("검색타입 - searchType: {}, 검색어 - keyword: {} " + searchType, keyword);
         log.info("정렬 조건 - orderBy: {} " + orderBy);
 
-        ScrollResponse<RecipeList> scrollResponse = recipeService.getRecipes(scrollRequest, searchType, keyword, orderBy);
+        ScrollResponse<RecipeList> scrollResponse = recipeService.getRecipes(cursor, size, searchType, keyword, orderBy);
         if(scrollResponse.getData() == null || scrollResponse.getData().isEmpty()) {
             log.info("레시피 검색 및 전체 조회 완료 - 데이터 없음");
             return ResponseEntity.noContent().build();

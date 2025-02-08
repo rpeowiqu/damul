@@ -61,12 +61,14 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         log.info("Authentication Details: {}", authentication.getDetails());
 
         if (authentication == null) {
+            log.error("Authentication is null");
             return null;
         }
 
 
         // 인증된 사용자의 이메일 또는 식별자 추출
         String userIdentifier = authentication.getName();
+        log.info("userIdentifier: {}", userIdentifier);
 
         // 데이터베이스에서 사용자 정보 조회
         Optional<User> userOptional = userRepository.findByEmail(userIdentifier);

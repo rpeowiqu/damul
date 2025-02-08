@@ -52,7 +52,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2Response oAuth2Response = getOAuth2Response(registrationId, oAuth2User.getAttributes());
         log.info("OAuth2Response after mapping - email: {}", oAuth2Response.getEmail());
 
-        Optional<UserInfo> existingUser = authRepository.findByEmail(oAuth2Response.getEmail());
+        Optional<User> existingUser = authRepository.findByEmail(oAuth2Response.getEmail());
 
         if (existingUser.isEmpty()) {
             log.info("CustomOAuth2UserService, 신규 회원입니다.");
@@ -105,8 +105,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         log.info("기존 유저입니다.");
-        UserInfo userInfo = existingUser.get();
-
+        User user = existingUser.get();
+        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getNickname());
+        log.info("조회된 사용자: id={}, email={}, nickname={}",
+                user.getId(), user.getEmail(), user.getNickname());
         // DefaultOAuth2User 대신 CustomUserDetails 반환
         return new CustomUserDetails(
                 userInfo,
