@@ -10,7 +10,36 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
 
+  jpa:
+    hibernate:
+      ddl-auto: none    # 스키마 자동 생성/수정 비활성화
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  main:
+    allow-bean-definition-overriding: true
+
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+      s3:
+        bucket: ${AWS_S3_BUCKET}
+      region:
+        static: ap-northeast-2
+      stack:
+        auto: false
+
   security:
+    admin:
+      password: ${ADMIN_PASSWORD}
     oauth2:
       client:
         registration:
@@ -39,13 +68,13 @@ spring:
             client-name: KAKAO
             client-id: ${KAKAO_CLIENT_ID}
             client-secret: ${KAKAO_CLIENT_SECRET}
+            redirect-uri: ${KAKAO_REDIRECT_URL}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
             scope:
               - profile_nickname
               - account_email
               - profile_image
-            authorization-grant-type: authorization_code
-            redirect-uri: ${KAKAO_REDIRECT_URL}
-            client-authentication-method: POST
 
         provider:
           google:
@@ -64,22 +93,22 @@ spring:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: response
+            user-name-attribute: id
 
   datasource:
     driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
-  jpa:
-    hibernate:
-      ddl-auto: update  # 테이블 변경사항만 반영
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+
+
 
 jwt:
   secret: ${JWT_SECRET}
@@ -92,6 +121,13 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.type: trace
     org.springframework.security: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.damul.api.recipe: DEBUG    # 레시피 관련 패키지 로깅
+
+redirect:
+  frontUrl: ${FRONT_URL}
+  main: ${MAIN_URL}
+  terms: ${TERMS_URL}
 
 ---
 spring:

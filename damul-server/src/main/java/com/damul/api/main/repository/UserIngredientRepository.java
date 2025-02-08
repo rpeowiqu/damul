@@ -36,7 +36,7 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
     @Query("SELECT new com.damul.api.main.dto.response.HomeIngredientDetail(" +
             "ui.userIngredientId, ui.categoryId, ui.ingredientQuantity, " +
             "ui.ingredientUp, ui.ingredientName, " +
-            "FUNCTION('DATEDIFF', DATE(ui.dueDate), CURRENT_DATE)) " +
+            "CAST(FUNCTION('DATEDIFF', DATE(ui.dueDate), CURRENT_DATE) AS int)) " +
             "FROM UserIngredient ui " +
             "WHERE ui.userIngredientId = :ingredientId " +
             "AND ui.isDeleted = false")
@@ -44,13 +44,13 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
 
     @Query("""
         SELECT DISTINCT r FROM Recipe r
-        LEFT JOIN FETCH RecipeTag rt ON rt.recipe.recipeId = r.recipeId
-        JOIN RecipeIngredient ri ON ri.recipe.recipeId = r.recipeId
+        LEFT JOIN FETCH RecipeTag rt ON rt.recipe.id = r.id
+        JOIN RecipeIngredient ri ON ri.recipe.id = r.id
         LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
             AND ui.userReciept.user.id = :userId
             AND ui.isDeleted = false
-        WHERE r.isDeleted = false
-        GROUP BY r.recipeId
+        WHERE r.deleted = false
+        GROUP BY r.id
         HAVING COUNT(DISTINCT ui.userIngredientId) > 0
         ORDER BY COUNT(DISTINCT ui.userIngredientId) * 1.0 / COUNT(DISTINCT ri.id) DESC,
                  r.likeCnt * 0.3 DESC

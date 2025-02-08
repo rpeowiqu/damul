@@ -1,12 +1,15 @@
 package com.damul.api.auth.entity;
 
+import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.auth.entity.type.Provider;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.user.dto.request.SettingUpdate;
 import jakarta.persistence.*;
 import lombok.*;
-import org.joda.time.DateTime;
-import org.springframework.stereotype.Service;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Entity
 @Builder
@@ -20,6 +23,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "INT AUTO_INCREMENT")
     private int id;
+
+    @Setter
     private String nickname;
     private String email;
     private String profileImageUrl;
@@ -33,38 +38,40 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;         // ENUM
 
+    @Column(name = "created_at", updatable = false, columnDefinition = "DATETIME")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", columnDefinition = "DATETIME")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    @Column(name = "active")
     @Builder.Default
-    private boolean termsAgreed = false;
-
-    @Column(name = "created_at")
-    private DateTime createdAt;
-
-    @Column(name = "updated_at")
-    private DateTime updatedAt;
-
-    @Column(name = "is_active")
-    private boolean isActive;
+    private boolean active = true;
 
     @Column(name = "report_count")
     private int reportCount;
 
+    @Setter
     @Column(name = "self_introduction")
     private String selfIntroduction;
 
-    @Column(name = "is_fridge_public", nullable = false)
-    private boolean isFridgePublic;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private AccessRange accessRange = AccessRange.PUBLIC;
 
-    @Column(name = "is_warning", nullable = false)
-    private boolean warning;
-
+    @Column(name = "warning_enabled")
+    @Builder.Default
+    private boolean warningEnabled = true;
 
     public void updateSettings(SettingUpdate settingUpdate) {
         this.nickname = settingUpdate.getNickname();
         this.selfIntroduction = settingUpdate.getSelfIntroduction();
         this.profileImageUrl = settingUpdate.getProfileImageUrl();
-        this.profileBackgroundImageUrl = settingUpdate.getProfileBackgroundImageUrl();
-        this.isFridgePublic = settingUpdate.isFridgeVisible();
-        this.warning = settingUpdate.isWarningEnabled();
+        this.profileBackgroundImageUrl = settingUpdate.getBackgroundImageUrl();
+        this.accessRange = settingUpdate.getAccessRange();
+        this.warningEnabled = settingUpdate.isWarningEnabled();
     }
-
 }

@@ -1,12 +1,10 @@
 package com.damul.api.user.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.damul.api.auth.entity.type.AccessRange;
+import lombok.*;
 
 @Getter
-@Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class SettingUpdate {
@@ -14,7 +12,7 @@ public class SettingUpdate {
     private String nickname;
     private String selfIntroduction;
     private String profileImageUrl;
-    private String profileBackgroundImageUrl;
-    private boolean fridgeVisible;
+    private String backgroundImageUrl;
+    private AccessRange accessRange;
     private boolean warningEnabled;
 }

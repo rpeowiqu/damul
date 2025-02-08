@@ -2,12 +2,14 @@ package com.damul.api.post.dto.response;
 
 import com.damul.api.post.dto.PostStatus;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostList {

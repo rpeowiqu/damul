@@ -2,19 +2,20 @@ package com.damul.api.user.service;
 
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
+import com.damul.api.user.dto.response.UserList;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     // 닉네임 중복확인
     boolean checkNicknameDuplication(String email);
 
     // 설정 조회
-    SettingResponse getSetting();
+    SettingResponse getSetting(int userId);
 
     // 설정 수정
-    void updateSetting(int userId, SettingUpdate setting);
+    void updateUserSettings(int userId, SettingUpdate setting, MultipartFile profileImage,
+                       MultipartFile backgroundImage);
 
-    // 팔로워 목록 조회
-
-    // 팔로잉 목록 조회
-
+    // 사용자 목록 조회 및 검색
+    UserList getSearchUserList(String keyword);
 }

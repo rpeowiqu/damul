@@ -44,14 +44,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         log.info("CustomOAuth2UserService, loadUser 진입");
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
+        log.info("OAuth2ser Attributes: {}", oAuth2User.getAttributes());
+
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        log.info("Registration ID: {}", registrationId);
+
         OAuth2Response oAuth2Response = getOAuth2Response(registrationId, oAuth2User.getAttributes());
+        log.info("OAuth2Response after mapping - email: {}", oAuth2Response.getEmail());
 
         Optional<UserInfo> existingUser = authRepository.findByEmail(oAuth2Response.getEmail());
 
         if (existingUser.isEmpty()) {
             log.info("CustomOAuth2UserService, 신규 회원입니다.");
-            String sessionKey = "oauth2:user:" + RequestContextHolder.currentRequestAttributes().getSessionId();
+            String sessionKey = "oauth2:user:" + oAuth2Response.getEmail(); // 이메일 기반 키 사용
 
             try {
                 User user = User.builder()
@@ -62,19 +67,31 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                                 .role(Role.USER)
                                 .build();
 
+                log.info("Redis에 저장할 사용자 정보: {}", user);
+
                 // Redis에 저장
+                log.info("Redis에 저장 시작");
                 String jsonString = objectMapper.writeValueAsString(user);
+                log.info("직렬화된 JSON: {}", jsonString);
                 redisTemplate.opsForValue().set(sessionKey, jsonString, Duration.ofMinutes(30));
+                log.info("Redis에 저장 완료");
 
                 Map<String, Object> signupInfo = new HashMap<>();
                 signupInfo.put("email", user.getEmail());
                 signupInfo.put("nickname", user.getNickname());
 
+                log.info("임시토큰 발급");
                 String tempToken = jwtTokenProvider.generateTempToken(signupInfo);
+                log.info("임시토큰 발급 완료 - tempToken: {}", tempToken);
+
+
+                // OAuth2User attributes용 정보 (claims 정보 + tempToken)
+                Map<String, Object> attributes = new HashMap<>(signupInfo);  // claims 정보 복사
+                attributes.put("tempToken", tempToken);  // tempToken 추가
 
                 return new DefaultOAuth2User(
                         Collections.emptyList(),
-                        Map.of("tempToken", tempToken),
+                        attributes,
                         "email"
                 );
 

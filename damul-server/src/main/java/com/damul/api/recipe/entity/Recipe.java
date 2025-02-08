@@ -14,12 +14,13 @@ import java.time.LocalDateTime;
 public class Recipe {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writer_id", referencedColumnName = "id")
+    @JoinColumn(name = "author_id")
     private User user;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int recipeId;
+    private int id;
 
     @Column(name = "title", length=200, nullable = false)
     private String title;
@@ -43,6 +44,6 @@ public class Recipe {
     private LocalDateTime updatedAt;
 
     @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
+    private boolean deleted;
 
 }
