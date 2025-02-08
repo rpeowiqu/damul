@@ -63,6 +63,16 @@ public class ChatMessage {
         return message;
     }
 
+    public static ChatMessage createFileMessage(ChatRoom room, User sender, String content, String fileUrl) {
+        ChatMessage message = new ChatMessage();
+        message.room = room;
+        message.sender = sender;
+        message.content = content;
+        message.fileUrl = fileUrl;
+        message.messageType = MessageType.FILE;
+        return message;
+    }
+
     // ENTER, LEAVE 메시지용 팩토리 메서드
     public static ChatMessage createEnterMessage(ChatRoom room, User sender) {
         ChatMessage message = new ChatMessage();
