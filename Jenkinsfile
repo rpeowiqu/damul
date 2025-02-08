@@ -1,10 +1,4 @@
 pipeline {
-    agent any  // 기본 workspace context를 위해 필요
-    
-    options {
-        timeout(time: 1, unit: 'HOURS')
-        skipDefaultCheckout(false)
-    }
     
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
@@ -25,7 +19,6 @@ pipeline {
             }
         }
 
-        stage('Setup BuildX') {
             agent {
                 docker {
                     image 'docker:24.0-dind'
@@ -34,20 +27,48 @@ pipeline {
                 }
             }
             steps {
-                sh '''
-                    docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                    docker buildx create --name builder --driver docker-container --use || true
-                    docker buildx inspect builder --bootstrap
-                '''
-            }
-        }
+                script {
+                    def branch = env.BRANCH_NAME
 
-        stage('Client Build') {
-            agent {
-                docker {
-                    image 'docker:24.0-dind'
-                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
-                    reuseNode true
+                    sh '''
+                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                        docker buildx rm builder || true
+                        docker buildx create --name builder --driver docker-container --use
+                        docker buildx inspect builder --bootstrap
+                    '''
+
+                    if (env.CHANGE_ID == null) {
+                        if (branch == 'master') {
+                            sh """
+                                docker buildx build --builder builder \
+                                    --platform linux/amd64 \
+                                    -t $CLIENT_DOCKER_IMAGE \
+                                    ./damul-client \
+                                    --push
+                                docker buildx build --builder builder \
+                                    --platform linux/amd64 \
+                                    -t $SERVER_DOCKER_IMAGE \
+                                    ./damul-server \
+                                    --push
+                            """
+                        } else if (branch == 'Client' || branch == 'client-develop') {
+                            sh """
+                                docker buildx build --builder builder \
+                                    --platform linux/amd64 \
+                                    -t $CLIENT_DOCKER_IMAGE \
+                                    ./damul-client \
+                                    --push
+                            """
+                        } else if (branch == 'Server' || branch == 'server-develop') {
+                            sh """
+                                docker buildx build --builder builder \
+                                    --platform linux/amd64 \
+                                    -t $SERVER_DOCKER_IMAGE \
+                                    ./damul-server \
+                                    --push
+                            """
+                        }
+                    }
                 }
             }
             when {
@@ -152,16 +173,16 @@ pipeline {
             steps {
                 sh '''
                     apt-get update && apt-get install -y openssh-client
-                    mkdir -p $HOME/.ssh
-                    echo "$SSH_KEY" > $HOME/.ssh/I12A306T.pem
-                    chmod 600 $HOME/.ssh/I12A306T.pem
-                    ssh-keyscan $EC2_HOST >> $HOME/.ssh/known_hosts
-                '''
-                
+                    mkdir -p /root/.ssh
+                    chmod 700 /root/.ssh             # 추가
+                    ssh-keyscan ${EC2_HOST} >> /root/.ssh/known_hosts
+                    chmod 600 /root/.ssh/known_hosts # 추가
+                """
+
                 script {
                     def branch = env.BRANCH_NAME
-                    def deployCmd = ''
-                    
+                    def deployCmd = "cd $DEPLOY_PATH && docker compose -f docker-compose.prod.yml pull server && docker compose -f docker-compose.prod.yml up -d server && docker image prune -f"
+
                     switch(branch) {
                         case 'Client':
                             deployCmd = """
