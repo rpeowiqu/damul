@@ -17,6 +17,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.Optional;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -67,10 +69,18 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         String userIdentifier = authentication.getName();
 
         // 데이터베이스에서 사용자 정보 조회
-        UserInfo userInfo = userRepository.findByEmail(userIdentifier)
-                .map(user -> new UserInfo(user.getId(), user.getEmail(), user.getNickname()))
-                .orElse(null);
+        Optional<User> userOptional = userRepository.findByEmail(userIdentifier);
 
-        return userInfo;
+
+        if (userOptional.isEmpty()) {
+            log.warn("해당 이메일로 사용자를 찾을 수 없음: {}", userIdentifier);
+            return null;
+        }
+
+        User user = userOptional.get();
+        log.info("찾은 사용자 정보 - ID: {}, Email: {}, Nickname: {}",
+                user.getId(), user.getEmail(), user.getNickname());
+
+        return new UserInfo(user.getId(), user.getEmail(), user.getNickname());
     }
 }
