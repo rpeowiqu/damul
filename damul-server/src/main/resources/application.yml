@@ -39,7 +39,7 @@ spring:
 
   security:
     admin:
-      password: ${admin.password}
+      password: ${ADMIN_PASSWORD}
     oauth2:
       client:
         registration:

@@ -1,6 +1,6 @@
 from openai import OpenAI
 import datetime
-from app.config import settings
+from config import settings
 import json
 
 from PIL import Image   # 이미지 크기 조절
@@ -85,4 +85,5 @@ async def gpt_service_execution(input_msg):
     res = response.choices[0].message.content
     res = res[7:-3].replace('\n','').replace('\t','')
     res_json = json.loads(res)
+    print(res)
     return res_json

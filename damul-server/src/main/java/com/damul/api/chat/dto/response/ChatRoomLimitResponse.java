@@ -1,18 +1,15 @@
 package com.damul.api.chat.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class ChatMember {
+public class ChatRoomLimitResponse {
 
-    private int id;
-    private String nickname;
-    private String profileImageUrl;
+    private int roomId;
+    private int memberLimit;
 
 }
