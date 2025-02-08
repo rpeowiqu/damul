@@ -69,6 +69,10 @@ public class ChatRoom {
         this.status = Status.ACTIVE;
     }
 
+    public void updateMemberLimit(int newLimit) {
+        this.memberLimit = newLimit;
+    }
+
     public static ChatRoom createDirectRoom(User creator, String roomName) {
         ChatRoom room = new ChatRoom();
         room.creator = creator;

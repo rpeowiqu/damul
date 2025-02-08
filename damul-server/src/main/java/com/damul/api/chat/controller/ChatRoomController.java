@@ -2,7 +2,9 @@ package com.damul.api.chat.controller;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
+import com.damul.api.chat.dto.request.ChatRoomLimitUpdate;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
+import com.damul.api.chat.dto.response.ChatRoomLimitResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
 import com.damul.api.chat.dto.response.UnReadResponse;
 import com.damul.api.chat.entity.ChatMessage;
@@ -142,6 +144,26 @@ public class ChatRoomController {
                 userId, currentUser.getId());
 
         CreateResponse response = chatRoomService.createDirectChatRoom(userId, currentUser.getId());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{roomId}/limit")
+    public ResponseEntity<ChatRoomLimitResponse> updateMemberLimit(
+            @PathVariable int roomId,
+            @RequestBody ChatRoomLimitUpdate request,
+            @CurrentUser User user) {
+        log.info("컨트롤러: 채팅방 최대 인원 변경 시작 - roomId: {}, newLimit: {}",
+                roomId, request.getMemberLimit());
+
+        ChatRoomLimitResponse response = chatRoomService.updateMemberLimit(
+                roomId,
+                request.getMemberLimit(),
+                user.getId()
+        );
+
+        log.info("컨트롤러: 채팅방 최대 인원 변경 성공 - roomId: {}, newLimit: {}",
+                roomId, request.getMemberLimit());
 
         return ResponseEntity.ok(response);
     }

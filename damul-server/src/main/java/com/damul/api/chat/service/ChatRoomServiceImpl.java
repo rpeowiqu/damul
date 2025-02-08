@@ -5,6 +5,7 @@ import com.damul.api.chat.dto.MessageType;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.response.ChatMember;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
+import com.damul.api.chat.dto.response.ChatRoomLimitResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
 import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.entity.ChatRoom;
@@ -245,6 +246,57 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         log.info("서비스: 1:1 채팅방 생성 완료 - roomId: {}", savedRoom.getId());
 
         return new CreateResponse(savedRoom.getId());
+    }
+
+    @Override
+    public ChatRoomLimitResponse updateMemberLimit(int roomId, int newLimit, int userId) {
+        log.info("서비스: 채팅방 최대 인원 변경 시작 - roomId: {}, newLimit: {}, userId: {}",
+                roomId, newLimit, userId);
+
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 채팅방입니다."));
+
+        validateRoomStatus(chatRoom);
+        validateRoomType(chatRoom);
+        validateCreator(chatRoom, userId);
+        validateNewLimit(chatRoom, newLimit);
+
+        chatRoom.updateMemberLimit(newLimit);
+
+        log.info("서비스: 채팅방 최대 인원 변경 완료 - roomId: {}, newLimit: {}", roomId, newLimit);
+
+        return new ChatRoomLimitResponse(roomId, newLimit);
+    }
+
+    private void validateRoomStatus(ChatRoom chatRoom) {
+        if (chatRoom.getStatus() == ChatRoom.Status.INACTIVE) {
+            throw new IllegalStateException("비활성화된 채팅방입니다.");
+        }
+    }
+
+    private void validateRoomType(ChatRoom chatRoom) {
+        if (chatRoom.getRoomType() == ChatRoom.RoomType.PRIVATE) {
+            throw new IllegalStateException("1:1 채팅방은 인원 제한을 변경할 수 없습니다.");
+        }
+    }
+
+    private void validateCreator(ChatRoom chatRoom, int userId) {
+        if (chatRoom.getCreator().getId() != userId) {
+            throw new IllegalStateException("채팅방 생성자만 인원 제한을 변경할 수 있습니다.");
+        }
+    }
+
+    private void validateNewLimit(ChatRoom chatRoom, int newLimit) {
+        if (newLimit < 2) {
+            throw new IllegalArgumentException("채팅방 최대 인원은 2명 이상이어야 합니다.");
+        }
+
+        int currentMemberCount = chatRoomMemberRepository.countMembersByRoomId(chatRoom.getId());
+        if (newLimit < currentMemberCount) {
+            throw new IllegalStateException(
+                    String.format("현재 참여 중인 인원(%d명)보다 적게 설정할 수 없습니다.", currentMemberCount)
+            );
+        }
     }
 
     private void createSystemMessage(ChatRoom chatRoom, String content) {
