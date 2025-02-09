@@ -53,4 +53,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "FROM User u " +
             "WHERE u.nickname LIKE %:keyword%")
     CreateResponse findUserByNickname(@Param("keyword") String keyword);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.active = true")
+    int countActiveUsers();
+
 }

@@ -1,5 +1,6 @@
 package com.damul.api.recipe.repository;
 
+import com.damul.api.mypage.dto.response.MyRecipeList;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
 import jakarta.transaction.Transactional;
@@ -118,5 +119,28 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     @Transactional
     @Query("UPDATE Recipe r SET r.viewCnt = :viewCount WHERE r.id = :recipeId")
     void updateViewCount(@Param("recipeId") int recipeId, @Param("viewCount") int viewCount);
+
+    @Query("""
+            SELECT new com.damul.api.mypage.dto.response.MyRecipeList(
+                r.id,
+                r.title,
+                r.content,
+                r.thumbnailUrl,
+                r.createdAt
+            )
+            FROM Recipe r
+            WHERE r.user.id = :userId
+            AND r.deleted = false
+            AND (:cursor = 0 OR r.id < :cursor)
+            ORDER BY r.id DESC
+            LIMIT :size
+            """)
+    List<MyRecipeList> findMyRecipes(
+            @Param("userId") int userId,
+            @Param("cursor") int cursor,
+            @Param("size") int size
+    );
+
+    boolean existsByUserIdAndIdLessThan(int userId, int id);
 
 }

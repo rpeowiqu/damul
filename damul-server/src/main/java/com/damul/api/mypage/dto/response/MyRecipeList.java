@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,6 +15,6 @@ public class MyRecipeList {
     private String title;
     private String content;
     private String thumbnailUrl;
-    private String createdAt;
+    private LocalDateTime createdAt;
 
 }

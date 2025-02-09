@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class FollowResponse {
+import java.util.List;
 
-    private boolean following;
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class BadgeResponse {
+
+    private List<BadgeList> list;
 
 }
+
