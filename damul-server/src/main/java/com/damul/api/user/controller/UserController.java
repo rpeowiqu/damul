@@ -36,6 +36,7 @@ public class UserController {
         return ResponseEntity.ok(settingResponse);
     }
 
+    // 설정 수정
     @PutMapping("/{userId}/settings")
     public ResponseEntity updateSetting(@PathVariable("userId") int userId,
                                         @RequestPart("settingUpdate") SettingUpdate setting,

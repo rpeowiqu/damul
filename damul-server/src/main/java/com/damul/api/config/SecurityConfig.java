@@ -41,13 +41,10 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-
-
     @Value("${redirect.frontUrl}")
     private String frontUrl;
 
+    private final JwtDecoder jwtDecoder;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
@@ -72,7 +69,7 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oauth2 -> {
                     log.info("OAuth2 리소스 서버 설정");
                     oauth2.jwt(jwt -> {
-                        jwt.decoder(jwtDecoder())
+                        jwt.decoder(jwtDecoder)
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter());
                     });
                 })// refresh 필터 추가
@@ -128,14 +125,6 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-        return NimbusJwtDecoder.withSecretKey(key)
-                .macAlgorithm(MacAlgorithm.HS512)  // HS512 알고리즘 명시
-                .build();
     }
 
 

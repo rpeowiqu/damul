@@ -25,17 +25,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;              // JWT 서명에 사용할 비밀키
+    private final SecretKey jwtSecretKey;
 
     @Value("${jwt.access-token-expiration}")
-    private long accessTokenExpire;        // Access Token 만료 시간 (ms)
+    private long accessTokenExpire;
 
     @Value("${jwt.refresh-token-expiration}")
-    private long refreshTokenExpire;       // Refresh Token 만료 시간 (ms)
+    private long refreshTokenExpire;
 
     @Value("${jwt.temporary-token-expiration}")
     private long temporaryTokenExpire;
+
 
     /**
      * Access Token 생성
@@ -47,20 +47,16 @@ public class JwtTokenProvider {
     public String generateAccessToken(Authentication authentication) {
         // 이메일 추출 방식 변경
         String email = authentication.getName();
-
         return Jwts.builder()
-                .setSubject(email)    // 사용자 식별자로 이메일 사용
-                .claim("role", authentication.getAuthorities()) // 사용자 권한 정보 포함
-                .setIssuedAt(new Date())                        // 토큰 발행 시간
+                .setSubject(email)
+                .claim("role", authentication.getAuthorities())
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpire))
-                .signWith(getSigninKey(), SignatureAlgorithm.HS512)
+                .signWith(jwtSecretKey, SignatureAlgorithm.HS512)
                 .compact();
     }
 
 
-    private SecretKey getSigninKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-    }
 
     /**
      * Access Token의 만료 시간을 반환
@@ -88,13 +84,12 @@ public class JwtTokenProvider {
     public String generateRefreshToken(Authentication authentication) {
         // OAuth2User로 캐스팅 대신 getName() 사용
         String email = authentication.getName();
-
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", authentication.getAuthorities())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpire))
-                .signWith(getSigninKey(), SignatureAlgorithm.HS512)  // 일관된 키와 알고리즘 사용
+                .signWith(jwtSecretKey, SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -104,7 +99,7 @@ public class JwtTokenProvider {
                 .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + temporaryTokenExpire))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(jwtSecretKey, SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -116,10 +111,10 @@ public class JwtTokenProvider {
      */
     public String getUserEmailFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .verifyWith(jwtSecretKey)
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
+                .parseSignedClaims(token)
+                .getPayload()
                 .getSubject();
     }
 
@@ -131,7 +126,7 @@ public class JwtTokenProvider {
      */
     public Claims getClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSigninKey())
+                .verifyWith(jwtSecretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -147,9 +142,9 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(getSigninKey())  // verifyWith 사용
+                    .verifyWith(jwtSecretKey)
                     .build()
-                    .parseSignedClaims(token);   // parseSignedClaims 사용
+                    .parseSignedClaims(token);
             return true;
         } catch (Exception e) {
             log.error("토큰 검증 실패", e);
