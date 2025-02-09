@@ -22,12 +22,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             FROM Recipe r
             JOIN r.user u
             WHERE r.deleted = false
-            AND (:cursorId = 0 OR r.id < :cursorId)
+            AND (:cursor = 0 OR r.id < :cursor)
             ORDER BY r.id DESC
             LIMIT :size
             """)
     List<RecipeList> findAllRecipes(
-            @Param("cursorId") int cursorId,
+            @Param("cursor") int cursor,
             @Param("size") int size
     );
 
@@ -39,14 +39,14 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             FROM Recipe r
             JOIN r.user u
             WHERE r.deleted = false
-            AND (:cursorId = 0 OR r.id < :cursorId)
+            AND (:cursor = 0 OR r.id < :cursor)
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
                 OR :searchType = 'content' AND (r.title LIKE %:keyword% OR r.content LIKE %:keyword%))
             ORDER BY r.id DESC
             LIMIT :size
             """)
     List<RecipeList> findBySearch(
-            @Param("cursorId") int cursorId,
+            @Param("cursor") int cursor,
             @Param("size") int size,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword
@@ -61,7 +61,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             JOIN r.user u
             LEFT JOIN Recipe prev ON prev.id = :cursorId
             WHERE r.deleted = false
-            AND (:cursorId = 0 OR 
+            AND (:cursor = 0 OR 
                 ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
                 OR (:orderBy = 'views' AND (r.viewCnt < prev.viewCnt OR (r.viewCnt = prev.viewCnt AND r.id < prev.id)))
                 OR (:orderBy NOT IN ('likes', 'views') AND r.id < :cursorId)))
@@ -75,7 +75,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             LIMIT :size
             """)
     List<RecipeList> findAllWithOrder(
-            @Param("cursorId") int cursorId,
+            @Param("cursor") int cursor,
             @Param("size") int size,
             @Param("orderBy") String orderBy
     );
@@ -87,12 +87,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
                 r.user.id, r.user.nickname)
             FROM Recipe r
             JOIN r.user u
-            LEFT JOIN Recipe prev ON prev.id = :cursorId
+            LEFT JOIN Recipe prev ON prev.id = :cursor
             WHERE r.deleted = false
-            AND (:cursorId = 0 OR 
+            AND (:cursor = 0 OR 
                 ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
                 OR (:orderBy = 'views' AND (r.viewCnt < prev.viewCnt OR (r.viewCnt = prev.viewCnt AND r.id < prev.id)))
-                OR (:orderBy NOT IN ('likes', 'views') AND r.id < :cursorId)))
+                OR (:orderBy NOT IN ('likes', 'views') AND r.id < :cursor)))
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
                 OR :searchType = 'content' AND (r.title LIKE %:keyword% OR r.content LIKE %:keyword%))
             ORDER BY
@@ -105,7 +105,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             LIMIT :size
             """)
     List<RecipeList> findBySearchWithOrder(
-            @Param("cursorId") int cursorId,
+            @Param("cursor") int cursor,
             @Param("size") int size,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword,

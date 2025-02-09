@@ -13,9 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -44,13 +41,10 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-
-
     @Value("${redirect.frontUrl}")
     private String frontUrl;
 
+    private final JwtDecoder jwtDecoder;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
@@ -75,7 +69,7 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oauth2 -> {
                     log.info("OAuth2 리소스 서버 설정");
                     oauth2.jwt(jwt -> {
-                        jwt.decoder(jwtDecoder())
+                        jwt.decoder(jwtDecoder)
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter());
                     });
                 })// refresh 필터 추가
@@ -87,8 +81,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> {
                     log.info("URL 접근 권한 설정");
                     auth
-                            .requestMatchers("/api/v1/**","/multibranch-webhook-trigger/invoke*").permitAll()
-                            .requestMatchers("/", "/login", "/admin/login", "/test-token").permitAll() // 누구나 접근 가능
+                            .requestMatchers("/api/v1", "/multibranch-webhook-trigger/invoke*").permitAll()
+                            .requestMatchers("/", "/login", "/admin/login", "/api/v1/test/token").permitAll() // 누구나 접근 가능
                             .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
                             .requestMatchers("/ws/**").permitAll()  // WebSocket 엔드포인트 허용
                             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
@@ -133,20 +127,12 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-        return NimbusJwtDecoder.withSecretKey(key)
-                .macAlgorithm(MacAlgorithm.HS512)  // HS512 알고리즘 명시
-                .build();
-    }
-
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            List<String> roles = jwt.getClaimAsStringList("roles");
+            List<String> roles = jwt.getClaimAsStringList("role");
             if (roles == null) {
                 roles = Collections.emptyList();
             }

@@ -24,12 +24,12 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
                 f.follower.email)
             FROM Follow f
             WHERE f.following.id = :followingId
-            AND (:cursorId = 0 OR f.id < :cursorId)
+            AND (:cursor = 0 OR f.id < :cursor)
             ORDER BY f.id DESC
             LIMIT :size
             """)
     List<UserList> findFollowersByUserIdAndCursorId(@Param("followingId") int followingId,
-                                                    @Param("cursorId") int cursorId,
+                                                    @Param("cursor") int cursor,
                                                     @Param("size") int size);
     // 내가 팔로우하는 사람들 목록 (팔로잉 목록)
     @Query("""
@@ -39,12 +39,12 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
                 f.following.email)
             FROM Follow f
             WHERE f.follower.id = :followerId
-            AND (:cursorId = 0 OR f.id < :cursorId)
+            AND (:cursor = 0 OR f.id < :cursor)
             ORDER BY f.id DESC
             LIMIT :size
             """)
     List<UserList> findFollowingsByUserIdAndCursorId(@Param("followerId") int followerId,
-                                                        @Param("cursorId") int cursorId,
+                                                        @Param("cursor") int cursor,
                                                         @Param("size") int size);
 
     // 팔로우 관계를 확인

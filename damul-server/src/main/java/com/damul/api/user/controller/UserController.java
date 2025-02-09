@@ -36,6 +36,7 @@ public class UserController {
         return ResponseEntity.ok(settingResponse);
     }
 
+    // 설정 수정
     @PutMapping("/{userId}/settings")
     public ResponseEntity updateSetting(@PathVariable("userId") int userId,
                                         @RequestPart("settingUpdate") SettingUpdate setting,
@@ -60,10 +61,11 @@ public class UserController {
 
     // 팔로워 목록 조회
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<?> getFollowers(@RequestBody ScrollRequest scrollRequest,
+    public ResponseEntity<?> getFollowers(@RequestParam int cursor,
+                                          @RequestParam int size,
                                           @PathVariable int userId) {
         log.info("팔로워 목록 조회 요청");
-        ScrollResponse<UserList> userList = followService.getFollowers(scrollRequest, userId);
+        ScrollResponse<UserList> userList = followService.getFollowers(cursor, size, userId);
 
         if(userList.getData().isEmpty() || userList.getData().size() == 0) {
             log.info("팔로워 목록 조회 성공 - 데이터없음");
@@ -77,10 +79,11 @@ public class UserController {
     
     // 팔로잉 목록 조회
     @GetMapping("/{userId}/follwings")
-    public ResponseEntity<?> getFollwings(@RequestBody ScrollRequest scrollRequest,
+    public ResponseEntity<?> getFollwings(@RequestParam int cursor,
+                                          @RequestParam int size,
                                           @PathVariable int userId) {
         log.info("팔로잉 목록 조회 요청");
-        ScrollResponse<UserList> userList = followService.getFollowings(scrollRequest, userId);
+        ScrollResponse<UserList> userList = followService.getFollowings(cursor, size, userId);
 
         if(userList.getData().isEmpty() || userList.getData().size() == 0) {
             log.info("팔로잉 목록 조회 성공 - 데이터없음");

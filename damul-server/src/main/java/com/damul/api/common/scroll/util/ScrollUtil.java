@@ -7,11 +7,11 @@ import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import java.util.List;
 
 public class ScrollUtil {
-    public static <T extends ScrollCursor> ScrollResponse<T> createScrollResponse(List<T> items, ScrollRequest request) {
-        boolean hasNext = items.size() == request.getSize();
+    public static <T extends ScrollCursor> ScrollResponse<T> createScrollResponse(List<T> items, int cursorId, int size) {
+        boolean hasNext = items.size() == size;
         int nextCursor = hasNext && !items.isEmpty()
                 ? items.get(items.size() - 1).getId()  // 일반적인 엔티티의 경우
-                : request.getCursorId();
+                : cursorId;
 
         return new ScrollResponse<>(items, new CursorPageMetaInfo(nextCursor, hasNext));
     }

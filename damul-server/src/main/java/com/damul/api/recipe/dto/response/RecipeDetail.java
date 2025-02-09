@@ -16,6 +16,7 @@ public class RecipeDetail {
     private String title;
     private boolean bookmarked;
     private boolean liked;
+    private String content;
     private String createdAt;
     private int authorId;
     private String authorName;
