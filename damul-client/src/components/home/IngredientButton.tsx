@@ -2,8 +2,10 @@ import { MouseEventHandler } from "react";
 import { CATEGORY } from "@/constants/category";
 import DamulButton from "../common/DamulButton";
 import AlertCircleIcon from "../svg/AlertCircleIcon";
+import { useIngredientStore } from "@/stores/ingredientStore";
 
 interface IngredientButtonProps {
+  id: number;
   variant: keyof typeof CATEGORY;
   name: string;
   quantity: number;
@@ -13,6 +15,7 @@ interface IngredientButtonProps {
 }
 
 const IngredientButton = ({
+  id,
   variant,
   name,
   quantity,
@@ -21,6 +24,13 @@ const IngredientButton = ({
   onEdit,
 }: IngredientButtonProps) => {
   const IconComponent = CATEGORY[variant];
+
+  const { selectedIngredients } = useIngredientStore();
+
+  const isSelected = selectedIngredients.some(
+    (item) => item.userIngredientId === id,
+  );
+
   return (
     <DamulButton
       onClick={onClick}
@@ -28,7 +38,22 @@ const IngredientButton = ({
     >
       <div className="relative">
         {expirationDate <= 7 && expirationDate > 0 && (
-          <AlertCircleIcon className="stroke-negative-500 absolute scale-110 -left-4 bottom-4" />
+          <AlertCircleIcon className="stroke-negative-500 absolute scale-110 -left-4 bottom-4 fill-white" />
+        )}
+        {onEdit && (
+          <input
+            type="checkbox"
+            className={`
+            absolute -right-24 bottom-4 w-4 h-4 appearance-none rounded border-2 border-positive-400 
+            bg-white checked:bg-positive-500  checked:border-positive-600 
+            cursor-pointer transition-all 
+            flex items-center justify-center
+            before:content-['✓'] before:text-white before:text-sm before:hidden 
+            checked:before:block
+          `}
+            checked={isSelected}
+            readOnly
+          />
         )}
       </div>
       <IconComponent className="scale-150" />

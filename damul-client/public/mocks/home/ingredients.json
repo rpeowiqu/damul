@@ -2,28 +2,28 @@
   "userIngredients": {
     "freezer": [
       {
-        "userIngredientId": 1,
+        "userIngredientId": 1324,
         "categoryId": 4,
         "ingredientName": "소고기",
         "ingredientQuantity": 80,
         "expirationDate": 30
       },
       {
-        "userIngredientId": 2,
+        "userIngredientId": 12423442,
         "categoryId": 6,
         "ingredientName": "고등어",
         "ingredientQuantity": 70,
         "expirationDate": -21312
       },
       {
-        "userIngredientId": 9,
+        "userIngredientId": 9156,
         "categoryId": 5,
         "ingredientName": "닭가슴살",
         "ingredientQuantity": 90,
         "expirationDate": 25
       },
       {
-        "userIngredientId": 10,
+        "userIngredientId": 123432412341234231423140,
         "categoryId": 6,
         "ingredientName": "오징어",
         "ingredientQuantity": 60,
@@ -67,7 +67,7 @@
         "expirationDate": 5
       },
       {
-        "userIngredientId": 4,
+        "userIngredientId": 42342134,
         "categoryId": 3,
         "ingredientName": "치즈",
         "ingredientQuantity": 40,
@@ -81,14 +81,14 @@
         "expirationDate": 7
       },
       {
-        "userIngredientId": 11,
+        "userIngredientId": 13647541,
         "categoryId": 1,
         "ingredientName": "오이",
         "ingredientQuantity": 30,
         "expirationDate": -5325
       },
       {
-        "userIngredientId": 12,
+        "userIngredientId": 1636473772,
         "categoryId": 3,
         "ingredientName": "버터",
         "ingredientQuantity": 20,
@@ -132,35 +132,35 @@
     ],
     "roomTemp": [
       {
-        "userIngredientId": 6,
+        "userIngredientId": 612343214,
         "categoryId": 0,
         "ingredientName": "쌀",
         "ingredientQuantity": 90,
         "expirationDate": 180
       },
       {
-        "userIngredientId": 7,
+        "userIngredientId": 412342317,
         "categoryId": 8,
         "ingredientName": "소금",
         "ingredientQuantity": 70,
         "expirationDate": 365
       },
       {
-        "userIngredientId": 8,
+        "userIngredientId": 832434124,
         "categoryId": 9,
         "ingredientName": "설탕",
         "ingredientQuantity": 80,
         "expirationDate": 730
       },
       {
-        "userIngredientId": 13,
+        "userIngredientId": 112342314122314233,
         "categoryId": 8,
         "ingredientName": "고추장",
         "ingredientQuantity": 50,
         "expirationDate": 180
       },
       {
-        "userIngredientId": 14,
+        "userIngredientId": 1326685844,
         "categoryId": 8,
         "ingredientName": "된장",
         "ingredientQuantity": 40,

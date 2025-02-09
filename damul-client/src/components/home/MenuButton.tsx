@@ -2,33 +2,25 @@ import DamulButton from "@/components/common/DamulButton";
 import MenuIcon from "@/components/svg/MenuIcon";
 import PlusIcon from "@/components/svg/PlusIcon";
 import EditIcon from "@/components/svg/EditIcon";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useClickOutside from "@/hooks/useClickOutside";
+import { useIngredientStore } from "@/stores/ingredientStore";
 
 interface MenuButtonProps {
   onClick: () => void;
-  setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MenuButton = ({ onClick, setIsEditMode }: MenuButtonProps) => {
+const MenuButton = ({ onClick }: MenuButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navigate = useNavigate();
+  const { clearSelectedIngredients } = useIngredientStore();
 
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const menuRef = useClickOutside<HTMLDivElement>(() => {
+    clearSelectedIngredients();
+    setIsOpen(false);
+  });
 
   return (
     <div className="fixed w-full flex justify-end bottom-0 max-w-[600px] bg-white">
@@ -39,6 +31,7 @@ const MenuButton = ({ onClick, setIsEditMode }: MenuButtonProps) => {
               variant="shadow"
               onClick={() => {
                 setIsOpen((preState) => !preState);
+                clearSelectedIngredients();
               }}
               className="w-full"
             >

@@ -40,6 +40,7 @@ import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPag
 import ChattingSearchResultPage from "@/pages/chat/ChattingSearchResultPage";
 import ChattingRoomPage from "@/pages/chat/ChattingRoomPage";
 import AlarmPage from "@/pages/alarm/AlarmPage";
+import HomeIngredientsEditPage from "@/pages/home/HomeIngredientsEditPage";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,7 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       { path: "home/register", element: <HomeIngredientsRegisterPage /> },
+      { path: "home/edit", element: <HomeIngredientsEditPage /> },
       {
         path: "profile/:userId",
         element: <ProfilePage />,

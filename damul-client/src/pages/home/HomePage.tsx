@@ -21,6 +21,7 @@ const HomePage = () => {
     setIsEditMode((prev) => !prev);
   };
 
+  // 수정 예정
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -79,9 +80,9 @@ const HomePage = () => {
         })}
       </div>
       {isEditMode ? (
-        <IngredientEditOverview />
+        <IngredientEditOverview onClose={handleEditClick} />
       ) : (
-        <MenuButton onClick={handleEditClick} setIsEditMode={setIsEditMode} />
+        <MenuButton onClick={handleEditClick} />
       )}
     </div>
   );

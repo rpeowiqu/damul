@@ -80,7 +80,7 @@ const IngredientDetail = ({
         </div>
         <div className="flex justify-center">
           <Slider
-            className="w-full px-5"
+            className="w-full"
             onValueChange={onQuantityChange}
             defaultValue={[ingredient.ingredientQuantity]}
             max={100}

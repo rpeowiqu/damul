@@ -7,6 +7,7 @@ import { Ingredient } from "@/types/Ingredient";
 import DamulModal from "../common/DamulModal";
 import IngredientDetail from "./IngredientDetail";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { useIngredientStore } from "@/stores/ingredientStore";
 
 interface IngredientStorageContainerProps {
   title: keyof typeof STORAGE_TYPE | keyof typeof ITEM_STATUS;
@@ -41,6 +42,8 @@ const IngredientStorageContainer = ({
     expirationDate: 3,
   });
 
+  const { setSelectedIngredients } = useIngredientStore();
+
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const handleOnClick = () => {
@@ -48,8 +51,12 @@ const IngredientStorageContainer = ({
   };
 
   const handleOnIngredientBtn = (ingredient: Ingredient) => {
-    setSelectedIngredient(ingredient);
-    setIsOpen(true);
+    if (onEdit) {
+      setSelectedIngredients(ingredient);
+    } else {
+      setSelectedIngredient(ingredient);
+      setIsOpen(true);
+    }
   };
 
   const handleQuantityChange = (value: number[]) => {
@@ -98,7 +105,7 @@ const IngredientStorageContainer = ({
         </p>
       </div>
       <div
-        className={`grid grid-cols-2 gap-2 p-2 mt-2 mb-3 pc:grid-cols-5 sm:grid-cols-4 xs:grid-cols-3 ${!isExpanded && "overflow-y-hidden h-20"}`}
+        className={`grid grid-cols-2 gap-2 p-2 mt-2 mb-3 pc:grid-cols-5 sm:grid-cols-4 xs:grid-cols-3 ${!isExpanded && "overflow-y-hidden h-[70px]"}`}
       >
         {items.map((item, idx) => {
           if (item.expirationDate < 0 && title === "expiringSoon") {
@@ -114,6 +121,7 @@ const IngredientStorageContainer = ({
               expirationDate={item.expirationDate}
               onClick={() => handleOnIngredientBtn(item)}
               onEdit={onEdit}
+              id={item.userIngredientId}
             />
           );
         })}
