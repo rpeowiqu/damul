@@ -12,9 +12,11 @@ const PostButton = ({ to, icon }: PostButtonProps) => {
   return (
     <div className="fixed w-full flex justify-end bottom-0 max-w-[600px]">
       <div className="relative">
-        <div className="absolute z-40 flex flex-col items-center w-20 bottom-20 right-0">
+        <div className="absolute z-40 flex flex-col items-center w-20 bottom-20 right-5 pc:right-10">
           <div>
             <DamulButton
+            variant="normal-outline"
+            className="rounded-full w-12 h-12"
               onClick={() => {
                 navigate(`${to}`);
               }}

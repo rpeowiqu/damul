@@ -64,7 +64,7 @@ const PostRecipeIngrediants = ({
       <table className="min-w-full">
         <thead>
           <tr>
-            <th className="pc:w-24 p-6 text-left"></th>
+            <th className="p-6 text-left"></th>
             <th className="p-2 text-left">재료</th>
             <th className="p-2 text-left">수량</th>
             <th className="p-2 text-left">단위</th>
@@ -73,14 +73,15 @@ const PostRecipeIngrediants = ({
         <tbody className="divide-y divide-neutral-300">
           {tempIngredients.map((ingredient) => (
             <tr key={ingredient.id}>
-              <td className="p-5">
+              <td className="p-1">
+                {ingredient.name &&
                 <button
                   type="button"
                   onClick={() => handleRemoveIngredient(ingredient.id)}
                   className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:negative-700 border-2 border-negative-600 text-xl font-semibold"
                 >
                   -
-                </button>
+                </button>}
               </td>
               <td className="p-2">
                 <input
@@ -121,7 +122,7 @@ const PostRecipeIngrediants = ({
           }
         }}
         triggerContent={
-          <div className="text-blue-400 hover:text-blue-700 text-2xl">+</div>
+          <div className="text-blue-400 hover:text-blue-700 text-2xl mt-5">+</div>
         }
         headerContent={
           <PostRecipeIngrediantForm

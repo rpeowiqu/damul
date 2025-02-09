@@ -67,13 +67,14 @@ const PostRecipeSteps = ({
           {tempOrders.map((order, index) => (
             <tr key={order.id}>
               <td className="p-1">
+                {order.description &&
                 <button
                   type="button"
                   onClick={() => handleRemoveStep(order.id)}
                   className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:text-negative-700 border-2 border-negative-600 text-xl font-semibold"
                 >
                   -
-                </button>
+                </button>}
               </td>
               <td className="p-1 text-center">
                 {order.image ? (
@@ -110,7 +111,7 @@ const PostRecipeSteps = ({
           }
         }}
         triggerContent={
-          <div className="text-blue-400 hover:text-blue-700 text-2xl">+</div>
+          <div className="text-blue-400 hover:text-blue-700 text-2xl mt-5">+</div>
         }
         headerContent={
           <PostRecipeOrderForm
