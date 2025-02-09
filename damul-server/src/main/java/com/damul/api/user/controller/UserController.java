@@ -41,13 +41,13 @@ public class UserController {
     // 설정 수정
     @PutMapping("/{userId}/settings")
     public ResponseEntity updateSetting(@PathVariable("userId") int userId,
-                                        @RequestPart("settingJson") String settingJson,
+                                        @RequestPart("settingUpdate") SettingUpdate setting,
                                         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
                                         @RequestPart(value = "backgroundImage", required = false) MultipartFile backgroundImage)
             throws JsonProcessingException {
-
-
-        SettingUpdate setting = objectMapper.readValue(settingJson, SettingUpdate.class);
+//
+//
+//        SettingUpdate setting = objectMapper.readValue(settingJson, SettingUpdate.class);
 
         userService.updateUserSettings(userId, setting, profileImage, backgroundImage);
         return ResponseEntity.ok().build();
