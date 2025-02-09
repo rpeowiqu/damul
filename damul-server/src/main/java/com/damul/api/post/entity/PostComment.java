@@ -2,16 +2,20 @@ package com.damul.api.post.entity;
 
 import com.damul.api.auth.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "postComment")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class PostComment {
 
     @Id
@@ -44,5 +48,15 @@ public class PostComment {
     // 논리적 삭제를 위한 메서드
     public void delete() {
         this.isDeleted = true;
+    }
+
+    @Builder
+    public PostComment(Post post, User user, PostComment parentPostComment, String comment) {
+        this.post = Objects.requireNonNull(post, "post cannot be null");
+        this.user = Objects.requireNonNull(user, "user cannot be null");
+        this.comment = Objects.requireNonNull(comment, "comment cannot be null");
+        this.parentPostComment = parentPostComment;
+        this.createdAt = LocalDateTime.now();
+        this.isDeleted = false;
     }
 }
