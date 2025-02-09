@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -20,7 +19,7 @@ public class PostDetail {
     private String profileImageUrl;
     private String contentImageUrl;
     private String content;
-    private LocalDateTime createdAt;
+    private String createdAt;
     private int currentChatNum;
     private int chatSize;
     private int commentCnt;

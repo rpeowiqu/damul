@@ -1,5 +1,6 @@
 package com.damul.api.post.dto.response;
 
+import com.damul.api.common.scroll.util.ScrollCursor;
 import com.damul.api.post.dto.PostStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostList {
+public class PostList implements ScrollCursor {
     private int id;
     private String title;
     private String thumbnailUrl;
@@ -21,4 +22,9 @@ public class PostList {
     private int authorId;
     private String authorName;
     private PostStatus postStatus;
+
+    @Override
+    public int getId() {
+        return this.id;
+    }
 }

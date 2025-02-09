@@ -4,12 +4,14 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.post.dto.PostStatus;
 import com.damul.api.post.dto.PostType;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "post")
@@ -70,5 +72,17 @@ public class Post {
 
     public void incrementViewCnt() {
         this.viewCnt++;
+    }
+
+    @Builder
+    public Post(User user, String thumbnailUrl, String title, String content) {
+        this.user = Objects.requireNonNull(user, "user cannot be null");
+        this.title = Objects.requireNonNull(title, "title cannot be null");
+        this.content = Objects.requireNonNull(content, "content cannot be null");
+        this.thumbnailUrl = thumbnailUrl;
+        this.postStatus = PostStatus.ACTIVE;
+        this.viewCnt = 0;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 }
