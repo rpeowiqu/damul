@@ -27,6 +27,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
+
+    @Value("${jwt.access-token-expiration}")
+    private long accessTokenExpire;        // Access Token 만료 시간 (ms)
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long refreshTokenExpire;       // Refresh Token 만료 시간 (ms)
+
+    @Value("${jwt.temporary-token-expiration}")
+    private long temporaryTokenExpire;
+
     @Value("${redirect.frontUrl}")
     private String frontUrl;
 
@@ -56,12 +66,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             Map<String, String> tokens = authService.generateTokens(authentication);
 
             // 액세스 토큰 쿠키 생성
-            cookieUtil.addCookie(response, "access_token", tokens.get("accessToken"),
-                    (int) jwtTokenProvider.getAccessTokenExpire() / 1000);
+            cookieUtil.addCookie(response, "access_token", tokens.get("accessToken"), accessTokenExpire);
 
             // 리프레시 토큰 쿠키 생성
-            cookieUtil.addCookie(response, "refresh_token", tokens.get("refreshToken"),
-                    (int) jwtTokenProvider.getRefreshTokenExpire() / 1000);
+            cookieUtil.addCookie(response, "refresh_token", tokens.get("refreshToken"), refreshTokenExpire);
 
 
             // 쿠키 설정 로그 추가
@@ -75,7 +83,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             String tempToken = oAuth2User.getAttribute("tempToken");
 
             // 쿠키로 전달
-            cookieUtil.addCookie(response, "tempToken", tempToken, 1800); // 30분 유지
+            cookieUtil.addCookie(response, "tempToken", tempToken, temporaryTokenExpire); // 30분 유지
 
             // 신규 회원이면 약관동의 페이지로 Redirect
             response.sendRedirect(frontUrl+terms);

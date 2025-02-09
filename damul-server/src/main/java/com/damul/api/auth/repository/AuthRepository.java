@@ -15,7 +15,7 @@ public interface AuthRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT new com.damul.api.auth.dto.response.UserInfo(u.id, u.email, u.nickname) " +
             "FROM User u WHERE u.email = :email")
-    Optional<UserInfo> findByEmail(String email);
+    Optional<User> findByEmail(String email);
     // SELECT * FROM user WHERE email = ? 쿼리 자동 생성
 
     User save(User user);

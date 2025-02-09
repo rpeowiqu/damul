@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
             return settingResponse;
         } else {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
         }
     }
 
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("해당 유저를 찾을 수 없습니다. - userId: {}", userId);
-                    return new BusinessException(ErrorCode.USER_NOT_FOUND);
+                    return new BusinessException(ErrorCode.USER_FORBIDDEN);
                 });
         log.info("유저 검색 완료 - userNickname: {}", user.getNickname());
 
@@ -128,14 +128,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserList getSearchUserList(String keyword) {
         UserList userList;
-
         if(keyword == null || keyword.isEmpty()) {
-            log.info("검색어 없음 - 전체 조회 시작");
-            userList = userRepository.findUser();
-        } else {
-            log.info("검색어 있음 - 검색어: {}", keyword);
-            userList = userRepository.findUserByNickname(keyword);
+            log.info("검색어 없음");
+            throw new BusinessException(ErrorCode.USER_NICKNAME_NOT_PROVIDED);
         }
+
+
+        log.info("검색어 있음 - 검색어: {}", keyword);
+        userList = userRepository.findUserByNickname(keyword);
+
 
         return userList;
     }

@@ -55,11 +55,11 @@ public class RecipeServiceImpl implements RecipeService {
 
     // 레시피 전체 조회 및 검색
     @Override
-    public ScrollResponse getRecipes(ScrollRequest scrollRequest, String searchType, String keyword, String orderBy) {
+    public ScrollResponse getRecipes(int cursor, int size, String searchType, String keyword, String orderBy) {
 
         log.debug("=== Recipe Search Start ===");
-        log.debug("Parameters: cursorId={}, size={}, searchType={}, keyword={}, orderBy={}", scrollRequest.getCursorId(),
-                scrollRequest.getSize(), searchType, keyword, orderBy);
+        log.debug("Parameters: cursor={}, size={}, searchType={}, keyword={}, orderBy={}", cursor,
+                size, searchType, keyword, orderBy);
         // 검색어가 있는데 검색 타입이 없는 경우 예외 처리
         if (keyword != null && searchType == null) {
             log.error("검색어는 존재, 검색타입 없음");
@@ -74,16 +74,15 @@ public class RecipeServiceImpl implements RecipeService {
         if (!hasSearch && !hasOrder) {
             log.info("기본 전체 조회");
             recipes = recipeRepository.findAllRecipes(
-                    scrollRequest.getCursorId(),
-                    scrollRequest.getSize() + 1
+                    cursor, size + 1
             );
         }
         // 2. 검색어만 있는 경우
         else if (hasSearch && !hasOrder) {
             log.info("검색어만 존재");
             recipes = recipeRepository.findBySearch(
-                    scrollRequest.getCursorId(),
-                    scrollRequest.getSize() + 1,
+                    cursor,
+                    size + 1,
                     searchType,
                     keyword
             );
@@ -93,8 +92,8 @@ public class RecipeServiceImpl implements RecipeService {
         else if (!hasSearch && hasOrder) {
             log.info("정렬 조건만 존재");
             recipes = recipeRepository.findAllWithOrder(
-                    scrollRequest.getCursorId(),
-                    scrollRequest.getSize() + 1,
+                    cursor,
+                    size + 1,
                     orderBy
             );
         }
@@ -103,16 +102,16 @@ public class RecipeServiceImpl implements RecipeService {
         else {
             log.info("모두 존재");
             recipes = recipeRepository.findBySearchWithOrder(
-                    scrollRequest.getCursorId(),
-                    scrollRequest.getSize() + 1,
+                    cursor,
+                    size + 1,
                     searchType,
                     keyword,
                     orderBy
             );
         }
 
-        if (recipes.size() > scrollRequest.getSize()) {
-            recipes = recipes.subList(0, scrollRequest.getSize());
+        if (recipes.size() > size) {
+            recipes = recipes.subList(0, size);
         }
 
         if (recipes.isEmpty()) {
@@ -125,17 +124,21 @@ public class RecipeServiceImpl implements RecipeService {
                     recipes.get(0).getUserId());
         }
 
-        return ScrollUtil.createScrollResponse(recipes, scrollRequest);
+        return ScrollUtil.createScrollResponse(recipes, cursor, size);
     }
 
     @Override
     @Transactional
     public RecipeDetail getRecipeDetail(int recipeId, UserInfo userInfo) {
+        if(userInfo == null) {
+            log.error("userInfo 없음 - userInfo is null");
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
         int userId = checkUserInfo(userInfo);
         log.info("레시피 상세조회 및 조회수 증가 시작 - recipeId: {}, userId: {}", recipeId, userInfo.getId());
         if(userId == 0) {
             log.error("UserInfo Id값 조회 불가 - userId: {}", userId);
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
         }
 
 
@@ -232,6 +235,7 @@ public class RecipeServiceImpl implements RecipeService {
         return RecipeDetail.builder()
                 .recipeId(recipe.getId())
                 .title(recipe.getTitle())
+                .content(recipe.getContent())
                 .bookmarked(isBookmarked)
                 .liked(isLiked)
                 .createdAt(recipe.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
@@ -276,7 +280,7 @@ public class RecipeServiceImpl implements RecipeService {
         int userId = checkUserInfo(userInfo);
         if(userId == 0) {
             log.error("UserInfo Id값 조회 불가 - userId: {}", userId);
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
         }
 
         log.info("레시피 존재 유무 확인");
@@ -311,7 +315,7 @@ public class RecipeServiceImpl implements RecipeService {
     public CreateResponse addRecipeComment(int recipeId, CommentCreate commentCreate, UserInfo userInfo) {
         log.info("댓글 작성 시작");
         User user = userRepository.findById(commentCreate.getAuthorId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
 
         Recipe recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
@@ -340,7 +344,7 @@ public class RecipeServiceImpl implements RecipeService {
         int userId = checkUserInfo(userInfo);
         if(userId == 0) {
             log.error("UserInfo Id값 조회 불가 - userId: {}", userId);
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
         }
 
         log.info("레시피 존재 확인");

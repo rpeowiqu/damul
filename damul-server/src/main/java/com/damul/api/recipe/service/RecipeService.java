@@ -16,7 +16,7 @@ import java.util.List;
 public interface RecipeService {
 
     // 레시피 전체 조회 및 검색
-    ScrollResponse<RecipeList> getRecipes(ScrollRequest scrollRequest,
+    ScrollResponse<RecipeList> getRecipes(int cursorId, int size,
                                                    String searchType,
                                                    String keyword,
                                                    String orderBy);

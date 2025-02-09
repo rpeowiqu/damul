@@ -42,9 +42,9 @@ public class FollowServiceImpl implements FollowService {
         }
 
         User currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
         User targetUser = userRepository.findById(targetId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
 
         try {
             Optional<Follow> existingFollow = followRepository.findByFollowerAndFollowing(currentUser, targetUser);
@@ -73,37 +73,37 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public ScrollResponse<UserList> getFollowers(ScrollRequest request, int followingId ) {
+    public ScrollResponse<UserList> getFollowers(int cursorId, int size, int followingId ) {
         log.info("팔로워 목록 조회 시작");
         List<UserList> userLists = followRepository.findFollowersByUserIdAndCursorId(
                 followingId,
-                request.getCursorId(),
-                request.getSize() + 1
+                cursorId,
+                size + 1
         );
 
         // 마지막 하나를 더 조회했으므로 size보다 큰 경우 다음 데이터가 있다는 의미
-        if (userLists.size() > request.getSize()) {
-            userLists = userLists.subList(0, request.getSize());
+        if (userLists.size() > size) {
+            userLists = userLists.subList(0, size);
         }
 
         log.info("팔로워 목록 조회 완료");
-        return ScrollUtil.createScrollResponse(userLists, request);
+        return ScrollUtil.createScrollResponse(userLists, cursorId, size);
     }
 
     @Override
-    public ScrollResponse<UserList> getFollowings(ScrollRequest request, int followerId) {
+    public ScrollResponse<UserList> getFollowings(int cursorId, int size, int followerId) {
         log.info("팔로잉 목록 조회 시작");
         List<UserList> userLists = followRepository.findFollowingsByUserIdAndCursorId(
                 followerId,
-                request.getCursorId(),
-                request.getSize() + 1
+                cursorId,
+                size + 1
         );
 
-        if (userLists.size() > request.getSize()) {
-            userLists = userLists.subList(0, request.getSize());
+        if (userLists.size() > size) {
+            userLists = userLists.subList(0, size);
         }
         log.info("팔로잉 목록 조회 완료");
-        return ScrollUtil.createScrollResponse(userLists, request);
+        return ScrollUtil.createScrollResponse(userLists, cursorId, size);
     }
 
     // 팔로워 강제 삭제
