@@ -57,7 +57,7 @@ public class RecipeController {
         RecipeDetail detail = recipeService.getRecipeDetail(recipeId, userInfo);
         if(detail == null) {
             log.error("레시피 상세 조회 실패 - recipeId: {}", recipeId);
-            throw new BusinessException(ErrorCode.BOARD_NOT_FOUND);
+            throw new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND);
         }
 
         return ResponseEntity.ok(detail);
@@ -119,10 +119,14 @@ public class RecipeController {
     }
 
     // 댓글 삭제
-    @DeleteMapping("/{recipeId}/comments")
-    public ResponseEntity<?> deleteComment(@CurrentUser UserInfo userInfo) {
-
-        return null;
+    @DeleteMapping("/{recipeId}/comments/{commentId}")
+    public ResponseEntity<?> deleteComment(@RequestParam("recipeId") int recipeId,
+                                           @RequestParam("commentId") int commentId,
+                                           @CurrentUser UserInfo userInfo) {
+        log.info("댓글 삭제 요청 - recipeId: {}, commentId: {}", recipeId, commentId);
+        recipeService.deleteComment(recipeId, commentId);
+        log.info("댓글 삭제 완료");
+        return ResponseEntity.ok().build();
     }
 
     // 레시피 북마크 추가/삭제
