@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
         if(userOptional.isPresent()) {
             User user = userOptional.get();
             SettingResponse settingResponse = SettingResponse.builder()
+                    .email(user.getEmail())
                     .nickname(user.getNickname())
                     .profileImageUrl(user.getProfileImageUrl())
                     .selfIntroduction(user.getSelfIntroduction())
