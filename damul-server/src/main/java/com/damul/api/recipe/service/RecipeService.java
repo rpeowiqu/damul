@@ -2,15 +2,13 @@ package com.damul.api.recipe.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.common.comment.CommentCreate;
-import com.damul.api.common.scroll.dto.request.ScrollRequest;
-import com.damul.api.common.scroll.dto.response.CreateResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.RecipeDetail;
 import com.damul.api.recipe.dto.response.RecipeList;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.xml.stream.events.Comment;
 import java.util.List;
 
 public interface RecipeService {

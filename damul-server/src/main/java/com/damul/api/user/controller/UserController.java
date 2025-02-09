@@ -1,6 +1,6 @@
 package com.damul.api.user.controller;
 
-import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.user.dto.request.CheckNicknameRequest;
 import com.damul.api.user.dto.request.FollowRequest;
@@ -11,7 +11,6 @@ import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.service.FollowService;
 import com.damul.api.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -49,7 +48,7 @@ public class UserController {
     }
 
     // 닉네임 중복 확인
-    @PostMapping("/nickname-check")
+    @PostMapping("/check-nickname")
     public ResponseEntity<?> nicknameCheck(@RequestBody CheckNicknameRequest nickname) {
         log.info("닉네임 중복 확인 요청 - nickname: {}", nickname.getNickname());
         boolean isDuplicated = userService.checkNicknameDuplication(nickname.getNickname());
@@ -108,7 +107,7 @@ public class UserController {
     }
 
     // 팔로워 삭제
-    @DeleteMapping("/{userId}/force-unfollow/{followId}")
+    @DeleteMapping("/{userId}/followers/{followId}")
     public ResponseEntity<?> unfollow(@PathVariable int userId, @PathVariable int followId) {
         log.info("팔로워 강제 삭제 요청 - userId: {}, followId: {}", userId, followId);
         followService.deleteFollower(userId, followId);
@@ -118,16 +117,16 @@ public class UserController {
     }
 
     // 사용자 목록 검색/조회
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<?> search(@RequestParam(required = false) String keyword) {
         log.info("사용자 목록 검색/조회 요청 - keyword: {}", keyword);
-        UserList userList = userService.getSearchUserList(keyword);
-        if(userList == null) {
+        CreateResponse createResponse = userService.getSearchUserList(keyword);
+        if(createResponse == null) {
             log.info("사용자 목록 검색/조회 완료 - 데이터 없음");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
             log.info("사용자 목록 검색/조회 완료");
-            return ResponseEntity.ok(userList);
+            return ResponseEntity.ok(createResponse);
         }
     }
 }
