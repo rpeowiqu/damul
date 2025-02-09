@@ -46,4 +46,12 @@ public class Recipe {
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;
 
+
+    public void incrementLikeCnt() {
+        this.likeCnt++;
+    }
+
+    public void decrementLikeCnt() {
+        this.likeCnt = Math.max(0, this.likeCnt - 1);  // 음수가 되지 않도록 처리
+    }
 }

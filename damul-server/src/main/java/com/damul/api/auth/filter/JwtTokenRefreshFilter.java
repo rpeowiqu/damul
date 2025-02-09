@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -26,16 +27,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtTokenRefreshFilter extends OncePerRequestFilter {
-
-    @Value("${jwt.access-token-expiration}")
-    private long accessTokenExpire;        // Access Token 만료 시간 (ms)
-
-    @Value("${jwt.refresh-token-expiration}")
-    private long refreshTokenExpire;       // Refresh Token 만료 시간 (ms)
-
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthService authService;
     private final CookieUtil cookieUtil;
+    private final long accessTokenExpire;  // 생성자로 주입
+    private final long refreshTokenExpire; // 생성자로 주입
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -49,6 +46,27 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
 
             log.info("accessToken 존재: {}", accessTokenCookie.isPresent());
             log.info("refreshToken 존재: {}", refreshTokenCookie.isPresent());
+
+
+            if (accessTokenCookie.isPresent()) {
+                String accessToken = accessTokenCookie.get().getValue();
+
+                if (jwtTokenProvider.validateToken(accessToken)) {
+                    // 토큰이 유효한 경우 SecurityContext 설정
+                    Claims claims = jwtTokenProvider.getClaims(accessToken);
+                    String userEmail = claims.getSubject();
+
+                    List<SimpleGrantedAuthority> authorities = ((List<String>) claims.get("role")).stream()
+                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                            .collect(Collectors.toList());
+
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userEmail, null, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                    log.info("Security Context에 '{}' 인증 정보를 저장했습니다", userEmail);
+                }
+            }
 
             if (accessTokenCookie.isPresent() && refreshTokenCookie.isPresent()) {
                 String accessToken = accessTokenCookie.get().getValue();

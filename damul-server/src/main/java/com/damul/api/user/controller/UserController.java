@@ -49,7 +49,7 @@ public class UserController {
     }
 
     // 닉네임 중복 확인
-    @PostMapping("/nickname-check")
+    @PostMapping("/check-nickname")
     public ResponseEntity<?> nicknameCheck(@RequestBody CheckNicknameRequest nickname) {
         log.info("닉네임 중복 확인 요청 - nickname: {}", nickname.getNickname());
         boolean isDuplicated = userService.checkNicknameDuplication(nickname.getNickname());
@@ -108,7 +108,7 @@ public class UserController {
     }
 
     // 팔로워 삭제
-    @DeleteMapping("/{userId}/force-unfollow/{followId}")
+    @DeleteMapping("/{userId}/followers/{followId}")
     public ResponseEntity<?> unfollow(@PathVariable int userId, @PathVariable int followId) {
         log.info("팔로워 강제 삭제 요청 - userId: {}, followId: {}", userId, followId);
         followService.deleteFollower(userId, followId);
@@ -118,7 +118,7 @@ public class UserController {
     }
 
     // 사용자 목록 검색/조회
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<?> search(@RequestParam(required = false) String keyword) {
         log.info("사용자 목록 검색/조회 요청 - keyword: {}", keyword);
         UserList userList = userService.getSearchUserList(keyword);

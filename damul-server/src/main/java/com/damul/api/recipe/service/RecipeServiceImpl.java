@@ -295,6 +295,8 @@ public class RecipeServiceImpl implements RecipeService {
         if (recipeLike.isPresent()) {
             log.info("좋아요 했음 -> 좋아요 취소");
             recipeLikeRepository.delete(recipeLike.get());
+            recipe.decrementLikeCnt();  // likeCnt 감소
+            recipeRepository.save(recipe);  // 변경사항 저장
             return false;
         } else {
             log.info("좋아요 추가");
@@ -303,6 +305,8 @@ public class RecipeServiceImpl implements RecipeService {
                     .user(userRepository.getReferenceById(userId))  // 실제 조회 없이 참조만 가져옴
                     .build();
             recipeLikeRepository.save(newLike);
+            recipe.incrementLikeCnt();  // likeCnt 증가
+            recipeRepository.save(recipe);  // 변경사항 저장
             return true;
         }
 
