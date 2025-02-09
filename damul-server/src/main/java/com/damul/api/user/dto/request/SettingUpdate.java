@@ -8,7 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SettingUpdate {
-    private int userId;
     private String nickname;
     private String selfIntroduction;
     private String profileImageUrl;

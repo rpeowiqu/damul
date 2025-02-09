@@ -118,6 +118,13 @@ public class RecipeController {
         return ResponseEntity.ok(createResponse);
     }
 
+    // 댓글 삭제
+    @DeleteMapping("/{recipeId}/comments")
+    public ResponseEntity<?> deleteComment(@CurrentUser UserInfo userInfo) {
+
+        return null;
+    }
+
     // 레시피 북마크 추가/삭제
     @PostMapping("/{recipeId}/bookmarks")
     public ResponseEntity<?> addBookmark(@PathVariable int recipeId,
