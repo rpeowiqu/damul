@@ -9,18 +9,22 @@ import {
 
 interface ImageUploaderProps {
   defaultImage?: string;
+  initImage?: string;
   className?: string;
   setFile?: Dispatch<SetStateAction<File | null>>;
   children: (props: { onEdit: () => void; onReset: () => void }) => ReactNode;
 }
 
 const ImageUploader = ({
-  defaultImage,
+  defaultImage = "",
+  initImage,
   className,
   setFile,
   children,
 }: ImageUploaderProps) => {
-  const [previewURL, setPreviewURL] = useState<string>(defaultImage || "");
+  const [previewURL, setPreviewURL] = useState<string>(
+    initImage || defaultImage,
+  );
   const fileInput = useRef<HTMLInputElement>(null);
 
   const onChangeFile = (e: ChangeEvent<HTMLInputElement>) => {

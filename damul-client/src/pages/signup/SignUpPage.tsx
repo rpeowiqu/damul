@@ -8,7 +8,7 @@ enum SignUpStep {
   INFO,
 }
 
-export interface UserInput {
+export interface UserInfo {
   nickname: string;
   selfIntroduction: string;
 }
@@ -23,7 +23,7 @@ const SignUpPage = () => {
   const [step, setStep] = useState<SignUpStep>(SignUpStep.TERMS);
   const [selectBit, setSelectBit] = useState<number>(0);
   const [email, setEmail] = useState<string>("");
-  const [userInput, setUserInput] = useState<UserInput>({
+  const [userInfo, setUserInfo] = useState<UserInfo>({
     nickname: "",
     selfIntroduction: "",
   });
@@ -34,7 +34,7 @@ const SignUpPage = () => {
       const response = await consent();
       if (response) {
         setEmail(response.data.email);
-        setUserInput({ ...userInput, nickname: response.data.nickname });
+        setUserInfo({ ...userInfo, nickname: response.data.nickname });
         terms.current = response.data.terms;
       }
     };
@@ -57,8 +57,8 @@ const SignUpPage = () => {
         return (
           <InfoForm
             email={email}
-            userInput={userInput}
-            setUserInput={setUserInput}
+            userInfo={userInfo}
+            setUserInfo={setUserInfo}
             onPrev={() => setStep(SignUpStep.TERMS)}
           />
         );

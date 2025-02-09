@@ -5,22 +5,22 @@ export const getUserSetting = (userId: number) => {
   return apiRequest(() => apiClient.get(`/users/${userId}/settings`));
 };
 
-export const setUserSetting = (
+export const modifyUserSetting = (
   userId: number,
   settingUpdate: {
-    userId: number;
     nickname: string;
     selfIntroduction: string;
-    accessRange: "public" | "friends" | "private";
+    accessRange: "PUBLIC" | "FRIENDS" | "PRIVATE";
     warningEnabled: boolean;
   },
-  profileImage?: File,
-  backgroundImage?: File,
+  profileImage: File | null,
+  backgroundImage: File | null,
 ) => {
   const formData = new FormData();
-  Object.entries(settingUpdate).forEach(([key, value]) => {
-    formData.append(key, value.toString());
+  const settingBlob = new Blob([JSON.stringify(settingUpdate)], {
+    type: "application/json",
   });
+  formData.append("settingJson", settingBlob);
   if (profileImage) {
     formData.append("profileImage", profileImage);
   }
@@ -32,7 +32,9 @@ export const setUserSetting = (
 };
 
 export const checkNicknameDuplication = (nickname: string) => {
-  return apiRequest(() => apiClient.post("/users/nickname-check", nickname));
+  return apiRequest(() =>
+    apiClient.post("/users/check-nickname", { nickname }),
+  );
 };
 
 export const getFollowers = (
@@ -64,10 +66,10 @@ export const toggleFollow = (followRequest: {
 
 export const deleteFollower = (userId: number, followerId: number) => {
   return apiRequest(() =>
-    apiClient.delete(`/users/${userId}/force-unfollow/${followerId}`),
+    apiClient.delete(`/users/${userId}/followers/${followerId}`),
   );
 };
 
-export const searchUser = (nickname: string) => {
-  return apiRequest(() => apiClient.get(`/users/search/${nickname}`));
+export const getUser = (nickname: string) => {
+  return apiRequest(() => apiClient.get(`/users/${nickname}`));
 };
