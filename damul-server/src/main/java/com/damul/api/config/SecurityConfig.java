@@ -44,6 +44,12 @@ public class SecurityConfig {
     @Value("${redirect.frontUrl}")
     private String frontUrl;
 
+    @Value("${jwt.access-token-expiration}")
+    private long accessTokenExpire;
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long refreshTokenExpire;
+
     private final JwtDecoder jwtDecoder;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -73,10 +79,16 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter());
                     });
                 })// refresh 필터 추가
-                .addFilterBefore(
-                        new JwtTokenRefreshFilter(jwtTokenProvider, authService, cookieUtil),
-                        UsernamePasswordAuthenticationFilter.class
-                )
+//                .addFilterBefore(
+//                        new JwtTokenRefreshFilter(
+//                                jwtTokenProvider,
+//                                authService,
+//                                cookieUtil,
+//                                accessTokenExpire,    // SecurityConfig에서 @Value로 가져온 값 전달
+//                                refreshTokenExpire    // SecurityConfig에서 @Value로 가져온 값 전달
+//                        ),
+//                        UsernamePasswordAuthenticationFilter.class
+//                )
                 // URL별 접근 권한 설정
                 .authorizeHttpRequests((auth) -> {
                     log.info("URL 접근 권한 설정");

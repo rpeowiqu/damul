@@ -5,8 +5,7 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
-import com.damul.api.common.scroll.dto.request.ScrollRequest;
-import com.damul.api.common.scroll.dto.response.CreateResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.recipe.dto.request.RecipeRequest;
@@ -25,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.xml.stream.events.Comment;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -295,6 +292,8 @@ public class RecipeServiceImpl implements RecipeService {
         if (recipeLike.isPresent()) {
             log.info("좋아요 했음 -> 좋아요 취소");
             recipeLikeRepository.delete(recipeLike.get());
+            recipe.decrementLikeCnt();  // likeCnt 감소
+            recipeRepository.save(recipe);  // 변경사항 저장
             return false;
         } else {
             log.info("좋아요 추가");
@@ -303,6 +302,8 @@ public class RecipeServiceImpl implements RecipeService {
                     .user(userRepository.getReferenceById(userId))  // 실제 조회 없이 참조만 가져옴
                     .build();
             recipeLikeRepository.save(newLike);
+            recipe.incrementLikeCnt();  // likeCnt 증가
+            recipeRepository.save(recipe);  // 변경사항 저장
             return true;
         }
 

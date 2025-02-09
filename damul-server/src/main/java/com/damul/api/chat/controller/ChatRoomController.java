@@ -11,7 +11,7 @@ import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.service.ChatMessageService;
 import com.damul.api.chat.service.ChatRoomService;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
-import com.damul.api.common.scroll.dto.response.CreateResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
 import com.damul.api.common.user.CurrentUser;

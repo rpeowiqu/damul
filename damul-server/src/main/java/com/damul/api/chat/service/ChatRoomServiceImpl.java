@@ -1,7 +1,6 @@
 package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
-import com.damul.api.chat.dto.MessageType;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.response.ChatMember;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
@@ -14,7 +13,7 @@ import com.damul.api.chat.repository.ChatMessageRepository;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
-import com.damul.api.common.scroll.dto.response.CreateResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
@@ -22,7 +21,6 @@ import com.damul.api.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

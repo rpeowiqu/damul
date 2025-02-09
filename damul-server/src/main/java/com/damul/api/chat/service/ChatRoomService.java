@@ -5,7 +5,7 @@ import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.dto.response.ChatRoomLimitResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
-import com.damul.api.common.scroll.dto.response.CreateResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
 
