@@ -24,7 +24,7 @@ const CommentItem = ({ comment, replies, onReply }: CommentItemProps) => {
       <p className="text-sm ml-12 pb-1">{comment.comment}</p>
       <div className="flex justify-start gap-2 ml-12 cursor-pointer text-neutral-500">
         <ReportButton className="flex items-center gap-1">
-          <p className="text-xs">신고하기</p>
+          <p className="text-xs">신고</p>
         </ReportButton>
         <div
           className="flex items-center gap-1"
