@@ -315,6 +315,9 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public CreateResponse addRecipeComment(int recipeId, CommentCreate commentCreate, UserInfo userInfo) {
         log.info("댓글 작성 시작");
+        if(commentCreate != null) {
+            log.info("commentCreate.getAuthorId(): {}", commentCreate.getAuthorId());
+        }
         User user = userRepository.findById(commentCreate.getAuthorId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
 

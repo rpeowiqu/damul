@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
             SettingResponse settingResponse = SettingResponse.builder()
                     .nickname(user.getNickname())
                     .profileImageUrl(user.getProfileImageUrl())
+                    .selfIntroduction(user.getSelfIntroduction())
                     .profileBackgroundImageUrl(user.getProfileBackgroundImageUrl())
                     .accessRange(user.getAccessRange().name())
                     .warningEnabled(user.isWarningEnabled())
