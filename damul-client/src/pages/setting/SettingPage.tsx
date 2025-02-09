@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { logout } from "@/service/auth";
 
 export interface UserSetting {
   nickname: string;
@@ -47,6 +48,7 @@ const SettingPage = () => {
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [backgroundFile, setBackgroundFile] = useState<File | null>(null);
   const [infoText, setInfoText] = useState<string>("");
+  const nav = useNavigate();
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,6 +57,11 @@ const SettingPage = () => {
     if (!infoText) {
       alert("회원 정보가 수정되었습니다.");
     }
+  };
+
+  const onLogout = async () => {
+    const response = await logout();
+    console.log(response);
   };
 
   const handleInput = (
@@ -72,7 +79,6 @@ const SettingPage = () => {
         setUserSetting({ ...userSetting, nickname: value });
         break;
       case "introduction":
-        // 자기소개는 255자를 넘을 수 없다.
         if (value.length <= 255) {
           setUserSetting({ ...userSetting, selfIntroduction: value });
         }
@@ -281,9 +287,12 @@ const SettingPage = () => {
         </div>
 
         <div>
-          <Link to={"/login"} className="text-sm text-normal-300 underline">
+          <p
+            className="text-sm text-normal-300 underline cursor-pointer"
+            onClick={onLogout}
+          >
             로그아웃
-          </Link>
+          </p>
         </div>
 
         <DamulButton type="submit" variant="positive">

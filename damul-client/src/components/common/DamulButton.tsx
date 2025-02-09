@@ -28,7 +28,7 @@ const DamulButton = ({
     <Button
       type={type}
       className={clsx(
-        "text-base font-bold rounded-lg transition-colors ease-in-out",
+        "text-sm font-bold rounded-lg transition-colors ease-in-out",
         {
           "bg-positive-300 hover:bg-positive-400 text-white":
             variant === "positive",

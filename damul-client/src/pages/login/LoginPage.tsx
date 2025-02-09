@@ -4,76 +4,63 @@ import GoogleIcon from "@/components/svg/GoogleIcon";
 import NaverIcon from "@/components/svg/NaverIcon";
 
 const LoginPage = () => {
-  const onClickKakaoLogin = () => {
-    window.location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${
-      import.meta.env.VITE_KAKAO_APP_KEY
-    }&redirect_uri=${import.meta.env.VITE_KAKAO_REDIRECT_URI}`;
+  const onLoginGoogle = () => {
+    window.location.href = import.meta.env.VITE_GOOGLE_OAUTH2_LOGIN_URI;
   };
 
-  const onClickGoogleLogin = () => {
-    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${import.meta.env.VITE_GOOGLE_REDIRECT_URI}&response_type=token&scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile`;
+  const onLoginKakao = () => {
+    window.location.href = import.meta.env.VITE_KAKAO_OAUTH2_LOGIN_URI;
   };
 
-  const onClickNaverLogin = () => {
-    window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${import.meta.env.VITE_NAVER_CLIENT_ID}&redirect_uri=${import.meta.env.VITE_NAVER_REDIRECT_URI}&state=damul`;
+  const onLoginNaver = () => {
+    window.location.href = import.meta.env.VITE_NAVER_OAUTH2_LOGIN_URI;
   };
 
   return (
-    <main className="px-10">
-      <p className="mt-40 text-4xl">
+    <div className="flex flex-col justify-center gap-36 h-full px-10">
+      <p className="text-3xl sm:text-4xl">
         효율적인 식자재 관리
         <br />
         오직
-        <div className="inline-block m-2 font-bold animate-bounce">다믈램</div>
+        <div className="inline-block m-2 font-bold animate-bounce">다믈랭</div>
         에서
       </p>
 
-      <div className="flex flex-col gap-5 mt-36">
-        <div className="flex items-center px-10">
-          <hr className="flex-1" />
-          <p className="mx-2 text-center text-normal-300">
+      <div className="flex flex-col gap-5">
+        <div className="flex items-center">
+          <hr className="flex-1 border-normal-50" />
+          <p className="mx-2 text-center text-normal-300 text-sm sm:text-base">
             SNS 계정으로 간편하게 로그인 하세요.
           </p>
-          <hr className="flex-1" />
+          <hr className="flex-1 border-normal-50" />
         </div>
 
-        <div className="relative w-full">
-          <KakaoIcon className="absolute w-6 left-12 top-2" />
-          <DamulButton
-            variant="shadow"
-            size="full"
-            textSize="base"
-            onClick={onClickKakaoLogin}
-          >
-            카카오로 시작하기
-          </DamulButton>
-        </div>
+        <DamulButton
+          variant="shadow"
+          className="w-full"
+          onClick={onLoginGoogle}
+        >
+          <div className="flex items-center px-8 w-full">
+            <GoogleIcon />
+            <p className="flex-1 text-sm sm:text-base">구글로 시작하기</p>
+          </div>
+        </DamulButton>
 
-        <div className="relative w-full">
-          <GoogleIcon className="absolute w-6 left-12 top-2" />
-          <DamulButton
-            variant="shadow"
-            size="full"
-            textSize="base"
-            onClick={onClickGoogleLogin}
-          >
-            구글로 시작하기
-          </DamulButton>
-        </div>
+        <DamulButton variant="shadow" className="w-full" onClick={onLoginKakao}>
+          <div className="flex items-center px-8 w-full">
+            <KakaoIcon className="w-6" />
+            <p className="flex-1 text-sm sm:text-base">카카오로 시작하기</p>
+          </div>
+        </DamulButton>
 
-        <div className="relative w-full">
-          <NaverIcon className="absolute w-6 left-12 top-2" />
-          <DamulButton
-            variant="shadow"
-            size="full"
-            textSize="base"
-            onClick={onClickNaverLogin}
-          >
-            네이버로 시작하기
-          </DamulButton>
-        </div>
+        <DamulButton variant="shadow" className="w-full" onClick={onLoginNaver}>
+          <div className="flex items-center px-8 w-full">
+            <NaverIcon />
+            <p className="flex-1 text-sm sm:text-base">네이버로 시작하기</p>
+          </div>
+        </DamulButton>
       </div>
-    </main>
+    </div>
   );
 };
 
