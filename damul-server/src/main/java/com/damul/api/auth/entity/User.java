@@ -69,8 +69,12 @@ public class User {
     public void updateSettings(SettingUpdate settingUpdate) {
         this.nickname = settingUpdate.getNickname();
         this.selfIntroduction = settingUpdate.getSelfIntroduction();
-        this.profileImageUrl = settingUpdate.getProfileImageUrl();
-        this.profileBackgroundImageUrl = settingUpdate.getBackgroundImageUrl();
+        if(settingUpdate.getProfileImageUrl() != null) {
+            this.profileImageUrl = settingUpdate.getProfileImageUrl();
+        }
+        if(settingUpdate.getBackgroundImageUrl() != null) {
+            this.profileBackgroundImageUrl = settingUpdate.getBackgroundImageUrl();
+        }
         this.accessRange = settingUpdate.getAccessRange();
         this.warningEnabled = settingUpdate.isWarningEnabled();
     }

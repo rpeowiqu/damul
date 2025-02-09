@@ -1,4 +1,4 @@
-package com.damul.api.common.scroll.dto.response;
+package com.damul.api.common.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
