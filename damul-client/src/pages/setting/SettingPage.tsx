@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { logout } from "@/service/auth";
 
 export interface UserSetting {
   nickname: string;
@@ -47,6 +48,7 @@ const SettingPage = () => {
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [backgroundFile, setBackgroundFile] = useState<File | null>(null);
   const [infoText, setInfoText] = useState<string>("");
+  const nav = useNavigate();
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,6 +57,11 @@ const SettingPage = () => {
     if (!infoText) {
       alert("회원 정보가 수정되었습니다.");
     }
+  };
+
+  const onLogout = async () => {
+    const response = await logout();
+    console.log(response);
   };
 
   const handleInput = (
@@ -72,7 +79,6 @@ const SettingPage = () => {
         setUserSetting({ ...userSetting, nickname: value });
         break;
       case "introduction":
-        // 자기소개는 255자를 넘을 수 없다.
         if (value.length <= 255) {
           setUserSetting({ ...userSetting, selfIntroduction: value });
         }
@@ -81,8 +87,8 @@ const SettingPage = () => {
   };
 
   return (
-    <div className="px-10 py-8">
-      <h1 className="text-xl font-black text-normal-700">프로필 수정</h1>
+    <div className="px-6 sm:px-10 py-8">
+      <h1 className="text-xl font-black text-normal-700">마이페이지</h1>
       <form onSubmit={onSubmit} className="flex flex-col gap-10 mt-3">
         <div>
           <p className="text-sm text-positive-400 font-bold">
@@ -102,7 +108,7 @@ const SettingPage = () => {
                       type="button"
                       className="absolute bottom-2 right-2 bg-white hover:bg-normal-100 border border-normal-100 rounded-full p-1"
                     >
-                      <EditIcon className="w-5" />
+                      <EditIcon className="size-4 fill-positive-400" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -131,7 +137,7 @@ const SettingPage = () => {
                       type="button"
                       className="absolute bottom-3 right-5 bg-white hover:bg-normal-100 border border-normal-100 rounded-full p-1"
                     >
-                      <EditIcon className="w-5" />
+                      <EditIcon className="size-4 fill-positive-400" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -281,9 +287,12 @@ const SettingPage = () => {
         </div>
 
         <div>
-          <Link to={"/login"} className="text-sm text-normal-300 underline">
+          <p
+            className="text-sm text-normal-300 underline cursor-pointer"
+            onClick={onLogout}
+          >
             로그아웃
-          </Link>
+          </p>
         </div>
 
         <DamulButton type="submit" variant="positive">
