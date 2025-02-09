@@ -65,7 +65,7 @@ const SignUpPage = () => {
     }
   };
 
-  return <div>{currentForm()}</div>;
+  return <div className="px-6 sm:px-10 py-8">{currentForm()}</div>;
 };
 
 export default SignUpPage;

@@ -96,8 +96,8 @@ const InfoForm = ({
   };
 
   return (
-    <div className="px-6 sm:px-10">
-      <div className="flex gap-5 mt-10">
+    <div className="pt-10">
+      <div className="flex gap-5">
         <button className="font-black" onClick={() => onPrev()}>
           &lt;
         </button>

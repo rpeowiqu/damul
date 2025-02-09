@@ -87,8 +87,8 @@ const SettingPage = () => {
   };
 
   return (
-    <div className="px-10 py-8">
-      <h1 className="text-xl font-black text-normal-700">프로필 수정</h1>
+    <div className="px-6 sm:px-10 py-8">
+      <h1 className="text-xl font-black text-normal-700">마이페이지</h1>
       <form onSubmit={onSubmit} className="flex flex-col gap-10 mt-3">
         <div>
           <p className="text-sm text-positive-400 font-bold">
@@ -108,7 +108,7 @@ const SettingPage = () => {
                       type="button"
                       className="absolute bottom-2 right-2 bg-white hover:bg-normal-100 border border-normal-100 rounded-full p-1"
                     >
-                      <EditIcon className="w-5" />
+                      <EditIcon className="size-4 fill-positive-400" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -137,7 +137,7 @@ const SettingPage = () => {
                       type="button"
                       className="absolute bottom-3 right-5 bg-white hover:bg-normal-100 border border-normal-100 rounded-full p-1"
                     >
-                      <EditIcon className="w-5" />
+                      <EditIcon className="size-4 fill-positive-400" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>

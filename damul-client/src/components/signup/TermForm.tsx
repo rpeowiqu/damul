@@ -74,8 +74,8 @@ const TermsForm = ({
   }, [selectBit]);
 
   return (
-    <div className="px-6 sm:px-10">
-      <h1 className="text-lg sm:text-xl font-black text-normal-700 mt-10">
+    <div className="pt-10">
+      <h1 className="text-lg sm:text-xl font-black text-normal-700">
         서비스 이용약관에 동의해 주세요.
       </h1>
 
