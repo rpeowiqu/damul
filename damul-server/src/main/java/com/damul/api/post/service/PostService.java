@@ -26,7 +26,7 @@ public interface PostService {
     CreateResponse updatePost(int postId, UserInfo userInfo, PostRequest postUpdateRequest, MultipartFile thumbnailImage);
     
     // 게시글 삭제
-    void deletePost(int postId);
+    void deletePost(int postId, UserInfo userInfo);
     
     // 댓글 작성
     CreateResponse addPostComment(int postId, CommentCreate commentCreate, UserInfo userInfo);

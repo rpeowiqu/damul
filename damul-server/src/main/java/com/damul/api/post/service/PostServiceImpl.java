@@ -323,10 +323,23 @@ public class PostServiceImpl implements PostService {
 
     // 게시글 삭제
     @Override
-    public void deletePost(int postId) {
+    public void deletePost(int postId, UserInfo userInfo) {
         log.info("게시글 삭제 시작 - postI: {}", postId);
+        // 유저 조회
+        if (checkUserInfo(userInfo) == 0) {
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
+        User user = userRepository.findById(userInfo.getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
+
+        // 게시글 조회 및 작성자 확인
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (post.getUser().getId() != user.getId()) {
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
+
         postRepository.delete(post);
         log.info("게시글 삭제 완료");
     }
