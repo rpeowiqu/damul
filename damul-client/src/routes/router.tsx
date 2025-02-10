@@ -39,6 +39,9 @@ import ChattingStartPage from "@/pages/chat/ChattingStartPage";
 import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPage";
 import ChattingSearchResultPage from "@/pages/chat/ChattingSearchResultPage";
 import ChattingRoomPage from "@/pages/chat/ChattingRoomPage";
+import StatisticsPage from "@/pages/statistics/StatisticsPage";
+import StatisticsTrendPage from "@/pages/statistics/StatisticsTrendPage";
+import StatisticsHistoryPage from "@/pages/statistics/StatisticsHistoryPage";
 
 const router = createBrowserRouter([
   {
@@ -207,6 +210,24 @@ const router = createBrowserRouter([
           {
             path: "create",
             element: <ChattingStartPage />,
+          },
+        ],
+      },
+      {
+        path: "statistics",
+        element: <StatisticsPage />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="trend" replace />,
+          },
+          {
+            path: "trend",
+            element: <StatisticsTrendPage />,
+          },
+          {
+            path: "history",
+            element: <StatisticsHistoryPage />,
           },
         ],
       },
