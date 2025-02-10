@@ -6,56 +6,72 @@
         "categoryId": 4,
         "ingredientName": "소고기",
         "ingredientQuantity": 80,
-        "expirationDate": 30
+        "expirationDate": 30,
+        "storage": "freezer",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 12423442,
         "categoryId": 6,
         "ingredientName": "고등어",
         "ingredientQuantity": 70,
-        "expirationDate": -21312
+        "expirationDate": -21312,
+        "storage": "freezer",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 9156,
         "categoryId": 5,
         "ingredientName": "닭가슴살",
         "ingredientQuantity": 90,
-        "expirationDate": 25
+        "expirationDate": 25,
+        "storage": "freezer",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 123432412341234231423140,
         "categoryId": 6,
         "ingredientName": "오징어",
         "ingredientQuantity": 60,
-        "expirationDate": 2
+        "expirationDate": 2,
+        "storage": "freezer",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 4234234,
         "categoryId": 4,
         "ingredientName": "소고기",
         "ingredientQuantity": 80,
-        "expirationDate": 30
+        "expirationDate": 30,
+        "storage": "freezer",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 21312312412,
         "categoryId": 6,
         "ingredientName": "고등어",
         "ingredientQuantity": 70,
-        "expirationDate": -4234
+        "expirationDate": -4234,
+        "storage": "freezer",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 5435345435345,
         "categoryId": 5,
         "ingredientName": "닭가슴살",
         "ingredientQuantity": 90,
-        "expirationDate": 25
+        "expirationDate": 25,
+        "storage": "freezer",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 3242342343243243,
         "categoryId": 6,
         "ingredientName": "오징어",
         "ingredientQuantity": 60,
-        "expirationDate": 20
+        "expirationDate": 20,
+        "storage": "freezer",
+        "purchaseDate": "2025-02-10"
       }
     ],
     "fridge": [
@@ -64,70 +80,90 @@
         "categoryId": 1,
         "ingredientName": "상추",
         "ingredientQuantity": 50,
-        "expirationDate": 5
+        "expirationDate": 5,
+        "storage": "fridge",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 42342134,
         "categoryId": 3,
         "ingredientName": "치즈",
         "ingredientQuantity": 40,
-        "expirationDate": 10
+        "expirationDate": 10,
+        "storage": "fridge",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 5,
         "categoryId": 5,
         "ingredientName": "달걀",
         "ingredientQuantity": 12,
-        "expirationDate": 7
+        "expirationDate": 7,
+        "storage": "fridge",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 13647541,
         "categoryId": 1,
         "ingredientName": "오이",
         "ingredientQuantity": 30,
-        "expirationDate": -5325
+        "expirationDate": -5325,
+        "storage": "fridge",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 1636473772,
         "categoryId": 3,
         "ingredientName": "버터",
         "ingredientQuantity": 20,
-        "expirationDate": -123213
+        "expirationDate": -123213,
+        "storage": "fridge",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 32535346,
         "categoryId": 1,
         "ingredientName": "상추",
         "ingredientQuantity": 50,
-        "expirationDate": 4214
+        "expirationDate": 4214,
+        "storage": "fridge",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 593745923,
         "categoryId": 3,
         "ingredientName": "치즈",
         "ingredientQuantity": 40,
-        "expirationDate": 10
+        "expirationDate": 10,
+        "storage": "fridge",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 312312353,
         "categoryId": 5,
         "ingredientName": "달걀",
         "ingredientQuantity": 12,
-        "expirationDate": 150
+        "expirationDate": 150,
+        "storage": "fridge",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 9732989,
         "categoryId": 1,
         "ingredientName": "오이",
         "ingredientQuantity": 30,
-        "expirationDate": 123
+        "expirationDate": 123,
+        "storage": "fridge",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 5342853496798,
         "categoryId": 3,
         "ingredientName": "버터",
         "ingredientQuantity": 20,
-        "expirationDate": -214
+        "expirationDate": -214,
+        "storage": "fridge",
+        "purchaseDate": "2025-02-10"
       }
     ],
     "roomTemp": [
@@ -136,70 +172,90 @@
         "categoryId": 0,
         "ingredientName": "쌀",
         "ingredientQuantity": 90,
-        "expirationDate": 180
+        "expirationDate": 180,
+        "storage": "roomTemp",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 412342317,
         "categoryId": 8,
         "ingredientName": "소금",
         "ingredientQuantity": 70,
-        "expirationDate": 365
+        "expirationDate": 365,
+        "storage": "roomTemp",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 832434124,
         "categoryId": 9,
         "ingredientName": "설탕",
         "ingredientQuantity": 80,
-        "expirationDate": 730
+        "expirationDate": 730,
+        "storage": "roomTemp",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 112342314122314233,
         "categoryId": 8,
         "ingredientName": "고추장",
         "ingredientQuantity": 50,
-        "expirationDate": 180
+        "expirationDate": 180,
+        "storage": "roomTemp",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 1326685844,
         "categoryId": 8,
         "ingredientName": "된장",
         "ingredientQuantity": 40,
-        "expirationDate": 365
+        "expirationDate": 365,
+        "storage": "roomTemp",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 654234,
         "categoryId": 0,
         "ingredientName": "쌀",
         "ingredientQuantity": 90,
-        "expirationDate": 180
+        "expirationDate": 180,
+        "storage": "roomTemp",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 733,
         "categoryId": 8,
         "ingredientName": "소금",
         "ingredientQuantity": 70,
-        "expirationDate": 365
+        "expirationDate": 365,
+        "storage": "roomTemp",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 8423467,
         "categoryId": 9,
         "ingredientName": "설탕",
         "ingredientQuantity": 80,
-        "expirationDate": 730
+        "expirationDate": 730,
+        "storage": "roomTemp",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 14231563,
         "categoryId": 8,
         "ingredientName": "고추장",
         "ingredientQuantity": 50,
-        "expirationDate": 180
+        "expirationDate": 180,
+        "storage": "roomTemp",
+        "purchaseDate": "2025-02-10"
       },
       {
         "userIngredientId": 1534623466284,
         "categoryId": 8,
         "ingredientName": "된장",
         "ingredientQuantity": 40,
-        "expirationDate": 365
+        "expirationDate": 365,
+        "storage": "roomTemp",
+        "purchaseDate": "2025-02-10"
       }
     ]
   }
