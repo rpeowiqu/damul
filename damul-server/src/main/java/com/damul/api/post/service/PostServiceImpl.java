@@ -281,39 +281,45 @@ public class PostServiceImpl implements PostService {
         return new CreateResponse(savedPost.getPostId());
     }
 
-//    // 게시글 수정
-//    @Override
-//    public CreateResponse updatePost(PostRequest postRequest, MultipartFile thumbnailImage) {
-//        log.info("게시글 수정 시작 - postId: {}", postId);
-//
-//        Post post = postRepository.findById(postId)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
-//
-//        // 썸네일이 존재하고 변경된 경우만 업로드 처리
-//        if (thumbnailImage.isPresent()) {
-//            String newThumbnailUrl = uploadImage(thumbnailImage.get());
-//            post = Post.builder()
-//                    .user(post.getUser())
-//                    .title(postRequest.getTitle())
-//                    .content(postRequest.getContent())
-//                    .thumbnailUrl(newThumbnailUrl)
-//                    .postType(postRequest.getPostType())
-//                    .build();
-//        } else {
-//            post = Post.builder()
-//                    .user(post.getUser())
-//                    .title(postRequest.getTitle())
-//                    .content(postRequest.getContent())
-//                    .thumbnailUrl(post.getThumbnailUrl())
-//                    .postType(postRequest.getPostType())
-//                    .build();
-//        }
-//
-//        Post updatedPost = postRepository.save(post);
-//        log.info("게시글 수정 완료 - ID: {}", updatedPost.getPostId());
-//
-//        return new CreateResponse(updatedPost.getPostId());
-//    }
+    // 게시글 수정
+    @Override
+    public CreateResponse updatePost(int postId, UserInfo userInfo, PostRequest postRequest, MultipartFile thumbnailImage) {
+        log.info("게시글 수정 시작 - 제목: {}, 내용: {}, 인원수: {}", postRequest.getTitle(), postRequest.getContent(), postRequest.getChatSize());
+        // 유저 조회
+        if (checkUserInfo(userInfo) == 0) {
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
+        User user = userRepository.findById(userInfo.getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
+
+        // 게시글 조회 및 작성자 확인
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (post.getUser().getId() != user.getId()) {
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
+
+        // 썸네일 업데이트 처리
+        String thumbnailUrl = post.getThumbnailUrl(); // 기존 썸네일 유지
+        if (thumbnailImage != null && !thumbnailImage.isEmpty()) {
+            validateImageFile(thumbnailImage);
+            thumbnailUrl = s3Service.uploadFile(thumbnailImage);  // 새 썸네일 업로드
+            log.info("새로운 썸네일 업로드 완료");
+        }
+
+        // 게시글 수정
+        post.setTitle(postRequest.getTitle());
+        post.setContent(postRequest.getContent());
+        post.setThumbnailUrl(thumbnailUrl);
+        
+        // 채팅방 인원 수정
+
+        Post updatedPost = postRepository.save(post);
+        log.info("게시글 수정 완료 - ID: {}", updatedPost.getPostId());
+
+        return new CreateResponse(updatedPost.getPostId());
+    }
 
     // 게시글 삭제
     @Override

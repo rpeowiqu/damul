@@ -75,14 +75,23 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 
-//    // 게시글 수정
-//    @PostMapping("/{postId}")
-//    public ResponseEntity<?> updatePost(@PathVariable int postId,
-//                                        @RequestPart("postRequest") PostRequest postRequest,
-//                                        @RequestPart("thumbnailImage") MultipartFile thumbnailImage) {
-//        postService.updatePost(postRequest, thumbnailImage);
-//        return ResponseEntity.ok().build();
-//    }
+    // 게시글 수정
+    @PutMapping("/{postId}")
+    public ResponseEntity<?> updatePost(@PathVariable int postId,
+                                        @CurrentUser UserInfo userInfo,
+                                        @RequestPart("postRequest") PostRequest postRequest,
+                                        @RequestPart(value = "image", required = false) MultipartFile thumbnailImage) {
+        postService.updatePost(postId, userInfo, postRequest, thumbnailImage);
+        
+        log.info("게시글 수정 시작");
+        CreateResponse post = postService.updatePost(postId, userInfo, postRequest, thumbnailImage);
+        if (post == null) {
+            log.error("게시글 수정 실패 - postTitle: {}", postRequest.getTitle());
+            throw new BusinessException(ErrorCode.DATABASE_ERROR);
+        }
+
+        return ResponseEntity.ok(post);
+    }
 
     // 게시글 삭제
     @DeleteMapping("/{postId}")

@@ -22,8 +22,8 @@ public interface PostService {
     // 게시글 작성
     CreateResponse addPost(UserInfo userInfo, PostRequest postRequest, MultipartFile thumbnailImage);
 
-//    // 게시글 수정
-//    CreateResponse updatePost(PostRequest postRequest, MultipartFile thumbnailImage);
+    // 게시글 수정
+    CreateResponse updatePost(int postId, UserInfo userInfo, PostRequest postUpdateRequest, MultipartFile thumbnailImage);
     
     // 게시글 삭제
     void deletePost(int postId);
