@@ -196,4 +196,38 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     void softDeleteRecipe(@Param("recipeId") int recipeId);
 
     Optional<Recipe> findByIdAndDeletedFalse(int recipeId);
+
+    @Query("""
+    SELECT DISTINCT r FROM Recipe r
+    LEFT JOIN FETCH RecipeTag rt ON rt.recipe.id = r.id
+    JOIN RecipeIngredient ri ON ri.recipe.id = r.id
+    JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
+        AND ui.userReciept.user.id = :userId
+        AND ui.userIngredientId = :userIngredientId
+        AND ui.isDeleted = false
+    WHERE r.deleted = false
+    ORDER BY r.likeCnt DESC
+    LIMIT 5
+    """)
+    List<Recipe> findRecommendedRecipesByIngredient(
+            @Param("userId") int userId,
+            @Param("userIngredientId") int userIngredientId
+    );
+
+    @Query("""
+    SELECT DISTINCT r FROM Recipe r
+    LEFT JOIN FETCH RecipeTag rt ON rt.recipe.id = r.id
+    JOIN RecipeIngredient ri ON ri.recipe.id = r.id
+    LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
+        AND ui.userReciept.user.id = :userId
+        AND ui.isDeleted = false
+    WHERE r.deleted = false
+    GROUP BY r.id
+    HAVING COUNT(DISTINCT ui.userIngredientId) > 0
+    ORDER BY COUNT(DISTINCT ui.userIngredientId) * 1.0 / COUNT(DISTINCT ri.id) DESC,
+             r.likeCnt * 0.3 DESC
+    LIMIT 5
+    """)
+    List<Recipe> findRecommendedRecipes(@Param("userId") int userId);
+
 }
