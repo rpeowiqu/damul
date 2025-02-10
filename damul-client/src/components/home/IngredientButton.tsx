@@ -38,7 +38,7 @@ const IngredientButton = ({
     >
       <div className="relative">
         {expirationDate <= 7 && expirationDate > 0 && (
-          <AlertCircleIcon className="stroke-negative-500 absolute scale-110 -left-4 bottom-4 fill-white" />
+          <AlertCircleIcon className="animate-pulse duration-1000 stroke-negative-500 absolute scale-110 -left-4 bottom-4 fill-white" />
         )}
         {onEdit && (
           <input
