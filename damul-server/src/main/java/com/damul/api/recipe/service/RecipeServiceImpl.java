@@ -18,6 +18,8 @@ import com.damul.api.recipe.repository.*;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -60,18 +62,21 @@ public class RecipeServiceImpl implements RecipeService {
         // 검색어가 있는데 검색 타입이 없는 경우 예외 처리
         if (keyword != null && searchType == null) {
             log.error("검색어는 존재, 검색타입 없음");
-            throw new BusinessException(ErrorCode.SEARCHTYPE_NOT_FOUND);
+            throw new BusinessException(ErrorCode.INVALID_SEARCH_TYPE);
         }
 
         List<RecipeList> recipes;
         boolean hasSearch = (searchType != null && keyword != null);
         boolean hasOrder = (orderBy != null);
 
+        // Limit 대신 pageable
+        Pageable pageable = PageRequest.of(0, size + 1);
+
         // 1. 기본 전체 조회
         if (!hasSearch && !hasOrder) {
             log.info("기본 전체 조회");
             recipes = recipeRepository.findAllRecipes(
-                    cursor, size + 1
+                    cursor, pageable
             );
         }
         // 2. 검색어만 있는 경우
@@ -79,7 +84,7 @@ public class RecipeServiceImpl implements RecipeService {
             log.info("검색어만 존재");
             recipes = recipeRepository.findBySearch(
                     cursor,
-                    size + 1,
+                    pageable,
                     searchType,
                     keyword
             );
@@ -90,7 +95,7 @@ public class RecipeServiceImpl implements RecipeService {
             log.info("정렬 조건만 존재");
             recipes = recipeRepository.findAllWithOrder(
                     cursor,
-                    size + 1,
+                    pageable,
                     orderBy
             );
         }
@@ -100,7 +105,7 @@ public class RecipeServiceImpl implements RecipeService {
             log.info("모두 존재");
             recipes = recipeRepository.findBySearchWithOrder(
                     cursor,
-                    size + 1,
+                    pageable,
                     searchType,
                     keyword,
                     orderBy
@@ -147,7 +152,7 @@ public class RecipeServiceImpl implements RecipeService {
         // Redis에 해당 키가 없으면 DB에서 조회수를 가져와서 설정
         if (!Boolean.TRUE.equals(redisTemplate.hasKey(redisKey))) {
             Recipe recipe = recipeRepository.findById(recipeId)
-                    .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+                    .orElseThrow(() -> new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND));
             ops.set(redisKey, String.valueOf(recipe.getViewCnt()));
             redisTemplate.expire(redisKey, REDIS_DATA_EXPIRE_TIME, TimeUnit.SECONDS);
         }
@@ -170,7 +175,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         // 2. Recipe 정보 조회
         Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND));
 
         // 3. 북마크/좋아요 상태 확인
         boolean isBookmarked = false;
@@ -265,7 +270,7 @@ public class RecipeServiceImpl implements RecipeService {
     public void deleteRecipe(int recipeId) {
         log.info("레시피 삭제 시작 - recipeId: {}", recipeId);
         Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND));
         recipeRepository.delete(recipe);
         log.info("레시피 삭제 완료");
     }
@@ -282,7 +287,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         log.info("레시피 존재 유무 확인");
         Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND));
 
         log.info("레시피 좋아요 유무 확인");
         Optional<RecipeLike> recipeLike = recipeLikeRepository.findByRecipe_IdAndUser_Id(recipeId, userId);
@@ -340,6 +345,29 @@ public class RecipeServiceImpl implements RecipeService {
 
         RecipeComment savedComment = recipeCommentRepository.save(comment);
         return new CreateResponse(savedComment.getId());
+    }
+
+    // 댓글 삭제
+    @Override
+    public void deleteComment(int recipeId, int commentId) {
+        log.info("댓글 삭제 시작 - recipeId: {}, commentId: {}", recipeId, commentId);
+
+        log.info("레시피 조회 시작 - recipeId: {}", recipeId);
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> {
+                    log.error("해당 레시피는 존재하지 않습니다.");
+                    throw new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND);
+                });
+
+        RecipeComment comment = recipeCommentRepository.findById(commentId)
+                .orElseThrow(() -> {
+                    log.error("해당 댓글은 존재하지 않습니다.");
+                    throw new BusinessException(ErrorCode.COMMENT_ID_NOT_FOUND);
+                });
+
+        log.info("댓글 삭제 시작 - commentId: {}", commentId);
+        recipeCommentRepository.delete(comment);
+        log.info("댓글 삭제 완료 - commentId: {}", commentId);
     }
 
     @Override

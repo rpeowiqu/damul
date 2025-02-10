@@ -42,6 +42,9 @@ public interface RecipeService {
     // 댓글 작성
     CreateResponse addRecipeComment(int recipeId, CommentCreate commentCreate, UserInfo userInfo);
 
+    // 댓글 삭제
+    void deleteComment(int recipeId, int commentId);
+
     // 레시피 북마크 추가/삭제
     boolean toggleRecipeBookmark(int recipeId, UserInfo userInfo);
 }

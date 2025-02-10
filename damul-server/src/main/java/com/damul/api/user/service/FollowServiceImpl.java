@@ -1,8 +1,6 @@
 package com.damul.api.user.service;
 
 import com.damul.api.auth.entity.User;
-import com.damul.api.common.scroll.dto.request.ScrollRequest;
-import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
@@ -38,7 +36,7 @@ public class FollowServiceImpl implements FollowService {
         // 자기 자신을 팔로우 하는 경우 체크
         if(userId == targetId) {
             log.error("자기 자신을 팔로우 할 수 없습니다.");
-            throw new BusinessException(ErrorCode.INVALED_TARGETID);
+            throw new BusinessException(ErrorCode.INVALID_TARGET_ID);
         }
 
         User currentUser = userRepository.findById(userId)
