@@ -14,21 +14,19 @@ import { signUp } from "@/service/auth";
 import { checkNicknameDuplication } from "@/service/user";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
-import { UserInput } from "@/pages/signup/SignUpPage";
+import { UserInfo } from "@/pages/signup/SignUpPage";
+import GoogleIcon from "../svg/GoogleIcon";
+import KakaoIcon from "../svg/KakaoIcon";
+import NaverIcon from "../svg/NaverIcon";
 
 interface InfoFormProps {
   email: string;
-  userInput: UserInput;
-  setUserInput: Dispatch<SetStateAction<UserInput>>;
+  userInfo: UserInfo;
+  setUserInfo: Dispatch<SetStateAction<UserInfo>>;
   onPrev: () => void;
 }
 
-const InfoForm = ({
-  email,
-  userInput,
-  setUserInput,
-  onPrev,
-}: InfoFormProps) => {
+const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
   const [status, setStatus] = useState<
     "none" | "available" | "duplicate" | "validLength"
   >("none");
@@ -39,7 +37,7 @@ const InfoForm = ({
 
     const newStatus = await checkNickname();
     if (newStatus === "available") {
-      const response = await signUp(userInput);
+      const response = await signUp(userInfo);
       if (response?.status === 200) {
         alert("회원가입 되었습니다.");
         nav("/home", { replace: true });
@@ -59,21 +57,22 @@ const InfoForm = ({
         } else {
           setStatus("none");
         }
-        setUserInput({ ...userInput, nickname: value });
+        setUserInfo({ ...userInfo, nickname: value });
         break;
       case "selfIntroduction":
         if (value.length <= 255) {
-          setUserInput({ ...userInput, selfIntroduction: value });
+          setUserInfo({ ...userInfo, selfIntroduction: value });
         }
         break;
     }
   };
 
   const checkNickname = async () => {
-    if (!isValidNickname(userInput.nickname)) {
+    if (!isValidNickname(userInfo.nickname)) {
       return "validLength";
     } else {
-      const response = await checkNicknameDuplication(userInput.nickname);
+      const response = await checkNicknameDuplication(userInfo.nickname);
+      console.log(response);
       if (!response?.data) {
         return "available";
       } else {
@@ -93,6 +92,16 @@ const InfoForm = ({
     }
 
     return "";
+  };
+
+  const getEmailIcon = () => {
+    if (email.endsWith("gmail.com")) {
+      return <GoogleIcon className="size-5" />;
+    } else if (email.endsWith("kakao.com")) {
+      return <KakaoIcon className="size-5" />;
+    } else if (email.endsWith("naver.com")) {
+      return <NaverIcon className="size-5" />;
+    }
   };
 
   return (
@@ -117,7 +126,10 @@ const InfoForm = ({
           <p className="text-sm text-positive-400 font-bold">
             연동된 이메일 계정
           </p>
-          <p>{email}</p>
+          <div className="flex items-center gap-2">
+            {getEmailIcon()}
+            <p>{email}</p>
+          </div>
         </div>
 
         <div className="relative">
@@ -134,7 +146,7 @@ const InfoForm = ({
                 name="nickname"
                 type="text"
                 placeholder="닉네임을 입력해 주세요."
-                value={userInput.nickname}
+                value={userInfo.nickname}
                 onChange={handleInput}
                 className={clsx(
                   "focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0 text-sm",
@@ -159,7 +171,7 @@ const InfoForm = ({
           </div>
 
           <p
-            className={clsx("min-h-6 text-sm text-negative-400", {
+            className={clsx("absolute text-sm text-negative-400", {
               "text-positive-400": status === "available",
             })}
           >
@@ -179,15 +191,15 @@ const InfoForm = ({
             name="selfIntroduction"
             className="resize-none focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0 text-sm"
             placeholder="회원님에 대해 자유롭게 소개해 보세요."
-            value={userInput.selfIntroduction}
+            value={userInfo.selfIntroduction}
             onChange={handleInput}
           />
-          <p className="text-end text-xs">
-            {userInput.selfIntroduction.length} / 255
+          <p className="absolute right-0 -bottom-5 text-xs">
+            {userInfo.selfIntroduction.length} / 255
           </p>
         </div>
 
-        <DamulButton type="submit" variant="positive" className="w-full">
+        <DamulButton type="submit" variant="positive" className="w-full mt-6">
           가입하기
         </DamulButton>
       </form>

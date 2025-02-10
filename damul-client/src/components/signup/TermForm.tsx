@@ -79,8 +79,8 @@ const TermsForm = ({
         서비스 이용약관에 동의해 주세요.
       </h1>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-20 mt-16">
-        <div>
+      <form onSubmit={onSubmit} className="flex flex-col gap-16 mt-16">
+        <div className="relative">
           <div className="flex items-center space-x-3">
             <Checkbox
               id="checkAll"
@@ -127,7 +127,9 @@ const TermsForm = ({
             })}
           </div>
 
-          <p className="min-h-6 mt-5 text-sm text-negative-400">{infoText}</p>
+          <p className="absolute -bottom-16 text-sm text-negative-400">
+            {infoText}
+          </p>
         </div>
 
         <DamulButton type="submit" variant="positive" className="w-full">
@@ -135,7 +137,7 @@ const TermsForm = ({
         </DamulButton>
       </form>
 
-      <p className="text-normal-300 text-xs sm:text-sm mt-6">
+      <p className="text-normal-300 text-xs sm:text-sm mt-5">
         ‘선택’ 항목에 동의하지 않아도 서비스 이용이 가능합니다. 개인정보 수집 및
         이용에 대한 동의를 거부할 권리가 있으며, 동의 거부 시 회원제 서비스
         이용이 제한됩니다.

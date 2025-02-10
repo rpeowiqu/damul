@@ -7,10 +7,6 @@ const token =
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true, // 쿠키 전송 허용
-  headers: {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json;charset=utf-8",
-  },
 });
 
 export const apiRequest = async <T>(

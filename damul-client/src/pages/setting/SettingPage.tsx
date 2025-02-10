@@ -1,7 +1,7 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import ImageUploader from "@/components/common/ImageUploader";
-import defaultProfile from "@/assets/profile.png";
-import defaultProfileBg from "@/assets/profile-background.jpg";
+import defaultProfileImage from "@/assets/profile.png";
+import defaultBackgroundImage from "@/assets/profile-background.jpg";
 import EditIcon from "@/components/svg/EditIcon";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,59 +25,98 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/service/auth";
+import {
+  checkNicknameDuplication,
+  getUserSetting,
+  modifyUserSetting,
+} from "@/service/user";
+import useUserStore from "@/stores/user";
+import { isValidNickname } from "@/utils/regex";
+import clsx from "clsx";
+import { useNavigate } from "react-router-dom";
+import { userInfo } from "os";
+import GoogleIcon from "@/components/svg/GoogleIcon";
+import KakaoIcon from "@/components/svg/KakaoIcon";
+import NaverIcon from "@/components/svg/NaverIcon";
 
-export interface UserSetting {
+interface UserSetting {
   nickname: string;
+  email: string;
   selfIntroduction: string;
-  profileImage: string;
-  backgroundImage: string;
-  accessRange: "public" | "friends" | "private";
-  isWarning: boolean;
+  profileImageUrl: string;
+  profileBackgroundImageUrl: string;
+  accessRange: "PUBLIC" | "FRIENDS" | "PRIVATE";
+  warningEnabled: boolean;
 }
 
 const SettingPage = () => {
+  const myId = useUserStore((state) => state.myId);
   const [userSetting, setUserSetting] = useState<UserSetting>({
     nickname: "",
+    email: "",
     selfIntroduction: "",
-    profileImage: defaultProfile,
-    backgroundImage: defaultProfileBg,
-    accessRange: "public",
-    isWarning: true,
+    profileImageUrl: "",
+    profileBackgroundImageUrl: "",
+    accessRange: "PUBLIC",
+    warningEnabled: true,
   });
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [backgroundFile, setBackgroundFile] = useState<File | null>(null);
-  const [infoText, setInfoText] = useState<string>("");
+  const [status, setStatus] = useState<
+    "none" | "available" | "duplicate" | "validLength"
+  >("none");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const nav = useNavigate();
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getUserSetting(myId);
+      if (response) {
+        setUserSetting(response.data);
+      }
+      setIsLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 닉네임 유효성 검사 문구가 Falsy일 경우, 회원 정보 수정이 가능하다.
-    if (!infoText) {
-      alert("회원 정보가 수정되었습니다.");
+    const newStatus = await checkNickname();
+    if (newStatus === "available") {
+      const response = await modifyUserSetting(
+        myId,
+        {
+          nickname: userSetting.nickname,
+          selfIntroduction: userSetting.selfIntroduction,
+          accessRange: userSetting.accessRange,
+          warningEnabled: userSetting.warningEnabled,
+        },
+        profileFile,
+        backgroundFile,
+      );
+      if (response?.status === 200) {
+        alert("회원정보가 수정되었습니다.");
+      }
     }
-  };
-
-  const onLogout = async () => {
-    const response = await logout();
-    console.log(response);
+    setStatus(newStatus);
   };
 
   const handleInput = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-
     switch (name) {
       case "nickname":
-        // if (!isValidNickname(value)) {
-        //   setInfoText("닉네임은 한글, 영문 2-8자로만 구성되어야 합니다.");
-        // } else {
-        //   setInfoText("");
-        // }
+        if (!isValidNickname(value)) {
+          setStatus("validLength");
+        } else {
+          setStatus("none");
+        }
         setUserSetting({ ...userSetting, nickname: value });
         break;
-      case "introduction":
+      case "selfIntroduction":
         if (value.length <= 255) {
           setUserSetting({ ...userSetting, selfIntroduction: value });
         }
@@ -86,9 +124,57 @@ const SettingPage = () => {
     }
   };
 
+  const checkNickname = async () => {
+    if (!isValidNickname(userSetting.nickname)) {
+      return "validLength";
+    } else {
+      const response = await checkNicknameDuplication(userSetting.nickname);
+      if (!response?.data) {
+        return "available";
+      } else {
+        return "duplicate";
+      }
+    }
+  };
+
+  const getInfoText = () => {
+    switch (status) {
+      case "available":
+        return "사용 가능한 닉네임입니다!";
+      case "duplicate":
+        return "이미 사용중인 닉네임입니다.";
+      case "validLength":
+        return "닉네임은 한글, 영문 2-8자로만 구성되어야 합니다.";
+    }
+
+    return "";
+  };
+
+  const onLogout = async () => {
+    const response = await logout();
+    if (response?.status === 200) {
+      alert("로그아웃 되었습니다.");
+      nav("/login", { replace: true });
+    }
+  };
+
+  const getEmailIcon = () => {
+    if (userSetting.email.endsWith("gmail.com")) {
+      return <GoogleIcon className="size-5" />;
+    } else if (userSetting.email.endsWith("kakao.com")) {
+      return <KakaoIcon className="size-5" />;
+    } else if (userSetting.email.endsWith("naver.com")) {
+      return <NaverIcon className="size-5" />;
+    }
+  };
+
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <div className="px-6 sm:px-10 py-8">
-      <h1 className="text-xl font-black text-normal-700">마이페이지</h1>
+      <h1 className="text-xl font-black text-normal-700">설정</h1>
       <form onSubmit={onSubmit} className="flex flex-col gap-10 mt-3">
         <div>
           <p className="text-sm text-positive-400 font-bold">
@@ -97,7 +183,8 @@ const SettingPage = () => {
 
           <div className="relative">
             <ImageUploader
-              defaultImage={userSetting.backgroundImage}
+              defaultImage={defaultBackgroundImage}
+              initImage={userSetting.profileBackgroundImageUrl}
               setFile={setBackgroundFile}
               className="relative w-full h-44"
             >
@@ -126,7 +213,8 @@ const SettingPage = () => {
             </ImageUploader>
 
             <ImageUploader
-              defaultImage={userSetting.profileImage}
+              defaultImage={defaultProfileImage}
+              initImage={userSetting.profileImageUrl}
               setFile={setProfileFile}
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border-4 border-normal-50 bg-white overflow-hidden"
             >
@@ -162,11 +250,14 @@ const SettingPage = () => {
           <p className="text-sm text-positive-400 font-bold">
             연동된 이메일 계정
           </p>
-          <p>jongwoo@google.com</p>
+          <div className="flex items-center gap-2">
+            {getEmailIcon()}
+            <p>{userSetting.email}</p>
+          </div>
         </div>
 
         <div className="relative">
-          <div className="flex w-full items-end space-x-3">
+          <div className="flex w-full items-end gap-3">
             <div className="flex flex-col justify-end w-full">
               <Label
                 htmlFor="nickname"
@@ -181,39 +272,53 @@ const SettingPage = () => {
                 placeholder="닉네임을 입력해 주세요."
                 value={userSetting.nickname}
                 onChange={handleInput}
-                className="focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0"
-                required
+                className={clsx(
+                  "focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0 text-sm",
+                  {
+                    "focus-visible:ring-negative-400":
+                      status === "duplicate" || status === "validLength",
+                  },
+                )}
               />
             </div>
 
-            <DamulButton variant="positive" className="text-sm">
+            <DamulButton
+              variant="positive"
+              className="text-sm"
+              onClick={async () => {
+                const newStatus = await checkNickname();
+                setStatus(newStatus);
+              }}
+            >
               중복 확인
             </DamulButton>
           </div>
 
-          <p className="absolute -bottom-6 text-sm text-negative-400 min-h-5">
-            {infoText}
+          <p
+            className={clsx("absolute text-sm text-negative-400", {
+              "text-positive-400": status === "available",
+            })}
+          >
+            {getInfoText()}
           </p>
         </div>
 
-        <div className="flex flex-col justify-end w-full">
+        <div className="relative flex flex-col justify-end w-full">
           <Label
-            htmlFor="introduction"
+            htmlFor="selfIntroduction"
             className="text-sm text-positive-400 font-bold"
           >
             자기소개
           </Label>
           <Textarea
-            id="introduction"
-            name="introduction"
-            className="resize-none focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0"
+            id="selfIntroduction"
+            name="selfIntroduction"
+            className="resize-none focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0 text-sm"
             placeholder="회원님에 대해 자유롭게 소개해 보세요."
             value={userSetting.selfIntroduction}
             onChange={handleInput}
           />
-          <p
-            className={`text-end text-xs  ${userSetting.selfIntroduction.length === 255 ? "text-negative-400" : "text-normal-400"}`}
-          >
+          <p className="absolute right-0 -bottom-5 text-xs">
             {userSetting.selfIntroduction.length} / 255
           </p>
         </div>
@@ -225,10 +330,10 @@ const SettingPage = () => {
           <Select
             name="accessRange"
             value={userSetting.accessRange}
-            onValueChange={(value) =>
+            onValueChange={(value: "PUBLIC" | "FRIENDS" | "PRIVATE") =>
               setUserSetting({
                 ...userSetting,
-                accessRange: value as "public" | "friends" | "private",
+                accessRange: value,
               })
             }
           >
@@ -239,19 +344,19 @@ const SettingPage = () => {
               <SelectGroup>
                 <SelectItem
                   className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                  value="public"
+                  value="PUBLIC"
                 >
                   전체 공개
                 </SelectItem>
                 <SelectItem
                   className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                  value="friends"
+                  value="FRIENDS"
                 >
                   친구만 공개
                 </SelectItem>
                 <SelectItem
                   className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                  value="private"
+                  value="PRIVATE"
                 >
                   비공개
                 </SelectItem>
@@ -270,32 +375,35 @@ const SettingPage = () => {
           <div className="flex items-center gap-3">
             <Switch
               id="warning"
-              checked={userSetting.isWarning}
+              checked={userSetting.warningEnabled}
               onCheckedChange={(checked: boolean) => {
-                setUserSetting({ ...userSetting, isWarning: checked });
+                setUserSetting({ ...userSetting, warningEnabled: checked });
               }}
               className="data-[state=checked]:bg-positive-200"
             />
             <p
-              className={`text-sm ${userSetting.isWarning ? "text-positive-400" : "text-normal-400"}`}
+              className={clsx(
+                "text-sm",
+                userSetting.warningEnabled
+                  ? "text-positive-400"
+                  : "text-normal-400",
+              )}
             >
-              {userSetting.isWarning
+              {userSetting.warningEnabled
                 ? "재확인 알림이 나타납니다."
                 : "재확인 알림이 나타나지 않습니다."}
             </p>
           </div>
         </div>
 
-        <div>
-          <p
-            className="text-sm text-normal-300 underline cursor-pointer"
-            onClick={onLogout}
-          >
-            로그아웃
-          </p>
-        </div>
+        <p
+          className="w-fit text-sm text-normal-300 underline cursor-pointer"
+          onClick={onLogout}
+        >
+          로그아웃
+        </p>
 
-        <DamulButton type="submit" variant="positive">
+        <DamulButton type="submit" variant="positive" className="w-full">
           수정하기
         </DamulButton>
       </form>
