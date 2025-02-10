@@ -1,5 +1,6 @@
 package com.damul.api.main.controller;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
@@ -23,7 +24,7 @@ public class HomeController {
     private final HomeService homeService;
 
     @GetMapping
-    public ResponseEntity<?> getUserIngredients(@CurrentUser User user) {
+    public ResponseEntity<?> getUserIngredients(@CurrentUser UserInfo user) {
         log.info("컨트롤러: 유저 식자재 목록 조회 시작 - userId: {}", user.getId());
 
         IngredientResponse response = homeService.getUserIngredientList(user.getId());

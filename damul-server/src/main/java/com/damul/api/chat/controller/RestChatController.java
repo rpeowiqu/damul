@@ -1,5 +1,6 @@
 package com.damul.api.chat.controller;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.ChatRoomLimitUpdate;
@@ -66,7 +67,7 @@ public class RestChatController {
     public ResponseEntity<?> searchChatRooms(
             @RequestParam(required = false) String keyword,
             @RequestBody ScrollRequest scrollRequest,
-            @CurrentUser User user) {
+            @CurrentUser UserInfo user) {
         SearchResponse<ChatRoomList> response = chatRoomService.searchChatRooms(keyword, scrollRequest, user.getId());
 
         if (response.getResults().getData().isEmpty()) {
@@ -92,7 +93,7 @@ public class RestChatController {
     @DeleteMapping("/rooms/{roomId}")
     public ResponseEntity<?> deleteChatRoom(
             @PathVariable int roomId,
-            @CurrentUser User user) {
+            @CurrentUser UserInfo user) {
         log.info("컨트롤러: 채팅방 삭제 시작 - roomId: {}", roomId);
 
         chatRoomService.deleteChatRoom(roomId, user.getId());
@@ -104,7 +105,7 @@ public class RestChatController {
     public ResponseEntity<?> kickMember(
             @PathVariable int roomId,
             @PathVariable int memberId,
-            @CurrentUser User user) {
+            @CurrentUser UserInfo user) {
         log.info("컨트롤러: 채팅방 멤버 추방 시작 - roomId: {}, memberId: {}", roomId, memberId);
 
         chatRoomService.kickMember(roomId, memberId, user.getId());
@@ -113,7 +114,7 @@ public class RestChatController {
     }
 
     @GetMapping("/unreads")
-    public ResponseEntity<UnReadResponse> getUnreadMessages(@CurrentUser User user) {
+    public ResponseEntity<UnReadResponse> getUnreadMessages(@CurrentUser UserInfo user) {
         log.info("컨트롤러: 전체 안 읽은 메시지 수 조회 시작 - userId: {}", user.getId());
 
         UnReadResponse response = chatMessageService.getUnreadMessageCount(user.getId());
@@ -139,7 +140,7 @@ public class RestChatController {
     @PostMapping("/direct/{userId}")
     public ResponseEntity<CreateResponse> createDirectChatRoom(
             @PathVariable int userId,
-            @CurrentUser User currentUser) {
+            @CurrentUser UserInfo currentUser) {
         log.info("컨트롤러: 1:1 채팅방 생성 시작 - targetUserId: {}, currentUserId: {}",
                 userId, currentUser.getId());
 
@@ -152,7 +153,7 @@ public class RestChatController {
     public ResponseEntity<ChatRoomLimitResponse> updateMemberLimit(
             @PathVariable int roomId,
             @RequestBody ChatRoomLimitUpdate request,
-            @CurrentUser User user) {
+            @CurrentUser UserInfo user) {
         log.info("컨트롤러: 채팅방 최대 인원 변경 시작 - roomId: {}, newLimit: {}",
                 roomId, request.getMemberLimit());
 

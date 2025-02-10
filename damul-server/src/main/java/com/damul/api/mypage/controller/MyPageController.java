@@ -1,5 +1,6 @@
 package com.damul.api.mypage.controller;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.user.CurrentUser;
@@ -24,7 +25,7 @@ public class MyPageController {
     @GetMapping("/{userId}/header")
     public ResponseEntity<?> getProfileHeader(
             @PathVariable int userId,
-            @CurrentUser User currentUser) {
+            @CurrentUser UserInfo currentUser) {
         log.info("컨트롤러: 마이페이지 헤더 조회 시작 - userId: {}", userId);
 
         ProfileHeaderDetail response = myPageService.getProfileHeader(userId, currentUser);
@@ -35,7 +36,7 @@ public class MyPageController {
     @GetMapping("/{userId}/profiles")
     public ResponseEntity<?> getProfile(
             @PathVariable int userId,
-            @CurrentUser User currentUser) {
+            @CurrentUser UserInfo currentUser) {
         log.info("컨트롤러: 마이페이지 프로필 조회 시작 - userId: {}", userId);
 
         ProfileDetail profileDetail = myPageService.getProfileDetail(userId, currentUser);
@@ -50,7 +51,7 @@ public class MyPageController {
     @GetMapping("/{userId}/badges")
     public ResponseEntity<BadgeResponse> getBadges(
             @PathVariable int userId,
-            @CurrentUser User currentUser) {
+            @CurrentUser UserInfo currentUser) {
         log.info("컨트롤러: 마이페이지 뱃지 조회 시작 - userId: {}", userId);
 
         List<BadgeList> badges = myPageService.getUserBadges(userId, currentUser);
@@ -66,7 +67,7 @@ public class MyPageController {
     public ResponseEntity<BadgeDetail> getBadgeDetail(
             @PathVariable int userId,
             @PathVariable int badgeId,
-            @CurrentUser User currentUser) {
+            @CurrentUser UserInfo currentUser) {
         log.info("컨트롤러: 마이페이지 뱃지 상세 조회 시작 - userId: {}, badgeId: {}", userId, badgeId);
 
         BadgeDetail badgeDetail = myPageService.getBadgeDetail(userId, badgeId, currentUser);
@@ -79,7 +80,7 @@ public class MyPageController {
             @PathVariable int userId,
             @RequestParam(defaultValue = "0") int cursor,
             @RequestParam(defaultValue = "10") int size,
-            @CurrentUser User currentUser) {
+            @CurrentUser UserInfo currentUser) {
         log.info("컨트롤러: 마이페이지 레시피 조회 시작 - userId: {}, cursor: {}, size: {}",
                 userId, cursor, size);
 
@@ -102,7 +103,7 @@ public class MyPageController {
             @PathVariable int userId,
             @RequestParam(defaultValue = "0") int cursor,
             @RequestParam(defaultValue = "10") int size,
-            @CurrentUser User currentUser) {
+            @CurrentUser UserInfo currentUser) {
         log.info("컨트롤러: 마이페이지 북마크 조회 시작 - userId: {}, cursor: {}, size: {}",
                 userId, cursor, size);
 
