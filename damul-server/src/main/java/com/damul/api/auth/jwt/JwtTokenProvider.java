@@ -125,11 +125,24 @@ public class JwtTokenProvider {
      * @return 생성된 JWT Refresh Token 문자열
      */
     public String generateRefreshToken(Authentication authentication) {
-        // OAuth2User로 캐스팅 대신 getName() 사용
-        String email = authentication.getName();
+        Object principal = authentication.getPrincipal();
+        Map<String, Object> claims = new HashMap<>();
+        if (principal instanceof UserInfo) {
+            UserInfo userInfo = (UserInfo) principal;
+            claims.put("sub", userInfo.getEmail());
+            claims.put("email", userInfo.getEmail());
+            claims.put("userId", userInfo.getId());
+            claims.put("nickname", userInfo.getNickname());
+            claims.put("role", authentication.getAuthorities());
+        } else {
+            String email = authentication.getName();
+            claims.put("sub", email);
+            claims.put("email", email);
+            claims.put("role", authentication.getAuthorities());
+        }
+
         return Jwts.builder()
-                .setSubject(email)
-                .claim("role", authentication.getAuthorities())
+                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpire))
                 .signWith(jwtSecretKey, SignatureAlgorithm.HS512)
