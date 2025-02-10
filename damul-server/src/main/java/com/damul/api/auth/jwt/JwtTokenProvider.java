@@ -1,6 +1,8 @@
 package com.damul.api.auth.jwt;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.common.user.CustomUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -14,6 +16,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -45,11 +48,43 @@ public class JwtTokenProvider {
      * @return 생성된 JWT Access Token 문자열
      */
     public String generateAccessToken(Authentication authentication) {
-        // 이메일 추출 방식 변경
-        String email = authentication.getName();
+        Object principal = authentication.getPrincipal();
+        String email;
+        Map<String, Object> claims = new HashMap<>();  // 일반 HashMap 사용
+
+        log.info("------------------------principal:{}", principal);
+        log.info("------------------------principalType:{}", principal.getClass().getSimpleName());
+
+        if (principal instanceof CustomUserDetails) {
+            CustomUserDetails customUserDetails = (CustomUserDetails) principal;
+            UserInfo userInfo = customUserDetails.getUserInfo(); // 필드에 직접 접근
+
+            log.info("JwtTokenProvider: principal is CustomUserDetails");
+            log.info("UserInfo: {}", userInfo);
+
+            email = userInfo.getEmail();
+            claims.put("sub", email);
+            claims.put("email", email);
+            claims.put("userId", userInfo.getId());
+            claims.put("nickname", userInfo.getNickname());
+            claims.put("role", authentication.getAuthorities());
+        } else if (principal instanceof UserInfo) {
+            UserInfo userInfo = (UserInfo) principal;
+            email = userInfo.getEmail();
+            claims.put("sub", email);
+            claims.put("email", email);
+            claims.put("userId", userInfo.getId());
+            claims.put("nickname", userInfo.getNickname());
+            claims.put("role", authentication.getAuthorities());
+        } else {
+            email = authentication.getName();
+            claims.put("sub", email);
+            claims.put("email", email);
+            claims.put("role", authentication.getAuthorities());
+        }
+
         return Jwts.builder()
-                .setSubject(email)
-                .claim("role", authentication.getAuthorities())
+                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpire))
                 .signWith(jwtSecretKey, SignatureAlgorithm.HS512)

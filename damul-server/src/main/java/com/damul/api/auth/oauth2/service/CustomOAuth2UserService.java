@@ -109,7 +109,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         log.info("User 객체 조회 완료: id={}, email={}, nickname={}, role={}",
                 user.getId(), user.getEmail(), user.getNickname());
 
-        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getNickname());
+        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getNickname(), user.getRole().name());
         log.info("UserInfo 객체 생성 완료: id={}, email={}, nickname={}",
                 user.getId(), user.getEmail(), user.getNickname());
 

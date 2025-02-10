@@ -59,12 +59,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
                 r.user.id, r.user.nickname)
             FROM Recipe r
             JOIN r.user u
-            LEFT JOIN Recipe prev ON prev.id = :cursorId
+            LEFT JOIN Recipe prev ON prev.id = :cursor
             WHERE r.deleted = false
             AND (:cursor = 0 OR 
                 ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
                 OR (:orderBy = 'views' AND (r.viewCnt < prev.viewCnt OR (r.viewCnt = prev.viewCnt AND r.id < prev.id)))
-                OR (:orderBy NOT IN ('likes', 'views') AND r.id < :cursorId)))
+                OR (:orderBy NOT IN ('likes', 'views') AND r.id < :cursor)))
             ORDER BY
             CASE 
                 WHEN :orderBy = 'likes' THEN r.likeCnt
