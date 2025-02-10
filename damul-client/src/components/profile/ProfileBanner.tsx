@@ -1,8 +1,10 @@
 import Image from "@/components/common/Image";
 import defaultProfile from "@/assets/profile.png";
 import defaultProfileBg from "@/assets/profile-background.jpg";
-import { useState } from "react";
 import DamulSearchBox from "../common/DamulSearchBox";
+import { getUser } from "@/service/user";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileBannerProps {
   nickname: string;
@@ -15,52 +17,34 @@ const ProfileBanner = ({
   imageUrl,
   bgImageUrl,
 }: ProfileBannerProps) => {
-  const [searchActive, setSearchActive] = useState<boolean>();
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const nav = useNavigate();
+
+  const handleSearch = async (nickname: string) => {
+    const response = await getUser(nickname);
+    if (response) {
+      nav(`/profile/${response.data.id}/info`);
+    }
+  };
 
   return (
     <div>
       <DamulSearchBox
         className="rounded-none bg-normal-50 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
         placeholder="유저 검색"
+        onButtonClick={() => handleSearch(searchKeyword)}
+        inputValue={searchKeyword}
+        setInputValue={setSearchKeyword}
       />
-      {/* <div
-        className={`flex items-center gap-1 rounded-full bg-white border border-normal-100
-transition-all duration-200 ease-in-out overflow-hidden ${searchActive ? "w-80" : "w-8"}`}
-      >
-        <button onClick={() => setSearchActive((prev) => !prev)}>
-          <SearchIcon className="size-8 fill-positive-300" />
-        </button>
-        <input
-          type="text"
-          className="text-sm flex-1 outline-none"
-          placeholder="유저 닉네임을 입력해 주세요."
-        />
-      </div> */}
-
       <div className="relative w-full h-44 select-none">
-        <Image
+        <img
           src={bgImageUrl ? bgImageUrl : defaultProfileBg}
           className="w-full h-full object-cover"
         />
-
-        {/* <div
-          className={`flex items-center gap-1 absolute top-1 left-1 rounded-full bg-white border-2 border-normal-100
-transition-all duration-200 ease-in-out overflow-hidden ${searchActive ? "w-full" : "w-8"}`}
-        >
-          <button onClick={() => setSearchActive((prev) => !prev)}>
-            <SearchIcon className="size-8 fill-normal-400" />
-          </button>
-          <input
-            type="text"
-            className="text-sm flex-1 outline-none"
-            placeholder="유저 닉네임을 입력해 주세요."
-          />
-        </div> */}
-
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border-4 border-normal-50 bg-white overflow-hidden">
-          <Image
+          <img
             src={imageUrl ? imageUrl : defaultProfile}
-            className="w-full h-full"
+            className="w-full h-full object-cover"
           />
         </div>
 

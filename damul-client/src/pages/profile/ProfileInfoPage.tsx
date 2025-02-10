@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { ProfileInfo } from "@/types/profile";
 import DamulButton from "@/components/common/DamulButton";
 import useUserStore from "@/stores/user";
+import { getProfileDetail } from "@/service/mypage";
 
 const chartConfig = {
   categoryPreference: {
@@ -44,15 +45,11 @@ const ProfileInfoPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          `/mocks/profile/user-profile-info_${user.userId}.json`,
-        );
-        if (!response.ok) {
-          throw new Error("데이터를 불러오지 못했습니다.");
+        const response = await getProfileDetail(parseInt(user.userId));
+        if (response) {
+          console.log(response.data);
+          setProfileInfo(response.data);
         }
-
-        const data = await response.json();
-        setProfileInfo(data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -67,7 +64,11 @@ const ProfileInfoPage = () => {
     return null;
   }
 
-  const getFavoriteFood = () => {
+  const getFavoriteFoodText = () => {
+    if (profileInfo.foodPreference.length === 0) {
+      return <p className="text-normal-600">아직 등록된 식자재가 없어요.</p>;
+    }
+
     const favoriteFood = profileInfo.foodPreference.reduce(
       (maxItem, item, index) =>
         item.categoryPreference > maxItem.item.categoryPreference
@@ -77,18 +78,22 @@ const ProfileInfoPage = () => {
     );
 
     return (
-      <span
-        className={"font-bold ml-0.5"}
-        style={{ color: colorList[favoriteFood.index] }}
-      >
-        {favoriteFood.item.categoryName}
-      </span>
+      <p className="text-normal-600">
+        {user.nickname}님은
+        <span
+          className={"font-bold ml-0.5"}
+          style={{ color: colorList[favoriteFood.index] }}
+        >
+          {favoriteFood.item.categoryName}
+        </span>
+        을(를) 가장 좋아하시는군요!
+      </p>
     );
   };
 
   return (
     <div className="flex flex-col gap-3 h-full">
-      <div className="flex items-center font-bold py-4 bg-white">
+      <div className="flex items-center font-bold min-h-24 bg-white">
         <Link
           to={`/profile/${user.userId}/friend/follower`}
           className="flex flex-col items-center flex-1 border-r border-normal-50"
@@ -111,14 +116,14 @@ const ProfileInfoPage = () => {
           <div className="flex flex-col flex-1 justify-center items-center gap-2">
             <DamulButton
               variant="positive"
-              className="w-20 sm:w-24 h-8 text-sm"
+              className="w-20 sm:w-24 h-7 text-sm"
               onClick={() => {}}
             >
               채팅 시작
             </DamulButton>
             <DamulButton
               variant="positive"
-              className="w-20 sm:w-24 h-8 text-sm"
+              className="w-20 sm:w-24 h-7 text-sm"
               onClick={() => {}}
             >
               팔로우
@@ -137,9 +142,8 @@ const ProfileInfoPage = () => {
 
       <div className="flex flex-col flex-1 gap-2 p-5 bg-white">
         <h1 className="text-lg font-bold">선호 식자재 그래프</h1>
-        <p className="text-normal-600">
-          {user.nickname}님은 {getFavoriteFood()}을(를) 가장 좋아하시는군요!
-        </p>
+        {getFavoriteFoodText()}
+
         <ChartContainer config={chartConfig} className="w-full min-h-80">
           <BarChart
             accessibilityLayer

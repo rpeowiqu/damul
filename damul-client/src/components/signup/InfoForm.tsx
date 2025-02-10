@@ -105,15 +105,9 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
   };
 
   return (
-    <div className="px-10">
-      <div className="flex gap-5 mt-10">
-        <button
-          className="font-black"
-          onClick={() => {
-            setUserInput({ ...userInput, nickname: "", introduction: "" });
-            onPrev?.();
-          }}
-        >
+    <div className="pt-10">
+      <div className="flex gap-5">
+        <button className="font-black" onClick={() => onPrev()}>
           &lt;
         </button>
         <h1 className="text-lg sm:text-xl font-black text-normal-700">
