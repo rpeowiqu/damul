@@ -26,11 +26,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
 
     @Override
-    public ScrollResponse<ChatMessage> getChatMessages(int roomId, ScrollRequest request, int userId) {
+    @Transactional(readOnly = true)
+    public ScrollResponse<ChatMessage> getChatMessages(int roomId, int cursor, int size, int userId) {
         log.info("서비스: 채팅 메시지 조회 시작 - roomId: {}", roomId);
 
-        ChatRoomMember member = validateAndGetMember(roomId, userId);
-        List<ChatMessage> messages = fetchMessages(roomId, request, member);
+        validateMembership(roomId, userId);
+        List<ChatMessage> messages = fetchMessages(roomId, cursor, size);
 
         if (messages.isEmpty()) {
             return createEmptyResponse();
@@ -51,15 +52,16 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         return new UnReadResponse(unreadCount);
     }
 
-    private ChatRoomMember validateAndGetMember(int roomId, int userId) {
-        return chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
-                .orElseThrow(() -> new IllegalStateException("채팅방 멤버가 아닙니다."));
+    private void validateMembership(int roomId, int userId) {
+        if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
+            throw new IllegalStateException("채팅방 멤버가 아닙니다.");
+        }
     }
 
-    private List<ChatMessage> fetchMessages(int roomId, ScrollRequest request, ChatRoomMember member) {
-        return request.getCursorId() == 0
-                ? chatMessageRepository.findInitialMessages(roomId, member.getLastReadMessageId(), request.getSize())
-                : chatMessageRepository.findPreviousMessages(roomId, request.getCursorId(), request.getSize());
+    private List<ChatMessage> fetchMessages(int roomId, int cursor, int size) {
+        return cursor == 0
+                ? chatMessageRepository.findFirstPageByRoomId(roomId, size)
+                : chatMessageRepository.findPreviousMessages(roomId, cursor, size);
     }
 
     private ScrollResponse<ChatMessage> createEmptyResponse() {

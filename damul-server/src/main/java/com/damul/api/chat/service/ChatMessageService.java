@@ -7,7 +7,7 @@ import com.damul.api.common.scroll.dto.response.ScrollResponse;
 
 public interface ChatMessageService {
 
-    ScrollResponse<ChatMessage> getChatMessages(int roomId, ScrollRequest request, int userId);
+    ScrollResponse<ChatMessage> getChatMessages(int roomId, int cursor, int size, int userId);
 
     UnReadResponse getUnreadMessageCount(int userId);
 
