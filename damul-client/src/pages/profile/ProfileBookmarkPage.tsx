@@ -11,10 +11,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import FeedList from "@/components/common/FeedList";
+import { getBookmarks } from "@/service/mypage";
 
 const ProfileBookmarkPage = () => {
   const { user } = useOutletContext();
   const [sortType, setSortType] = useState("date");
+
+  const fetchData = async (pageParam: number) => {
+    const response = await getBookmarks(user!, {
+      cursor: pageParam,
+      size: 5,
+    });
+    console.log(response);
+    if (response?.status === 204) {
+      return { data: [], meta: { nextCursor: null, hasNext: false } };
+    }
+
+    return response?.data;
+  };
 
   return (
     <div className="flex flex-col gap-2 p-5 bg-white">
@@ -52,6 +66,14 @@ const ProfileBookmarkPage = () => {
         </Select>
       </div>
       <FeedList type="profile/bookmark" />
+
+      {/* <DamulInfiniteScrollList
+        queryKey={["bookMarks"]}
+        fetchFn={fetchData}
+        renderItems={(item: FeedCardProps) => (
+          <FeedCard key={item.id} {...item} />
+        )}
+      /> */}
     </div>
   );
 };
