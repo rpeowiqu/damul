@@ -14,10 +14,12 @@ import java.util.List;
 public interface RecipeService {
 
     // 레시피 전체 조회 및 검색
-    ScrollResponse<RecipeList> getRecipes(int cursorId, int size,
-                                                   String searchType,
-                                                   String keyword,
-                                                   String orderBy);
+    ScrollResponse<RecipeList> getRecipes(UserInfo userInfo,
+                                          int cursorId,
+                                          int size,
+                                       String searchType,
+                                       String keyword,
+                                       String orderBy);
     
 
     // 인기 레시피 조회

@@ -1,20 +1,16 @@
 package com.damul.api.auth.jwt;
 
 import com.damul.api.auth.dto.response.UserInfo;
-import com.damul.api.auth.entity.User;
 import com.damul.api.common.user.CustomUserDetails;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,6 +71,18 @@ public class JwtTokenProvider {
             claims.put("email", email);
             claims.put("userId", userInfo.getId());
             claims.put("nickname", userInfo.getNickname());
+            claims.put("role", authentication.getAuthorities());
+        }  else if (principal instanceof Jwt) {
+            Jwt jwt = (Jwt) principal;
+
+            log.info("========================= JWT 상세 정보 =========================");
+            log.info("Claims: {}", jwt.getClaims());
+
+            email = jwt.getClaimAsString("email");
+            claims.put("sub", email);
+            claims.put("email", email);
+            claims.put("userId", jwt.getClaim("userId"));
+            claims.put("nickname", jwt.getClaimAsString("nickname"));
             claims.put("role", authentication.getAuthorities());
         } else {
             email = authentication.getName();
@@ -181,9 +189,32 @@ public class JwtTokenProvider {
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (Exception e) {
-            log.error("토큰 검증 실패", e);
+        } catch (ExpiredJwtException e) {
+            log.info("만료된 토큰입니다: {}", e.getMessage());
             return false;
+        } catch (SecurityException | MalformedJwtException e) {
+            log.error("잘못된 JWT 서명입니다: {}", e.getMessage());
+            return false;
+        } catch (UnsupportedJwtException e) {
+            log.error("지원되지 않는 JWT 토큰입니다: {}", e.getMessage());
+            return false;
+        } catch (IllegalArgumentException e) {
+            log.error("JWT 토큰이 잘못되었습니다: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    // 토큰이 만료되었는지만 체크하는 별도의 메서드 추가
+    public boolean isTokenExpired(String token) {
+        try {
+            Claims claims = getClaims(token);
+            Date expiration = claims.getExpiration();
+            return expiration.before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        } catch (Exception e) {
+            log.error("토큰 만료 확인 중 에러 발생", e);
+            return true;
         }
     }
 }
