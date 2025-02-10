@@ -145,7 +145,6 @@ const TermsForm = ({
       <DamulModal
         isOpen={isOpen}
         onOpenChange={() => {
-        onOpenChange={() => {
           if (isOpen) {
             setTermContent("");
           }
