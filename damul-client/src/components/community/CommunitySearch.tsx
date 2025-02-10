@@ -29,7 +29,7 @@ const CommunitySearch = ({ placeholder, type }: CommunitySearch) => {
   const navigate = useNavigate();
 
   const [inputValue, setInputValue] = useState("");
-  const [searchType, setSearchType] = useState("title");
+  const [searchType, setSearchType] = useState("content");
 
   useEffect(() => {
     console.log(searchType);
@@ -53,7 +53,7 @@ const CommunitySearch = ({ placeholder, type }: CommunitySearch) => {
                 </SelectLabel>
                 <SelectItem
                   className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500 text-xs pc:text-sm"
-                  value="title"
+                  value="content"
                 >
                   제목+내용
                 </SelectItem>
@@ -71,7 +71,8 @@ const CommunitySearch = ({ placeholder, type }: CommunitySearch) => {
               placeholder={placeholder}
               onButtonClick={(content) => {
                 handleAddSearch(content);
-                navigate(`${content}`);
+                navigate(`/community/${type}/search/result?keyword=${encodeURIComponent(content)}&searchType=${searchType}`);
+
               }}
               inputValue={inputValue}
               setInputValue={setInputValue}

@@ -10,17 +10,25 @@ interface CommentItemProps {
   comment: Comment;
   replies: Comment[];
   onReply: (_comment: Comment) => void;
+  fetchRecipeDetail: () => void;
 }
 const CommentItem = ({
   recipeId,
   comment,
   replies,
   onReply,
+  fetchRecipeDetail
 }: CommentItemProps) => {
   const deleteComment = async (commentId: number) => {
+    const isConfirmed = window.confirm("정말로 댓글을 삭제하시겠습니까?");
+
+    if (!isConfirmed) {
+      return;
+    }
     try {
       const response = await deleteRecipeComment(recipeId, commentId);
-      console.log(response?.data);
+      console.log(response);
+      fetchRecipeDetail();
     } catch (error) {
       console.error(error);
     }
@@ -67,6 +75,7 @@ const CommentItem = ({
           comment={comment}
           reply={reply}
           onReply={onReply}
+          fetchRecipeDetail={fetchRecipeDetail}
         />
       ))}
     </div>

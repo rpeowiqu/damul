@@ -9,6 +9,7 @@ interface CommentsSectionProps {
   maxMemberSize?: number;
   status?: string;
   type?: string;
+  fetchRecipeDetail: () => void;
 }
 const CommentsSection = ({
   recipeId,
@@ -18,6 +19,7 @@ const CommentsSection = ({
   maxMemberSize,
   status,
   type,
+  fetchRecipeDetail,
 }: CommentsSectionProps) => {
   // 최상위 댓글(대댓글이 아닌 댓글)만 필터링
   const topLevelComments = comments.filter((c) => !c.parentId);
@@ -49,6 +51,7 @@ const CommentsSection = ({
               comment={comment}
               replies={replies}
               onReply={onReply}
+              fetchRecipeDetail={fetchRecipeDetail}
             />
           );
         })}

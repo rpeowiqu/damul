@@ -128,6 +128,7 @@ const CommunityRecipeDetailPage = () => {
           comments={data.comments}
           onReply={(comment) => setReplyingTo(comment)}
           type="recipe"
+          fetchRecipeDetail={fetchRecipeDetail}
         />
       </main>
       <FixedCommentInput

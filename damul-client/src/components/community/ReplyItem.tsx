@@ -9,12 +9,25 @@ interface ReplyItemProps {
   comment: Comment;
   reply: Comment;
   onReply: (_comment: Comment) => void;
+  fetchRecipeDetail: () => void;
 }
-const ReplyItem = ({ recipeId, comment, reply, onReply }: ReplyItemProps) => {
+const ReplyItem = ({
+  recipeId,
+  comment,
+  reply,
+  onReply,
+  fetchRecipeDetail,
+}: ReplyItemProps) => {
   const deleteComment = async (commentId: number) => {
+    const isConfirmed = window.confirm("정말로 댓글을 삭제하시겠습니까?");
+
+    if (!isConfirmed) {
+      return;
+    }
     try {
       const response = await deleteRecipeComment(recipeId, commentId);
       console.log(response?.data);
+      fetchRecipeDetail();
     } catch (error) {
       console.error(error);
     }
