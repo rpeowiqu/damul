@@ -340,6 +340,7 @@ public class PostServiceImpl implements PostService {
             throw new BusinessException(ErrorCode.USER_FORBIDDEN);
         }
 
+        // 논리적 삭제로 바꿔야 함
         postRepository.delete(post);
         log.info("게시글 삭제 완료");
     }
