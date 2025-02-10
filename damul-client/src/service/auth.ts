@@ -1,29 +1,24 @@
 import { apiClient, apiRequest } from "./http";
 
-export const adminLogin = async (provider: string) => {
+export const adminLogin = (provider: string) => {
   return apiRequest(() => apiClient.post("/auth/admin/login", provider));
 };
 
-export const logout = async () => {
-  return apiRequest(
-    () => apiClient.post("/auth/admin/logout"),
-    (error) => {
-      if (error.status === 401) {
-        console.log("401에러");
-      }
-    },
-  );
+export const logout = () => {
+  return apiRequest(() => apiClient.post("/auth/logout"));
 };
 
-export const signUp = async (signUpRequest: {
+export const signUp = (signUpRequest: {
   nickname: string;
   selfIntroduction: string;
 }) => {
-  apiClient.post("/auth/signup", signUpRequest).then;
-
   return apiRequest(() => apiClient.post("/auth/signup", signUpRequest));
 };
 
-export const consent = async () => {
+export const consent = () => {
   return apiRequest(() => apiClient.get("/auth/consent"));
+};
+
+export const getInfo = () => {
+  return apiRequest(() => apiClient.get("/auth/users"));
 };

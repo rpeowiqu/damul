@@ -1,56 +1,71 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TermsForm from "@/components/signup/TermForm";
 import InfoForm from "@/components/signup/InfoForm";
+import { consent } from "@/service/auth";
 
 enum SignUpStep {
   TERMS,
   INFO,
 }
 
-interface UserInput {
-  selectBit: number;
+export interface UserInfo {
   nickname: string;
-  introduction: string;
+  selfIntroduction: string;
 }
 
-export interface SignUpFormProps {
-  userInput: UserInput;
-  setUserInput: Dispatch<SetStateAction<UserInput>>;
-  onNext?: () => void;
-  onPrev?: () => void;
+export interface Term {
+  id: number;
+  title: string;
+  content: string;
 }
 
 const SignUpPage = () => {
   const [step, setStep] = useState<SignUpStep>(SignUpStep.TERMS);
-  const [userInput, setUserInput] = useState({
-    selectBit: 0,
+  const [selectBit, setSelectBit] = useState<number>(0);
+  const [email, setEmail] = useState<string>("");
+  const [userInfo, setUserInfo] = useState<UserInfo>({
     nickname: "",
-    introduction: "",
+    selfIntroduction: "",
   });
+  const terms = useRef<Term[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await consent();
+      if (response) {
+        setEmail(response.data.email);
+        setUserInfo({ ...userInfo, nickname: response.data.nickname });
+        terms.current = response.data.terms;
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const currentForm = () => {
     switch (step) {
       case SignUpStep.TERMS:
-      default:
         return (
           <TermsForm
-            userInput={userInput}
-            setUserInput={setUserInput}
+            selectBit={selectBit}
+            setSelectBit={setSelectBit}
+            terms={terms.current}
             onNext={() => setStep(SignUpStep.INFO)}
           />
         );
       case SignUpStep.INFO:
         return (
           <InfoForm
-            userInput={userInput}
-            setUserInput={setUserInput}
+            email={email}
+            userInfo={userInfo}
+            setUserInfo={setUserInfo}
             onPrev={() => setStep(SignUpStep.TERMS)}
           />
         );
     }
   };
 
-  return currentForm();
+  return <div className="px-6 sm:px-10 py-8">{currentForm()}</div>;
 };
 
 export default SignUpPage;
