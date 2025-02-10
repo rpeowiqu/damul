@@ -7,31 +7,46 @@ import WriteIcon from "../svg/WriteIcon";
 import DeleteIcon from "../svg/DeleteIcon";
 import ReportButton from "../common/ReportButton";
 import { postRecipeLike } from "@/service/recipe";
+import { useState, useEffect } from "react";
 
 interface AuthorInfoProps {
   profileImageUrl: string;
   authorName: string;
   viewCnt?: number;
   likeCnt?: number;
-  isLiked?: boolean;
+  liked?: boolean;
   type: string;
   recipeId: string;
 }
+
 const AuthorInfo = ({
   profileImageUrl,
   authorName,
   viewCnt,
-  likeCnt,
-  isLiked,
+  likeCnt = 0,
+  liked,
   type,
   recipeId,
 }: AuthorInfoProps) => {
   const navigate = useNavigate();
+  const [isLiked, setIsLiked] = useState(liked);
+  const [likesCount, setLikesCount] = useState(likeCnt);
+
+  useEffect(() => {
+    setIsLiked(liked);
+    setLikesCount(likeCnt);
+  }, [liked, likeCnt, recipeId]);
 
   const likeRecipe = async () => {
     try {
       const response = await postRecipeLike(recipeId);
-      console.log(response);
+      if (response?.data) {
+        setIsLiked(true);
+        setLikesCount((prev) => prev + 1);
+      } else {
+        setIsLiked(false);
+        setLikesCount((prev) => Math.max(0, prev - 1));
+      }
     } catch (error) {
       console.error(error);
     }
@@ -52,15 +67,15 @@ const AuthorInfo = ({
                 <p className="text-xs text-neutral-700">{viewCnt}</p>
               </div>
               <div
-                onClick={() => likeRecipe()}
+                onClick={likeRecipe}
                 className="flex items-center gap-1 cursor-pointer"
               >
                 {isLiked ? (
-                  <LikesIcon className="w-5 h-5 fill-positive-300  stroke-neutral-700" />
+                  <LikesIcon className="w-5 h-5 fill-positive-300 stroke-neutral-500" />
                 ) : (
-                  <LikesIcon className="w-5 h-5   stroke-neutral-700" />
+                  <LikesIcon className="w-5 h-5 stroke-neutral-700" />
                 )}
-                <p className="text-xs text-neutral-700">{likeCnt}</p>
+                <p className="text-xs text-neutral-700">{likesCount}</p>
               </div>
             </div>
           </div>
@@ -84,7 +99,7 @@ const AuthorInfo = ({
         </div>
         <div className="flex items-center gap-0 cursor-pointer">
           <DeleteIcon className="w-5 h-5 pc:w-7 pc:h-7 fill-neutral-700 pb-0.5" />
-          <p className="text-xs pc:text-sm ">삭제하기</p>
+          <p className="text-xs pc:text-sm">삭제하기</p>
         </div>
       </div>
     </div>

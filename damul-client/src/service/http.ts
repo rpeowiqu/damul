@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 임시 토큰
 const token =
-  "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6eXUyMkBuYXZlci5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzkwMzA1OTMsImV4cCI6MTczOTAzNDE5M30.vDe5LdwLAmEjd3Ir_vxjCSKvYkkDWn3YKENU2a3qoYELejh5c0Y5lKkssg0LlICAmPwQnR7pb2ehTF_iFHvRrA";
+  "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ6eXUyMkBuYXZlci5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzkwOTA4MDIsImV4cCI6MTczOTA5NDQwMn0.T_yUJiKt83Y5my9oYsaAX4NY5AVlWRvcF2tusg-1VCDTfULhLy-2eq1Oar9O9y7AL6ipc91SgBxjVUIqDSNDVg";
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,

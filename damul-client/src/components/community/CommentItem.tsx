@@ -16,9 +16,12 @@ const CommentItem = ({ comment, replies, onReply }: CommentItemProps) => {
           src={comment.profileImageUrl}
           className="w-10 h-10 rounded-full"
         />
-        <div className="flex w-full justify-between pr-2">
+        <div className="flex flex-1 justify-between pr-2">
           <p className="font-semibold text-sm">{comment.nickname}</p>
-          <p className="text-xs text-neutral-500">{comment.createdAt}</p>
+          <p className="text-xs text-neutral-500">
+            {comment.createdAt.split("T")[0]}{" "}
+            {comment.createdAt.split("T")[1].slice(0, 5)}
+          </p>
         </div>
       </div>
       <p className="text-sm ml-12 pb-1">{comment.comment}</p>

@@ -35,8 +35,8 @@ interface Comment {
 interface RecipeDetail {
   recipeId: string;
   title: string;
-  isBookmarked: boolean;
-  isLiked: boolean;
+  bookmarked: boolean;
+  liked: boolean;
   createdAt: string;
   authorId: number;
   authorName: string;
@@ -58,8 +58,8 @@ const CommunityRecipeDetailPage = () => {
   const initialRecipeDetail: RecipeDetail = {
     recipeId: "0",
     title: "",
-    isBookmarked: false,
-    isLiked: false,
+    bookmarked: false,
+    liked: false,
     createdAt: "",
     authorId: 0,
     authorName: "",
@@ -103,7 +103,8 @@ const CommunityRecipeDetailPage = () => {
         <CommunityDetailHeader
           title={data.title}
           createdAt={data.createdAt}
-          isBookmarked={data.isBookmarked}
+          bookmarked={data.bookmarked}
+          recipeId={data.recipeId}
           type="recipe"
         />
         <AuthorInfo
@@ -111,7 +112,7 @@ const CommunityRecipeDetailPage = () => {
           authorName={data.authorName}
           viewCnt={data.viewCnt}
           likeCnt={data.likeCnt}
-          isLiked={data.isLiked}
+          liked={data.liked}
           recipeId={data.recipeId}
           type="recipe"
         />
@@ -129,6 +130,7 @@ const CommunityRecipeDetailPage = () => {
         />
       </main>
       <FixedCommentInput
+        recipeId={recipeId || ""}
         replyingTo={replyingTo}
         comment={comment}
         setComment={setComment}

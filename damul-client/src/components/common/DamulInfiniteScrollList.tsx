@@ -1,11 +1,10 @@
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 interface DamulInfiniteScrollListProps<T> {
   queryKey: string[];
-  fetchFn: (pageParam: number) => Promise<T[]>;
-  initPage?: number;
+  fetchFn: (pageParam: number) => Promise<{ data: T[]; meta: { nextCursor: number | null; hasNextData: boolean } }>;  initPage?: number;
   loadSize?: number; // 스켈레톤 개수를 출력할 때 사용
   renderItems: (item: T, index: number) => ReactNode;
   skeleton?: ReactNode;
@@ -15,7 +14,7 @@ interface DamulInfiniteScrollListProps<T> {
 const DamulInfiniteScrollList = <T,>({
   queryKey,
   fetchFn,
-  initPage = 1,
+  initPage = 0,
   loadSize = 1,
   renderItems,
   skeleton,
@@ -28,23 +27,24 @@ const DamulInfiniteScrollList = <T,>({
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: [queryKey],
-      queryFn: ({ pageParam = 1 }) => fetchFn(pageParam),
+      queryFn: ({ pageParam = 0 }) => fetchFn(pageParam),
       initialPageParam: initPage,
-      getNextPageParam: (lastPage, allPages) =>
-        lastPage.length > 0 ? allPages.length + 1 : undefined,
+      getNextPageParam: (lastPage) =>
+        lastPage.meta.hasNextData ? lastPage.meta.nextCursor : undefined, // 커서 사용
     });
 
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
+      console.log(data)
     }
   }, [inView]);
 
   return (
     <div className={className}>
       {data?.pages.map((page, pageIndex) =>
-        page.map((item, index) =>
-          renderItems(item, index + pageIndex * page.length),
+        page.data.map((item, index) =>
+          renderItems(item, index + pageIndex * page.data.length),
         ),
       )}
 

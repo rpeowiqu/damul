@@ -1,8 +1,10 @@
 import { ChangeEvent, KeyboardEvent, Dispatch, SetStateAction } from "react";
 import { Input } from "@/components/ui/input";
 import SendIcon from "../svg/SendIcon";
+import { postRecipeComment } from "@/service/recipe";
 
 interface CommentInputProps {
+  recipeId: string;
   placeholder?: string;
   onButtonClick?: (_value: string) => void; // 버튼 클릭 이벤트 (입력값 전달)
   comment: string;
@@ -11,6 +13,7 @@ interface CommentInputProps {
 }
 
 const CommentInput = ({
+  recipeId,
   placeholder,
   onButtonClick,
   comment,
@@ -33,9 +36,20 @@ const CommentInput = ({
 
   // 입력 버튼 클릭 핸들러
   const handleButtonClick = () => {
+    submitComment();
     console.log(comment);
     setComment("");
   };
+
+  const authorId = "1"
+  const submitComment = async () => {
+    try {
+      const response = await postRecipeComment({recipeId, authorId, comment});
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <div className={`relative ${className}`}>

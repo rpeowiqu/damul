@@ -1,22 +1,24 @@
 import { apiClient, apiRequest } from "./http";
 
-// 레시피 검색 및 전체조회
+// 게시글 검색 및 전체조회
 export const getRecipes = async ({
-  cursor = 0,
-  size = 10,
+  cursor = "0",
+  size = "10",
   searchType,
   keyword,
+  status,
   orderBy,
 }: {
-  cursor?: number;
-  size?: number;
+  cursor?: string;
+  size?: string;
   searchType?: string;
   keyword?: string;
+  status?: string;
   orderBy?: string;
 }) => {
   const params = new URLSearchParams({
-    cursor: cursor.toString(),
-    size: size.toString(),
+    cursor,
+    size,
   });
 
   if (searchType) {
@@ -25,16 +27,19 @@ export const getRecipes = async ({
   if (keyword) {
     params.append("keyword", keyword);
   }
+  if (status) {
+    params.append("status", status);
+  }
   if (orderBy) {
     params.append("orderBy", orderBy);
   }
 
-  return apiRequest(() => apiClient.get(`/recipes?${params.toString()}`));
+  return apiRequest(() => apiClient.get(`/posts?${params.toString()}`));
 };
 
-// 레시피 상세조회
-export const getRecipeDetail = async (recipeId: string | undefined) => {
-  return apiRequest(() => apiClient.get(`/recipes/${recipeId}`));
+// 게시글 상세조회
+export const getRecipeDetail = async (postId: string | undefined) => {
+  return apiRequest(() => apiClient.get(`/posts/${postId}`));
 };
 
 // 인기 레시피 조회
