@@ -40,6 +40,7 @@ const AuthorInfo = ({
   const likeRecipe = async () => {
     try {
       const response = await postRecipeLike(recipeId);
+      console.log(response?.data);
       if (response?.data) {
         setIsLiked(true);
         setLikesCount((prev) => prev + 1);
@@ -64,18 +65,22 @@ const AuthorInfo = ({
             <div className="flex gap-2 items-center justify-end">
               <div className="flex items-center gap-1">
                 <ViewIcon className="w-4 h-4 stroke-neutral-700" />
-                <p className="text-xs text-neutral-700">{viewCnt}</p>
+                <p className="text-xs text-neutral-700">
+                  {viewCnt?.toLocaleString()}
+                </p>
               </div>
               <div
                 onClick={likeRecipe}
-                className="flex items-center gap-1 cursor-pointer"
+                className="flex items-center w-12 gap-1 cursor-pointer"
               >
                 {isLiked ? (
                   <LikesIcon className="w-5 h-5 fill-positive-300 stroke-neutral-500" />
                 ) : (
                   <LikesIcon className="w-5 h-5 stroke-neutral-700" />
                 )}
-                <p className="text-xs text-neutral-700">{likesCount}</p>
+                <p className="text-xs text-neutral-700">
+                  {likesCount?.toLocaleString()}
+                </p>
               </div>
             </div>
           </div>

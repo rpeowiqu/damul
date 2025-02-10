@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import FeedList from "@/components/common/FeedList";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import {
   Select,
@@ -12,27 +11,59 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import FeedCard from "@/components/common/FeedCard";
+import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
+import { getRecipes } from "@/service/recipe";
+
+interface RecipeItem {
+  id: number;
+  title: string;
+  thumbnailUrl: string;
+  content: string;
+  createdAt: string;
+  authorId: number;
+  nickname: string;
+  bookmarked?: boolean;
+  likeCnt?: number;
+  liked?: boolean;
+  viewCnt: number;
+}
 
 const CommunitySearchResultPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [sortType, setSortType] = useState("latest");
   const [filterActive, setFlterActive] = useState(false);
   const navigate = useNavigate();
 
-  // 특정 쿼리 값 가져오기
+  // URL에서 keyword
   const keyword = searchParams.get("keyword") || "";
-  const searchType = searchParams.get("searchType");
-  const orderBy = searchParams.get("orderBy");
 
+  // URL에서 searchType
+  const searchType = searchParams.get("searchType") || "";
 
-  const addSortParams = () => {
-    searchParams.set("orderBy", sortType);
-    setSearchParams(searchParams);
+  // URL의 orderBy 값이 없으면 기본값 'latest' 설정
+  const orderType = searchParams.get("orderBy") || "latest";
+
+  const handleSortChange = (value: string) => {
+    // 정렬 기준 변경 시 URL 업데이트
+    const newParams = new URLSearchParams(searchParams);
+    if (value === "latest") {
+      newParams.delete("orderBy");
+    } else {
+      newParams.set("orderBy", value);
+    }
+    setSearchParams(newParams);
   };
 
-  useEffect(() => {
-    addSortParams();
-  }, [sortType]);
+  const fetchItems = async (pageParam: number) => {
+    const response = await getRecipes({
+      cursor: pageParam,
+      size: 5,
+      orderBy: orderType,
+      searchType: searchType,
+      keyword: keyword,
+    });
+    return response?.data;
+  };
 
   const location = useLocation();
 
@@ -70,7 +101,7 @@ const CommunitySearchResultPage = () => {
         ) : (
           <div></div>
         )}
-        <Select value={sortType} onValueChange={(value) => setSortType(value)}>
+        <Select value={orderType} onValueChange={handleSortChange}>
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
           </SelectTrigger>
@@ -118,7 +149,30 @@ const CommunitySearchResultPage = () => {
           </SelectContent>
         </Select>
       </div>
-      <FeedList type={`${basePath}`} />
+      <DamulInfiniteScrollList
+        queryKey={["recipes", orderType]}
+        fetchFn={fetchItems}
+        loadSize={5}
+        renderItems={(item: RecipeItem) => (
+          <FeedCard
+            key={item.id}
+            id={item.id}
+            title={item.title}
+            thumbnailUrl={item.thumbnailUrl}
+            content={item.content}
+            createdAt={item.createdAt}
+            authorId={item.authorId}
+            nickname={item.nickname}
+            bookmarked={item.bookmarked}
+            likeCnt={item.likeCnt}
+            liked={item.liked}
+            viewCnt={item.viewCnt}
+          />
+        )}
+        skeleton={
+          <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
+        }
+      />
     </main>
   );
 };

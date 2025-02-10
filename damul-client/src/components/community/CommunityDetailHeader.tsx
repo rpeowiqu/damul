@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import BookMarkIcon from "../svg/BookMarkIcon";
 import { postRecipeBookMark } from "@/service/recipe";
+import { formatDate } from "@/utils/date";
 
 interface RecipeHeaderProps {
   title: string;
@@ -16,27 +17,27 @@ const CommunityDetailHeader = ({
   type,
   status,
   bookmarked,
-  recipeId
+  recipeId,
 }: RecipeHeaderProps) => {
-
   const [isBookmarked, setIsBookmarked] = useState(bookmarked);
-  
-    useEffect(() => {
-      setIsBookmarked(bookmarked);
-    }, [bookmarked]);
-  
-    const bookmarkRecipe = async () => {
-      try {
-        const response = await postRecipeBookMark(recipeId);
-        if (response?.data) {
-          setIsBookmarked(true);
-        } else {
-          setIsBookmarked(false);
-        }
-      } catch (error) {
-        console.error(error);
+
+  useEffect(() => {
+    setIsBookmarked(bookmarked);
+  }, [bookmarked]);
+
+  const bookmarkRecipe = async () => {
+    try {
+      const response = await postRecipeBookMark(recipeId);
+      console.log(response?.data);
+      if (response?.data) {
+        setIsBookmarked(true);
+      } else {
+        setIsBookmarked(false);
       }
-    };
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const StatusMarker = () =>
     status === "ACTIVE" ? (
@@ -60,13 +61,18 @@ const CommunityDetailHeader = ({
         <h3 className="text-lg font-semibold">{title}</h3>
       </div>
       {type === "recipe" ? (
-        <div onClick={bookmarkRecipe} className="flex flex-col w-1/3 justify-between items-end py-0.5 cursor-pointer">
+        <div
+          onClick={bookmarkRecipe}
+          className="flex flex-col w-1/3 justify-between items-end py-0.5 cursor-pointer"
+        >
           {isBookmarked ? (
             <BookMarkIcon className="w-5 h-5 fill-positive-300 stroke-positive-300" />
           ) : (
-            <BookMarkIcon className="w-5 h-5 stroke-positive-300   " />
+            <BookMarkIcon className="w-5 h-5 stroke-positive-300" />
           )}
-          <p className="text-xs text-neutral-500">{createdAt.split("T")[0]}</p>
+          {createdAt && (
+            <p className="text-xs text-neutral-500">{formatDate(createdAt)}</p>
+          )}
         </div>
       ) : (
         <div className="flex flex-col justify-between items-end">

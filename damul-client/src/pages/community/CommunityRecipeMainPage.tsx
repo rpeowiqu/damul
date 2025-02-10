@@ -1,6 +1,4 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-import FeedList from "@/components/common/FeedList";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import PostButton from "@/components/community/PostButton";
 import {
@@ -18,45 +16,43 @@ import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList
 import FeedCard from "@/components/common/FeedCard";
 
 interface RecipeItem {
-  data: [
-    {
-      id: number;
-      title: string;
-      thumbnailUrl: string;
-      content: string;
-      createdAt: string;
-      authorId: number;
-      authorname: string;
-    },
-  ];
-  meta: {
-    nextCursor: number;
-    hasNext: boolean;
-  };
+  id: number;
+  title: string;
+  thumbnailUrl: string;
+  content: string;
+  createdAt: string;
+  authorId: number;
+  nickname: string;
+  bookmarked: boolean;
+  likeCnt: number;
+  liked: boolean;
+  viewCnt: number;
 }
 
 const CommunityRecipeMainPage = () => {
   const navigate = useNavigate();
-  const [sortType, setSortType] = useState("latest");
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const addSortParams = () => {
-    searchParams.set("orderBy", sortType);
-    setSearchParams(searchParams);
+  // URL의 orderBy 값이 없으면 기본값 'latest' 설정
+  const orderType = searchParams.get("orderBy") || "latest";
+
+  const handleSortChange = (value: string) => {
+    // 정렬 기준 변경 시 URL 업데이트
+    const newParams = new URLSearchParams(searchParams);
+    if (value === "latest") {
+      newParams.delete("orderBy");
+    } else {
+      newParams.set("orderBy", value);
+    }
+    setSearchParams(newParams);
   };
-
-  const orderBy = searchParams.get("orderBy") || "";
-
-  useEffect(() => {
-    addSortParams();
-  }, [sortType]);
 
   const fetchItems = async (pageParam: number) => {
     const response = await getRecipes({
       cursor: pageParam,
-      size: 10,
+      size: 5,
+      orderBy: orderType,
     });
-    console.log(response?.data);
     return response?.data;
   };
 
@@ -70,7 +66,7 @@ const CommunityRecipeMainPage = () => {
         className="cursor-pointer"
       />
       <div className="flex justify-end">
-        <Select value={sortType} onValueChange={(value) => setSortType(value)}>
+        <Select value={orderType} onValueChange={handleSortChange}>
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
           </SelectTrigger>
@@ -100,18 +96,10 @@ const CommunityRecipeMainPage = () => {
         </Select>
       </div>
       <DamulInfiniteScrollList
-        queryKey={["recipes"]}
+        queryKey={["recipes", orderType]}
         fetchFn={fetchItems}
-        loadSize={10}
-        renderItems={(item:  {
-          id: number;
-          title: string;
-          thumbnailUrl: string;
-          content: string;
-          createdAt: string;
-          authorId: number;
-          authorname: string;
-        },) => (
+        loadSize={5}
+        renderItems={(item: RecipeItem) => (
           <FeedCard
             key={item.id}
             id={item.id}
@@ -120,7 +108,11 @@ const CommunityRecipeMainPage = () => {
             content={item.content}
             createdAt={item.createdAt}
             authorId={item.authorId}
-            authorname={item.authorname}
+            nickname={item.nickname}
+            bookmarked={item.bookmarked}
+            likeCnt={item.likeCnt}
+            liked={item.liked}
+            viewCnt={item.viewCnt}
           />
         )}
         skeleton={

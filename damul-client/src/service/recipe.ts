@@ -48,7 +48,7 @@ export const postRecipe = async () => {
 };
 
 // 레시피 삭제
-export const deleteRecipe = async (recipeId: string | undefined) => {
+export const deleteRecipe = async (recipeId: string) => {
   return apiRequest(() => apiClient.delete(`/recipes/${recipeId}`));
 };
 
@@ -72,17 +72,28 @@ export const postRecipeComment = async ({
   recipeId: string;
   authorId: string;
   comment: string;
-  parentId?: string;
+  parentId?: number;
 }) => {
   const CommentCreate: Record<string, any> = { authorId, comment };
 
   if (parentId) {
     CommentCreate.parentId = parentId;
+    console.log(parentId);
   }
 
+  console.log(CommentCreate);
+
   return apiRequest(() =>
-    apiClient.post(`recipes/${recipeId}/comments`, {
-      CommentCreate,
-    }),
+    apiClient.post(`recipes/${recipeId}/comments`, CommentCreate),
+  );
+};
+
+// 레시피  댓글 삭제
+export const deleteRecipeComment = async (
+  recipeId: string,
+  commentId: number,
+) => {
+  return apiRequest(() =>
+    apiClient.delete(`/recipes/${recipeId}/comments/${commentId}`),
   );
 };
