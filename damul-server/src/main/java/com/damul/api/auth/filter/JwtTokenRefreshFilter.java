@@ -1,8 +1,12 @@
 package com.damul.api.auth.filter;
 
+import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.common.user.CustomUserDetails;
+import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -49,19 +53,34 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
 
 
             if (accessTokenCookie.isPresent()) {
+                log.info("accessToken 존재 - 시작!");
                 String accessToken = accessTokenCookie.get().getValue();
-
+                log.info("accessToken: {}", accessToken);
                 if (jwtTokenProvider.validateToken(accessToken)) {
+                    log.info("토큰 유효함 - accessToken: {}", accessToken);
                     // 토큰이 유효한 경우 SecurityContext 설정
                     Claims claims = jwtTokenProvider.getClaims(accessToken);
-                    String userEmail = claims.getSubject();
+                    log.info("claims: {}", claims);
+                    String userEmail = claims.get("email", String.class);
+                    log.info("userEmail: {}", userEmail);
 
-                    List<SimpleGrantedAuthority> authorities = ((List<String>) claims.get("role")).stream()
-                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                            .collect(Collectors.toList());
+                    // 단일 권한만 부여
+                    SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + Role.USER.name());
+                    List<SimpleGrantedAuthority> authorities = Collections.singletonList(authority);
 
+                    log.info("authorities: {}", authorities);
+                    log.info("권한 부여 완");
+                    // UserInfo 객체 생성 시 모든 필수 필드 설정
+                    UserInfo userInfo = UserInfo.builder()
+                            .id(claims.get("userId", Integer.class))
+                            .email(userEmail)
+                            .nickname(claims.get("nickname", String.class))
+                            .role(Role.USER.name())
+                            .build();
+
+                    log.info("userInfo: {}", userInfo);
                     UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userEmail, null, authorities);
+                            new UsernamePasswordAuthenticationToken(userInfo, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
                     log.info("Security Context에 '{}' 인증 정보를 저장했습니다", userEmail);
@@ -97,11 +116,17 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
                                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                                         .collect(Collectors.toList());
 
-                        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                                userEmail,
-                                null,
-                                authorities
-                        );
+
+                        UserInfo userInfo = UserInfo.builder()
+                                .id(refreshTokenClaims.get("userId", Integer.class))
+                                .email(refreshTokenClaims.get("email", String.class))
+                                .nickname(refreshTokenClaims.get("nickname", String.class))
+                                .role(Role.USER.name())
+                                .build();
+
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(userInfo, null, authorities);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
 
                         // 새로운 액세스 토큰 발급
                         String newAccessToken = jwtTokenProvider.generateAccessToken(authentication);

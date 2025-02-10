@@ -1,6 +1,8 @@
 package com.damul.api.common.user;
 
 import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.auth.entity.type.Role;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,6 +15,7 @@ import java.util.Collections;
 import java.util.Map;
 
 @Getter
+@Builder
 @RequiredArgsConstructor
 public class CustomUserDetails implements OAuth2User {
     private final UserInfo userInfo;
@@ -47,4 +50,6 @@ public class CustomUserDetails implements OAuth2User {
     public String getNickname() {
         return userInfo.getNickname();
     }
+
+    public String getRole() { return userInfo.getRole(); }
 }

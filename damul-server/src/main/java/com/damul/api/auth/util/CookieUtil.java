@@ -19,7 +19,7 @@ public class CookieUtil {
 
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .path("/")
-                .domain("")
+                .domain("localhost")
                 .sameSite("Lax")
                 .httpOnly(true)
                 .secure(false)        // 개발 환경에서는 false, 운영에서는 true
