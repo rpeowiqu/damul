@@ -51,14 +51,21 @@ public class RecipeServiceImpl implements RecipeService {
     private final UserRepository userRepository;
     private final RecipeLikeRepository recipeLikeRepository;
     private final RecipeBookmarkRepository recipeBookmarkRepository;
-
     // 레시피 전체 조회 및 검색
     @Override
-    public ScrollResponse getRecipes(int cursor, int size, String searchType, String keyword, String orderBy) {
-
+    public ScrollResponse getRecipes(UserInfo userInfo, int cursor, int size, String searchType, String keyword, String orderBy) {
         log.debug("=== Recipe Search Start ===");
         log.debug("Parameters: cursor={}, size={}, searchType={}, keyword={}, orderBy={}", cursor,
                 size, searchType, keyword, orderBy);
+
+        if(userInfo == null) {
+            log.error("사용자 정보를 찾을 수 없습니다.");
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
+
+        // 현재 로그인한 사용자 ID 가져오기 (인증 컨텍스트에서)
+        int currentUserId = userInfo.getId();
+
         // 검색어가 있는데 검색 타입이 없는 경우 예외 처리
         if (keyword != null && searchType == null) {
             log.error("검색어는 존재, 검색타입 없음");
@@ -76,7 +83,9 @@ public class RecipeServiceImpl implements RecipeService {
         if (!hasSearch && !hasOrder) {
             log.info("기본 전체 조회");
             recipes = recipeRepository.findAllRecipes(
-                    cursor, pageable
+                    cursor,
+                    currentUserId,
+                    pageable
             );
         }
         // 2. 검색어만 있는 경우
@@ -84,6 +93,7 @@ public class RecipeServiceImpl implements RecipeService {
             log.info("검색어만 존재");
             recipes = recipeRepository.findBySearch(
                     cursor,
+                    currentUserId,
                     pageable,
                     searchType,
                     keyword
@@ -95,6 +105,7 @@ public class RecipeServiceImpl implements RecipeService {
             log.info("정렬 조건만 존재");
             recipes = recipeRepository.findAllWithOrder(
                     cursor,
+                    currentUserId,
                     pageable,
                     orderBy
             );
@@ -105,6 +116,7 @@ public class RecipeServiceImpl implements RecipeService {
             log.info("모두 존재");
             recipes = recipeRepository.findBySearchWithOrder(
                     cursor,
+                    currentUserId,
                     pageable,
                     searchType,
                     keyword,
@@ -117,13 +129,16 @@ public class RecipeServiceImpl implements RecipeService {
         }
 
         if (recipes.isEmpty()) {
-            log.debug("No recipes found in JPA query result");
+            log.debug("레시피 없음");
         } else {
-            log.debug("Found {} recipes in JPA query", recipes.size());
-            log.debug("First recipe data: id={}, title={}, userId={}",
+            log.debug("First recipe data: id={}, title={}, userId={}, viewCnt={}, likeCnt={}, bookmarked={}, liked={}",
                     recipes.get(0).getId(),
                     recipes.get(0).getTitle(),
-                    recipes.get(0).getUserId());
+                    recipes.get(0).getUserId(),
+                    recipes.get(0).getViewCnt(),
+                    recipes.get(0).getLikeCnt(),
+                    recipes.get(0).isBookmarked(),
+                    recipes.get(0).isLiked());
         }
 
         return ScrollUtil.createScrollResponse(recipes, cursor, size);
@@ -320,10 +335,17 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public CreateResponse addRecipeComment(int recipeId, CommentCreate commentCreate, UserInfo userInfo) {
         log.info("댓글 작성 시작");
-        if(commentCreate != null) {
-            log.info("commentCreate.getAuthorId(): {}", commentCreate.getAuthorId());
+        if(commentCreate == null) {
+            log.error("commentCreate 존재하지 않음");
+            throw new BusinessException(ErrorCode.INVALID_COMMENT);
         }
-        User user = userRepository.findById(commentCreate.getAuthorId())
+
+        if(userInfo == null) {
+            log.error("유저가 존재하지 않습니다");
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
+
+        User user = userRepository.findById(userInfo.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
 
         Recipe recipe = recipeRepository.findById(recipeId)

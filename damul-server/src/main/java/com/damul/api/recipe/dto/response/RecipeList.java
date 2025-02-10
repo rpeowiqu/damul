@@ -19,6 +19,10 @@ public class RecipeList implements ScrollCursor {
     private LocalDateTime createdAt;
     private int userId;
     private String nickname;
+    private int viewCnt;
+    private int likeCnt;
+    private boolean bookmarked;
+    private boolean liked;
 
     @Override
     public int getId() {
@@ -33,7 +37,11 @@ public class RecipeList implements ScrollCursor {
             String content,
             LocalDateTime createdAt,
             int userId,         // r.user.id
-            String nickname     // r.user.nickname
+            String nickname,     // r.user.nickname
+            int viewCnt,
+            int likeCnt,
+            boolean bookmarked,
+            boolean liked
     ) {
         this.id = id;
         this.title = title;
@@ -42,6 +50,10 @@ public class RecipeList implements ScrollCursor {
         this.createdAt = createdAt;
         this.userId = userId;
         this.nickname = nickname;
+        this.viewCnt = viewCnt;
+        this.likeCnt = likeCnt;
+        this.bookmarked = bookmarked;
+        this.liked = liked;
     }
 
 }

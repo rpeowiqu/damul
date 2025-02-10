@@ -20,15 +20,20 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     @Query("""
             SELECT DISTINCT new com.damul.api.recipe.dto.response.RecipeList(
                 r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
-                r.user.id, r.user.nickname)
+                r.user.id, r.user.nickname, r.viewCnt, r.likeCnt,
+                CASE WHEN b.id IS NOT NULL THEN true ELSE false END,
+                CASE WHEN l.id IS NOT NULL THEN true ELSE false END)
             FROM Recipe r
             JOIN r.user u
+            LEFT JOIN RecipeBookmark b ON b.recipe.id = r.id AND b.user.id = :currentUserId
+            LEFT JOIN RecipeLike l ON l.recipe.id = r.id AND l.user.id = :currentUserId
             WHERE r.deleted = false
             AND (:cursor = 0 OR r.id < :cursor)
             ORDER BY r.id DESC
             """)
     List<RecipeList> findAllRecipes(
             @Param("cursor") int cursor,
+            @Param("currentUserId") int currentUserId,
             Pageable pageable
     );
 
@@ -36,9 +41,13 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     @Query("""
             SELECT new com.damul.api.recipe.dto.response.RecipeList(
                 r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
-                r.user.id, r.user.nickname)
+                r.user.id, r.user.nickname, r.viewCnt, r.likeCnt,
+                CASE WHEN b.id IS NOT NULL THEN true ELSE false END,
+                CASE WHEN l.id IS NOT NULL THEN true ELSE false END)
             FROM Recipe r
             JOIN r.user u
+            LEFT JOIN RecipeBookmark b ON b.recipe.id = r.id AND b.user.id = :currentUserId
+            LEFT JOIN RecipeLike l ON l.recipe.id = r.id AND l.user.id = :currentUserId
             WHERE r.deleted = false
             AND (:cursor = 0 OR r.id < :cursor)
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
@@ -48,6 +57,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             """)
     List<RecipeList> findBySearch(
             @Param("cursor") int cursor,
+            @Param("currentUserId") int currentUserId,
             Pageable pageable,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword
@@ -57,10 +67,14 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     @Query("""
             SELECT new com.damul.api.recipe.dto.response.RecipeList(
                 r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
-                r.user.id, r.user.nickname)
+                r.user.id, r.user.nickname, r.viewCnt, r.likeCnt,
+                CASE WHEN b.id IS NOT NULL THEN true ELSE false END,
+                CASE WHEN l.id IS NOT NULL THEN true ELSE false END)
             FROM Recipe r
             JOIN r.user u
             LEFT JOIN Recipe prev ON prev.id = :cursor
+            LEFT JOIN RecipeBookmark b ON b.recipe.id = r.id AND b.user.id = :currentUserId
+            LEFT JOIN RecipeLike l ON l.recipe.id = r.id AND l.user.id = :currentUserId
             WHERE r.deleted = false
             AND (:cursor = 0 OR 
                 ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
@@ -76,6 +90,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             """)
     List<RecipeList> findAllWithOrder(
             @Param("cursor") int cursor,
+            @Param("currentUserId") int currentUserId,
             Pageable pageable,
             @Param("orderBy") String orderBy
     );
@@ -84,10 +99,14 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     @Query("""
             SELECT new com.damul.api.recipe.dto.response.RecipeList(
                 r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
-                r.user.id, r.user.nickname)
+                r.user.id, r.user.nickname, r.viewCnt, r.likeCnt,
+                CASE WHEN b.id IS NOT NULL THEN true ELSE false END,
+                CASE WHEN l.id IS NOT NULL THEN true ELSE false END)
             FROM Recipe r
             JOIN r.user u
             LEFT JOIN Recipe prev ON prev.id = :cursor
+            LEFT JOIN RecipeBookmark b ON b.recipe.id = r.id AND b.user.id = :currentUserId
+            LEFT JOIN RecipeLike l ON l.recipe.id = r.id AND l.user.id = :currentUserId
             WHERE r.deleted = false
             AND (:cursor = 0 OR 
                 ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
@@ -105,12 +124,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             """)
     List<RecipeList> findBySearchWithOrder(
             @Param("cursor") int cursor,
+            @Param("currentUserId") int currentUserId,
             Pageable pageable,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword,
             @Param("orderBy") String orderBy
     );
-
 
     // 레시피 상세조회 시 조회수증가
     @Modifying
