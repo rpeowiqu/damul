@@ -53,7 +53,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
                 OR :searchType = 'content' AND (r.title LIKE %:keyword% OR r.content LIKE %:keyword%))
             ORDER BY r.id DESC
-            LIMIT :size
             """)
     List<RecipeList> findBySearch(
             @Param("cursor") int cursor,
