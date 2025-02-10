@@ -13,7 +13,7 @@ public interface ChatRoomService {
 
     ScrollResponse<ChatRoomList> getChatRooms(int cursor, int size, int userId);
 
-    SearchResponse<ChatRoomList> searchChatRooms(String keyword, ScrollRequest request, int userId);
+    SearchResponse<ChatRoomList> searchChatRooms(String keyword, int cursor, int size, int userId);
 
     ChatMembersResponse getChatRoomMembers(int roomId);
 

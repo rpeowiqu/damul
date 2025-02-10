@@ -72,11 +72,21 @@ public class RestChatController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchChatRooms(
+    public ResponseEntity<SearchResponse<ChatRoomList>> searchChatRooms(
             @RequestParam(required = false) String keyword,
-            @RequestBody ScrollRequest scrollRequest,
-            @CurrentUser UserInfo user) {
-        SearchResponse<ChatRoomList> response = chatRoomService.searchChatRooms(keyword, scrollRequest, user.getId());
+            @RequestParam int cursor,
+            @RequestParam int size,
+            @CurrentUser User user
+    ) {
+        log.info("컨트롤러: 채팅방 검색 시작 - keyword: {}, cursor: {}, size: {}",
+                keyword, cursor, size);
+
+        SearchResponse<ChatRoomList> response = chatRoomService.searchChatRooms(
+                keyword,
+                cursor,
+                size,
+                user.getId()
+        );
 
         if (response.getResults().getData().isEmpty()) {
             return ResponseEntity.noContent().build();

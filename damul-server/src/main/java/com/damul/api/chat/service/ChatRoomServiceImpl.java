@@ -68,20 +68,21 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public SearchResponse<ChatRoomList> searchChatRooms(String keyword, ScrollRequest request, int userId) {
-        log.info("서비스: 채팅 목록 검색 시작");
-        // 검색 결과 조회
-        List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursorAndKeyword(
-                request.getCursorId(), keyword, request.getSize());
+    @Transactional(readOnly = true)
+    public SearchResponse<ChatRoomList> searchChatRooms(String keyword, int cursor, int size, int userId) {
+        log.info("서비스: 채팅방 검색 시작 - keyword: {}", keyword);
 
-        // 총 검색 결과 개수 조회
+        List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursorAndKeyword(
+                cursor > 0 ? cursor : null,
+                keyword,
+                size
+        );
+
+        ScrollResponse<ChatRoomList> results = processRoomResults(rooms, userId);
         int totalCount = chatRoomRepository.countByKeyword(keyword);
 
-        // 스크롤 응답 생성
-        ScrollResponse<ChatRoomList> scrollResponse = processRoomResults(rooms, userId);
-        log.info("서비스: 채팅 목록 검색 성공");
-
-        return new SearchResponse<>(scrollResponse, totalCount);
+        log.info("서비스: 채팅방 검색 완료 - 총 결과 수: {}", totalCount);
+        return new SearchResponse<>(results, totalCount);
     }
 
     @Override
