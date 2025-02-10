@@ -50,11 +50,17 @@ public class RestChatController {
     @GetMapping("/{roomId}")
     public ResponseEntity<ScrollResponse<ChatMessage>> getChatMessages(
             @PathVariable int roomId,
-            @RequestBody ScrollRequest scrollRequest,
-            @CurrentUser User user) {
+            @RequestParam int cursor,
+            @RequestParam int size,
+            @CurrentUser User user
+    ) {
+        log.info("컨트롤러: 채팅 메시지 조회 시작 - roomId: {}, cursor: {}, size: {}",
+                roomId, cursor, size);
+
         ScrollResponse<ChatMessage> response = chatMessageService.getChatMessages(
                 roomId,
-                scrollRequest,
+                cursor,
+                size,
                 user.getId()
         );
 
