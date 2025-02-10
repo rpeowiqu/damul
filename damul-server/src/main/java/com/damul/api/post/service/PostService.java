@@ -3,7 +3,7 @@ package com.damul.api.post.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.common.comment.CommentCreate;
-import com.damul.api.common.scroll.dto.response.CreateResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.post.dto.request.PostRequest;
 import com.damul.api.post.dto.response.PostDetail;

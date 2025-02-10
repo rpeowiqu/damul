@@ -6,7 +6,7 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
-import com.damul.api.common.scroll.dto.response.CreateResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.config.service.S3Service;
@@ -67,7 +67,7 @@ public class PostServiceImpl implements PostService {
         // 검색어가 있는데 검색 타입이 없는 경우 예외 처리
         if (keyword != null && searchType == null) {
             log.error("검색어는 존재, 검색타입 없음");
-            throw new BusinessException(ErrorCode.SEARCHTYPE_NOT_FOUND);
+            throw new BusinessException(ErrorCode.INVALID_SEARCH_TYPE);
         }
 
         // 전체 조회 검색 x
@@ -348,7 +348,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public CreateResponse addPostComment (int postId, CommentCreate commentCreate, UserInfo userInfo) {
         log.info("댓글 작성 시작");
-        User user = userRepository.findById(commentCreate.getAuthorId())
+        if(userInfo == null) {
+            log.error("유저가 존재하지 않습니다. userInfo : {}", userInfo);
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
+        User user = userRepository.findById(userInfo.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
 
         Post post = postRepository.findById(postId)
