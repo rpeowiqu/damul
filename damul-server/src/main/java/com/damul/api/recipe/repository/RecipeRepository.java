@@ -198,36 +198,36 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     Optional<Recipe> findByIdAndDeletedFalse(int recipeId);
 
     @Query("""
-    SELECT DISTINCT r FROM Recipe r
-    LEFT JOIN FETCH RecipeTag rt ON rt.recipe.id = r.id
-    JOIN RecipeIngredient ri ON ri.recipe.id = r.id
-    JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
+    SELECT DISTINCT r, rt, t FROM Recipe r
+    LEFT JOIN RecipeTag rt ON rt.recipe.id = r.id
+    LEFT JOIN Tag t ON rt.tag.id = t.id
+    LEFT JOIN RecipeIngredient ri ON ri.recipe.id = r.id
+    LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
+        AND ui.userReciept.user.id = :userId
+        AND ui.isDeleted = false
+    WHERE r.deleted = false
+    GROUP BY r.id, rt.id, t.id
+    ORDER BY COUNT(CASE WHEN ui.id IS NOT NULL THEN 1 END) * 1.0 / 
+             NULLIF(COUNT(DISTINCT ri.id), 0) DESC NULLS LAST,
+             r.likeCnt * 0.3 DESC
+    """)
+    List<Recipe> findRecommendedRecipes(@Param("userId") int userId);
+
+    @Query("""
+    SELECT DISTINCT r, rt, t FROM Recipe r
+    LEFT JOIN RecipeTag rt ON rt.recipe.id = r.id
+    LEFT JOIN Tag t ON rt.tag.id = t.id
+    LEFT JOIN RecipeIngredient ri ON ri.recipe.id = r.id
+    LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
         AND ui.userReciept.user.id = :userId
         AND ui.userIngredientId = :userIngredientId
         AND ui.isDeleted = false
     WHERE r.deleted = false
     ORDER BY r.likeCnt DESC
-    LIMIT 5
     """)
     List<Recipe> findRecommendedRecipesByIngredient(
             @Param("userId") int userId,
             @Param("userIngredientId") int userIngredientId
     );
-
-    @Query("""
-    SELECT DISTINCT r FROM Recipe r
-    LEFT JOIN FETCH RecipeTag rt ON rt.recipe.id = r.id
-    JOIN RecipeIngredient ri ON ri.recipe.id = r.id
-    LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
-        AND ui.userReciept.user.id = :userId
-        AND ui.isDeleted = false
-    WHERE r.deleted = false
-    GROUP BY r.id
-    HAVING COUNT(DISTINCT ui.userIngredientId) > 0
-    ORDER BY COUNT(DISTINCT ui.userIngredientId) * 1.0 / COUNT(DISTINCT ri.id) DESC,
-             r.likeCnt * 0.3 DESC
-    LIMIT 5
-    """)
-    List<Recipe> findRecommendedRecipes(@Param("userId") int userId);
 
 }
