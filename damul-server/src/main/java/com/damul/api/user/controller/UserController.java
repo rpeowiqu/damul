@@ -45,10 +45,6 @@ public class UserController {
                                         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
                                         @RequestPart(value = "backgroundImage", required = false) MultipartFile backgroundImage)
             throws JsonProcessingException {
-//
-//
-//        SettingUpdate setting = objectMapper.readValue(settingJson, SettingUpdate.class);
-
         userService.updateUserSettings(userId, setting, profileImage, backgroundImage);
         return ResponseEntity.ok().build();
     }
