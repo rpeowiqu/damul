@@ -129,9 +129,17 @@ public class AuthService {
 
             User savedUser = authRepository.save(user);
 
+            // 5. UserInfo 객체 생성
+            UserInfo userInfo = UserInfo.builder()
+                    .id(savedUser.getId())
+                    .email(savedUser.getEmail())
+                    .nickname(savedUser.getNickname())
+                    .role(savedUser.getRole().name())
+                    .build();
+
             // 5. 토큰 생성
             Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    user.getEmail(),
+                    userInfo,
                     null,
                     Collections.singletonList(new SimpleGrantedAuthority(savedUser.getRole().name()))
             );
@@ -198,17 +206,17 @@ public class AuthService {
         String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
 
         // Refresh Token Redis에 저장
-        String userId = authentication.getName(); // 이메일
+        String userEmail = authentication.getName(); // 이메일
         redisTemplate.opsForValue().set(
-                "RT:" + userId,
+                "RT:" + userEmail,
                 refreshToken,
                 jwtTokenProvider.getRefreshTokenExpire(),
                 TimeUnit.MILLISECONDS
         );
 
         return Map.of(
-                "accessToken", accessToken,
-                "refreshToken", refreshToken
+                "access_token", accessToken,
+                "refresh_token", refreshToken
         );
     }
 
@@ -243,16 +251,18 @@ public class AuthService {
         log.info("관리자 로그인 성공: {}", admin.getEmail());
     }
 
-    public String findRefreshToken(String userId) {
-        return redisTemplate.opsForValue().get("RT:" + userId);
+    public String findRefreshToken(String userEmail) {
+        return redisTemplate.opsForValue().get("RT:" + userEmail);
     }
 
-    public void removeRefreshToken(String userId) {
-        redisTemplate.delete("RT:" + userId);
+    public void removeRefreshToken(String userEmail) {
+        redisTemplate.delete("RT:" + userEmail);
     }
 
-    public boolean validateRefreshToken(String userId, String refreshToken) {
-        String storedRefreshToken = findRefreshToken(userId);
+    public boolean validateRefreshToken(String userEmail, String refreshToken) {
+        log.info("refresh token: {}", refreshToken);
+        String storedRefreshToken = findRefreshToken(userEmail);
+        log.info("storedRefreshToken: {}", storedRefreshToken);
         return storedRefreshToken != null && storedRefreshToken.equals(refreshToken);
     }
 }
