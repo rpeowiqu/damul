@@ -1,6 +1,8 @@
 package com.damul.api.auth.jwt;
 
 import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.user.CustomUserDetails;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +57,12 @@ public class JwtTokenProvider {
             CustomUserDetails customUserDetails = (CustomUserDetails) principal;
             UserInfo userInfo = customUserDetails.getUserInfo(); // 필드에 직접 접근
 
+
+            if (userInfo.getId() == null) {
+                log.error("userId is null for user: {}", userInfo.getEmail());
+                throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+            }
+
             log.info("JwtTokenProvider: principal is CustomUserDetails");
             log.info("UserInfo: {}", userInfo);
 
@@ -88,6 +96,7 @@ public class JwtTokenProvider {
             email = authentication.getName();
             claims.put("sub", email);
             claims.put("email", email);
+
             claims.put("role", authentication.getAuthorities());
         }
 
@@ -126,6 +135,7 @@ public class JwtTokenProvider {
      */
     public String generateRefreshToken(Authentication authentication) {
         Object principal = authentication.getPrincipal();
+        String email;
         Map<String, Object> claims = new HashMap<>();
         if (principal instanceof UserInfo) {
             UserInfo userInfo = (UserInfo) principal;
@@ -134,8 +144,27 @@ public class JwtTokenProvider {
             claims.put("userId", userInfo.getId());
             claims.put("nickname", userInfo.getNickname());
             claims.put("role", authentication.getAuthorities());
-        } else {
-            String email = authentication.getName();
+        } else if (principal instanceof CustomUserDetails) {
+            CustomUserDetails customUserDetails = (CustomUserDetails) principal;
+            UserInfo userInfo = customUserDetails.getUserInfo(); // 필드에 직접 접근
+
+
+            if (userInfo.getId() == null) {
+                log.error("userId is null for user: {}", userInfo.getEmail());
+                throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+            }
+
+            log.info("JwtTokenProvider: principal is CustomUserDetails");
+            log.info("UserInfo: {}", userInfo);
+
+            email = userInfo.getEmail();
+            claims.put("sub", email);
+            claims.put("email", email);
+            claims.put("userId", userInfo.getId());
+            claims.put("nickname", userInfo.getNickname());
+            claims.put("role", authentication.getAuthorities());
+
+        } else {email = authentication.getName();
             claims.put("sub", email);
             claims.put("email", email);
             claims.put("role", authentication.getAuthorities());
@@ -197,6 +226,7 @@ public class JwtTokenProvider {
      */
     public boolean validateToken(String token) {
         try {
+            log.info("토큰 유효성 검사 시작 - token: {}", token);
             Jwts.parser()
                     .verifyWith(jwtSecretKey)
                     .build()

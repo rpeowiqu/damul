@@ -73,18 +73,6 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             log.error("토큰 갱신 중 에러 발생: {}", e.getMessage(), e);
-            // 에러 발생 시 기존 토큰들을 삭제
-            try {
-                if (refreshTokenCookie != null && refreshTokenCookie.isPresent()) {
-                    String userEmail = jwtTokenProvider.getUserEmailFromToken(refreshTokenCookie.get().getValue());
-                    authService.removeRefreshToken(userEmail);
-                }
-                cookieUtil.deleteCookie(response, "access_token");
-                cookieUtil.deleteCookie(response, "refresh_token");
-                SecurityContextHolder.clearContext();  // 보안 컨텍스트도 클리어
-            } catch (Exception ex) {
-                log.error("토큰 삭제 중 추가 에러 발생: {}", ex.getMessage(), ex);
-            }
         } finally {
             filterChain.doFilter(request, response);
         }
@@ -145,34 +133,61 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
     }
 
     private void handleTokenRenewal(HttpServletResponse response, String accessToken, String refreshToken) {
-        if (jwtTokenProvider.validateToken(refreshToken)) {
-            String userEmail = jwtTokenProvider.getUserEmailFromToken(refreshToken);
+        try {
+            if (jwtTokenProvider.validateToken(refreshToken)) {
 
-            if (authService.validateRefreshToken(userEmail, refreshToken)) {
-                Claims refreshTokenClaims = jwtTokenProvider.getClaims(refreshToken);
-                UserInfo userInfo = buildUserInfoFromClaims(refreshTokenClaims);
-                Authentication authentication = createAuthentication(userInfo);
+                // 디버깅을 위한 로그 추가
+                Claims refreshTokenClaims2 = jwtTokenProvider.getClaims(refreshToken);
+                log.info("Refresh Token Claims: {}", refreshTokenClaims2);  // 모든 claims 출력
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                String userEmail = jwtTokenProvider.getUserEmailFromToken(refreshToken);
+                log.info("User Email from refresh token: {}", userEmail);
 
-                String newAccessToken = jwtTokenProvider.generateAccessToken(authentication);
-                cookieUtil.addCookie(response, "access_token", newAccessToken, accessTokenExpire);
 
-                log.info("새로운 액세스 토큰 발급 완료");
-            } else {
-                log.error("저장된 리프레시 토큰과 일치하지 않습니다.");
-                authService.removeRefreshToken(userEmail);
-                cookieUtil.deleteCookie(response, "access_token");
-                cookieUtil.deleteCookie(response, "refresh_token");
+                if (authService.validateRefreshToken(userEmail, refreshToken)) {
+                    Claims refreshTokenClaims = jwtTokenProvider.getClaims(refreshToken);
+
+
+                    // Claims 유효성 검증
+                    if (refreshTokenClaims.get("userId") == null) {
+                        log.error("Refresh token missing userId claim");
+                        throw new IllegalStateException("Invalid refresh token claims");
+                    }
+
+                    UserInfo userInfo = buildUserInfoFromClaims(refreshTokenClaims);
+                    Authentication authentication = createAuthentication(userInfo);
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                    String newAccessToken = jwtTokenProvider.generateAccessToken(authentication);
+                    cookieUtil.addCookie(response, "access_token", newAccessToken, accessTokenExpire);
+
+                    log.info("새로운 액세스 토큰 발급 완료");
+                } else {
+                    handleInvalidToken(response, userEmail);
+                }
             }
+        } catch (Exception e) {
+            log.error("Token renewal failed", e);
+            cookieUtil.deleteCookie(response, "access_token");
+            cookieUtil.deleteCookie(response, "refresh_token");
         }
     }
 
     private UserInfo buildUserInfoFromClaims(Claims claims) {
+        Integer userId = claims.get("userId", Integer.class);
+        String email = claims.get("email", String.class);
+        String nickname = claims.get("nickname", String.class);
+
+        if (userId == null || email == null) {
+            log.error("Required claims missing - userId: {}, email: {}", userId, email);
+            throw new IllegalStateException("Required claims are missing from token");
+        }
+
         return UserInfo.builder()
-                .id(claims.get("userId", Integer.class))
-                .email(claims.get("email", String.class))
-                .nickname(claims.get("nickname", String.class))
+                .id(userId)
+                .email(email)
+                .nickname(nickname)
                 .role(Role.USER.name())
                 .build();
     }
@@ -181,5 +196,12 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + Role.USER.name());
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(authority);
         return new UsernamePasswordAuthenticationToken(userInfo, null, authorities);
+    }
+
+    private void handleInvalidToken(HttpServletResponse response, String userEmail) {
+        log.error("저장된 리프레시 토큰과 일치하지 않습니다.");
+        authService.removeRefreshToken(userEmail);
+        cookieUtil.deleteCookie(response, "access_token");
+        cookieUtil.deleteCookie(response, "refresh_token");
     }
 }
