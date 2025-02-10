@@ -8,6 +8,7 @@ import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.recipe.dto.request.RecipeRequest;
+import com.damul.api.recipe.dto.response.FamousRecipe;
 import com.damul.api.recipe.dto.response.RecipeDetail;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.repository.RecipeRepository;
@@ -66,8 +67,15 @@ public class RecipeController {
 
     // 인기 레시피 조회
     @GetMapping("/famous")
-    public ResponseEntity<?> getFamous(@RequestParam int famous) {
-        return null;
+    public ResponseEntity<?> getFamous() {
+        log.info("인기 급상승 레시피 조회 요청");
+        List<FamousRecipe> topRecipes = recipeService.getFamousRecipe();
+        if(topRecipes == null || topRecipes.isEmpty()) {
+            log.info("인기 급상승 레시피 조회 성공 - 데이터없음: {}", topRecipes.size());
+            return ResponseEntity.noContent().build();
+        }
+        log.info("인기 급상승 레시피 조회 성공");
+        return ResponseEntity.ok(topRecipes);
     }
 
     // 레시피 작성

@@ -83,8 +83,8 @@ public class UserController {
 
     
     // 팔로잉 목록 조회
-    @GetMapping("/{userId}/follwings")
-    public ResponseEntity<?> getFollwings(@RequestParam int cursor,
+    @GetMapping("/{userId}/followings")
+    public ResponseEntity<?> getFollowings(@RequestParam int cursor,
                                           @RequestParam int size,
                                           @PathVariable int userId) {
         log.info("팔로잉 목록 조회 요청");
