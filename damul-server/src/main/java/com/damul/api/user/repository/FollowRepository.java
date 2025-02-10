@@ -19,31 +19,31 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
     // 나를 팔로우하는 사람들 목록 (팔로워 목록)
     @Query("""
             SELECT new com.damul.api.user.dto.response.UserList(
-                f.following.id,
-                f.follower.profileImageUrl,
-                f.following.nickname)
-            FROM Follow f
-            WHERE f.follower.id = :followerId
-            AND (:cursor = 0 OR f.id < :cursor)
-            ORDER BY f.id DESC
-            LIMIT :size
-            """)
-    List<UserList> findFollowersByUserIdAndCursorId(@Param("followerId") int followerId,
-                                                    @Param("cursor") int cursor,
-                                                    @Param("size") int size);
-    // 내가 팔로우하는 사람들 목록 (팔로잉 목록)
-    @Query("""
-            SELECT new com.damul.api.user.dto.response.UserList(
                 f.follower.id,
-                f.follower.profileImageUrl,
-                f.follower.nickname)
+                f.follower.nickname,
+                f.follower.email)
             FROM Follow f
             WHERE f.following.id = :followingId
             AND (:cursor = 0 OR f.id < :cursor)
             ORDER BY f.id DESC
             LIMIT :size
             """)
-    List<UserList> findFollowingsByUserIdAndCursorId(@Param("followingId") int followingId,
+    List<UserList> findFollowersByUserIdAndCursorId(@Param("followingId") int followingId,
+                                                    @Param("cursor") int cursor,
+                                                    @Param("size") int size);
+    // 내가 팔로우하는 사람들 목록 (팔로잉 목록)
+    @Query("""
+            SELECT new com.damul.api.user.dto.response.UserList(
+                f.following.id,
+                f.following.nickname,
+                f.following.email)
+            FROM Follow f
+            WHERE f.follower.id = :followerId
+            AND (:cursor = 0 OR f.id < :cursor)
+            ORDER BY f.id DESC
+            LIMIT :size
+            """)
+    List<UserList> findFollowingsByUserIdAndCursorId(@Param("followerId") int followerId,
                                                         @Param("cursor") int cursor,
                                                         @Param("size") int size);
 
