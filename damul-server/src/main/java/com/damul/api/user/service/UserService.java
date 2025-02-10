@@ -1,8 +1,8 @@
 package com.damul.api.user.service;
 
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
-import com.damul.api.user.dto.response.UserList;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -17,5 +17,5 @@ public interface UserService {
                        MultipartFile backgroundImage);
 
     // 사용자 목록 조회 및 검색
-    UserList getSearchUserList(String keyword);
+    CreateResponse getSearchUserList(String keyword);
 }

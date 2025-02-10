@@ -1,8 +1,10 @@
 package com.damul.api.recipe.repository;
 
+import com.damul.api.mypage.dto.response.MyRecipeList;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,36 +20,44 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     @Query("""
             SELECT DISTINCT new com.damul.api.recipe.dto.response.RecipeList(
                 r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
-                r.user.id, r.user.nickname)
+                r.user.id, r.user.nickname, r.viewCnt, r.likeCnt,
+                CASE WHEN b.id IS NOT NULL THEN true ELSE false END,
+                CASE WHEN l.id IS NOT NULL THEN true ELSE false END)
             FROM Recipe r
             JOIN r.user u
+            LEFT JOIN RecipeBookmark b ON b.recipe.id = r.id AND b.user.id = :currentUserId
+            LEFT JOIN RecipeLike l ON l.recipe.id = r.id AND l.user.id = :currentUserId
             WHERE r.deleted = false
             AND (:cursor = 0 OR r.id < :cursor)
             ORDER BY r.id DESC
-            LIMIT :size
             """)
     List<RecipeList> findAllRecipes(
             @Param("cursor") int cursor,
-            @Param("size") int size
+            @Param("currentUserId") int currentUserId,
+            Pageable pageable
     );
 
     // 검색 조건만 있는 경우
     @Query("""
             SELECT new com.damul.api.recipe.dto.response.RecipeList(
                 r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
-                r.user.id, r.user.nickname)
+                r.user.id, r.user.nickname, r.viewCnt, r.likeCnt,
+                CASE WHEN b.id IS NOT NULL THEN true ELSE false END,
+                CASE WHEN l.id IS NOT NULL THEN true ELSE false END)
             FROM Recipe r
             JOIN r.user u
+            LEFT JOIN RecipeBookmark b ON b.recipe.id = r.id AND b.user.id = :currentUserId
+            LEFT JOIN RecipeLike l ON l.recipe.id = r.id AND l.user.id = :currentUserId
             WHERE r.deleted = false
             AND (:cursor = 0 OR r.id < :cursor)
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
                 OR :searchType = 'content' AND (r.title LIKE %:keyword% OR r.content LIKE %:keyword%))
             ORDER BY r.id DESC
-            LIMIT :size
             """)
     List<RecipeList> findBySearch(
             @Param("cursor") int cursor,
-            @Param("size") int size,
+            @Param("currentUserId") int currentUserId,
+            Pageable pageable,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword
     );
@@ -56,15 +66,19 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     @Query("""
             SELECT new com.damul.api.recipe.dto.response.RecipeList(
                 r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
-                r.user.id, r.user.nickname)
+                r.user.id, r.user.nickname, r.viewCnt, r.likeCnt,
+                CASE WHEN b.id IS NOT NULL THEN true ELSE false END,
+                CASE WHEN l.id IS NOT NULL THEN true ELSE false END)
             FROM Recipe r
             JOIN r.user u
-            LEFT JOIN Recipe prev ON prev.id = :cursorId
+            LEFT JOIN Recipe prev ON prev.id = :cursor
+            LEFT JOIN RecipeBookmark b ON b.recipe.id = r.id AND b.user.id = :currentUserId
+            LEFT JOIN RecipeLike l ON l.recipe.id = r.id AND l.user.id = :currentUserId
             WHERE r.deleted = false
             AND (:cursor = 0 OR 
                 ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
                 OR (:orderBy = 'views' AND (r.viewCnt < prev.viewCnt OR (r.viewCnt = prev.viewCnt AND r.id < prev.id)))
-                OR (:orderBy NOT IN ('likes', 'views') AND r.id < :cursorId)))
+                OR (:orderBy NOT IN ('likes', 'views') AND r.id < :cursor)))
             ORDER BY
             CASE 
                 WHEN :orderBy = 'likes' THEN r.likeCnt
@@ -72,11 +86,11 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
                 ELSE r.id
             END DESC,
             r.id DESC
-            LIMIT :size
             """)
     List<RecipeList> findAllWithOrder(
             @Param("cursor") int cursor,
-            @Param("size") int size,
+            @Param("currentUserId") int currentUserId,
+            Pageable pageable,
             @Param("orderBy") String orderBy
     );
 
@@ -84,10 +98,14 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     @Query("""
             SELECT new com.damul.api.recipe.dto.response.RecipeList(
                 r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
-                r.user.id, r.user.nickname)
+                r.user.id, r.user.nickname, r.viewCnt, r.likeCnt,
+                CASE WHEN b.id IS NOT NULL THEN true ELSE false END,
+                CASE WHEN l.id IS NOT NULL THEN true ELSE false END)
             FROM Recipe r
             JOIN r.user u
             LEFT JOIN Recipe prev ON prev.id = :cursor
+            LEFT JOIN RecipeBookmark b ON b.recipe.id = r.id AND b.user.id = :currentUserId
+            LEFT JOIN RecipeLike l ON l.recipe.id = r.id AND l.user.id = :currentUserId
             WHERE r.deleted = false
             AND (:cursor = 0 OR 
                 ((:orderBy = 'likes' AND (r.likeCnt < prev.likeCnt OR (r.likeCnt = prev.likeCnt AND r.id < prev.id)))
@@ -102,21 +120,43 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
                 ELSE r.id
             END DESC,
             r.id DESC
-            LIMIT :size
             """)
     List<RecipeList> findBySearchWithOrder(
             @Param("cursor") int cursor,
-            @Param("size") int size,
+            @Param("currentUserId") int currentUserId,
+            Pageable pageable,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword,
             @Param("orderBy") String orderBy
     );
-
 
     // 레시피 상세조회 시 조회수증가
     @Modifying
     @Transactional
     @Query("UPDATE Recipe r SET r.viewCnt = :viewCount WHERE r.id = :recipeId")
     void updateViewCount(@Param("recipeId") int recipeId, @Param("viewCount") int viewCount);
+
+    @Query("""
+            SELECT new com.damul.api.mypage.dto.response.MyRecipeList(
+                r.id,
+                r.title,
+                r.content,
+                r.thumbnailUrl,
+                r.createdAt
+            )
+            FROM Recipe r
+            WHERE r.user.id = :userId
+            AND r.deleted = false
+            AND (:cursor = 0 OR r.id < :cursor)
+            ORDER BY r.id DESC
+            LIMIT :size
+            """)
+    List<MyRecipeList> findMyRecipes(
+            @Param("userId") int userId,
+            @Param("cursor") int cursor,
+            @Param("size") int size
+    );
+
+    boolean existsByUserIdAndIdLessThan(int userId, int id);
 
 }

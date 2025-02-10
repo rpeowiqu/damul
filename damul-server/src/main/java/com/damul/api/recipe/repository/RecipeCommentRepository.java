@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface RecipeCommentRepository extends JpaRepository<RecipeComment, Integer> {
-    List<RecipeComment> findByRecipeOrderByCreatedAtDesc(Recipe recipe);
+    List<RecipeComment> findByRecipeOrderByCreatedAt(Recipe recipe);
 }

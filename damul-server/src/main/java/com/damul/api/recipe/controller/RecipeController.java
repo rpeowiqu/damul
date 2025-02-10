@@ -1,19 +1,15 @@
 package com.damul.api.recipe.controller;
 
 import com.damul.api.auth.dto.response.UserInfo;
-import com.damul.api.auth.entity.User;
 import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
-import com.damul.api.common.scroll.dto.request.ScrollRequest;
-import com.damul.api.common.scroll.dto.response.CreateResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
-import com.damul.api.common.scroll.util.ScrollCursor;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.RecipeDetail;
 import com.damul.api.recipe.dto.response.RecipeList;
-import com.damul.api.recipe.entity.Recipe;
 import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.recipe.service.RecipeService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.xml.stream.events.Comment;
 import java.util.List;
 
 @Slf4j
@@ -35,7 +30,8 @@ public class RecipeController {
 
     // 레시피 검색 및 전체 조회
     @GetMapping
-    public ResponseEntity<?> getAllRecipes(@RequestParam int cursor,
+    public ResponseEntity<?> getAllRecipes(@CurrentUser UserInfo userInfo,
+                                           @RequestParam int cursor,
                                            @RequestParam int size,
                                            @RequestParam(required = false) String searchType,
                                            @RequestParam(required = false) String keyword,
@@ -44,7 +40,7 @@ public class RecipeController {
         log.info("검색타입 - searchType: {}, 검색어 - keyword: {} " + searchType, keyword);
         log.info("정렬 조건 - orderBy: {} " + orderBy);
 
-        ScrollResponse<RecipeList> scrollResponse = recipeService.getRecipes(cursor, size, searchType, keyword, orderBy);
+        ScrollResponse<RecipeList> scrollResponse = recipeService.getRecipes(userInfo, cursor, size, searchType, keyword, orderBy);
         if(scrollResponse.getData() == null || scrollResponse.getData().isEmpty()) {
             log.info("레시피 검색 및 전체 조회 완료 - 데이터 없음");
             return ResponseEntity.noContent().build();
@@ -62,7 +58,7 @@ public class RecipeController {
         RecipeDetail detail = recipeService.getRecipeDetail(recipeId, userInfo);
         if(detail == null) {
             log.error("레시피 상세 조회 실패 - recipeId: {}", recipeId);
-            throw new BusinessException(ErrorCode.BOARD_NOT_FOUND);
+            throw new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND);
         }
 
         return ResponseEntity.ok(detail);
@@ -121,6 +117,17 @@ public class RecipeController {
         log.info("레시피 댓글 작성 성공");
 
         return ResponseEntity.ok(createResponse);
+    }
+
+    // 댓글 삭제
+    @DeleteMapping("/{recipeId}/comments/{commentId}")
+    public ResponseEntity<?> deleteComment(@RequestParam("recipeId") int recipeId,
+                                           @RequestParam("commentId") int commentId,
+                                           @CurrentUser UserInfo userInfo) {
+        log.info("댓글 삭제 요청 - recipeId: {}, commentId: {}", recipeId, commentId);
+        recipeService.deleteComment(recipeId, commentId);
+        log.info("댓글 삭제 완료");
+        return ResponseEntity.ok().build();
     }
 
     // 레시피 북마크 추가/삭제

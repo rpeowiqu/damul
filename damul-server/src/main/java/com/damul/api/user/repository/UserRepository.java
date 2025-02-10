@@ -2,6 +2,7 @@ package com.damul.api.user.repository;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Role;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
 import com.damul.api.user.dto.response.UserList;
@@ -48,8 +49,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     UserList findUser(@Param("nickname") String nickname);
 
     // 사용자 검색
-    @Query("SELECT new com.damul.api.user.dto.response.UserList(u.id, u.profileImageUrl, u.nickname) " +
+    @Query("SELECT new com.damul.api.common.dto.response.CreateResponse(u.id) " +
             "FROM User u " +
             "WHERE u.nickname LIKE %:keyword%")
-    UserList findUserByNickname(@Param("keyword") String keyword);
+    CreateResponse findUserByNickname(@Param("keyword") String keyword);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.active = true")
+    int countActiveUsers();
+
 }

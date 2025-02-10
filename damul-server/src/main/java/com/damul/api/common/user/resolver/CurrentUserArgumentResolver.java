@@ -67,15 +67,18 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 
 
         // 인증된 사용자의 이메일 또는 식별자 추출
-        String userIdentifier = authentication.getName();
+        UserInfo userInfo = (UserInfo) authentication.getPrincipal();
+        String userIdentifier = userInfo.getNickname();
+        int userId = userInfo.getId();
         log.info("userIdentifier: {}", userIdentifier);
+        log.info("userId: {}", userId);
 
         // 데이터베이스에서 사용자 정보 조회
-        Optional<User> userOptional = userRepository.findByEmail(userIdentifier);
+        Optional<User> userOptional = userRepository.findById(userId);
 
 
         if (userOptional.isEmpty()) {
-            log.warn("해당 이메일로 사용자를 찾을 수 없음: {}", userIdentifier);
+            log.warn("해당 ID로 사용자를 찾을 수 없음: {}", userId);
             return null;
         }
 
@@ -83,6 +86,6 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         log.info("찾은 사용자 정보 - ID: {}, Email: {}, Nickname: {}",
                 user.getId(), user.getEmail(), user.getNickname());
 
-        return new UserInfo(user.getId(), user.getEmail(), user.getNickname());
+        return new UserInfo(user.getId(), user.getEmail(), user.getNickname(), user.getRole().name());
     }
 }

@@ -1,16 +1,12 @@
 package com.damul.api.user.service;
 
 import com.damul.api.auth.entity.User;
-import com.damul.api.common.scroll.dto.request.ScrollRequest;
-import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
-import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
-import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.config.service.S3Service;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
-import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +42,10 @@ public class UserServiceImpl implements UserService {
         if(userOptional.isPresent()) {
             User user = userOptional.get();
             SettingResponse settingResponse = SettingResponse.builder()
-                    .userId(user.getId())
+                    .email(user.getEmail())
                     .nickname(user.getNickname())
                     .profileImageUrl(user.getProfileImageUrl())
+                    .selfIntroduction(user.getSelfIntroduction())
                     .profileBackgroundImageUrl(user.getProfileBackgroundImageUrl())
                     .accessRange(user.getAccessRange().name())
                     .warningEnabled(user.isWarningEnabled())
@@ -74,6 +71,8 @@ public class UserServiceImpl implements UserService {
                 });
         log.info("유저 검색 완료 - userNickname: {}", user.getNickname());
 
+        log.info("backgrounImage : {}", backgroundImage);
+        log.info("profileImage : {}", profileImage);
         // 프로필 이미지 처리
         if (profileImage != null && !profileImage.isEmpty()) {
             validateImageFile(profileImage);
@@ -114,6 +113,10 @@ public class UserServiceImpl implements UserService {
             setting.setBackgroundImageUrl(backgroundImageUrl);
         }
 
+        log.info("nickname: {}", setting.getNickname());
+        log.info("selfIntroduction: {}", setting.getSelfIntroduction());
+        log.info("accessRange: {}", setting.getAccessRange());
+        log.info("warningEnabled: {}", setting.isWarningEnabled());
         // 사용자 설정 업데이트
         user.updateSettings(setting);
         log.info("설정 수정 완료");
@@ -126,8 +129,7 @@ public class UserServiceImpl implements UserService {
 
     // 사용자 목록 조회 및 검색
     @Override
-    public UserList getSearchUserList(String keyword) {
-        UserList userList;
+    public CreateResponse getSearchUserList(String keyword) {
         if(keyword == null || keyword.isEmpty()) {
             log.info("검색어 없음");
             throw new BusinessException(ErrorCode.USER_NICKNAME_NOT_PROVIDED);
@@ -135,10 +137,10 @@ public class UserServiceImpl implements UserService {
 
 
         log.info("검색어 있음 - 검색어: {}", keyword);
-        userList = userRepository.findUserByNickname(keyword);
+        CreateResponse createResponse = userRepository.findUserByNickname(keyword);
 
 
-        return userList;
+        return createResponse;
     }
 
 

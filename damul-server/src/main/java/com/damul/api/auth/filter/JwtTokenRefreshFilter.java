@@ -1,8 +1,12 @@
 package com.damul.api.auth.filter;
 
+import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.common.user.CustomUserDetails;
+import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -26,85 +31,155 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtTokenRefreshFilter extends OncePerRequestFilter {
-
-    @Value("${jwt.access-token-expiration}")
-    private long accessTokenExpire;        // Access Token 만료 시간 (ms)
-
-    @Value("${jwt.refresh-token-expiration}")
-    private long refreshTokenExpire;       // Refresh Token 만료 시간 (ms)
-
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthService authService;
     private final CookieUtil cookieUtil;
+    private final long accessTokenExpire;  // 생성자로 주입
+    private final long refreshTokenExpire; // 생성자로 주입
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        Optional<Cookie> accessTokenCookie = null;
+        Optional<Cookie> refreshTokenCookie = null;
+
         try {
             log.info("JwtTokenRefreshFilter 시작");
 
-            Optional<Cookie> accessTokenCookie = cookieUtil.getCookie(request, "access_token");
-            Optional<Cookie> refreshTokenCookie = cookieUtil.getCookie(request, "refresh_token");
+            accessTokenCookie = cookieUtil.getCookie(request, "access_token");
+            refreshTokenCookie = cookieUtil.getCookie(request, "refresh_token");
 
             log.info("accessToken 존재: {}", accessTokenCookie.isPresent());
             log.info("refreshToken 존재: {}", refreshTokenCookie.isPresent());
 
-            if (accessTokenCookie.isPresent() && refreshTokenCookie.isPresent()) {
+            // Case 1: 리프레시 토큰만 존재하는 경우
+            if (!accessTokenCookie.isPresent() && refreshTokenCookie.isPresent()) {
+                handleRefreshTokenOnly(response, refreshTokenCookie.get());
+            }
+            // Case 2: 액세스 토큰이 존재하는 경우
+            else if (accessTokenCookie.isPresent()) {
                 String accessToken = accessTokenCookie.get().getValue();
-                String refreshToken = refreshTokenCookie.get().getValue();
-
-                log.info("토큰 검증 시작");
-                log.info("accessToken 유효성: {}", jwtTokenProvider.validateToken(accessToken));
-                log.info("refreshToken 유효성: {}", jwtTokenProvider.validateToken(refreshToken));
-
-                // 토큰 디코딩 시도
-                Claims claims = jwtTokenProvider.getClaims(accessToken);
-                log.info("Access Token Claims: {}", claims);
-
-                // 액세스 토큰이 만료되었고, 리프레시 토큰이 유효한 경우
-                if (!jwtTokenProvider.validateToken(accessToken) &&
-                        jwtTokenProvider.validateToken(refreshToken)) {
-                    log.info("토큰 재발급 시작");
-
-                    // 리프레시 토큰에서 사용자 이메일 추출
-                    String userEmail = jwtTokenProvider.getUserEmailFromToken(refreshToken);
-
-                    // Redis에 저장된 리프레시 토큰과 비교
-                    if (authService.validateRefreshToken(userEmail, refreshToken)) {
-                        // 리프레시 토큰의 실제 권한 정보 사용
-                        Claims refreshTokenClaims = jwtTokenProvider.getClaims(refreshToken);
-                        List<SimpleGrantedAuthority> authorities =
-                                ((List<String>) refreshTokenClaims.get("role")).stream()
-                                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                                        .collect(Collectors.toList());
-
-                        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                                userEmail,
-                                null,
-                                authorities
-                        );
-
-                        // 새로운 액세스 토큰 발급
-                        String newAccessToken = jwtTokenProvider.generateAccessToken(authentication);
-
-                        // 새로운 액세스 토큰을 쿠키에 설정
-                        cookieUtil.addCookie(response, "access_token", newAccessToken, accessTokenExpire);
-
-                        log.info("새로운 액세스 토큰 발급 완료");
-                    } else {
-                        log.error("저장된 리프레시 토큰과 일치하지 않습니다.");
-                        // 모든 토큰 삭제
-                        authService.removeRefreshToken(userEmail);
-                        cookieUtil.deleteCookie(response, "access_token");
-                        cookieUtil.deleteCookie(response, "refresh_token");
-                    }
+                // 액세스 토큰이 유효한 경우
+                if (!jwtTokenProvider.isTokenExpired(accessToken)) {
+                    setSecurityContextFromAccessToken(accessToken);
+                }
+                // 액세스 토큰이 만료되고 리프레시 토큰이 있는 경우
+                else if (refreshTokenCookie.isPresent()) {
+                    handleTokenRenewal(response, accessToken, refreshTokenCookie.get().getValue());
                 }
             }
-        } catch (Exception e) {
-            log.error("토큰 갱신 중 에러 발생", e);
-        }
 
-        filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            log.error("토큰 갱신 중 에러 발생: {}", e.getMessage(), e);
+            // 에러 발생 시 기존 토큰들을 삭제
+            try {
+                if (refreshTokenCookie != null && refreshTokenCookie.isPresent()) {
+                    String userEmail = jwtTokenProvider.getUserEmailFromToken(refreshTokenCookie.get().getValue());
+                    authService.removeRefreshToken(userEmail);
+                }
+                cookieUtil.deleteCookie(response, "access_token");
+                cookieUtil.deleteCookie(response, "refresh_token");
+                SecurityContextHolder.clearContext();  // 보안 컨텍스트도 클리어
+            } catch (Exception ex) {
+                log.error("토큰 삭제 중 추가 에러 발생: {}", ex.getMessage(), ex);
+            }
+        } finally {
+            filterChain.doFilter(request, response);
+        }
+    }
+
+    private void handleRefreshTokenOnly(HttpServletResponse response, Cookie refreshTokenCookie) {
+        log.info("====== Refresh Token 전용 처리 시작 ======");
+        String refreshToken = refreshTokenCookie.getValue();
+
+        try {
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(refreshToken);
+            log.info("1. 추출된 사용자 이메일: {}", userEmail);
+
+            // 실제 Redis에 저장된 값 확인
+            String storedToken = authService.findRefreshToken(userEmail);
+            log.info("2. Redis에 저장된 토큰: {}", storedToken);
+            log.info("3. 현재 쿠키의 토큰: {}", refreshToken);
+
+            log.info("4. Redis에서 Refresh Token 검증 시작");
+            boolean isValidInRedis = authService.validateRefreshToken(userEmail, refreshToken);
+            log.info("5. Redis 검증 결과: {}", isValidInRedis);
+
+            if (!isValidInRedis) {
+                log.error("Redis에 저장된 Refresh Token과 일치하지 않습니다.");
+                authService.removeRefreshToken(userEmail);
+                cookieUtil.deleteCookie(response, "refresh_token");
+                return;
+            }
+
+            Claims refreshTokenClaims = jwtTokenProvider.getClaims(refreshToken);
+            log.info("Refresh Token Claims: {}", refreshTokenClaims);
+
+            UserInfo userInfo = buildUserInfoFromClaims(refreshTokenClaims);
+            log.info("생성된 UserInfo: {}", userInfo);
+
+            Authentication authentication = createAuthentication(userInfo);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            String newAccessToken = jwtTokenProvider.generateAccessToken(authentication);
+            log.info("새로운 Access Token 생성 완료");
+
+            cookieUtil.addCookie(response, "access_token", newAccessToken, accessTokenExpire);
+            log.info("새로운 Access Token을 쿠키에 저장 완료");
+
+            log.info("====== Refresh Token 전용 처리 완료 ======");
+        } catch (Exception e) {
+            log.error("Refresh Token 처리 중 에러 발생: {}", e.getMessage(), e);
+            cookieUtil.deleteCookie(response, "refresh_token");
+        }
+    }
+
+    private void setSecurityContextFromAccessToken(String accessToken) {
+        Claims claims = jwtTokenProvider.getClaims(accessToken);
+        UserInfo userInfo = buildUserInfoFromClaims(claims);
+        Authentication authentication = createAuthentication(userInfo);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.info("Security Context에 '{}' 인증 정보를 저장했습니다", userInfo.getEmail());
+    }
+
+    private void handleTokenRenewal(HttpServletResponse response, String accessToken, String refreshToken) {
+        if (jwtTokenProvider.validateToken(refreshToken)) {
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(refreshToken);
+
+            if (authService.validateRefreshToken(userEmail, refreshToken)) {
+                Claims refreshTokenClaims = jwtTokenProvider.getClaims(refreshToken);
+                UserInfo userInfo = buildUserInfoFromClaims(refreshTokenClaims);
+                Authentication authentication = createAuthentication(userInfo);
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                String newAccessToken = jwtTokenProvider.generateAccessToken(authentication);
+                cookieUtil.addCookie(response, "access_token", newAccessToken, accessTokenExpire);
+
+                log.info("새로운 액세스 토큰 발급 완료");
+            } else {
+                log.error("저장된 리프레시 토큰과 일치하지 않습니다.");
+                authService.removeRefreshToken(userEmail);
+                cookieUtil.deleteCookie(response, "access_token");
+                cookieUtil.deleteCookie(response, "refresh_token");
+            }
+        }
+    }
+
+    private UserInfo buildUserInfoFromClaims(Claims claims) {
+        return UserInfo.builder()
+                .id(claims.get("userId", Integer.class))
+                .email(claims.get("email", String.class))
+                .nickname(claims.get("nickname", String.class))
+                .role(Role.USER.name())
+                .build();
+    }
+
+    private Authentication createAuthentication(UserInfo userInfo) {
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + Role.USER.name());
+        List<SimpleGrantedAuthority> authorities = Collections.singletonList(authority);
+        return new UsernamePasswordAuthenticationToken(userInfo, null, authorities);
     }
 }

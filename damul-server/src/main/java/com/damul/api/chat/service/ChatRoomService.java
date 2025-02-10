@@ -5,15 +5,15 @@ import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.dto.response.ChatRoomLimitResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
-import com.damul.api.common.scroll.dto.response.CreateResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
 
 public interface ChatRoomService {
 
-    ScrollResponse<ChatRoomList> getChatRooms(ScrollRequest request, int userId);
+    ScrollResponse<ChatRoomList> getChatRooms(int cursor, int size, int userId);
 
-    SearchResponse<ChatRoomList> searchChatRooms(String keyword, ScrollRequest request, int userId);
+    SearchResponse<ChatRoomList> searchChatRooms(String keyword, int cursor, int size, int userId);
 
     ChatMembersResponse getChatRoomMembers(int roomId);
 

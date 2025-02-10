@@ -106,14 +106,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         log.info("기존 유저입니다.");
         User user = existingUser.get();
-        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getNickname());
-        log.info("조회된 사용자: id={}, email={}, nickname={}",
+        log.info("User 객체 조회 완료: id={}, email={}, nickname={}, role={}",
                 user.getId(), user.getEmail(), user.getNickname());
-        // DefaultOAuth2User 대신 CustomUserDetails 반환
-        return new CustomUserDetails(
-                userInfo,
-                oAuth2User.getAttributes()
-        );
+
+        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getNickname(), user.getRole().name());
+        log.info("UserInfo 객체 생성 완료: id={}, email={}, nickname={}",
+                user.getId(), user.getEmail(), user.getNickname());
+
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+        log.info("OAuth2User attributes: {}", attributes);
+
+        try {
+            CustomUserDetails customUserDetails = new CustomUserDetails(userInfo, attributes);
+            log.info("CustomUserDetails 생성 완료: id={}, email={}, nickname={}",
+                    customUserDetails.getId(), customUserDetails.getEmail(), customUserDetails.getNickname());
+            return customUserDetails;
+        } catch (Exception e) {
+            log.error("CustomUserDetails 생성 중 오류 발생", e);
+            log.error("Exception type: {}", e.getClass().getName());
+            log.error("Exception message: {}", e.getMessage());
+            log.error("Stack trace: ", e);
+            throw e;
+        }
     }
 
     // User 새로 생성

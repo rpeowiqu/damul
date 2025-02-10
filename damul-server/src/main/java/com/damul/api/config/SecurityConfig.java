@@ -44,6 +44,12 @@ public class SecurityConfig {
     @Value("${redirect.frontUrl}")
     private String frontUrl;
 
+    @Value("${jwt.access-token-expiration}")
+    private long accessTokenExpire;
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long refreshTokenExpire;
+
     private final JwtDecoder jwtDecoder;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -74,14 +80,20 @@ public class SecurityConfig {
                     });
                 })// refresh 필터 추가
                 .addFilterBefore(
-                        new JwtTokenRefreshFilter(jwtTokenProvider, authService, cookieUtil),
+                        new JwtTokenRefreshFilter(
+                                jwtTokenProvider,
+                                authService,
+                                cookieUtil,
+                                accessTokenExpire,    // SecurityConfig에서 @Value로 가져온 값 전달
+                                refreshTokenExpire    // SecurityConfig에서 @Value로 가져온 값 전달
+                        ),
                         UsernamePasswordAuthenticationFilter.class
                 )
                 // URL별 접근 권한 설정
                 .authorizeHttpRequests((auth) -> {
                     log.info("URL 접근 권한 설정");
                     auth
-                            .requestMatchers("/api/v1", "/multibranch-webhook-trigger/invoke*").permitAll()
+                            .requestMatchers("/multibranch-webhook-trigger/invoke*").permitAll()
                             .requestMatchers("/", "/login", "/admin/login", "/api/v1/test/token").permitAll() // 누구나 접근 가능
                             .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
                             .requestMatchers("/ws/**").permitAll()  // WebSocket 엔드포인트 허용
