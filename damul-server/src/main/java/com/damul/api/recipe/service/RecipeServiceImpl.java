@@ -189,7 +189,7 @@ public class RecipeServiceImpl implements RecipeService {
         }
 
         // 2. Recipe 정보 조회
-        Recipe recipe = recipeRepository.findById(recipeId)
+        Recipe recipe = recipeRepository.findByIdAndDeletedFalse(recipeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND));
 
         // 3. 북마크/좋아요 상태 확인
@@ -233,7 +233,7 @@ public class RecipeServiceImpl implements RecipeService {
         log.info("댓글 목록 조회 시작");
         // 6. 댓글 목록 조회
         List<CommentList> comments = recipeCommentRepository
-                .findByRecipeOrderByCreatedAt(recipe)
+                .findByRecipe_IdAndDeletedFalseOrderByCreatedAtAsc(recipeId)
                 .stream()
                 .map(comment -> CommentList.builder()
                         .id(comment.getId())
@@ -286,7 +286,7 @@ public class RecipeServiceImpl implements RecipeService {
         log.info("레시피 삭제 시작 - recipeId: {}", recipeId);
         Recipe recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND));
-        recipeRepository.delete(recipe);
+        recipeRepository.softDeleteRecipe(recipeId);
         log.info("레시피 삭제 완료");
     }
 
@@ -388,7 +388,7 @@ public class RecipeServiceImpl implements RecipeService {
                 });
 
         log.info("댓글 삭제 시작 - commentId: {}", commentId);
-        recipeCommentRepository.delete(comment);
+        recipeCommentRepository.softDeleteComment(commentId);
         log.info("댓글 삭제 완료 - commentId: {}", commentId);
     }
 

@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
@@ -159,4 +160,11 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
 
     boolean existsByUserIdAndIdLessThan(int userId, int id);
 
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Recipe r SET r.deleted = true WHERE r.id = :recipeId")
+    void softDeleteRecipe(@Param("recipeId") int recipeId);
+
+    Optional<Recipe> findByIdAndDeletedFalse(int recipeId);
 }
