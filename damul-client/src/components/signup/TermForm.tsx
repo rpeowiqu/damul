@@ -131,7 +131,6 @@ const TermsForm = ({
         </div>
 
         <DamulButton type="submit" variant="positive" className="w-full">
-        <DamulButton type="submit" variant="positive" className="w-full">
           다음
         </DamulButton>
       </form>
