@@ -1,8 +1,11 @@
 package com.damul.api.recipe.repository;
 
 import com.damul.api.mypage.dto.response.MyRecipeList;
+import com.damul.api.recipe.dto.response.FamousRecipe;
 import com.damul.api.recipe.dto.response.RecipeList;
+import com.damul.api.recipe.dto.response.TagDto;
 import com.damul.api.recipe.entity.Recipe;
+import com.damul.api.recipe.entity.Tag;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +14,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
@@ -157,6 +162,39 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             @Param("size") int size
     );
 
+    @Query(value = """
+        SELECT r.id, r.title, r.thumbnail_url
+        FROM recipes r
+        INNER JOIN (
+            SELECT recipe_id, COUNT(*) as like_count
+            FROM recipe_like
+            WHERE created_at BETWEEN :startDate AND :endDate
+            GROUP BY recipe_id
+            ORDER BY like_count DESC
+            LIMIT 5
+        ) top_likes ON r.id = top_likes.recipe_id
+        WHERE r.is_deleted = false
+        """, nativeQuery = true)
+    List<FamousRecipe> findTop5LikedRecipes(@Param("startDate") LocalDateTime startDate,
+                                            @Param("endDate") LocalDateTime endDate);
+
+
+    @Query("""
+    SELECT new com.damul.api.recipe.dto.response.TagDto(t.id, t.tagName)
+    FROM Tag t 
+    JOIN RecipeTag rt ON t.id = rt.tag.id 
+    WHERE rt.recipe.id = :recipeId
+    """)
+    List<TagDto> findTagDtosByRecipeId(@Param("recipeId") Integer recipeId);
+
+
     boolean existsByUserIdAndIdLessThan(int userId, int id);
 
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Recipe r SET r.deleted = true WHERE r.id = :recipeId")
+    void softDeleteRecipe(@Param("recipeId") int recipeId);
+
+    Optional<Recipe> findByIdAndDeletedFalse(int recipeId);
 }

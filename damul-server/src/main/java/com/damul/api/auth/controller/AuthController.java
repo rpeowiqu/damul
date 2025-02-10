@@ -90,10 +90,10 @@ public class AuthController {
 
     // 약관 동의 및 닉네임, 이메일 조회
     @GetMapping("/consent")
-    public ResponseEntity<?> getTerms(@CookieValue(name="tempToken", required = true) String tempToken) {
+    public ResponseEntity<?> getTerms(@CookieValue(name="temp_token", required = true) String tempToken) {
         log.info("약관 동의 조회 요청");
 
-        // tempToken null이면 클라이언트가 인증되지 않은 상태일 수 있음
+        // temp_token null이면 클라이언트가 인증되지 않은 상태일 수 있음
         if (tempToken == null) {
             log.error("tempToken 존재하지 않습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

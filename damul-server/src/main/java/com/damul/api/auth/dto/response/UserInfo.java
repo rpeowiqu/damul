@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserInfo {
-    private int id;
+    private Integer id;
     private String email;
     private String nickname;
     private String role;

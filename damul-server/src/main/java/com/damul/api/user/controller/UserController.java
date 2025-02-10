@@ -45,10 +45,6 @@ public class UserController {
                                         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
                                         @RequestPart(value = "backgroundImage", required = false) MultipartFile backgroundImage)
             throws JsonProcessingException {
-//
-//
-//        SettingUpdate setting = objectMapper.readValue(settingJson, SettingUpdate.class);
-
         userService.updateUserSettings(userId, setting, profileImage, backgroundImage);
         return ResponseEntity.ok().build();
     }
@@ -83,8 +79,8 @@ public class UserController {
 
     
     // 팔로잉 목록 조회
-    @GetMapping("/{userId}/follwings")
-    public ResponseEntity<?> getFollwings(@RequestParam int cursor,
+    @GetMapping("/{userId}/followings")
+    public ResponseEntity<?> getFollowings(@RequestParam int cursor,
                                           @RequestParam int size,
                                           @PathVariable int userId) {
         log.info("팔로잉 목록 조회 요청");
