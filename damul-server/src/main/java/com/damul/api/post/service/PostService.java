@@ -3,7 +3,7 @@ package com.damul.api.post.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.common.comment.CommentCreate;
-import com.damul.api.common.scroll.dto.response.CreateResponse;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.post.dto.request.PostRequest;
 import com.damul.api.post.dto.response.PostDetail;
@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface PostService {
 
     // 게시글 전체 조회/검색
-    ScrollResponse<PostList> getPosts(int cursor, int size, String searchType,
+    ScrollResponse<PostList> getPosts(UserInfo userInfo, int cursor, int size, String searchType,
                                       String keyword, String status, String orderBy);
 
     // 게시글 상세조회
@@ -32,9 +32,9 @@ public interface PostService {
     CreateResponse addPostComment(int postId, CommentCreate commentCreate, UserInfo userInfo);
 
     // 댓글 삭제
+    void deletePostComment(int postId, int commentId, UserInfo userInfo);
 
-
-//    // 게시글 현황 변경
-//    void changePostStatus(int postId);
+    // 게시글 현황 변경
+    boolean changePostStatus(int postId, UserInfo userInfo);
 
 }
