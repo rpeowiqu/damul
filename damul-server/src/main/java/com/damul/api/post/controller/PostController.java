@@ -95,9 +95,9 @@ public class PostController {
 
     // 게시글 삭제
     @DeleteMapping("/{postId}")
-    public ResponseEntity<?> deletePost(@PathVariable int postId) {
+    public ResponseEntity<?> deletePost(@PathVariable int postId, @CurrentUser UserInfo userInfo) {
         log.info("게시글 삭제 조회 - postId: {}", postId);
-        postService.deletePost(postId);
+        postService.deletePost(postId, userInfo);
         log.info("게시글 삭제 완료");
         return ResponseEntity.ok().build();
     }
