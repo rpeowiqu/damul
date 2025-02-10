@@ -9,6 +9,7 @@ import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
+import com.damul.api.config.service.S3Service;
 import com.damul.api.post.dto.PostStatus;
 import com.damul.api.post.dto.request.PostRequest;
 import com.damul.api.post.dto.response.CommentList;
@@ -47,14 +48,15 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
 
     // 게시글 전체 조회/검색
     @Override
     public ScrollResponse getPosts(int cursor, int size, String searchType, String keyword, String status, String orderBy) {
 
-        log.debug("Posts search start");
-        log.debug("Parameters: cursor={}, size={}, searchType={}, keyword={}, status={}, orderBy={}",
+        log.info("Posts search start");
+        log.info("Parameters: cursor={}, size={}, searchType={}, keyword={}, status={}, orderBy={}",
                 cursor, size, searchType, keyword, status, orderBy);
 
         List<PostList> posts = List.of();
@@ -148,10 +150,10 @@ public class PostServiceImpl implements PostService {
         }
 
         if (posts.isEmpty()) {
-            log.debug("No posts found in JPA query result");
+            log.info("No posts found in JPA query result");
         } else {
-            log.debug("Found {} posts in JPA query", posts.size());
-            log.debug("First posts data: id={}, title={}, userId={}",
+            log.info("Found {} posts in JPA query", posts.size());
+            log.info("First posts data: id={}, title={}, userId={}",
                     posts.get(0).getId(),
                     posts.get(0).getTitle(),
                     posts.get(0).getAuthorId());
@@ -228,6 +230,7 @@ public class PostServiceImpl implements PostService {
 
         // PostDetail 객체 생성 및 반환
         // status, 채팅방 인원수, 최대 인원수 필요
+        // currentChatNum, chatSize, commentCnt 필요
         return PostDetail.builder()
                 .id(post.getPostId())
                 .title(post.getTitle())
@@ -245,14 +248,22 @@ public class PostServiceImpl implements PostService {
 
     // 게시글 작성
     @Override
-    public CreateResponse addPost(PostRequest postRequest, MultipartFile thumbnailImage) {
-        log.info("게시글 작성 시작 - 제목: {}", postRequest.getTitle());
+    public CreateResponse addPost(UserInfo userInfo, PostRequest postRequest, MultipartFile thumbnailImage) {
+        log.info("게시글 작성 시작 - 제목: {}, 내용: {}, 인원수: {}", postRequest.getTitle(), postRequest.getContent(), postRequest.getChatSize());
         // 유저 조회
-        User user = userRepository.findById(postRequest.getUserId())
+        if (checkUserInfo(userInfo) == 0) {
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
+        User user = userRepository.findById(userInfo.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
 
         // 썸네일 업로드 처리
-        String thumbnailUrl = thumbnailImage.isPresent() ? uploadImage(thumbnailImage.get()) : null;
+        String thumbnailUrl = null;
+        if (thumbnailImage != null && !thumbnailImage.isEmpty()) {
+            validateImageFile(thumbnailImage);
+            thumbnailUrl = s3Service.uploadFile(thumbnailImage);  // 업로드 후 URL 반환하는 메서드 추가
+            log.info("사진 업로드 완료");
+        }
 
         // 게시글 저장
         Post post = Post.builder()
@@ -264,43 +275,45 @@ public class PostServiceImpl implements PostService {
 
         Post savedPost = postRepository.save(post);
         log.info("게시글 작성 완료 - ID: {}", savedPost.getPostId());
+        
+        // 채팅방 연결
 
         return new CreateResponse(savedPost.getPostId());
     }
 
-    // 게시글 수정
-    @Override
-    public CreateResponse updatePost(PostRequest postRequest, MultipartFile thumbnailImage) {
-        log.info("게시글 수정 시작 - postId: {}", postId);
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
-
-        // 썸네일이 존재하고 변경된 경우만 업로드 처리
-        if (thumbnailImage.isPresent()) {
-            String newThumbnailUrl = uploadImage(thumbnailImage.get());
-            post = Post.builder()
-                    .user(post.getUser())
-                    .title(postRequest.getTitle())
-                    .content(postRequest.getContent())
-                    .thumbnailUrl(newThumbnailUrl)
-                    .postType(postRequest.getPostType())
-                    .build();
-        } else {
-            post = Post.builder()
-                    .user(post.getUser())
-                    .title(postRequest.getTitle())
-                    .content(postRequest.getContent())
-                    .thumbnailUrl(post.getThumbnailUrl())
-                    .postType(postRequest.getPostType())
-                    .build();
-        }
-
-        Post updatedPost = postRepository.save(post);
-        log.info("게시글 수정 완료 - ID: {}", updatedPost.getPostId());
-
-        return new CreateResponse(updatedPost.getPostId());
-    }
+//    // 게시글 수정
+//    @Override
+//    public CreateResponse updatePost(PostRequest postRequest, MultipartFile thumbnailImage) {
+//        log.info("게시글 수정 시작 - postId: {}", postId);
+//
+//        Post post = postRepository.findById(postId)
+//                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+//
+//        // 썸네일이 존재하고 변경된 경우만 업로드 처리
+//        if (thumbnailImage.isPresent()) {
+//            String newThumbnailUrl = uploadImage(thumbnailImage.get());
+//            post = Post.builder()
+//                    .user(post.getUser())
+//                    .title(postRequest.getTitle())
+//                    .content(postRequest.getContent())
+//                    .thumbnailUrl(newThumbnailUrl)
+//                    .postType(postRequest.getPostType())
+//                    .build();
+//        } else {
+//            post = Post.builder()
+//                    .user(post.getUser())
+//                    .title(postRequest.getTitle())
+//                    .content(postRequest.getContent())
+//                    .thumbnailUrl(post.getThumbnailUrl())
+//                    .postType(postRequest.getPostType())
+//                    .build();
+//        }
+//
+//        Post updatedPost = postRepository.save(post);
+//        log.info("게시글 수정 완료 - ID: {}", updatedPost.getPostId());
+//
+//        return new CreateResponse(updatedPost.getPostId());
+//    }
 
     // 게시글 삭제
     @Override
@@ -338,32 +351,34 @@ public class PostServiceImpl implements PostService {
         PostComment savedComment = postCommentRepository.save(comment);
         return new CreateResponse(savedComment.getPostCommentId());
     }
+    
+    // 댓글 삭제
 
-    // 게시글 현황 변경
-    @Override
-    public void changePostStatus(int postId) {
-        log.info("게시글 상태 변경 시작 - postId: {}", postId);
-
-        // 게시글 존재 여부 확인
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
-
-        // 현재 상태가 이미 COMPLETED이면 변경할 필요 없음
-        if (post.getPostStatus() == PostStatus.COMPLETED) {
-            log.warn("게시글 상태 변경 불필요 - 이미 COMPLETED 상태 (postId: {})", postId);
-            return;
-        }
-
-        // ACTIVE 상태인 경우에만 COMPLETED로 변경 가능
-        if (post.getPostStatus() == PostStatus.ACTIVE) {
-            post.changeStatus(PostStatus.COMPLETED);
-            postRepository.save(post);
-            log.info("게시글 상태 변경 완료 - postId: {}, newStatus: COMPLETED", postId);
-        } else {
-            log.error("게시글 상태 변경 불가 - 현재 상태: {}", post.getPostStatus());
-            throw new BusinessException(ErrorCode.INVALID_STATUS);
-        }
-    }
+//    // 게시글 현황 변경
+//    @Override
+//    public void changePostStatus(int postId) {
+//        log.info("게시글 상태 변경 시작 - postId: {}", postId);
+//
+//        // 게시글 존재 여부 확인
+//        Post post = postRepository.findById(postId)
+//                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+//
+//        // 현재 상태가 이미 COMPLETED이면 변경할 필요 없음
+//        if (post.getPostStatus() == PostStatus.COMPLETED) {
+//            log.warn("게시글 상태 변경 불필요 - 이미 COMPLETED 상태 (postId: {})", postId);
+//            return;
+//        }
+//
+//        // ACTIVE 상태인 경우에만 COMPLETED로 변경 가능
+//        if (post.getPostStatus() == PostStatus.ACTIVE) {
+//            post.changeStatus(PostStatus.COMPLETED);
+//            postRepository.save(post);
+//            log.info("게시글 상태 변경 완료 - postId: {}, newStatus: COMPLETED", postId);
+//        } else {
+//            log.error("게시글 상태 변경 불가 - 현재 상태: {}", post.getPostStatus());
+//            throw new BusinessException(ErrorCode.INVALID_STATUS);
+//        }
+//    }
 
     // 유저 조회
     private int checkUserInfo(UserInfo userInfo) { return userInfo != null ? userInfo.getId() : 0; }

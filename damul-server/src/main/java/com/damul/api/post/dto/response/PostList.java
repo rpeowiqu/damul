@@ -19,7 +19,7 @@ public class PostList implements ScrollCursor {
     private LocalDateTime createdAt;
     private int authorId;
     private String authorName;
-    private PostStatus postStatus;
+    private PostStatus status;
 
     @Override
     public int getId() {

@@ -62,19 +62,27 @@ public class PostController {
 
     // 게시글 작성
     @PostMapping
-    public ResponseEntity<?> addPost(@RequestPart("postRequest")PostRequest postRequest,
-                                     @RequestPart("thumbnailImage")MultipartFile thumbnailImage) {
-        return null;
+    public ResponseEntity<?> addPost(@CurrentUser UserInfo userInfo,
+                                     @RequestPart("postRequest")PostRequest postRequest,
+                                     @RequestPart(value = "image", required = false)MultipartFile thumbnailImage) {
+        log.info("게시글 작성 시작");
+        CreateResponse post = postService.addPost(userInfo, postRequest, thumbnailImage);
+        if (post == null) {
+            log.error("게시글 작성 실패 - postTitle: {}", postRequest.getTitle());
+            throw new BusinessException(ErrorCode.DATABASE_ERROR);
+        }
+
+        return ResponseEntity.ok(post);
     }
 
-    // 게시글 수정
-    @PostMapping("/{postId}")
-    public ResponseEntity<?> updatePost(@PathVariable int postId,
-                                        @RequestPart("postRequest") PostRequest postRequest,
-                                        @RequestPart("thumbnailImage") MultipartFile thumbnailImage) {
-        postService.updatePost(postRequest, thumbnailImage);
-        return ResponseEntity.ok().build();
-    }
+//    // 게시글 수정
+//    @PostMapping("/{postId}")
+//    public ResponseEntity<?> updatePost(@PathVariable int postId,
+//                                        @RequestPart("postRequest") PostRequest postRequest,
+//                                        @RequestPart("thumbnailImage") MultipartFile thumbnailImage) {
+//        postService.updatePost(postRequest, thumbnailImage);
+//        return ResponseEntity.ok().build();
+//    }
 
     // 게시글 삭제
     @DeleteMapping("/{postId}")
@@ -96,6 +104,8 @@ public class PostController {
 
         return ResponseEntity.ok(createResponse);
     }
+    
+    // 댓글 삭제
 
     // 게시글 현황 변경
 

@@ -20,18 +20,21 @@ public interface PostService {
     PostDetail getPostDetail(int postId, UserInfo userInfo);
 
     // 게시글 작성
-    CreateResponse addPost(PostRequest postRequest, MultipartFile thumbnailImage);
-    
-    // 게시글 수정
-    CreateResponse updatePost(PostRequest postRequest, MultipartFile thumbnailImage);
+    CreateResponse addPost(UserInfo userInfo, PostRequest postRequest, MultipartFile thumbnailImage);
+
+//    // 게시글 수정
+//    CreateResponse updatePost(PostRequest postRequest, MultipartFile thumbnailImage);
     
     // 게시글 삭제
     void deletePost(int postId);
     
     // 댓글 작성
     CreateResponse addPostComment(int postId, CommentCreate commentCreate, UserInfo userInfo);
-    
-    // 게시글 현황 변경
-    void changePostStatus(int postId);
+
+    // 댓글 삭제
+
+
+//    // 게시글 현황 변경
+//    void changePostStatus(int postId);
 
 }
