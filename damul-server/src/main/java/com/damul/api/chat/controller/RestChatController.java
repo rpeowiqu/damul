@@ -32,11 +32,13 @@ public class RestChatController {
 
     @GetMapping("/rooms")
     public ResponseEntity<ScrollResponse<ChatRoomList>> getChatRooms(
-            @RequestBody ScrollRequest request,
+            @RequestParam int cursor,
+            @RequestParam int size,
             @CurrentUser User user
     ) {
-        ScrollResponse<ChatRoomList> response = chatRoomService
-                .getChatRooms(request, Integer.parseInt(user.getNickname()));
+        log.info("컨트롤러: 채팅방 목록 조회 시작 - cursor: {}, size: {}", cursor, size);
+
+        ScrollResponse<ChatRoomList> response = chatRoomService.getChatRooms(cursor, size, user.getId());
 
         if (response.getData().isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -48,11 +50,17 @@ public class RestChatController {
     @GetMapping("/{roomId}")
     public ResponseEntity<ScrollResponse<ChatMessage>> getChatMessages(
             @PathVariable int roomId,
-            @RequestBody ScrollRequest scrollRequest,
-            @CurrentUser User user) {
+            @RequestParam int cursor,
+            @RequestParam int size,
+            @CurrentUser User user
+    ) {
+        log.info("컨트롤러: 채팅 메시지 조회 시작 - roomId: {}, cursor: {}, size: {}",
+                roomId, cursor, size);
+
         ScrollResponse<ChatMessage> response = chatMessageService.getChatMessages(
                 roomId,
-                scrollRequest,
+                cursor,
+                size,
                 user.getId()
         );
 
@@ -64,11 +72,21 @@ public class RestChatController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchChatRooms(
+    public ResponseEntity<SearchResponse<ChatRoomList>> searchChatRooms(
             @RequestParam(required = false) String keyword,
-            @RequestBody ScrollRequest scrollRequest,
-            @CurrentUser UserInfo user) {
-        SearchResponse<ChatRoomList> response = chatRoomService.searchChatRooms(keyword, scrollRequest, user.getId());
+            @RequestParam int cursor,
+            @RequestParam int size,
+            @CurrentUser User user
+    ) {
+        log.info("컨트롤러: 채팅방 검색 시작 - keyword: {}, cursor: {}, size: {}",
+                keyword, cursor, size);
+
+        SearchResponse<ChatRoomList> response = chatRoomService.searchChatRooms(
+                keyword,
+                cursor,
+                size,
+                user.getId()
+        );
 
         if (response.getResults().getData().isEmpty()) {
             return ResponseEntity.noContent().build();
