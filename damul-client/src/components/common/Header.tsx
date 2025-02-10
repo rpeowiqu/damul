@@ -6,17 +6,21 @@ import { useEffect } from "react";
 import useUserStore from "@/stores/user";
 
 const Header = () => {
-  // const { setMyId, setMyNickname, setWarningEnable } = useUserStore();
+  const { myId, setMyId, setMyNickname, setWarningEnabled } = useUserStore();
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await getInfo();
       if (response) {
-        console.log(response);
+        setMyId(response.data.id);
+        setMyNickname(response.data.nickname);
+        setWarningEnabled(response.data.warningEnabled);
       }
     };
 
-    fetchData();
+    if (myId === 0) {
+      fetchData();
+    }
   }, []);
 
   return (

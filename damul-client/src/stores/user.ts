@@ -8,8 +8,8 @@ interface UserState {
   myNickname: string;
   setMyNickname: (nickname: string) => void;
 
-  myWarningEnable: boolean;
-  setWarningEnable: (warningEnable: boolean) => void;
+  myWarningEnabled: boolean;
+  setWarningEnabled: (warningEnable: boolean) => void;
 }
 
 const useUserStore = create(
@@ -17,12 +17,12 @@ const useUserStore = create(
     (set) => ({
       myId: 0,
       myNickname: "",
-      myWarningEnable: true,
+      myWarningEnabled: true,
 
       setMyId: (id) => set({ myId: id }),
       setMyNickname: (nickname) => set({ myNickname: nickname }),
-      setWarningEnable: (warningEnable) =>
-        set({ myWarningEnable: warningEnable }),
+      setWarningEnabled: (warningEnabled) =>
+        set({ myWarningEnabled: warningEnabled }),
     }),
     {
       name: "user",
