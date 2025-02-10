@@ -120,6 +120,7 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
+    @Transactional
     public void deleteIngredient(int userIngredientId) {
         log.info("식자재 삭제 시작");
         UserIngredient ingredient = userIngredientRepository.findByIdAndNotDeleted(userIngredientId)
@@ -142,6 +143,7 @@ public class HomeServiceImpl implements HomeService {
         }
 
         List<SuggestedRecipeList> suggestedRecipes = recommendedRecipes.stream()
+                .limit(5)
                 .map(this::convertToSuggestedRecipeList)
                 .collect(Collectors.toList());
 
@@ -149,20 +151,16 @@ public class HomeServiceImpl implements HomeService {
     }
 
     private SuggestedRecipeList convertToSuggestedRecipeList(Recipe recipe) {
-        List<RecipeTag> recipeTags = recipeTagRepository.findByRecipeId(recipe.getId());
-
-        List<RecipeTagList> recipeTagLists = recipeTags.stream()
-                .map(recipeTag -> new RecipeTagList(
-                        recipeTag.getTag().getId(),
-                        recipeTag.getTag().getTagName()
-                ))
-                .collect(Collectors.toList());
-
         return SuggestedRecipeList.builder()
                 .recipeId(recipe.getId())
                 .title(recipe.getTitle())
                 .thumbnailUrl(recipe.getThumbnailUrl())
-                .recipeTags(recipeTagLists)
+                .recipeTags(recipeTagRepository.findByRecipeId(recipe.getId()).stream()
+                        .map(recipeTag -> new RecipeTagList(
+                                recipeTag.getTag().getId(),
+                                recipeTag.getTag().getTagName()
+                        ))
+                        .collect(Collectors.toList()))
                 .build();
     }
 
