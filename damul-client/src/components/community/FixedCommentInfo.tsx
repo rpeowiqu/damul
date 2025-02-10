@@ -3,12 +3,14 @@ import CommentInput from "../common/CommentInput";
 import { Comment } from "@/types/community";
 
 interface FixedCommentInfoProps {
+  recipeId: string;
   replyingTo: Comment | null;
   comment: string;
   setComment: Dispatch<SetStateAction<string>>;
   cancelReply: () => void;
 }
 const FixedCommentInfo = ({
+  recipeId,
   replyingTo,
   comment,
   setComment,
@@ -34,6 +36,7 @@ const FixedCommentInfo = ({
         placeholder={
           replyingTo ? "대댓글을 입력해주세요" : "댓글을 입력해주세요"
         }
+        recipeId={recipeId}
         comment={comment}
         setComment={setComment}
       />

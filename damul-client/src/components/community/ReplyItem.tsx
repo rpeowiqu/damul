@@ -11,9 +11,12 @@ const ReplyItem = ({ reply, onReply }: ReplyItemProps) => {
     <div className="ml-6 mt-2 bg-neutral-100 p-2 rounded-md">
       <div className="flex items-center gap-2">
         <Image src={reply.profileImageUrl} className="w-10 h-10 rounded-full" />
-        <div className="flex w-full justify-between">
+        <div className="flex flex-1 justify-between">
           <p className="font-semibold text-sm">{reply.nickname}</p>
-          <p className="text-xs text-neutral-500">{reply.createdAt}</p>
+          <p className="text-xs text-neutral-500">
+            {reply.createdAt.split("T")[0]}{" "}
+            {reply.createdAt.split("T")[1].slice(0, 5)}
+          </p>
         </div>
       </div>
       <p className="text-sm ml-12 pb-1">{reply.comment}</p>

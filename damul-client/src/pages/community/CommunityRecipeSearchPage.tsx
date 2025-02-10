@@ -8,11 +8,11 @@ const CommunityRecipeSearchPage = () => {
     <main className="h-full px-4 py-6 pc:px-6 space-y-6">
       <CommunitySearch
         placeholder="찾고 싶은 레시피를 검색해보세요"
-        title="인기 급상승 레시피"
-        postTo="recipe"
+        type="recipe"
       />
+      <h3 className="px-2 font-semibold text-md">인기 급상승 레시피</h3>
       <DamulCarousel />
-      <PostButton to="/community/recipe/post" icon={<WriteIcon/>}/>
+      <PostButton to="/community/recipe/post" icon={<WriteIcon />} />
     </main>
   );
 };

@@ -39,6 +39,7 @@ import ChattingStartPage from "@/pages/chat/ChattingStartPage";
 import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPage";
 import ChattingSearchResultPage from "@/pages/chat/ChattingSearchResultPage";
 import ChattingRoomPage from "@/pages/chat/ChattingRoomPage";
+import TestPage from "@/pages/TestPage";
 import AlarmPage from "@/pages/alarm/AlarmPage";
 import HomeIngredientsEditPage from "@/pages/home/HomeIngredientsEditPage";
 
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
+      {
+        path: "test",
+        element: <TestPage />,
+      },
       {
         index: true,
         element: <HomePage />,
@@ -152,7 +157,7 @@ const router = createBrowserRouter([
                 element: <CommunityMarketSearchPage />,
               },
               {
-                path: "search/:keyword",
+                path: "search/result",
                 element: <CommunitySearchResultPage />,
               },
             ],
@@ -165,7 +170,7 @@ const router = createBrowserRouter([
         element: <CommunityRecipePostPage />,
       },
       {
-        path: "community/recipe/:id",
+        path: "community/recipe/:recipeId",
         element: <CommunityRecipeDetailPage />,
       },
       {

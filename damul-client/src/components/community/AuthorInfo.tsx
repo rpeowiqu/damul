@@ -6,26 +6,51 @@ import ReportIcon from "../svg/ReportIcon";
 import WriteIcon from "../svg/WriteIcon";
 import DeleteIcon from "../svg/DeleteIcon";
 import ReportButton from "../common/ReportButton";
+import { postRecipeLike } from "@/service/recipe";
+import { useState, useEffect } from "react";
 
 interface AuthorInfoProps {
   profileImageUrl: string;
   authorName: string;
   viewCnt?: number;
   likeCnt?: number;
-  isLiked?: boolean;
+  liked?: boolean;
   type: string;
-  id: number;
+  recipeId: string;
 }
+
 const AuthorInfo = ({
   profileImageUrl,
   authorName,
   viewCnt,
-  likeCnt,
-  isLiked,
+  likeCnt = 0,
+  liked,
   type,
-  id,
+  recipeId,
 }: AuthorInfoProps) => {
   const navigate = useNavigate();
+  const [isLiked, setIsLiked] = useState(liked);
+  const [likesCount, setLikesCount] = useState(likeCnt);
+
+  useEffect(() => {
+    setIsLiked(liked);
+    setLikesCount(likeCnt);
+  }, [liked, likeCnt, recipeId]);
+
+  const likeRecipe = async () => {
+    try {
+      const response = await postRecipeLike(recipeId);
+      if (response?.data) {
+        setIsLiked(true);
+        setLikesCount((prev) => prev + 1);
+      } else {
+        setIsLiked(false);
+        setLikesCount((prev) => Math.max(0, prev - 1));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex flex-col h-auto p-2">
@@ -41,13 +66,16 @@ const AuthorInfo = ({
                 <ViewIcon className="w-4 h-4 stroke-neutral-700" />
                 <p className="text-xs text-neutral-700">{viewCnt}</p>
               </div>
-              <div className="flex items-center gap-1 cursor-pointer">
+              <div
+                onClick={likeRecipe}
+                className="flex items-center gap-1 cursor-pointer"
+              >
                 {isLiked ? (
-                  <LikesIcon className="w-4 h-4 fill-positive-300  stroke-neutral-700" />
+                  <LikesIcon className="w-5 h-5 fill-positive-300 stroke-neutral-500" />
                 ) : (
-                  <LikesIcon className="w-4 h-4   stroke-neutral-700" />
+                  <LikesIcon className="w-5 h-5 stroke-neutral-700" />
                 )}
-                <p className="text-xs text-neutral-700">{likeCnt}</p>
+                <p className="text-xs text-neutral-700">{likesCount}</p>
               </div>
             </div>
           </div>
@@ -63,7 +91,7 @@ const AuthorInfo = ({
         <div
           className="flex items-center gap-0.5 cursor-pointer mr-1"
           onClick={() => {
-            navigate(`/community/${type}/${id}/edit`);
+            navigate(`/community/${type}/${recipeId}/edit`);
           }}
         >
           <WriteIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5" />
@@ -71,7 +99,7 @@ const AuthorInfo = ({
         </div>
         <div className="flex items-center gap-0 cursor-pointer">
           <DeleteIcon className="w-5 h-5 pc:w-7 pc:h-7 fill-neutral-700 pb-0.5" />
-          <p className="text-xs pc:text-sm ">삭제하기</p>
+          <p className="text-xs pc:text-sm">삭제하기</p>
         </div>
       </div>
     </div>
