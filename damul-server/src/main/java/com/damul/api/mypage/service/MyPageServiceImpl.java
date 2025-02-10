@@ -7,9 +7,10 @@ import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.mypage.dto.response.*;
 import com.damul.api.mypage.entity.Badge;
 import com.damul.api.mypage.entity.UserBadge;
-import com.damul.api.mypage.repository.MyPageRepository;
+import com.damul.api.mypage.repository.BookmarkRepository;
+import com.damul.api.mypage.repository.FoodPreferenceRepository;
+import com.damul.api.mypage.repository.UserBadgeRepository;
 import com.damul.api.recipe.dto.response.RecipeList;
-import com.damul.api.recipe.repository.RecipeBookmarkRepository;
 import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.user.dto.response.FollowResponse;
 import com.damul.api.user.repository.FollowRepository;
@@ -31,8 +32,10 @@ public class MyPageServiceImpl implements MyPageService {
 
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
-    private final MyPageRepository myPageRepository;
+    private final FoodPreferenceRepository foodPreferenceRepository;
     private final RecipeRepository recipeRepository;
+    private final BookmarkRepository bookmarkRepository;
+    private final UserBadgeRepository userBadgeRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -61,7 +64,7 @@ public class MyPageServiceImpl implements MyPageService {
 
         int followerCount = followRepository.countByFollowingId(userId);
         int followingCount = followRepository.countByFollowerId(userId);
-        List<FoodPreferenceList> foodPreferences = myPageRepository.findPreferencesByUserId(userId);
+        List<FoodPreferenceList> foodPreferences = foodPreferenceRepository.findPreferencesByUserId(userId);
 
         return ProfileDetail.builder()
                 .followerCount(followerCount)
@@ -88,7 +91,7 @@ public class MyPageServiceImpl implements MyPageService {
 
         validateAccessPermission(targetUser, currentUser);
 
-        List<BadgeList> badges = myPageRepository.findBadgesByUserId(userId);
+        List<BadgeList> badges = userBadgeRepository.findBadgesByUserId(userId);
 
         log.info("서비스: 마이페이지 뱃지 조회 완료 - userId: {}", userId);
 
@@ -105,7 +108,7 @@ public class MyPageServiceImpl implements MyPageService {
 
         validateAccessPermission(targetUser, currentUser);
 
-        UserBadge userBadge = myPageRepository.findByUserIdAndBadgeId(userId, badgeId)
+        UserBadge userBadge = userBadgeRepository.findByUserIdAndBadgeId(userId, badgeId)
                 .orElseThrow(() -> new EntityNotFoundException("획득하지 않은 뱃지입니다."));
 
         Badge badge = userBadge.getBadge();
@@ -160,7 +163,7 @@ public class MyPageServiceImpl implements MyPageService {
 
         validateAccessPermission(targetUser, currentUser);
 
-        List<RecipeList> bookmarks = myPageRepository.findBookmarkedRecipes(userId, cursor, size);
+        List<RecipeList> bookmarks = bookmarkRepository.findBookmarkedRecipes(userId, cursor, size);
 
         if (bookmarks.isEmpty()) {
             return new ScrollResponse<>(
@@ -170,7 +173,7 @@ public class MyPageServiceImpl implements MyPageService {
         }
 
         int nextCursor = bookmarks.get(bookmarks.size() - 1).getId();
-        boolean hasNext = myPageRepository.existsByUserIdAndIdLessThan(userId, nextCursor);
+        boolean hasNext = bookmarkRepository.existsByUserIdAndIdLessThan(userId, nextCursor);
 
         return new ScrollResponse<>(
                 bookmarks,
@@ -180,7 +183,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     private double calculateRankPercentage(int badgeId, int userLevel) {
         int totalUsers = userRepository.countActiveUsers();
-        int higherLevelUsers = myPageRepository.countUsersWithHigherLevel(badgeId, userLevel);
+        int higherLevelUsers = userBadgeRepository.countUsersWithHigherLevel(badgeId, userLevel);
 
         return (higherLevelUsers * 100.0) / totalUsers;
     }
