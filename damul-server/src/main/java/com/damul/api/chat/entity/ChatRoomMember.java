@@ -47,6 +47,10 @@ public class ChatRoomMember {
         lastReadMessageId = 0;
     }
 
+    public void updateLastReadMessageId(int messageId) {
+        this.lastReadMessageId = messageId;
+    }
+
     public static ChatRoomMember create(ChatRoom room, User user, String nickname, Integer lastReadMessageId) {
         ChatRoomMember member = new ChatRoomMember();
         member.room = room;
