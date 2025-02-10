@@ -18,3 +18,7 @@ export const signUp = (signUpRequest: {
 export const consent = () => {
   return apiRequest(() => apiClient.get("/auth/consent"));
 };
+
+export const getInfo = () => {
+  return apiRequest(() => apiClient.get("/auth/users"));
+};
