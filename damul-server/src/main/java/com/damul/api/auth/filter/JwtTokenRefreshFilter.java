@@ -95,27 +95,17 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
         String refreshToken = refreshTokenCookie.getValue();
 
         try {
-            log.info("Refresh Token 유효성 검사 시작");
-            boolean isValid = jwtTokenProvider.validateToken(refreshToken);
-            log.info("Refresh Token 유효성: {}", isValid);
-
-            if (!isValid) {
-                log.error("유효하지 않은 Refresh Token");
-                cookieUtil.deleteCookie(response, "refresh_token");
-                return;
-            }
-
             String userEmail = jwtTokenProvider.getUserEmailFromToken(refreshToken);
-            log.info("추출된 사용자 이메일: {}", userEmail);
+            log.info("1. 추출된 사용자 이메일: {}", userEmail);
 
-            if (userEmail == null || userEmail.isEmpty()) {
-                log.error("Refresh Token에서 사용자 이메일을 추출할 수 없습니다.");
-                return;
-            }
+            // 실제 Redis에 저장된 값 확인
+            String storedToken = authService.findRefreshToken(userEmail);
+            log.info("2. Redis에 저장된 토큰: {}", storedToken);
+            log.info("3. 현재 쿠키의 토큰: {}", refreshToken);
 
-            log.info("Redis에서 Refresh Token 검증 시작");
+            log.info("4. Redis에서 Refresh Token 검증 시작");
             boolean isValidInRedis = authService.validateRefreshToken(userEmail, refreshToken);
-            log.info("Redis 검증 결과: {}", isValidInRedis);
+            log.info("5. Redis 검증 결과: {}", isValidInRedis);
 
             if (!isValidInRedis) {
                 log.error("Redis에 저장된 Refresh Token과 일치하지 않습니다.");

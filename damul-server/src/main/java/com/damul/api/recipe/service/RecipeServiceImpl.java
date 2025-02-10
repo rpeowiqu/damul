@@ -233,7 +233,7 @@ public class RecipeServiceImpl implements RecipeService {
         log.info("댓글 목록 조회 시작");
         // 6. 댓글 목록 조회
         List<CommentList> comments = recipeCommentRepository
-                .findByRecipeOrderByCreatedAtDesc(recipe)
+                .findByRecipeOrderByCreatedAt(recipe)
                 .stream()
                 .map(comment -> CommentList.builder()
                         .id(comment.getId())
