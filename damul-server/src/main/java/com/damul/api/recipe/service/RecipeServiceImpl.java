@@ -10,14 +10,12 @@ import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.*;
-import com.damul.api.recipe.entity.Recipe;
-import com.damul.api.recipe.entity.RecipeBookmark;
-import com.damul.api.recipe.entity.RecipeComment;
-import com.damul.api.recipe.entity.RecipeLike;
+import com.damul.api.recipe.entity.*;
 import com.damul.api.recipe.repository.*;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -144,6 +143,30 @@ public class RecipeServiceImpl implements RecipeService {
         return ScrollUtil.createScrollResponse(recipes, cursor, size);
     }
 
+    // 인기 급상승 레시피 조회 (5개)
+    @Override
+    public List<FamousRecipe> getFamousRecipe() {
+        log.info("인기 급상승 조회 시작");
+        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate = endDate.minusDays(3);
+        log.info("시작일 - startDate: {}", startDate);
+        log.info("종료일 - endDate: {}", endDate);
+
+        List<FamousRecipe> topRecipes = recipeRepository.findTop5LikedRecipes(
+            startDate, endDate);
+
+        log.info("인기 급상승 조회 완료");
+
+        topRecipes.forEach(recipe -> {
+            List<TagDto> tags = recipeRepository.findTagDtosByRecipeId(recipe.getId());
+            recipe.setTag(tags);
+        });
+
+
+        return topRecipes;
+    }
+
+    // 레시피 상세보기
     @Override
     @Transactional
     public RecipeDetail getRecipeDetail(int recipeId, UserInfo userInfo) {
@@ -189,7 +212,7 @@ public class RecipeServiceImpl implements RecipeService {
         }
 
         // 2. Recipe 정보 조회
-        Recipe recipe = recipeRepository.findById(recipeId)
+        Recipe recipe = recipeRepository.findByIdAndDeletedFalse(recipeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND));
 
         // 3. 북마크/좋아요 상태 확인
@@ -233,7 +256,7 @@ public class RecipeServiceImpl implements RecipeService {
         log.info("댓글 목록 조회 시작");
         // 6. 댓글 목록 조회
         List<CommentList> comments = recipeCommentRepository
-                .findByRecipeOrderByCreatedAt(recipe)
+                .findByRecipe_IdAndDeletedFalseOrderByCreatedAtAsc(recipeId)
                 .stream()
                 .map(comment -> CommentList.builder()
                         .id(comment.getId())
@@ -286,7 +309,7 @@ public class RecipeServiceImpl implements RecipeService {
         log.info("레시피 삭제 시작 - recipeId: {}", recipeId);
         Recipe recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND));
-        recipeRepository.delete(recipe);
+        recipeRepository.softDeleteRecipe(recipeId);
         log.info("레시피 삭제 완료");
     }
 
@@ -388,7 +411,7 @@ public class RecipeServiceImpl implements RecipeService {
                 });
 
         log.info("댓글 삭제 시작 - commentId: {}", commentId);
-        recipeCommentRepository.delete(comment);
+        recipeCommentRepository.softDeleteComment(commentId);
         log.info("댓글 삭제 완료 - commentId: {}", commentId);
     }
 

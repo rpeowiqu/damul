@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,12 +24,20 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/test")
 @RequiredArgsConstructor
 public class TestAuthController {
+
+    @Value("${jwt.access-token-expiration}")
+    private long accessTokenExpire;        // Access Token 만료 시간 (ms)
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long refreshTokenExpire;       // Refresh Token 만료 시간 (ms)
+
 
     private final JwtTokenProvider tokenProvider;
     private final CookieUtil cookieUtil;
@@ -66,12 +75,20 @@ public class TestAuthController {
 
         // AuthService의 generateTokens 메서드 사용
         Map<String, String> tokens = authService.generateTokens(authentication);
+        String refreshToken = tokens.get("refresh_token");
+
+
+        // Redis에 RefreshToken 저장
+        redisTemplate.opsForValue().set(
+                "RT:" + userInfo.getEmail(),
+                refreshToken,
+                refreshTokenExpire,
+                TimeUnit.MILLISECONDS
+        );
 
         // 쿠키에 토큰 설정
-        cookieUtil.addCookie(response, "access_token", tokens.get("accessToken"),
-                (int) tokenProvider.getAccessTokenExpire() / 1000);
-        cookieUtil.addCookie(response, "refresh_token", tokens.get("refreshToken"),
-                (int) tokenProvider.getRefreshTokenExpire() / 1000);
+        cookieUtil.addCookie(response, "access_token", tokens.get("access_token"), accessTokenExpire);
+        cookieUtil.addCookie(response, "refresh_token", tokens.get("refresh_token"), refreshTokenExpire);
 
         log.info("토큰 생성 및 저장 완료 - email: {}", testUser.getEmail());
 

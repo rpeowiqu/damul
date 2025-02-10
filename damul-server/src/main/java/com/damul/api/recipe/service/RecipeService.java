@@ -5,6 +5,7 @@ import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.recipe.dto.request.RecipeRequest;
+import com.damul.api.recipe.dto.response.FamousRecipe;
 import com.damul.api.recipe.dto.response.RecipeDetail;
 import com.damul.api.recipe.dto.response.RecipeList;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,7 @@ public interface RecipeService {
     
 
     // 인기 레시피 조회
+    List<FamousRecipe> getFamousRecipe();
 
     // 레시피 상세 조회
     RecipeDetail getRecipeDetail(int recipeId, UserInfo userInfo);

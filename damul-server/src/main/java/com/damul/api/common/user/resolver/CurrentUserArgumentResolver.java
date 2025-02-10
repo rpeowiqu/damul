@@ -2,12 +2,15 @@ package com.damul.api.common.user.resolver;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.common.user.CustomUserDetails;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -60,9 +63,9 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         log.info("Principal 타입: {}", authentication.getPrincipal().getClass());
         log.info("Authentication Details: {}", authentication.getDetails());
 
-        if (authentication == null) {
-            log.error("Authentication is null");
-            return null;
+
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
 
