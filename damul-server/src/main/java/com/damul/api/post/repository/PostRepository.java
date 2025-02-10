@@ -18,11 +18,10 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("""
             SELECT new com.damul.api.post.dto.response.PostList(
                         p.postId, p.title, p.thumbnailUrl, p.content, 
-                        p.createdAt, p.user.id, p.user.nickname, p.postStatus
-                        )
+                        p.createdAt, p.user.id, p.user.nickname, p.status)
             FROM Post p
             JOIN p.user u
-            WHERE p.postStatus IN :statuses
+            WHERE p.status IN :statuses
             AND (:cursorId = 0 OR p.postId < :cursorId)
             ORDER BY p.postId DESC
             LIMIT :size
@@ -37,10 +36,10 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("""
             SELECT new com.damul.api.post.dto.response.PostList(
                 p.postId, p.title, p.thumbnailUrl, p.content, 
-                p.createdAt, p.user.id, p.user.nickname, p.postStatus)
+                p.createdAt, p.user.id, p.user.nickname, p.status)
             FROM Post p
             JOIN p.user u
-            WHERE p.postStatus IN :statuses
+            WHERE p.status IN :statuses
             AND (:cursorId = 0 OR p.postId < :cursorId)
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
                 OR :searchType = 'content' AND (p.title LIKE %:keyword% OR p.content LIKE %:keyword%))
@@ -59,11 +58,11 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("""
             SELECT new com.damul.api.post.dto.response.PostList(
                 p.postId, p.title, p.thumbnailUrl, p.content, 
-                p.createdAt, p.user.id, p.user.nickname, p.postStatus)
+                p.createdAt, p.user.id, p.user.nickname, p.status)
             FROM Post p
             JOIN p.user u
             LEFT JOIN Post prev ON prev.postId = :cursorId
-            WHERE p.postStatus IN :statuses
+            WHERE p.status IN :statuses
             AND (:cursorId = 0 OR
                 (:orderBy = 'views' AND (p.viewCnt < prev.viewCnt OR (p.viewCnt = prev.viewCnt AND p.postId < prev.postId))))
             ORDER BY
@@ -85,11 +84,11 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("""
             SELECT new com.damul.api.post.dto.response.PostList(
                 p.postId, p.title, p.thumbnailUrl, p.content, 
-                p.createdAt, p.user.id, p.user.nickname, p.postStatus)
+                p.createdAt, p.user.id, p.user.nickname, p.status)
             FROM Post p
             JOIN p.user u
             LEFT JOIN Post prev ON prev.postId = :cursorId
-            WHERE p.postStatus IN :statuses
+            WHERE p.status IN :statuses
             AND (:cursorId = 0 OR
                 (:orderBy = 'views' AND (p.viewCnt < prev.viewCnt OR (p.viewCnt = prev.viewCnt AND p.postId < prev.postId))))
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%

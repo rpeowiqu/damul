@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "postComment")
+@Table(name = "postComments")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,11 +24,11 @@ public class PostComment {
     private int postCommentId;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, targetEntity = Post.class)
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, targetEntity = User.class)
-    @JoinColumn(name = "user_id", updatable = false, nullable = false)
+    @JoinColumn(name = "author_id", updatable = false, nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, targetEntity = PostComment.class)

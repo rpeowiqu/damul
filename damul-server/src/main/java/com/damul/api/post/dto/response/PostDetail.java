@@ -1,5 +1,6 @@
 package com.damul.api.post.dto.response;
 
+import com.damul.api.post.dto.PostStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class PostDetail {
     private int authorId;
     private String authorName;
     private String profileImageUrl;
+    private PostStatus status;
     private String contentImageUrl;
     private String content;
     private String createdAt;
