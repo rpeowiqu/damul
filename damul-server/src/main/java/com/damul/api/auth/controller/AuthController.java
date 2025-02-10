@@ -3,12 +3,15 @@ package com.damul.api.auth.controller;
 import com.damul.api.auth.dto.request.AdminLoginRequest;
 import com.damul.api.auth.dto.request.SignupRequest;
 import com.damul.api.auth.dto.response.UserConsent;
+import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.auth.dto.response.UserResponse;
 import com.damul.api.auth.entity.Terms;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.common.user.CurrentUser;
 import com.damul.api.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +44,14 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-
+    // 사용자 정보 조회
+    @GetMapping("/users")
+    public ResponseEntity<UserResponse> getUser(@CurrentUser UserInfo userInfo) {
+        log.info("사용자 정보 조회 요청");
+        UserResponse userResponse = authService.getUser(userInfo);
+        log.info("사용자 정보 조회 완료");
+        return ResponseEntity.ok(userResponse);
+    }
 
     // 로그아웃
     @PostMapping("/logout")

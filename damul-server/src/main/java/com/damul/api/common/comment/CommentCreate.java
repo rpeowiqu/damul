@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentCreate {
-    private int authorId;
     private String comment;
     private int parentId;
 }

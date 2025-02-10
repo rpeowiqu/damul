@@ -33,7 +33,6 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
 
         if (exception.getMessage().equals("약관 동의가 필요합니다.")) {
             String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/terms-agreement")
-                    .queryParam("sessionId", request.getSession().getId())
                     .build().toUriString();
 
             response.sendRedirect(redirectUrl);

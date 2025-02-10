@@ -3,6 +3,8 @@ package com.damul.api.auth.service;
 import com.damul.api.auth.dto.request.AdminLoginRequest;
 import com.damul.api.auth.dto.request.SignupRequest;
 import com.damul.api.auth.dto.response.UserConsent;
+import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.auth.dto.response.UserResponse;
 import com.damul.api.auth.entity.Terms;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Role;
@@ -13,6 +15,7 @@ import com.damul.api.auth.util.CookieUtil;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.user.repository.UserRepository;
+import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
@@ -52,6 +55,26 @@ public class AuthService {
     private final ObjectMapper objectMapper;
     private final CookieUtil cookieUtil;
 
+    // 사용자 정보 조회
+    public UserResponse getUser(UserInfo userInfo) {
+        log.info("사용자 정보 조회 시작");
+        if(userInfo == null) {
+            log.error("userInfo null");
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
+
+        Optional<User> user = authRepository.findById(userInfo.getId());
+
+        log.info("사용자 정보 조회 완료");
+        UserResponse userResponse = user.map(u -> UserResponse.builder()
+                .id(u.getId())
+                .nickname(u.getNickname())
+                .warningEnabled(u.isWarningEnabled())
+                .build())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
+
+        return userResponse;
+    }
 
     // 로그아웃
     public void logout(HttpServletRequest request, HttpServletResponse response) {

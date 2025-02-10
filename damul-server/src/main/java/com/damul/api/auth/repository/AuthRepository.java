@@ -10,15 +10,10 @@ import java.util.Optional;
 
 @Repository
 public interface AuthRepository extends JpaRepository<User, Integer> {
-    boolean existsByEmail(String email);
-// SELECT EXISTS(SELECT 1 FROM user WHERE email = ?) 쿼리 자동 생성
 
-    @Query("SELECT new com.damul.api.auth.dto.response.UserInfo(u.id, u.email, u.nickname) " +
-            "FROM User u WHERE u.email = :email")
+    Optional<User> findById(int id);
     Optional<User> findByEmail(String email);
-    // SELECT * FROM user WHERE email = ? 쿼리 자동 생성
 
     User save(User user);
-// INSERT 또는 UPDATE 쿼리 자동 생성
 
 }

@@ -2,6 +2,7 @@ package com.damul.api.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -10,18 +11,27 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final JwtDecoder jwtDecoder;
+
+    public WebSocketConfig(JwtDecoder jwtDecoder) {
+        this.jwtDecoder = jwtDecoder;
+    }
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // 메시지 구독 요청 prefix
-        registry.enableSimpleBroker("/topic", "/queue");
-        // 메시지 발행 요청 prefix
-        registry.setApplicationDestinationPrefixes("/app");
+        // pub/sub 구조를 위한 메시지 브로커 설정
+        registry.enableSimpleBroker("/sub"); // 구독용 prefix
+        registry.setApplicationDestinationPrefixes("/pub"); // 발행용 prefix
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-stomp")
-                .setAllowedOrigins("*")
-                .withSockJS();
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("*") // 실제 운영 환경에서는 구체적인 도메인 지정 필요
+                .withSockJS()
+                .setStreamBytesLimit(512 * 1024) // 512KB
+                .setHttpMessageCacheSize(1000)
+                .setDisconnectDelay(30 * 1000); // 30초;
     }
+
 }

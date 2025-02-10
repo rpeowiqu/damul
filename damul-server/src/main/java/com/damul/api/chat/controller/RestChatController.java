@@ -1,5 +1,6 @@
 package com.damul.api.chat.controller;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.ChatRoomLimitUpdate;
@@ -24,18 +25,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/chats")
 @RequiredArgsConstructor
 @Slf4j
-public class ChatRoomController {
+public class RestChatController {
 
     private final ChatRoomService chatRoomService;
     private final ChatMessageService chatMessageService;
 
     @GetMapping("/rooms")
     public ResponseEntity<ScrollResponse<ChatRoomList>> getChatRooms(
-            @RequestBody ScrollRequest request,
+            @RequestParam int cursor,
+            @RequestParam int size,
             @CurrentUser User user
     ) {
-        ScrollResponse<ChatRoomList> response = chatRoomService
-                .getChatRooms(request, Integer.parseInt(user.getNickname()));
+        log.info("컨트롤러: 채팅방 목록 조회 시작 - cursor: {}, size: {}", cursor, size);
+
+        ScrollResponse<ChatRoomList> response = chatRoomService.getChatRooms(cursor, size, user.getId());
 
         if (response.getData().isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -47,11 +50,17 @@ public class ChatRoomController {
     @GetMapping("/{roomId}")
     public ResponseEntity<ScrollResponse<ChatMessage>> getChatMessages(
             @PathVariable int roomId,
-            @RequestBody ScrollRequest scrollRequest,
-            @CurrentUser User user) {
+            @RequestParam int cursor,
+            @RequestParam int size,
+            @CurrentUser User user
+    ) {
+        log.info("컨트롤러: 채팅 메시지 조회 시작 - roomId: {}, cursor: {}, size: {}",
+                roomId, cursor, size);
+
         ScrollResponse<ChatMessage> response = chatMessageService.getChatMessages(
                 roomId,
-                scrollRequest,
+                cursor,
+                size,
                 user.getId()
         );
 
@@ -63,11 +72,21 @@ public class ChatRoomController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchChatRooms(
+    public ResponseEntity<SearchResponse<ChatRoomList>> searchChatRooms(
             @RequestParam(required = false) String keyword,
-            @RequestBody ScrollRequest scrollRequest,
-            @CurrentUser User user) {
-        SearchResponse<ChatRoomList> response = chatRoomService.searchChatRooms(keyword, scrollRequest, user.getId());
+            @RequestParam int cursor,
+            @RequestParam int size,
+            @CurrentUser User user
+    ) {
+        log.info("컨트롤러: 채팅방 검색 시작 - keyword: {}, cursor: {}, size: {}",
+                keyword, cursor, size);
+
+        SearchResponse<ChatRoomList> response = chatRoomService.searchChatRooms(
+                keyword,
+                cursor,
+                size,
+                user.getId()
+        );
 
         if (response.getResults().getData().isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -92,7 +111,7 @@ public class ChatRoomController {
     @DeleteMapping("/rooms/{roomId}")
     public ResponseEntity<?> deleteChatRoom(
             @PathVariable int roomId,
-            @CurrentUser User user) {
+            @CurrentUser UserInfo user) {
         log.info("컨트롤러: 채팅방 삭제 시작 - roomId: {}", roomId);
 
         chatRoomService.deleteChatRoom(roomId, user.getId());
@@ -104,7 +123,7 @@ public class ChatRoomController {
     public ResponseEntity<?> kickMember(
             @PathVariable int roomId,
             @PathVariable int memberId,
-            @CurrentUser User user) {
+            @CurrentUser UserInfo user) {
         log.info("컨트롤러: 채팅방 멤버 추방 시작 - roomId: {}, memberId: {}", roomId, memberId);
 
         chatRoomService.kickMember(roomId, memberId, user.getId());
@@ -113,7 +132,7 @@ public class ChatRoomController {
     }
 
     @GetMapping("/unreads")
-    public ResponseEntity<UnReadResponse> getUnreadMessages(@CurrentUser User user) {
+    public ResponseEntity<UnReadResponse> getUnreadMessages(@CurrentUser UserInfo user) {
         log.info("컨트롤러: 전체 안 읽은 메시지 수 조회 시작 - userId: {}", user.getId());
 
         UnReadResponse response = chatMessageService.getUnreadMessageCount(user.getId());
@@ -139,7 +158,7 @@ public class ChatRoomController {
     @PostMapping("/direct/{userId}")
     public ResponseEntity<CreateResponse> createDirectChatRoom(
             @PathVariable int userId,
-            @CurrentUser User currentUser) {
+            @CurrentUser UserInfo currentUser) {
         log.info("컨트롤러: 1:1 채팅방 생성 시작 - targetUserId: {}, currentUserId: {}",
                 userId, currentUser.getId());
 
@@ -152,7 +171,7 @@ public class ChatRoomController {
     public ResponseEntity<ChatRoomLimitResponse> updateMemberLimit(
             @PathVariable int roomId,
             @RequestBody ChatRoomLimitUpdate request,
-            @CurrentUser User user) {
+            @CurrentUser UserInfo user) {
         log.info("컨트롤러: 채팅방 최대 인원 변경 시작 - roomId: {}, newLimit: {}",
                 roomId, request.getMemberLimit());
 

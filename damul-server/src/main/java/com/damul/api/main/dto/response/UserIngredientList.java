@@ -1,5 +1,6 @@
 package com.damul.api.main.dto.response;
 
+import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.entity.UserIngredient;
 import lombok.*;
 
@@ -10,12 +11,15 @@ import java.time.temporal.ChronoUnit;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UserIngredientList {
     private int userIngredientId;
     private int categoryId;
     private String ingredientName;
     private int ingredientQuantity;
     private int expirationDate;
+    private String storage;
+    private LocalDateTime purchaseDate;
 
     public static UserIngredientList from(UserIngredient entity) {
         LocalDate dueDate = entity.getDueDate().toLocalDate();
@@ -28,7 +32,17 @@ public class UserIngredientList {
                 entity.getCategoryId(),
                 entity.getIngredientName(),
                 entity.getIngredientQuantity(),
-                (int) daysBetween
+                (int) daysBetween,
+                convertStorage(entity.getIngredientStorage()),
+                entity.getIngredientUp()
         );
+    }
+
+    private static String convertStorage(IngredientStorage storage) {
+        return switch (storage) {
+            case FREEZER -> "freezer";
+            case FRIDGE -> "fridge";
+            case ROOM_TEMPARATURE -> "roomTemp";
+        };
     }
 }

@@ -11,6 +11,8 @@ import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.service.FollowService;
 import com.damul.api.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
     private final UserService userService;
     private final FollowService followService;
+    private final ObjectMapper objectMapper;
 
     // 설정 조회
     @GetMapping("/{userId}/settings")
@@ -42,6 +45,9 @@ public class UserController {
                                         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
                                         @RequestPart(value = "backgroundImage", required = false) MultipartFile backgroundImage)
             throws JsonProcessingException {
+//
+//
+//        SettingUpdate setting = objectMapper.readValue(settingJson, SettingUpdate.class);
 
         userService.updateUserSettings(userId, setting, profileImage, backgroundImage);
         return ResponseEntity.ok().build();

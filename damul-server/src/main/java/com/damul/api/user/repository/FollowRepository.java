@@ -54,4 +54,11 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
     // 팔로워 강제 삭제
     void deleteByFollower_IdAndFollowing_Id(@Param("followerId") int followerId,
                                             @Param("followingId") int followingId);
+
+    int countByFollowingId(int userId);
+
+    int countByFollowerId(int userId);
+
+    boolean existsByFollowerIdAndFollowingId(int followerId, int followingId);
+
 }

@@ -42,8 +42,10 @@ public class UserServiceImpl implements UserService {
         if(userOptional.isPresent()) {
             User user = userOptional.get();
             SettingResponse settingResponse = SettingResponse.builder()
+                    .email(user.getEmail())
                     .nickname(user.getNickname())
                     .profileImageUrl(user.getProfileImageUrl())
+                    .selfIntroduction(user.getSelfIntroduction())
                     .profileBackgroundImageUrl(user.getProfileBackgroundImageUrl())
                     .accessRange(user.getAccessRange().name())
                     .warningEnabled(user.isWarningEnabled())
@@ -111,6 +113,10 @@ public class UserServiceImpl implements UserService {
             setting.setBackgroundImageUrl(backgroundImageUrl);
         }
 
+        log.info("nickname: {}", setting.getNickname());
+        log.info("selfIntroduction: {}", setting.getSelfIntroduction());
+        log.info("accessRange: {}", setting.getAccessRange());
+        log.info("warningEnabled: {}", setting.isWarningEnabled());
         // 사용자 설정 업데이트
         user.updateSettings(setting);
         log.info("설정 수정 완료");

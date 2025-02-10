@@ -1,5 +1,6 @@
 package com.damul.api.auth.controller;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.jwt.JwtTokenProvider;
 import com.damul.api.auth.util.CookieUtil;
@@ -37,13 +38,21 @@ public class TestAuthController {
         User testUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Test user not found"));
 
+        // UserInfo 객체 생성
+        UserInfo userInfo = new UserInfo(
+                testUser.getId(),
+                testUser.getEmail(),
+                testUser.getNickname(),
+                testUser.getRole().name()
+        );
+
         List<GrantedAuthority> authorities = Collections.singletonList(
                 new SimpleGrantedAuthority("ROLE_" + testUser.getRole().name())
         );
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
-                        testUser.getEmail(),
+                        userInfo,  // UserInfo 객체로 변경
                         null,
                         authorities
                 );
