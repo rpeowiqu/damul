@@ -2,13 +2,30 @@ import Image from "../common/Image";
 import ReportButton from "../common/ReportButton";
 import ReplyItem from "./ReplyItem";
 import { Comment } from "@/types/community";
+import { formatDate } from "@/utils/date";
+import { deleteRecipeComment } from "@/service/recipe";
 
 interface CommentItemProps {
+  recipeId: string;
   comment: Comment;
   replies: Comment[];
   onReply: (_comment: Comment) => void;
 }
-const CommentItem = ({ comment, replies, onReply }: CommentItemProps) => {
+const CommentItem = ({
+  recipeId,
+  comment,
+  replies,
+  onReply,
+}: CommentItemProps) => {
+  const deleteComment = async (commentId: number) => {
+    try {
+      const response = await deleteRecipeComment(recipeId, commentId);
+      console.log(response?.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="py-3">
       <div className="flex items-center gap-2">
@@ -19,8 +36,7 @@ const CommentItem = ({ comment, replies, onReply }: CommentItemProps) => {
         <div className="flex flex-1 justify-between pr-2">
           <p className="font-semibold text-sm">{comment.nickname}</p>
           <p className="text-xs text-neutral-500">
-            {comment.createdAt.split("T")[0]}{" "}
-            {comment.createdAt.split("T")[1].slice(0, 5)}
+            {formatDate(comment.createdAt)}
           </p>
         </div>
       </div>
@@ -35,12 +51,23 @@ const CommentItem = ({ comment, replies, onReply }: CommentItemProps) => {
         >
           <p className="text-xs">답글</p>
         </div>
-        <div className="flex items-center gap-1">
+        <div
+          className="flex items-center gap-1"
+          onClick={() => {
+            deleteComment(comment.id);
+          }}
+        >
           <p className="text-xs">삭제</p>
         </div>
       </div>
       {replies.map((reply) => (
-        <ReplyItem key={reply.id} reply={reply} onReply={onReply} />
+        <ReplyItem
+          key={reply.id}
+          recipeId={recipeId}
+          comment={comment}
+          reply={reply}
+          onReply={onReply}
+        />
       ))}
     </div>
   );

@@ -124,6 +124,7 @@ const CommunityRecipeDetailPage = () => {
         <IngredientsSection ingredients={data.ingredients} />
         <CookingOrdersSection cookingOrders={data.cookingOrders} />
         <CommentsSection
+          recipeId={data.recipeId}
           comments={data.comments}
           onReply={(comment) => setReplyingTo(comment)}
           type="recipe"
@@ -132,9 +133,11 @@ const CommunityRecipeDetailPage = () => {
       <FixedCommentInput
         recipeId={recipeId || ""}
         replyingTo={replyingTo}
+        setReplyingTo={setReplyingTo}
         comment={comment}
         setComment={setComment}
         cancelReply={cancelReply}
+        fetchRecipeDetail={fetchRecipeDetail}
       />
     </div>
   );

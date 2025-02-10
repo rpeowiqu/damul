@@ -2,6 +2,7 @@ import CommentItem from "./CommentItem";
 import { Comment } from "@/types/community";
 
 interface CommentsSectionProps {
+  recipeId: string;
   comments: Comment[];
   onReply: (_comment: Comment) => void;
   currentMemberNum?: number;
@@ -10,6 +11,7 @@ interface CommentsSectionProps {
   type?: string;
 }
 const CommentsSection = ({
+  recipeId,
   comments = [],
   onReply,
   currentMemberNum,
@@ -35,9 +37,7 @@ const CommentsSection = ({
     <div className="py-3 text-start">
       <div className="flex flex-row p-3 border-b border-neutral-300 justify-between">
         <h3 className="text-lg font-semibold">댓글({comments.length})</h3>
-        {type === "market" && (
-          <StatusMarker/>
-        )}
+        {type === "market" && <StatusMarker />}
       </div>
       <div className="flex flex-col gap-3">
         {topLevelComments.map((comment) => {
@@ -45,6 +45,7 @@ const CommentsSection = ({
           return (
             <CommentItem
               key={comment.id}
+              recipeId={recipeId}
               comment={comment}
               replies={replies}
               onReply={onReply}

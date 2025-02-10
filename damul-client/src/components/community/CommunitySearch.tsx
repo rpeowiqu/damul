@@ -85,7 +85,9 @@ const CommunitySearch = ({ placeholder, type }: CommunitySearch) => {
         onRemoveSearchAll={handleRemoveSearchAll}
         onSearch={(keyword) => {
           handleAddSearch(keyword);
-          navigate(`/community/${type}/search/result?keyword=${encodeURIComponent(keyword)}&searchType=${searchType}`);
+          navigate(
+            `/community/${type}/search/result?keyword=${encodeURIComponent(keyword)}&searchType=${searchType}`,
+          );
         }}
       />
     </>

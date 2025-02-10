@@ -2,23 +2,28 @@ import { ChangeEvent, KeyboardEvent, Dispatch, SetStateAction } from "react";
 import { Input } from "@/components/ui/input";
 import SendIcon from "../svg/SendIcon";
 import { postRecipeComment } from "@/service/recipe";
+import { Comment } from "@/types/community";
 
 interface CommentInputProps {
   recipeId: string;
+  parentId?: number;
   placeholder?: string;
-  onButtonClick?: (_value: string) => void; // 버튼 클릭 이벤트 (입력값 전달)
   comment: string;
-  setComment: Dispatch<SetStateAction<string>>; // 상태 업데이트 함수
-  className?: string; // 추가된 스타일링 prop
+  setComment: Dispatch<SetStateAction<string>>;
+  className?: string;
+  setReplyingTo: Dispatch<SetStateAction<Comment | null>>;
+  fetchRecipeDetail: () => void;
 }
 
 const CommentInput = ({
   recipeId,
+  parentId,
   placeholder,
-  onButtonClick,
   comment,
   setComment,
   className = "",
+  setReplyingTo,
+  fetchRecipeDetail,
 }: CommentInputProps) => {
   // 입력값 변경 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -29,8 +34,7 @@ const CommentInput = ({
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && (comment || "").trim() !== "") {
       e.preventDefault();
-      onButtonClick?.(comment || ""); // 기본값 "" 설정
-      setComment("");
+      handleButtonClick();
     }
   };
 
@@ -38,18 +42,25 @@ const CommentInput = ({
   const handleButtonClick = () => {
     submitComment();
     console.log(comment);
-    setComment("");
   };
 
-  const authorId = "1"
+  const authorId = "1";
   const submitComment = async () => {
     try {
-      const response = await postRecipeComment({recipeId, authorId, comment});
+      const response = await postRecipeComment({
+        recipeId,
+        authorId,
+        comment,
+        parentId,
+      });
       console.log(response);
+      setReplyingTo(null);
+      setComment("");
+      fetchRecipeDetail();
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   return (
     <div className={`relative ${className}`}>
