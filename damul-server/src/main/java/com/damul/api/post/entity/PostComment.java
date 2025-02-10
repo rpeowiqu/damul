@@ -2,10 +2,7 @@ package com.damul.api.post.entity;
 
 import com.damul.api.auth.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -14,6 +11,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "postComments")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostComment {
