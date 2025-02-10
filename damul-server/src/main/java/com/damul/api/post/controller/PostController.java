@@ -2,9 +2,9 @@ package com.damul.api.post.controller;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.common.comment.CommentCreate;
-import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.post.dto.request.PostRequest;
@@ -29,8 +29,7 @@ public class PostController {
 
     // 게시글 전체 조회/검색
     @GetMapping
-    public ResponseEntity<?> getAllPosts(@CurrentUser UserInfo userInfo,
-                                         @RequestParam int cursor,
+    public ResponseEntity<?> getAllPosts(@RequestParam int cursor,
                                          @RequestParam int size,
                                          @RequestParam(required = false) String searchType,
                                          @RequestParam(required = false) String keyword,
@@ -39,7 +38,7 @@ public class PostController {
             log.info("게시글 목록 검색 시작");
             log.info("Searching posts with searchType: {}, keyword: {}, status: {}, orderBy: {}", searchType, keyword, status, orderBy);
 
-        ScrollResponse<PostList> scrollResponse = postService.getPosts(userInfo, cursor, size, searchType, keyword, status, orderBy);
+        ScrollResponse<PostList> scrollResponse = postService.getPosts(cursor, size, searchType, keyword, status, orderBy);
         if (scrollResponse.getData() == null || scrollResponse.getData().isEmpty()) {
             log.info("게시글 목록 조회 완료 - 데이터 없음");
             return ResponseEntity.noContent().build();
@@ -105,7 +104,7 @@ public class PostController {
 
     // 댓글 작성
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<?> addPostComment(@PathVariable int postId,
+    public ResponseEntity<?> addComment(@PathVariable int postId,
                                         @RequestBody CommentCreate comment,
                                         @CurrentUser UserInfo userInfo) {
         log.info("게시글 댓글 작성 - postId: {}, comment: {}", postId, comment);
@@ -116,23 +115,7 @@ public class PostController {
     }
     
     // 댓글 삭제
-    @DeleteMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<?> deletePostComment(@PathVariable("postId") int postId,
-                                           @PathVariable("commentId") int commentId,
-                                           @CurrentUser UserInfo userInfo) {
-        log.info("댓글 삭제 요청 - postId: {}, commentId: {}", postId, commentId);
-        postService.deletePostComment(postId, commentId, userInfo);
-        log.info("댓글 삭제 완료");
-        return ResponseEntity.ok().build();
-    }
 
     // 게시글 현황 변경
-    @PutMapping("/{postId}/status")
-    public ResponseEntity<?> changePostStatus(@PathVariable int postId,
-                                              @CurrentUser UserInfo userInfo) {
-        log.info("게시글 현황 변경 시작 - postId: {}", postId);
-        boolean status = postService.changePostStatus(postId, userInfo);
-        log.info("게시글 현황 변경 완료");
-        return ResponseEntity.ok(status);
-    }
+
 }

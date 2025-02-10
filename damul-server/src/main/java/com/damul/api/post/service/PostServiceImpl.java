@@ -4,9 +4,9 @@ package com.damul.api.post.service;
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.common.comment.CommentCreate;
-import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.config.service.S3Service;
@@ -53,7 +53,7 @@ public class PostServiceImpl implements PostService {
 
     // 게시글 전체 조회/검색
     @Override
-    public ScrollResponse getPosts(UserInfo userInfo, int cursor, int size, String searchType, String keyword, String status, String orderBy) {
+    public ScrollResponse getPosts(int cursor, int size, String searchType, String keyword, String status, String orderBy) {
 
         log.info("Posts search start");
         log.info("Parameters: cursor={}, size={}, searchType={}, keyword={}, status={}, orderBy={}",
@@ -67,7 +67,7 @@ public class PostServiceImpl implements PostService {
         // 검색어가 있는데 검색 타입이 없는 경우 예외 처리
         if (keyword != null && searchType == null) {
             log.error("검색어는 존재, 검색타입 없음");
-            throw new BusinessException(ErrorCode.BOARD_NOT_FOUND);
+            throw new BusinessException(ErrorCode.INVALID_SEARCH_TYPE);
         }
 
         // 전체 조회 검색 x
@@ -215,7 +215,7 @@ public class PostServiceImpl implements PostService {
 
         // 댓글 목록 조회
         List<CommentList> comments = postCommentRepository
-                .findByPost_PostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId)
+                .findByPostOrderByCreatedAtDesc(post)
                 .stream()
                 .map(comment -> CommentList.builder()
                         .id(comment.getPostCommentId())
@@ -340,26 +340,18 @@ public class PostServiceImpl implements PostService {
             throw new BusinessException(ErrorCode.USER_FORBIDDEN);
         }
 
-        // 논리적 삭제
-        if (post.getStatus() != PostStatus.DELETED) {
-            post.changeStatus(PostStatus.DELETED);
-            postRepository.save(post);
-            log.info("게시글 삭제 완료");
-        }
-        else {
-            log.info("이미 삭제된 게시글 입니다.");
-        }
+        postRepository.delete(post);
+        log.info("게시글 삭제 완료");
     }
 
     // 댓글 작성
     @Override
     public CreateResponse addPostComment (int postId, CommentCreate commentCreate, UserInfo userInfo) {
         log.info("댓글 작성 시작");
-        if(commentCreate == null) {
-            log.error("commentCreate 존재하지 않음");
-            throw new BusinessException(ErrorCode.INVALID_COMMENT);
+        if(userInfo == null) {
+            log.error("유저가 존재하지 않습니다. userInfo : {}", userInfo);
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
         }
-
         User user = userRepository.findById(userInfo.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
 
@@ -384,65 +376,32 @@ public class PostServiceImpl implements PostService {
     }
     
     // 댓글 삭제
-    public void deletePostComment(int postId, int commentId, UserInfo userInfo) {
-        log.info("댓글 삭제 시작 - postId: {}, commentId: {}", postId, commentId);
-        // 유저 조회
-        if (checkUserInfo(userInfo) == 0) {
-            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
-        }
-        User user = userRepository.findById(userInfo.getId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
 
-        // 댓글 조회 및 작성자 확인
-        PostComment comment = postCommentRepository.findById(commentId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
-
-        if (comment.getUser().getId() != user.getId()) {
-            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
-        }
-
-        // 논리적 삭제
-        if (!comment.isDeleted()) {
-            comment.delete();
-            postCommentRepository.save(comment);
-            log.info("게시글 삭제 완료");
-        }
-        else {
-            log.info("이미 삭제된 댓글 입니다.");
-        }
-    }
-
-    // 게시글 현황 변경
-    @Override
-    public boolean changePostStatus(int postId, UserInfo userInfo) {
-        log.info("게시글 상태 변경 시작 - postId: {}", postId);
-
-        // 유저 조회
-        if (checkUserInfo(userInfo) == 0) {
-            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
-        }
-        User user = userRepository.findById(userInfo.getId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
-
-        // 게시글 조회 및 작성자 확인
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
-
-        if (post.getUser().getId() != user.getId()) {
-            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
-        }
-
-        // 게시글 active -> completed
-        if (post.getStatus() != PostStatus.DELETED) {
-            post.changeStatus(PostStatus.COMPLETED);
-            postRepository.save(post);
-            log.info("게시글 상태 변경 완료");
-        }
-        else {
-            log.info("이미 삭제된 게시글 입니다.");
-        }
-        return true;
-    }
+//    // 게시글 현황 변경
+//    @Override
+//    public void changePostStatus(int postId) {
+//        log.info("게시글 상태 변경 시작 - postId: {}", postId);
+//
+//        // 게시글 존재 여부 확인
+//        Post post = postRepository.findById(postId)
+//                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+//
+//        // 현재 상태가 이미 COMPLETED이면 변경할 필요 없음
+//        if (post.getPostStatus() == PostStatus.COMPLETED) {
+//            log.warn("게시글 상태 변경 불필요 - 이미 COMPLETED 상태 (postId: {})", postId);
+//            return;
+//        }
+//
+//        // ACTIVE 상태인 경우에만 COMPLETED로 변경 가능
+//        if (post.getPostStatus() == PostStatus.ACTIVE) {
+//            post.changeStatus(PostStatus.COMPLETED);
+//            postRepository.save(post);
+//            log.info("게시글 상태 변경 완료 - postId: {}, newStatus: COMPLETED", postId);
+//        } else {
+//            log.error("게시글 상태 변경 불가 - 현재 상태: {}", post.getPostStatus());
+//            throw new BusinessException(ErrorCode.INVALID_STATUS);
+//        }
+//    }
 
     // 유저 조회
     private int checkUserInfo(UserInfo userInfo) { return userInfo != null ? userInfo.getId() : 0; }
