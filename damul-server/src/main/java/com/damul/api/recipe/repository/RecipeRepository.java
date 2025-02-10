@@ -3,6 +3,7 @@ package com.damul.api.recipe.repository;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,11 +25,10 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             WHERE r.deleted = false
             AND (:cursor = 0 OR r.id < :cursor)
             ORDER BY r.id DESC
-            LIMIT :size
             """)
     List<RecipeList> findAllRecipes(
             @Param("cursor") int cursor,
-            @Param("size") int size
+            Pageable pageable
     );
 
     // 검색 조건만 있는 경우
@@ -47,7 +47,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             """)
     List<RecipeList> findBySearch(
             @Param("cursor") int cursor,
-            @Param("size") int size,
+            Pageable pageable,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword
     );
@@ -72,11 +72,10 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
                 ELSE r.id
             END DESC,
             r.id DESC
-            LIMIT :size
             """)
     List<RecipeList> findAllWithOrder(
             @Param("cursor") int cursor,
-            @Param("size") int size,
+            Pageable pageable,
             @Param("orderBy") String orderBy
     );
 
@@ -102,11 +101,10 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
                 ELSE r.id
             END DESC,
             r.id DESC
-            LIMIT :size
             """)
     List<RecipeList> findBySearchWithOrder(
             @Param("cursor") int cursor,
-            @Param("size") int size,
+            Pageable pageable,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword,
             @Param("orderBy") String orderBy

@@ -18,6 +18,8 @@ import com.damul.api.recipe.repository.*;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -67,11 +69,14 @@ public class RecipeServiceImpl implements RecipeService {
         boolean hasSearch = (searchType != null && keyword != null);
         boolean hasOrder = (orderBy != null);
 
+        // Limit 대신 pageable
+        Pageable pageable = PageRequest.of(0, size + 1);
+
         // 1. 기본 전체 조회
         if (!hasSearch && !hasOrder) {
             log.info("기본 전체 조회");
             recipes = recipeRepository.findAllRecipes(
-                    cursor, size + 1
+                    cursor, pageable
             );
         }
         // 2. 검색어만 있는 경우
@@ -79,7 +84,7 @@ public class RecipeServiceImpl implements RecipeService {
             log.info("검색어만 존재");
             recipes = recipeRepository.findBySearch(
                     cursor,
-                    size + 1,
+                    pageable,
                     searchType,
                     keyword
             );
@@ -90,7 +95,7 @@ public class RecipeServiceImpl implements RecipeService {
             log.info("정렬 조건만 존재");
             recipes = recipeRepository.findAllWithOrder(
                     cursor,
-                    size + 1,
+                    pageable,
                     orderBy
             );
         }
@@ -100,7 +105,7 @@ public class RecipeServiceImpl implements RecipeService {
             log.info("모두 존재");
             recipes = recipeRepository.findBySearchWithOrder(
                     cursor,
-                    size + 1,
+                    pageable,
                     searchType,
                     keyword,
                     orderBy
