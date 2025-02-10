@@ -32,11 +32,13 @@ public class RestChatController {
 
     @GetMapping("/rooms")
     public ResponseEntity<ScrollResponse<ChatRoomList>> getChatRooms(
-            @RequestBody ScrollRequest request,
+            @RequestParam int cursor,
+            @RequestParam int size,
             @CurrentUser User user
     ) {
-        ScrollResponse<ChatRoomList> response = chatRoomService
-                .getChatRooms(request, Integer.parseInt(user.getNickname()));
+        log.info("컨트롤러: 채팅방 목록 조회 시작 - cursor: {}, size: {}", cursor, size);
+
+        ScrollResponse<ChatRoomList> response = chatRoomService.getChatRooms(cursor, size, user.getId());
 
         if (response.getData().isEmpty()) {
             return ResponseEntity.noContent().build();
