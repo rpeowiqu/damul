@@ -35,8 +35,8 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
     @Query("""
             SELECT new com.damul.api.user.dto.response.UserList(
                 f.following.id,
-                f.follower.profileImageUrl,
-                f.follower.nickname)
+                f.following.profileImageUrl,
+                f.following.nickname)
             FROM Follow f
             WHERE f.follower.id = :followerId
             AND (:cursor = 0 OR f.id < :cursor)
