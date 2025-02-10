@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
@@ -159,37 +160,11 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
 
     boolean existsByUserIdAndIdLessThan(int userId, int id);
 
-    @Query("""
-    SELECT DISTINCT r, rt, t FROM Recipe r
-    LEFT JOIN RecipeTag rt ON rt.recipe.id = r.id
-    LEFT JOIN Tag t ON rt.tag.id = t.id
-    LEFT JOIN RecipeIngredient ri ON ri.recipe.id = r.id
-    LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
-        AND ui.userReciept.user.id = :userId
-        AND ui.isDeleted = false
-    WHERE r.deleted = false
-    GROUP BY r.id, rt.id, t.id
-    ORDER BY COUNT(CASE WHEN ui.id IS NOT NULL THEN 1 END) * 1.0 / 
-             NULLIF(COUNT(DISTINCT ri.id), 0) DESC NULLS LAST,
-             r.likeCnt * 0.3 DESC
-    """)
-    List<Recipe> findRecommendedRecipes(@Param("userId") int userId);
 
-    @Query("""
-    SELECT DISTINCT r, rt, t FROM Recipe r
-    LEFT JOIN RecipeTag rt ON rt.recipe.id = r.id
-    LEFT JOIN Tag t ON rt.tag.id = t.id
-    LEFT JOIN RecipeIngredient ri ON ri.recipe.id = r.id
-    LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
-        AND ui.userReciept.user.id = :userId
-        AND ui.userIngredientId = :userIngredientId
-        AND ui.isDeleted = false
-    WHERE r.deleted = false
-    ORDER BY r.likeCnt DESC
-    """)
-    List<Recipe> findRecommendedRecipesByIngredient(
-            @Param("userId") int userId,
-            @Param("userIngredientId") int userIngredientId
-    );
+    @Modifying
+    @Transactional
+    @Query("UPDATE Recipe r SET r.deleted = true WHERE r.id = :recipeId")
+    void softDeleteRecipe(@Param("recipeId") int recipeId);
 
+    Optional<Recipe> findByIdAndDeletedFalse(int recipeId);
 }
