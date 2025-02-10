@@ -90,7 +90,7 @@ public class RecipeController {
 
     // 레시피 삭제
     @DeleteMapping("/{recipeId}")
-    public ResponseEntity<?> deleteRecipe(@RequestParam int recipeId) {
+    public ResponseEntity<?> deleteRecipe(@PathVariable int recipeId) {
         log.info("레시피 삭제 조회 시작 - recipeId: {}", recipeId);
         recipeService.deleteRecipe(recipeId);
         log.info("레시피 삭제 성공");
@@ -121,8 +121,8 @@ public class RecipeController {
 
     // 댓글 삭제
     @DeleteMapping("/{recipeId}/comments/{commentId}")
-    public ResponseEntity<?> deleteComment(@RequestParam("recipeId") int recipeId,
-                                           @RequestParam("commentId") int commentId,
+    public ResponseEntity<?> deleteComment(@PathVariable("recipeId") int recipeId,
+                                           @PathVariable("commentId") int commentId,
                                            @CurrentUser UserInfo userInfo) {
         log.info("댓글 삭제 요청 - recipeId: {}, commentId: {}", recipeId, commentId);
         recipeService.deleteComment(recipeId, commentId);
