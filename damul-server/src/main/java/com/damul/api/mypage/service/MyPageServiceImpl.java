@@ -1,5 +1,6 @@
 package com.damul.api.mypage.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
@@ -39,7 +40,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProfileHeaderDetail getProfileHeader(int userId, User currentUser) {
+    public ProfileHeaderDetail getProfileHeader(int userId, UserInfo currentUser) {
         log.info("서비스: 마이페이지 헤더 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
@@ -54,7 +55,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProfileDetail getProfileDetail(int userId, User currentUser) {
+    public ProfileDetail getProfileDetail(int userId, UserInfo currentUser) {
         log.info("서비스: 마이페이지 프로필 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
@@ -83,7 +84,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BadgeList> getUserBadges(int userId, User currentUser) {
+    public List<BadgeList> getUserBadges(int userId, UserInfo currentUser) {
         log.info("서비스: 마이페이지 뱃지 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
@@ -100,7 +101,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     @Transactional(readOnly = true)
-    public BadgeDetail getBadgeDetail(int userId, int badgeId, User currentUser) {
+    public BadgeDetail getBadgeDetail(int userId, int badgeId, UserInfo currentUser) {
         log.info("서비스: 마이페이지 뱃지 상세 조회 시작 - userId: {}, badgeId: {}", userId, badgeId);
 
         User targetUser = userRepository.findById(userId)
@@ -127,7 +128,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<MyRecipeList> getMyRecipes(int userId, int cursor, int size, User currentUser) {
+    public ScrollResponse<MyRecipeList> getMyRecipes(int userId, int cursor, int size, UserInfo currentUser) {
         log.info("서비스: 마이페이지 레시피 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
@@ -155,7 +156,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<RecipeList> getBookmarkedRecipes(int userId, int cursor, int size, User currentUser) {
+    public ScrollResponse<RecipeList> getBookmarkedRecipes(int userId, int cursor, int size, UserInfo currentUser) {
         log.info("서비스: 마이페이지 북마크 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
@@ -192,7 +193,7 @@ public class MyPageServiceImpl implements MyPageService {
         return String.format("%d회 달성 시 획득 가능", badge.getStandard());
     }
 
-    private void validateAccessPermission(User targetUser, User currentUser) {
+    private void validateAccessPermission(User targetUser, UserInfo currentUser) {
         if (!targetUser.isActive()) {
             throw new IllegalStateException("비활성화된 사용자입니다.");
         }
