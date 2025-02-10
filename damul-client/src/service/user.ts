@@ -20,7 +20,7 @@ export const modifyUserSetting = (
   const settingBlob = new Blob([JSON.stringify(settingUpdate)], {
     type: "application/json",
   });
-  formData.append("settingJson", settingBlob);
+  formData.append("settingUpdate", settingBlob);
   if (profileImage) {
     formData.append("profileImage", profileImage);
   }
@@ -71,5 +71,5 @@ export const deleteFollower = (userId: number, followerId: number) => {
 };
 
 export const getUser = (nickname: string) => {
-  return apiRequest(() => apiClient.get(`/users/${nickname}`));
+  return apiRequest(() => apiClient.get(`/users?keyword=${nickname}`));
 };

@@ -1,6 +1,8 @@
 export interface ProfileHeader {
   userId: number;
   nickname: string;
+  profileImageUrl: string;
+  profileBackgroundImageUrl: string;
 }
 
 export interface FoodPreference {

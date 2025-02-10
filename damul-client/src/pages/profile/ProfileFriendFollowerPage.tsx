@@ -1,59 +1,36 @@
-import { Link, useOutletContext } from "react-router-dom";
+import { Link, useOutletContext, useParams } from "react-router-dom";
 
 import DamulButton from "@/components/common/DamulButton";
 import Image from "@/components/common/Image";
 import defaultProfile from "@/assets/profile.png";
-
-const followerDummyData = [
-  {
-    id: 1,
-    nickname: "토마토러버전종우",
-    profileImage: defaultProfile,
-  },
-  {
-    id: 2,
-    nickname: "사과러버윤서희",
-    profileImage: defaultProfile,
-  },
-  {
-    id: 3,
-    nickname: "바나나러버신성우",
-    profileImage: defaultProfile,
-  },
-  {
-    id: 4,
-    nickname: "포도러버한재서",
-    profileImage: defaultProfile,
-  },
-  {
-    id: 5,
-    nickname: "망고러버지유림",
-    profileImage: defaultProfile,
-  },
-  {
-    id: 6,
-    nickname: "레몬러버윤혜진",
-    profileImage: defaultProfile,
-  },
-  {
-    id: 7,
-    nickname: "토마토맛토토맛토",
-    profileImage: defaultProfile,
-  },
-  {
-    id: 8,
-    nickname: "안녕하세염",
-    profileImage: defaultProfile,
-  },
-  {
-    id: 9,
-    nickname: "스크롤바화긴용",
-    profileImage: defaultProfile,
-  },
-];
+import { useEffect } from "react";
+import { getFollowers } from "@/service/user";
 
 const ProfileFriendFollowerPage = () => {
+  const { userId } = useParams();
   const { searchTerm } = useOutletContext();
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        const response = await getFollowers(parseInt(user.userId));
+        if (response) {
+          console.log(response.data);
+          setProfileInfo(response.data);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [userId]);
 
   return (
     <div className="flex flex-col">
