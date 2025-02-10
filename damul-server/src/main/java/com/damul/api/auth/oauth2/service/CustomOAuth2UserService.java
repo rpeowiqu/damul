@@ -82,12 +82,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
                 log.info("임시토큰 발급");
                 String tempToken = jwtTokenProvider.generateTempToken(signupInfo);
-                log.info("임시토큰 발급 완료 - tempToken: {}", tempToken);
+                log.info("임시토큰 발급 완료 - temp_token: {}", tempToken);
 
 
                 // OAuth2User attributes용 정보 (claims 정보 + tempToken)
                 Map<String, Object> attributes = new HashMap<>(signupInfo);  // claims 정보 복사
-                attributes.put("tempToken", tempToken);  // tempToken 추가
+                attributes.put("temp_token", tempToken);  // tempToken 추가
 
                 return new DefaultOAuth2User(
                         Collections.emptyList(),

@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -51,6 +53,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthRepository authRepository;
     private final CookieUtil cookieUtil;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -62,28 +65,44 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // 기존 회원
         if(oAuth2User instanceof CustomUserDetails) {
             log.info("기존 회원입니다.");
+
+            CustomUserDetails userDetails = (CustomUserDetails) oAuth2User;
+            String userEmail = userDetails.getEmail();
+            log.info("OAuth2Success !!! userEmail: " + userEmail);
+
             // 토큰 생성
             Map<String, String> tokens = authService.generateTokens(authentication);
+            String refreshToken = tokens.get("refresh_token");
 
-            // 액세스 토큰 쿠키 생성
-            cookieUtil.addCookie(response, "access_token", tokens.get("accessToken"), accessTokenExpire);
+            // Redis에 RefreshToken 저장
+            redisTemplate.opsForValue().set(
+                    "RT:" + userEmail,
+                    refreshToken,
+                    refreshTokenExpire,
+                    TimeUnit.MILLISECONDS
+            );
 
-            // 리프레시 토큰 쿠키 생성
-            cookieUtil.addCookie(response, "refresh_token", tokens.get("refreshToken"), refreshTokenExpire);
+
+            // Refresh Token 저장 로그 추가
+            log.info("Refresh Token이 Redis에 저장되었습니다. userEmail: {}, refreshToken: {}", userEmail, refreshToken);
+
+            cookieUtil.addCookie(response, "access_token", tokens.get("access_token"), accessTokenExpire);
+            cookieUtil.addCookie(response, "refresh_token", refreshToken, refreshTokenExpire);
+
 
 
             // 쿠키 설정 로그 추가
-            log.info("Access Token 쿠키 설정: {}", tokens.get("accessToken"));
-            log.info("Refresh Token 쿠키 설정: {}", tokens.get("refreshToken"));
+            log.info("Access Token 쿠키 설정: {}", tokens.get("access_token"));
+            log.info("Refresh Token 쿠키 설정: {}", tokens.get("refresh_token"));
 
             response.sendRedirect(frontUrl + main);
 
         } else if(oAuth2User instanceof DefaultOAuth2User) {
             log.info("신규 회원입니다.");
-            String tempToken = oAuth2User.getAttribute("tempToken");
+            String tempToken = oAuth2User.getAttribute("temp_token");
 
             // 쿠키로 전달
-            cookieUtil.addCookie(response, "tempToken", tempToken, temporaryTokenExpire); // 30분 유지
+            cookieUtil.addCookie(response, "temp_token", tempToken, temporaryTokenExpire); // 30분 유지
 
             // 신규 회원이면 약관동의 페이지로 Redirect
             response.sendRedirect(frontUrl+terms);
