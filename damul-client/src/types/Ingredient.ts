@@ -4,6 +4,8 @@ export interface Ingredient {
   ingredientName: string;
   ingredientQuantity: number;
   expirationDate: number;
+  storage: string;
+  purchaseDate: string;
 }
 
 export interface IngredientData {
