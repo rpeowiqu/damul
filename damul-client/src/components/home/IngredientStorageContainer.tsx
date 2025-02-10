@@ -22,6 +22,16 @@ const COLUMN_SIZE = {
   default: 2,
 };
 
+const initialData = {
+  userIngredientId: 11111,
+  categoryId: 2,
+  ingredientName: "사과",
+  ingredientQuantity: 50,
+  expirationDate: 30,
+  storage: "roomTemp",
+  purchaseDate: "2025-02-10",
+};
+
 const IngredientStorageContainer = ({
   title,
   items,
@@ -34,13 +44,8 @@ const IngredientStorageContainer = ({
   const [isOverColumnLimit, setIsOverColumnLimit] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedIngredient, setSelectedIngredient] = useState<Ingredient>({
-    userIngredientId: 1,
-    ingredientName: "사과",
-    ingredientQuantity: 50,
-    categoryId: 2,
-    expirationDate: 3,
-  });
+  const [selectedIngredient, setSelectedIngredient] =
+    useState<Ingredient>(initialData);
 
   const { setSelectedIngredients } = useIngredientStore();
 
@@ -57,18 +62,6 @@ const IngredientStorageContainer = ({
       setSelectedIngredient(ingredient);
       setIsOpen(true);
     }
-  };
-
-  const handleQuantityChange = (value: number[]) => {
-    setSelectedIngredient((prev) => {
-      if (prev) {
-        return {
-          ...prev,
-          ingredientQuantity: value[0],
-        };
-      }
-      return prev;
-    });
   };
 
   useEffect(() => {
@@ -139,11 +132,15 @@ const IngredientStorageContainer = ({
         )}
       </button>
 
-      <DamulModal isOpen={isOpen} onOpenChange={() => setIsOpen(false)}>
+      <DamulModal
+        isOpen={isOpen}
+        onOpenChange={() => {
+          setIsOpen(false);
+        }}
+      >
         {selectedIngredient && (
           <IngredientDetail
             ingredient={selectedIngredient}
-            onQuantityChange={handleQuantityChange}
             setIsDeleteOpen={setIsDeleteOpen}
             setIsOpen={setIsOpen}
           />

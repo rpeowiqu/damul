@@ -1,8 +1,8 @@
-import IngredientEditItem from "@/components/home/IngredientEditItem";
+import IngredientDetail from "@/components/home/IngredientDetail";
 import { useIngredientStore } from "@/stores/ingredientStore";
 
 const HomeIngredientsEditPage = () => {
-  const { selectedIngredients, setSelectedIngredients } = useIngredientStore();
+  const { selectedIngredients } = useIngredientStore();
 
   return (
     <div className="flex flex-col p-5">
@@ -22,9 +22,13 @@ const HomeIngredientsEditPage = () => {
           return (
             <div
               key={idx}
-              className="border-4 p-10 rounded-3xl border-positive-300"
+              className="border-4 w-full max-w-96 rounded-3xl border-positive-300"
             >
-              <IngredientEditItem ingredient={selectedIngredient} />
+              <IngredientDetail
+                ingredient={selectedIngredient}
+                setIsDeleteOpen={() => {}}
+                setIsOpen={() => {}}
+              />
             </div>
           );
         })}
