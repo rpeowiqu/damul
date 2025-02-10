@@ -15,7 +15,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,16 +30,42 @@ public class HomeServiceImpl implements HomeService {
     private final UserIngredientRepository userIngredientRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public IngredientResponse getUserIngredientList(int userId) {
-        log.info("사용자 식자재 전체 가져오기 시작");
+        log.info("사용자 식자재 전체 가져오기 시작 - userId: {}", userId);
+
         List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(userId);
 
-        List<UserIngredientList> ingredientDtos = userIngredients.stream()
-                .map(UserIngredientList::from)
+        if (userIngredients.isEmpty()) {
+            return new IngredientResponse(
+                    Collections.emptyList(),
+                    Collections.emptyList(),
+                    Collections.emptyList()
+            );
+        }
+
+        List<UserIngredientList> ingredients = userIngredients.stream()
+                .map(ingredient -> UserIngredientList.builder()
+                        .userIngredientId(ingredient.getUserIngredientId())
+                        .categoryId(ingredient.getCategoryId())
+                        .ingredientName(ingredient.getIngredientName())
+                        .ingredientQuantity(ingredient.getIngredientQuantity())
+                        .expirationDate(calculateDaysUntilExpiration(ingredient.getDueDate()))
+                        .storage(ingredient.getIngredientStorage().toString())
+                        .purchaseDate(ingredient.getIngredientUp())
+                        .build())
                 .collect(Collectors.toList());
 
-        return categorizeIngredients(ingredientDtos);
+        return new IngredientResponse(
+                ingredients.stream()
+                        .filter(i -> i.getStorage().equals("FROZEN"))
+                        .collect(Collectors.toList()),
+                ingredients.stream()
+                        .filter(i -> i.getStorage().equals("REFRIGERATED"))
+                        .collect(Collectors.toList()),
+                ingredients.stream()
+                        .filter(i -> i.getStorage().equals("ROOM_TEMPERATURE"))
+                        .collect(Collectors.toList())
+        );
     }
 
     @Override
@@ -103,6 +132,10 @@ public class HomeServiceImpl implements HomeService {
 
         log.info("식자재 삭제 성공");
         ingredient.delete();  // 논리적 삭제 처리
+    }
+
+    private int calculateDaysUntilExpiration(LocalDateTime dueDate) {
+        return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), dueDate);
     }
 
     private IngredientResponse categorizeIngredients(List<UserIngredientList> ingredients) {

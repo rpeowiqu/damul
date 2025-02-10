@@ -1,5 +1,7 @@
 package com.damul.api.main.controller;
 
+import com.damul.api.auth.entity.User;
+import com.damul.api.common.user.CurrentUser;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.HomeIngredientDetail;
 import com.damul.api.main.dto.response.IngredientResponse;
@@ -21,10 +23,16 @@ public class HomeController {
     private final HomeService homeService;
 
     @GetMapping
-    public ResponseEntity<?> getUserIngredients(int userId) {
-        log.info("유저 식자재 목록 조회 시작 userId: {}");
-        IngredientResponse response = homeService.getUserIngredientList(userId);
-        log.info("유저 식자재 목록 조회 성공");
+    public ResponseEntity<?> getUserIngredients(@CurrentUser User user) {
+        log.info("컨트롤러: 유저 식자재 목록 조회 시작 - userId: {}", user.getId());
+
+        IngredientResponse response = homeService.getUserIngredientList(user.getId());
+
+        if (response.getFreezer().isEmpty() && response.getFridge().isEmpty() && response.getRoomTemp().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        log.info("컨트롤러: 유저 식자재 목록 조회 완료 - userId: {}", user.getId());
         return ResponseEntity.ok(response);
     }
 
