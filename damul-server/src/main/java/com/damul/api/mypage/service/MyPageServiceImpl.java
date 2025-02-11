@@ -65,6 +65,7 @@ public class MyPageServiceImpl implements MyPageService {
 
         int followerCount = followRepository.countByFollowingId(userId);
         int followingCount = followRepository.countByFollowerId(userId);
+        Boolean followed = followRepository.existsByFollowerIdAndFollowingId(currentUser.getId(), userId);
         List<FoodPreferenceList> foodPreferences = foodPreferenceRepository.findPreferencesByUserId(userId);
 
         return ProfileDetail.builder()
@@ -196,11 +197,6 @@ public class MyPageServiceImpl implements MyPageService {
     private void validateAccessPermission(User targetUser, UserInfo currentUser) {
         if (!targetUser.isActive()) {
             throw new IllegalStateException("비활성화된 사용자입니다.");
-        }
-
-        if (targetUser.getAccessRange() == AccessRange.PRIVATE
-                && (targetUser.getId() != currentUser.getId())) {
-            throw new IllegalStateException("비공개 프로필입니다.");
         }
     }
 }
