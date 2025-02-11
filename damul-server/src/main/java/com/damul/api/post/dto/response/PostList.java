@@ -22,6 +22,7 @@ public class PostList implements ScrollCursor {
     private int authorId;
     private String authorName;
     private PostStatus status;
+    private int viewCnt;
 
     @Override
     public int getId() {

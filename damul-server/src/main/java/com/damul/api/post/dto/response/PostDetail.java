@@ -22,8 +22,8 @@ public class PostDetail {
     private String contentImageUrl;
     private String content;
     private String createdAt;
+    private int viewCnt;
     private int currentChatNum;
     private int chatSize;
-    private int commentCnt;
     private List<CommentList> comments;
 }

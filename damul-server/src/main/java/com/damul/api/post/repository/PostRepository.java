@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
     // 채팅방 정보도 받아와야 함!!
@@ -18,7 +19,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("""
             SELECT new com.damul.api.post.dto.response.PostList(
                         p.postId, p.title, p.thumbnailUrl, p.content, 
-                        p.createdAt, p.user.id, p.user.nickname, p.status)
+                        p.createdAt, p.user.id, p.user.nickname, p.status, p.viewCnt)
             FROM Post p
             JOIN p.user u
             WHERE p.status IN :statuses
@@ -36,7 +37,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("""
             SELECT new com.damul.api.post.dto.response.PostList(
                 p.postId, p.title, p.thumbnailUrl, p.content, 
-                p.createdAt, p.user.id, p.user.nickname, p.status)
+                p.createdAt, p.user.id, p.user.nickname, p.status, p.viewCnt)
             FROM Post p
             JOIN p.user u
             WHERE p.status IN :statuses
@@ -58,7 +59,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("""
             SELECT new com.damul.api.post.dto.response.PostList(
                 p.postId, p.title, p.thumbnailUrl, p.content, 
-                p.createdAt, p.user.id, p.user.nickname, p.status)
+                p.createdAt, p.user.id, p.user.nickname, p.status, p.viewCnt)
             FROM Post p
             JOIN p.user u
             LEFT JOIN Post prev ON prev.postId = :cursorId
@@ -84,7 +85,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("""
             SELECT new com.damul.api.post.dto.response.PostList(
                 p.postId, p.title, p.thumbnailUrl, p.content, 
-                p.createdAt, p.user.id, p.user.nickname, p.status)
+                p.createdAt, p.user.id, p.user.nickname, p.status, p.viewCnt)
             FROM Post p
             JOIN p.user u
             LEFT JOIN Post prev ON prev.postId = :cursorId
@@ -116,4 +117,5 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("UPDATE Post p SET p.viewCnt = :viewCount WHERE p.postId = :postId")
     void updateViewCount(@Param("postId") int postId, @Param("viewCount") int viewCount);
 
+    Optional<Post> findByPostIdAndStatusNot(int postId, PostStatus postStatus);
 }
