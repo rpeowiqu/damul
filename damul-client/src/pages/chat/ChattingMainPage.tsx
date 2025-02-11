@@ -4,7 +4,7 @@ import ChattingListInfo from "@/components/chat/ChattingListInfo";
 import ChattingList from "@/components/chat/ChattingList";
 import PostButton from "@/components/community/PostButton";
 import PlusIcon from "@/components/svg/PlusIcon";
-
+import WebSocketComponent from "./WebSocketComponent";
 const ChattingMainPage = () => {
   const navigate = useNavigate();
 
@@ -26,6 +26,7 @@ const ChattingMainPage = () => {
       </div>
       <ChattingList />
       <PostButton to="/chatting/create" icon={<PlusIcon />} />
+      <WebSocketComponent />
     </main>
   );
 };
