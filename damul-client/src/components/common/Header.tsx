@@ -9,17 +9,21 @@ const Header = () => {
   const { myId, setMyId, setMyNickname, setWarningEnabled } = useUserStore();
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await getInfo();
-      if (response) {
-        setMyId(response.data.id);
-        setMyNickname(response.data.nickname);
-        setWarningEnabled(response.data.warningEnabled);
+    const fetchMyInfo = async () => {
+      try {
+        const response = await getInfo();
+        if (response) {
+          setMyId(response.data.id);
+          setMyNickname(response.data.nickname);
+          setWarningEnabled(response.data.warningEnabled);
+        }
+      } catch (error) {
+        console.log(error);
       }
     };
 
     if (myId === 0) {
-      fetchData();
+      fetchMyInfo();
     }
   }, []);
 

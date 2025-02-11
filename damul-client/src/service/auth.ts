@@ -1,24 +1,24 @@
-import { apiClient, apiRequest } from "./http";
+import apiClient from "./http";
 
 export const adminLogin = (provider: string) => {
-  return apiRequest(() => apiClient.post("/auth/admin/login", provider));
+  return apiClient.post("/auth/admin/login", provider);
 };
 
 export const logout = () => {
-  return apiRequest(() => apiClient.post("/auth/logout"));
+  return apiClient.post("/auth/logout");
 };
 
 export const signUp = (signUpRequest: {
   nickname: string;
   selfIntroduction: string;
 }) => {
-  return apiRequest(() => apiClient.post("/auth/signup", signUpRequest));
+  return apiClient.post("/auth/signup", signUpRequest);
 };
 
 export const consent = () => {
-  return apiRequest(() => apiClient.get("/auth/consent"));
+  return apiClient.get("/auth/consent");
 };
 
 export const getInfo = () => {
-  return apiRequest(() => apiClient.get("/auth/users"));
+  return apiClient.get("/auth/users");
 };

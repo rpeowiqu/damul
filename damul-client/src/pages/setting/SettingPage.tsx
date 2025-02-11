@@ -34,7 +34,6 @@ import useUserStore from "@/stores/user";
 import { isValidNickname } from "@/utils/regex";
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
-import { userInfo } from "os";
 import GoogleIcon from "@/components/svg/GoogleIcon";
 import KakaoIcon from "@/components/svg/KakaoIcon";
 import NaverIcon from "@/components/svg/NaverIcon";
@@ -69,15 +68,20 @@ const SettingPage = () => {
   const nav = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await getUserSetting(myId);
-      if (response) {
-        setUserSetting(response.data);
+    const fetchUserSetting = async () => {
+      try {
+        const response = await getUserSetting(myId);
+        if (response) {
+          setUserSetting(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
-    fetchData();
+    fetchUserSetting();
   }, []);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
