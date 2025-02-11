@@ -1,20 +1,34 @@
+import { Ingredient } from "@/types/Ingredient";
 import DeleteIcon from "../svg/DeleteIcon";
+import { deleteUserIndegredient } from "@/service/home";
+import useUserStore from "@/stores/user";
 
 interface ConfirmDeleteModalProps {
   setIsDeleteOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  ingredient: Ingredient;
+  deleteIngredient: (ingredient: Ingredient) => void;
 }
 
 const ConfirmDeleteModal = ({
+  ingredient,
   setIsOpen,
   setIsDeleteOpen,
+  deleteIngredient,
 }: ConfirmDeleteModalProps) => {
-  const handleOnDelete = () => {
+  // const { setWarningEnabled } = useUserStore();
+  const handleOnDelete = async () => {
+    try {
+      await deleteUserIndegredient(ingredient.userIngredientId);
+      deleteIngredient(ingredient);
+    } catch (error) {
+      console.log("식자재 정보를 삭제 하지 못했습니다.");
+    }
     setIsDeleteOpen(false);
   };
-  const handleOnClose = () => {
+  const handleOnClose = async () => {
     setIsDeleteOpen(false);
-    setIsOpen(true);
+    setIsOpen?.(true);
   };
 
   return (

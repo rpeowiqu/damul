@@ -44,6 +44,9 @@ const IngredientStorageContainer = ({
   const [isOverColumnLimit, setIsOverColumnLimit] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
+
+  const [ingredients, setIngredients] = useState<Ingredient[]>(items);
+
   const [selectedIngredient, setSelectedIngredient] =
     useState<Ingredient>(initialData);
 
@@ -64,18 +67,32 @@ const IngredientStorageContainer = ({
     }
   };
 
+  const updateIngredient = (updatedIngredient: Ingredient) => {
+    setIngredients((prevItems) =>
+      prevItems.map((item) =>
+        item.userIngredientId === updatedIngredient.userIngredientId
+          ? updatedIngredient
+          : item,
+      ),
+    );
+  };
+
+  const deleteIngredient = (deletedIngredient: Ingredient) => {
+    setIngredients((prevItems) =>
+      prevItems.filter(
+        (item) => item.userIngredientId !== deletedIngredient.userIngredientId,
+      ),
+    );
+  };
+
   useEffect(() => {
     const handleResize = () => {
-      const filteredItems = items.filter(
-        (item) => !(item.expirationDate < 0 && title === "expiringSoon"),
-      );
-
       let columns = COLUMN_SIZE.default;
       if (window.innerWidth >= 600) columns = COLUMN_SIZE.pc;
       else if (window.innerWidth >= 480) columns = COLUMN_SIZE.sm;
       else if (window.innerWidth >= 360) columns = COLUMN_SIZE.xs;
 
-      setIsOverColumnLimit(filteredItems.length > columns);
+      setIsOverColumnLimit(items.length > columns);
       setIsExpanded(false);
     };
 
@@ -97,67 +114,73 @@ const IngredientStorageContainer = ({
           {title === "expiringSoon" ? ITEM_STATUS[title] : STORAGE_TYPE[title]}
         </p>
       </div>
-      <div
-        className={`grid grid-cols-2 gap-2 p-2 mt-2 mb-3 pc:grid-cols-5 sm:grid-cols-4 xs:grid-cols-3 ${!isExpanded && "overflow-y-hidden h-[70px]"}`}
-      >
-        {items.map((item, idx) => {
-          if (item.expirationDate < 0 && title === "expiringSoon") {
-            return null;
-          }
-
-          return (
-            <IngredientButton
-              key={idx}
-              variant={CATEGORYNUMBER[item.categoryId]}
-              name={item.ingredientName}
-              quantity={item.ingredientQuantity}
-              expirationDate={item.expirationDate}
-              onClick={() => handleOnIngredientBtn(item)}
-              onEdit={onEdit}
-              id={item.userIngredientId}
-            />
-          );
-        })}
-      </div>
-
-      <button
-        onClick={handleOnClick}
-        className={`${isOverColumnLimit ? "block" : "hidden"}
+      {items.length === 0 ? (
+        <div className="flex h-10 w-full items-center justify-center">
+          식자재가 없습니다.
+        </div>
+      ) : (
+        <>
+          <div
+            className={`grid grid-cols-2 gap-2 p-2 mt-2 mb-3 pc:grid-cols-5 sm:grid-cols-4 xs:grid-cols-3 ${!isExpanded && "overflow-y-hidden h-[70px]"}`}
+          >
+            {ingredients.map((ingredient, idx) => {
+              return (
+                <IngredientButton
+                  key={idx}
+                  variant={CATEGORYNUMBER[ingredient.categoryId]}
+                  name={ingredient.ingredientName}
+                  quantity={ingredient.ingredientQuantity}
+                  expirationDate={ingredient.expirationDate}
+                  onClick={() => handleOnIngredientBtn(ingredient)}
+                  onEdit={onEdit}
+                  id={ingredient.userIngredientId}
+                />
+              );
+            })}
+          </div>
+          <button
+            onClick={handleOnClick}
+            className={`${isOverColumnLimit ? "block" : "hidden"}
       flex items-center justify-center w-full h-full p-4 mt-2 bg-normal-100/50 rounded-b-xl`}
-      >
-        {isExpanded ? (
-          <div className="h-2 leading-3 text-xs text-normal-300">접기</div>
-        ) : (
-          <div className={"w-20 h-1 bg-normal-200/50"}></div>
-        )}
-      </button>
+          >
+            {isExpanded ? (
+              <div className="h-2 leading-3 text-xs text-normal-300">접기</div>
+            ) : (
+              <div className={"w-20 h-1 bg-normal-200/50"}></div>
+            )}
+          </button>
 
-      <DamulModal
-        isOpen={isOpen}
-        onOpenChange={() => {
-          setIsOpen(false);
-        }}
-      >
-        {selectedIngredient && (
-          <IngredientDetail
-            ingredient={selectedIngredient}
-            setIsDeleteOpen={setIsDeleteOpen}
-            setIsOpen={setIsOpen}
-          />
-        )}
-      </DamulModal>
+          <DamulModal
+            isOpen={isOpen}
+            onOpenChange={() => {
+              setIsOpen(false);
+            }}
+          >
+            {selectedIngredient && (
+              <IngredientDetail
+                selectedIngredient={selectedIngredient}
+                setIsDeleteOpen={setIsDeleteOpen}
+                setIsOpen={setIsOpen}
+                updateIngredient={updateIngredient}
+              />
+            )}
+          </DamulModal>
 
-      <DamulModal
-        isOpen={isDeleteOpen}
-        onOpenChange={() => setIsDeleteOpen(false)}
-      >
-        {selectedIngredient && (
-          <ConfirmDeleteModal
-            setIsDeleteOpen={setIsDeleteOpen}
-            setIsOpen={setIsOpen}
-          />
-        )}
-      </DamulModal>
+          <DamulModal
+            isOpen={isDeleteOpen}
+            onOpenChange={() => setIsDeleteOpen(false)}
+          >
+            {selectedIngredient && (
+              <ConfirmDeleteModal
+                setIsDeleteOpen={setIsDeleteOpen}
+                setIsOpen={setIsOpen}
+                ingredient={selectedIngredient}
+                deleteIngredient={deleteIngredient}
+              />
+            )}
+          </DamulModal>
+        </>
+      )}
     </div>
   );
 };

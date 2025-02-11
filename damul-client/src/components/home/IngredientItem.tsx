@@ -1,15 +1,19 @@
-import { CATEGORYNUMBER, CATEGORYNAME } from "@/constants/category";
-import { STORAGE_TYPE_MAP, STORAGE_TYPE_CONST } from "@/constants/storage";
+import { CATEGORYNAME } from "@/constants/category";
+import { STORAGE_TYPE_CONST } from "@/constants/storage";
 
 interface IngredientItemProps {
-  ingredient?: {
+  ingredient: {
     ingredientName: string;
     productPrice: number;
     categoryId: number;
     dueDate: string;
     ingredientStorage: keyof typeof STORAGE_TYPE_CONST;
   };
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    index?: number,
+    field?: string,
+  ) => void;
   onDelete: () => void;
 }
 
@@ -31,53 +35,80 @@ const IngredientItem = ({
       </div>
       <div className="flex flex-col w-full gap-2">
         <div className="flex gap-2 w-full justify-between">
-          <label className="w-20">상품명</label>
+          <label className="w-20 cursor-pointer" htmlFor="ingredientName">
+            상품명
+          </label>
           <input
             type="text"
-            className="border-1 w-full text-right focus:outline-positive-300"
-            value={ingredient && ingredient.ingredientName}
-            onChange={onChange}
+            id="ingredientName"
+            name="ingredientName"
+            className="border-1 w-full cursor-pointer text-right focus:outline-positive-300 p-1"
+            value={ingredient.ingredientName}
+            onChange={(e) => onChange(e)}
           />
         </div>
         <div className="flex gap-2 w-full justify-between">
-          <label className="w-20">분류</label>
+          <label className="w-20 cursor-pointer" htmlFor="categoryId">
+            분류
+          </label>
+          <select
+            id="categoryId"
+            name="categoryId"
+            className="border-1 w-full cursor-pointer text-right focus:outline-positive-300 p-1"
+            value={ingredient.categoryId}
+            onChange={(e) => onChange(e)}
+          >
+            {Object.keys(CATEGORYNAME).map((key) => (
+              <option key={key} value={key}>
+                {CATEGORYNAME[key as keyof typeof CATEGORYNAME]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex gap-2 w-full justify-between">
+          <label className="w-20 cursor-pointer" htmlFor="productPrice">
+            가격
+          </label>
           <input
             type="text"
-            className="border-1 w-full text-right focus:outline-positive-300"
-            onChange={onChange}
-            value={
-              ingredient && CATEGORYNAME[CATEGORYNUMBER[ingredient.categoryId]]
-            }
+            id="productPrice"
+            name="productPrice"
+            className="border-1 w-full cursor-pointer text-right focus:outline-positive-300 p-1"
+            onChange={(e) => onChange(e)}
+            value={ingredient.productPrice}
+            onFocus={(e) => e.target.select()}
           />
         </div>
         <div className="flex gap-2 w-full justify-between">
-          <label className="w-20">가격</label>
+          <label className="w-20 cursor-pointer" htmlFor="dueDate">
+            소비기한
+          </label>
           <input
-            type="text"
-            className="border-1 w-full text-right focus:outline-positive-300"
-            onChange={onChange}
-            value={ingredient && ingredient.productPrice}
+            type="date"
+            id="dueDate"
+            name="dueDate"
+            className="border-1 w-full cursor-pointer text-right focus:outline-positive-300 p-1"
+            onChange={(e) => onChange(e)}
+            value={ingredient.dueDate}
           />
         </div>
         <div className="flex gap-2 w-full justify-between">
-          <label className="w-20">소비기한</label>
-          <input
-            type="text"
-            className="border-1 w-full  text-right focus:outline-positive-300"
-            onChange={onChange}
-            value={ingredient && ingredient.dueDate}
-          />
-        </div>
-        <div className="flex gap-2 w-full justify-between">
-          <label className="w-20">보관장소</label>
-          <input
-            type="text"
-            className="border-1 w-full text-right focus:outline-positive-300"
-            onChange={onChange}
-            value={
-              ingredient && STORAGE_TYPE_CONST[ingredient.ingredientStorage]
-            }
-          />
+          <label className="w-20 cursor-pointer" htmlFor="ingredientStorage">
+            보관장소
+          </label>
+          <select
+            id="ingredientStorage"
+            name="ingredientStorage"
+            className="border-1 w-full cursor-pointer text-right focus:outline-positive-300 p-1"
+            value={ingredient.ingredientStorage}
+            onChange={(e) => onChange(e)}
+          >
+            {Object.keys(STORAGE_TYPE_CONST).map((key) => (
+              <option key={key} value={key}>
+                {STORAGE_TYPE_CONST[key as keyof typeof STORAGE_TYPE_CONST]}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
     </div>

@@ -3,12 +3,14 @@ import DeleteIcon from "../svg/DeleteIcon";
 import SaveIcon from "../svg/SaveIcon";
 import { Slider } from "../ui/slider";
 import { CATEGORY, CATEGORYNUMBER } from "@/constants/category";
-import { useState } from "react";
+import { patchUserIndegredient } from "@/service/home";
+import { useEffect, useState } from "react";
 
 interface IngredientDetailProps {
-  ingredient: Ingredient;
+  selectedIngredient: Ingredient;
+  updateIngredient?: (ingredient: Ingredient) => void;
   setIsDeleteOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
@@ -49,35 +51,43 @@ const getExpirationDate = (
 };
 
 const IngredientDetail = ({
-  ingredient,
+  selectedIngredient,
+  updateIngredient,
   setIsDeleteOpen,
   setIsOpen,
 }: IngredientDetailProps) => {
-  const IconComponent = CATEGORY[CATEGORYNUMBER[ingredient.categoryId]];
+  const IconComponent = CATEGORY[CATEGORYNUMBER[selectedIngredient.categoryId]];
 
-  const [selectedIngredient, setSelectedIngredient] =
-    useState<Ingredient>(ingredient);
-
+  const [ingredient, setIngredient] = useState<Ingredient>(selectedIngredient);
   const handleQuantityChange = (value: number[]) => {
-    setSelectedIngredient((prev) => {
-      if (prev) {
-        return {
-          ...prev,
-          ingredientQuantity: value[0],
-        };
-      }
-      return prev;
+    setIngredient((prev) => {
+      return {
+        ...prev,
+        ingredientQuantity: value[0],
+      };
     });
   };
 
   const handleDeleteClick = () => {
     setIsDeleteOpen(true);
-    setIsOpen(false);
+    setIsOpen?.(false);
   };
 
-  const handleSaveClick = () => {
-    setIsOpen(false);
+  const handleSaveClick = async () => {
+    try {
+      await patchUserIndegredient(ingredient.userIngredientId, {
+        ingredientQuantity: ingredient.ingredientQuantity,
+      });
+      updateIngredient?.(ingredient);
+    } catch (error) {
+      console.error("식자재 정보를 수정하지 못했습니다.");
+    }
+    setIsOpen?.(false);
   };
+
+  useEffect(() => {
+    setIngredient(selectedIngredient);
+  }, [selectedIngredient]);
 
   return (
     <div className="flex flex-col items-center w-full gap-4 p-5">
@@ -114,12 +124,13 @@ const IngredientDetail = ({
             onValueChange={handleQuantityChange}
             defaultValue={[selectedIngredient.ingredientQuantity]}
             max={100}
+            value={[ingredient.ingredientQuantity]}
             step={1}
           />
         </div>
         <p className="flex items-center justify-center w-full gap-1 text-sm my-2">
           <span className="text-lg font-bold">
-            {selectedIngredient.ingredientQuantity}%
+            {ingredient.ingredientQuantity}%
           </span>
           남았어요
         </p>
