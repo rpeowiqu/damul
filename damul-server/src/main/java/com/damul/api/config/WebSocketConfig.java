@@ -28,7 +28,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:*") // 실제 운영 환경에서는 구체적인 도메인 지정 필요
+                .setAllowedOriginPatterns("http://localhost:*") // 실제 운영 환경에서는 구체적인 도메인 지정 필요
                 .withSockJS()
                 .setStreamBytesLimit(512 * 1024) // 512KB
                 .setHttpMessageCacheSize(1000)
