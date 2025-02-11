@@ -3,8 +3,11 @@ package com.damul.api.post.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.entity.ChatRoom;
+import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
+import com.damul.api.chat.service.ChatRoomService;
 import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
@@ -52,6 +55,8 @@ public class PostServiceImpl implements PostService {
     private final PostCommentRepository postCommentRepository;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final ChatRoomService chatRoomService;
 
     private final S3Service s3Service;
 
@@ -215,9 +220,15 @@ public class PostServiceImpl implements PostService {
 
 
         // 채팅방 정보 조회
-        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPostId(postId)
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost(post)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
 
+        // 현재 채팅방 참여 인원 수
+        ChatMembersResponse chatMembersResponse = chatRoomService.getChatRoomMembers(chatRoom.getId());
+        int currentChatNum = chatMembersResponse.getTotalMembers();
 
+        // 채팅방 참여 여부
+        boolean entered = chatRoomMemberRepository.existsByRoomIdAndUserId(chatRoom.getId(), userId);
 
         // 댓글 목록 조회
         List<CommentList> comments = postCommentRepository
@@ -247,8 +258,9 @@ public class PostServiceImpl implements PostService {
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .viewCnt(post.getViewCnt())
-                .currentChatNum()
-                .chatSize()
+                .currentChatNum(currentChatNum)
+                .entered(entered)
+                .chatSize(chatRoom.getMemberLimit())
                 .comments(comments)
                 .build();
     }
@@ -284,7 +296,9 @@ public class PostServiceImpl implements PostService {
         Post savedPost = postRepository.save(post);
         log.info("게시글 작성 완료 - ID: {}", savedPost.getPostId());
 
-        // 채팅방 연결
+        // Todo: 채팅방 생성 api 받아오기
+        // 채팅방 생성
+//        chatRoomService.채팅방생성 (userInfo.getId())
 
         return new CreateResponse(savedPost.getPostId());
     }
@@ -321,7 +335,15 @@ public class PostServiceImpl implements PostService {
         post.setContent(postRequest.getContent());
         post.setThumbnailUrl(thumbnailUrl);
 
-        // 채팅방 인원 수정
+
+        // 채팅방 정보 조회
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost(post)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 채팅방 최대 인원 변경
+        if (chatRoom.getMemberLimit() != postRequest.getChatSize()) {
+            chatRoomService.updateMemberLimit(chatRoom.getId(), postRequest.getChatSize(), userInfo.getId());
+        }
 
         Post updatedPost = postRepository.save(post);
         log.info("게시글 수정 완료 - ID: {}", updatedPost.getPostId());

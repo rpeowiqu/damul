@@ -1,6 +1,7 @@
 package com.damul.api.chat.repository;
 
 import com.damul.api.chat.entity.ChatRoom;
+import com.damul.api.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -81,6 +82,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
             @Param("userId2") int userId2
     );
 
-
-    Optional<ChatRoom> findChatRoomByPostId(int postId);
+    // 게시글 id로 채팅방 조회
+    Optional<ChatRoom> findChatRoomByPost(Post post);
 }

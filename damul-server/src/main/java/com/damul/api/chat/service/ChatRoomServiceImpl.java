@@ -246,7 +246,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         User currentUser = userRepository.getReferenceById(currentUserId);
 
         // 채팅방 생성
-        ChatRoom newRoom = ChatRoom.createDirectRoom(
+        ChatRoom newRoom = ChatRoom.                             (
                 currentUser,
                 String.format("%s,%s의 대화방", currentUser.getNickname(), targetUser.getNickname())
         );

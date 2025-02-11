@@ -26,5 +26,6 @@ public class PostDetail {
     private int viewCnt;
     private int currentChatNum;
     private int chatSize;
+    private boolean entered;
     private List<CommentList> comments;
 }

@@ -118,5 +118,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("UPDATE Post p SET p.viewCnt = :viewCount WHERE p.postId = :postId")
     void updateViewCount(@Param("postId") int postId, @Param("viewCount") int viewCount);
 
+    // deleted되지 않은 post 조회
     Optional<Post> findByPostIdAndStatusNot(int postId, PostStatus postStatus);
 }
