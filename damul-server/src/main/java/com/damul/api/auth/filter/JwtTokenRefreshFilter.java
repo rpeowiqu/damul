@@ -55,12 +55,43 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
 
         Optional<Cookie> accessTokenCookie = null;
         Optional<Cookie> refreshTokenCookie = null;
+        Optional<Cookie> tempTokenCookie = null;
 
         try {
             log.info("JwtTokenRefreshFilter 시작");
 
             accessTokenCookie = cookieUtil.getCookie(request, "access_token");
             refreshTokenCookie = cookieUtil.getCookie(request, "refresh_token");
+            tempTokenCookie = cookieUtil.getCookie(request, "temp_token");
+
+            if (tempTokenCookie.isPresent()) {
+                String tempToken = tempTokenCookie.get().getValue();
+
+                // 토큰 유효성 검증
+                if (jwtTokenProvider.validateToken(tempToken)) {
+                    Claims claims = jwtTokenProvider.getClaims(tempToken);
+
+                    // 최소한의 인증 정보 생성
+                    UserInfo userInfo = UserInfo.builder()
+                            .email(claims.get("email", String.class))
+                            .nickname(claims.get("nickname", String.class))
+                            .build();
+
+                    // 제한된 권한으로 인증 정보 설정
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(
+                            userInfo,
+                            null,
+                            Collections.emptyList()  // 권한 없음
+                    );
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.info("임시토큰으로 제한적 인증 처리: {}", userInfo.getEmail());
+                } else {
+                    // 토큰이 유효하지 않은 경우 로그 및 오류 처리
+                    log.warn("유효하지 않은 임시토큰 감지 - 쿠키 삭제");
+                    cookieUtil.deleteCookie(response, "temp_token");
+                }
+            }
 
             log.info("accessToken 존재: {}", accessTokenCookie.isPresent());
             log.info("refreshToken 존재: {}", refreshTokenCookie.isPresent());

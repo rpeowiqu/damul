@@ -176,9 +176,13 @@ public class AuthService {
     // 약관동의 및 이메일,닉네임 조회
     public UserConsent getConsent(String tempToken) {
         log.info("약관동의 및 이메일, 닉네임 조회 시작");
+        if(tempToken == null) {
+            log.error("tempToken이 존재하지 않습니다");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
+        }
         if(!jwtTokenProvider.validateToken(tempToken)) {
             log.error("유효하지 않은 토큰입니다");
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         Claims claims = jwtTokenProvider.getClaims(tempToken);
@@ -196,11 +200,13 @@ public class AuthService {
         }
 
         log.info("약관 데이터 조회 성공, size: {}", terms.size());
-        return UserConsent.builder()
+        UserConsent consent = UserConsent.builder()
                 .email(email)
                 .nickname(defaultNickname)
                 .terms(terms)
                 .build();
+
+        return consent;
     }
 
     public Map<String, String> generateTokens(Authentication authentication) {
