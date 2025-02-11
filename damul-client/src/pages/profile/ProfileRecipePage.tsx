@@ -19,17 +19,20 @@ const ProfileRecipePage = () => {
   const { user } = useOutletContext();
   const [sortType, setSortType] = useState("date");
 
-  const fetchData = async (pageParam: number) => {
-    const response = await getMyRecipes(user!, {
-      cursor: pageParam,
-      size: 5,
-    });
-    console.log(response);
-    if (response?.status === 204) {
-      return { data: [], meta: { nextCursor: null, hasNext: false } };
-    }
+  const fetchRecipes = async (pageParam: number) => {
+    try {
+      const response = await getMyRecipes(parseInt(user.userId), {
+        cursor: pageParam,
+        size: 5,
+      });
+      if (response?.status === 204) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
 
-    return response?.data;
+      return response?.data;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -69,7 +72,7 @@ const ProfileRecipePage = () => {
 
       {/* <DamulInfiniteScrollList
         queryKey={["myRecipes"]}
-        fetchFn={fetchData}
+        fetchFn={fetchRecipes}
         renderItems={(item: FeedCardProps) => (
           <FeedCard key={item.id} {...item} />
         )}

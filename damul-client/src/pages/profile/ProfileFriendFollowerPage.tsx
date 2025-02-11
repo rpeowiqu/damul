@@ -8,23 +8,26 @@ const ProfileFriendFollowerPage = () => {
   const { userId } = useParams();
   // const { searchTerm } = useOutletContext();
 
-  const fetchData = async (pageParam: number) => {
-    const response = await getFollowers(parseInt(userId!), {
-      cursor: pageParam,
-      size: 5,
-    });
-    console.log(response);
-    if (response?.status === 204) {
-      return { data: [], meta: { nextCursor: null, hasNext: false } };
-    }
+  const fetchFollowers = async (pageParam: number) => {
+    try {
+      const response = await getFollowers(parseInt(userId!), {
+        cursor: pageParam,
+        size: 5,
+      });
+      if (response?.status === 204) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
 
-    return response?.data;
+      return response?.data;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <DamulInfiniteScrollList
       queryKey={["follower"]}
-      fetchFn={fetchData}
+      fetchFn={fetchFollowers}
       renderItems={(item: FriendItemProps) => (
         <FriendItem key={item.userId} {...item}>
           <DamulButton
