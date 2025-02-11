@@ -93,11 +93,12 @@ public class RecipeController {
     // 레시피 수정
     @PutMapping("/{recipeId}")
     public ResponseEntity<?> updateRecipe(@PathVariable int recipeId,
+                                          @CurrentUser UserInfo userInfo,
                                           @RequestPart("recipeRequest") RecipeRequest recipeRequest,
                                           @RequestPart("thumbnailImage") MultipartFile thumbnailImage,
                                           @RequestPart("cookingImages") List<MultipartFile> cookingImages) {
         log.info("레시피 수정 요청");
-        recipeService.updateRecipe(recipeRequest, thumbnailImage, cookingImages);
+        recipeService.updateRecipe(recipeId, userInfo, recipeRequest, thumbnailImage, cookingImages);
         log.info("레시피 수정 완료");
         return ResponseEntity.ok().build();
     }
