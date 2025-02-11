@@ -7,6 +7,7 @@ import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.config.service.S3Service;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
+import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -129,18 +130,20 @@ public class UserServiceImpl implements UserService {
 
     // 사용자 목록 조회 및 검색
     @Override
-    public CreateResponse getSearchUserList(String keyword) {
+    public List<UserList> getSearchUserList(String keyword) {
         if(keyword == null || keyword.isEmpty()) {
             log.info("검색어 없음");
             throw new BusinessException(ErrorCode.USER_NICKNAME_NOT_PROVIDED);
         }
 
+        String exactMatch = keyword; // 정확히 일치하는 경우
+        String startsWith = keyword + "%"; // 검색어로 시작하는 경우
+        String contains = "%" + keyword + "%"; // 검색어가 포함된 경우
+        log.info("검색어 있음 - 검색어 포함: {}, 정확히 일치: {}, 검색어 시작:{}", contains, exactMatch, startsWith);
+        List<UserList> userList = userRepository.findUserByNickname(contains, exactMatch, startsWith);
 
-        log.info("검색어 있음 - 검색어: {}", keyword);
-        CreateResponse createResponse = userRepository.findUserByNickname(keyword);
-
-
-        return createResponse;
+        log.info("사용자 목록 검색 조회 성공");
+        return userList;
     }
 
 
