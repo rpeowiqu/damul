@@ -361,11 +361,22 @@ public class RecipeServiceImpl implements RecipeService {
             log.info("레시피 스텝 저장 완료 - 총 {}개", steps.size());
 
             log.info("레시피 재료 저장 start");
+            int count = 0;
             List<RecipeIngredient> ingredients = new ArrayList<>();
             for(IngredientList ingredientList : recipeRequest.getIngredients()) {
+                RecipeIngredient recipeIngredient = new RecipeIngredient();
+                recipeIngredient.setRecipe(recipe);
+                recipeIngredient.setIngredientName(ingredientList.getName());
+                recipeIngredient.setUnit(ingredientList.getUnit());
+                recipeIngredient.setAmount(ingredientList.getAmount());
 
+                recipeIngredientRepository.save(recipeIngredient);
+                count++;
             }
-            return new CreateResponse();
+            log.info("레시피 재료 저장 완료 - count: {}", count);
+
+
+            return new CreateResponse(recipe.getId());
         } catch (Exception e) {
             log.error("레시피 저장 중 오류 발생", e);
 
