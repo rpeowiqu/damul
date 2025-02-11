@@ -49,10 +49,17 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     UserList findUser(@Param("nickname") String nickname);
 
     // 사용자 검색
-    @Query("SELECT new com.damul.api.common.dto.response.CreateResponse(u.id) " +
+    @Query("SELECT new com.damul.api.user.dto.response.UserList(u.id, u.profileImageUrl, u.nickname) " +
             "FROM User u " +
-            "WHERE u.nickname LIKE %:keyword%")
-    CreateResponse findUserByNickname(@Param("keyword") String keyword);
+            "WHERE u.nickname LIKE :keyword " +
+            "ORDER BY CASE " +
+            "   WHEN u.nickname = :exactMatch THEN 0 " +  // 정확히 일치
+            "   WHEN u.nickname LIKE :startsWith THEN 1 " +  // 검색어로 시작
+            "   ELSE 2 " +  // 그 외 포함
+            "END")
+    List<UserList> findUserByNickname(@Param("keyword") String keyword,
+                                      @Param("exactMatch") String exactMatch,
+                                      @Param("startsWith") String startsWith);
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.active = true")
     int countActiveUsers();

@@ -83,7 +83,7 @@ public class PostController {
                                         @RequestPart("postRequest") PostRequest postRequest,
                                         @RequestPart(value = "image", required = false) MultipartFile thumbnailImage) {
         postService.updatePost(postId, userInfo, postRequest, thumbnailImage);
-        
+
         log.info("게시글 수정 시작");
         CreateResponse post = postService.updatePost(postId, userInfo, postRequest, thumbnailImage);
         if (post == null) {
@@ -114,7 +114,7 @@ public class PostController {
 
         return ResponseEntity.ok(createResponse);
     }
-    
+
     // 댓글 삭제
     @DeleteMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<?> deletePostComment(@PathVariable("postId") int postId,

@@ -1,12 +1,12 @@
 package com.damul.api.user.dto.response;
 
 import com.damul.api.common.scroll.util.ScrollCursor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 
 @Getter
 @Builder
@@ -18,6 +18,7 @@ public class UserList implements ScrollCursor {
     private String nickname;
 
 
+    @JsonIgnore
     @Override
     public int getId() {
         return this.userId;
