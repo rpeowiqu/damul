@@ -40,16 +40,16 @@ export const CATEGORYNAME: Record<CategoryKey, string> = {
 // 카테고리 번호
 // 곡물, 채소, 과일, 유제품, 육류, 달걀류, 수산물, 기름, 양념, 기타
 export const CATEGORYNUMBER: Record<number, CategoryKey> = {
-  0: "grains",
-  1: "vegetable",
-  2: "fruit",
-  3: "dairy",
-  4: "meat",
-  5: "egg",
-  6: "fish",
-  7: "oil",
-  8: "seasoning",
-  9: "etc",
+  1: "grains",
+  2: "vegetable",
+  3: "fruit",
+  4: "dairy",
+  5: "meat",
+  6: "egg",
+  7: "fish",
+  8: "oil",
+  9: "seasoning",
+  10: "etc",
 };
 
 // 카테고리 아이콘
