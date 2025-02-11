@@ -9,7 +9,6 @@ interface DamulInfiniteScrollListProps<T> {
     meta: { nextCursor: number; hasNext: boolean };
   }>;
   initPage?: number;
-  loadSize?: number; // 스켈레톤 개수를 출력할 때 사용
   renderItems: (item: T, index: number) => ReactNode;
   skeleton?: ReactNode;
   className?: string;
@@ -19,7 +18,6 @@ const DamulInfiniteScrollList = <T,>({
   queryKey,
   fetchFn,
   initPage = 0,
-  loadSize = 1,
   renderItems,
   skeleton,
   className,
@@ -28,19 +26,19 @@ const DamulInfiniteScrollList = <T,>({
     triggerOnce: false,
     threshold: 0,
   });
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: [queryKey],
+      queryKey,
       queryFn: ({ pageParam = 0 }) => fetchFn(pageParam),
       initialPageParam: initPage,
       getNextPageParam: (lastPage) =>
-        lastPage.meta.hasNext ? lastPage.meta.nextCursor : undefined, // 커서 사용
+        lastPage.meta.hasNext ? lastPage.meta.nextCursor : undefined,
     });
 
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
-      console.log(data);
     }
   }, [inView]);
 
@@ -51,14 +49,7 @@ const DamulInfiniteScrollList = <T,>({
           renderItems(item, index + pageIndex * page.data.length),
         ),
       )}
-
-      {isFetchingNextPage ? (
-        Array.from({ length: loadSize }).map((_, index) => (
-          <div key={index}>{skeleton}</div>
-        ))
-      ) : (
-        <div ref={ref}></div>
-      )}
+      {isFetchingNextPage ? skeleton : <div ref={ref}></div>}
     </div>
   );
 };
