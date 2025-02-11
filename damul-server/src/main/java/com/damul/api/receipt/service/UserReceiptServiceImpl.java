@@ -28,7 +28,9 @@ public class UserReceiptServiceImpl implements UserReceiptService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public void registerIngredients(int userId, UserIngredientPost request) {
+        log.info("영수증 등록 시작 {} with id {}", userId, request);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
@@ -36,10 +38,11 @@ public class UserReceiptServiceImpl implements UserReceiptService {
         UserReceipt receipt = UserReceipt.builder()
                 .user(user)
                 .storeName(request.getStoreName())
-                .purchaseAt(LocalDateTime.parse(request.getPurchaseAt()))
+                .purchaseAt(request.getPurchaseAt().atStartOfDay())
                 .build();
 
         UserReceipt savedReceipt = userReceiptRepository.save(receipt);
+        log.info("영수증 등록 성공 {} with id {}", user, savedReceipt);
 
         // Create UserIngredients
         List<UserIngredient> ingredients = request.getUserIngredients().stream()
@@ -47,13 +50,14 @@ public class UserReceiptServiceImpl implements UserReceiptService {
                         .userReciept(savedReceipt)
                         .categoryId(item.getCategoryId())
                         .ingredientName(item.getIngredientName())
-                        .expirationDate(LocalDateTime.parse(item.getExpirationDate()))
+                        .expirationDate(item.getExpirationDate().atStartOfDay())
                         .ingredientStorage(item.getIngredientStorage())
                         .price(item.getProductPrice())
                         .build())
                 .collect(Collectors.toList());
 
         userIngredientRepository.saveAll(ingredients);
+        log.info("식자재 등록 성공 {} with id {}", user, savedReceipt);
     }
 
 }
