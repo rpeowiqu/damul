@@ -25,6 +25,7 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
             "ORDER BY cm.joinedAt ASC")
     List<ChatRoomMember> findAllByRoomId(@Param("roomId") int roomId);
 
+    // 채팅방에 내가 참여중인지
     boolean existsByRoomIdAndUserId(int roomId, int userId);
 
     // 채팅방 멤버 삭제

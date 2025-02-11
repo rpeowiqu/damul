@@ -2,12 +2,13 @@ package com.damul.api.main.service;
 
 import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
-import com.damul.api.main.dto.response.HomeIngredientDetail;
-import com.damul.api.main.dto.response.IngredientResponse;
-import com.damul.api.main.dto.response.SelectedIngredientList;
-import com.damul.api.main.dto.response.UserIngredientList;
+import com.damul.api.main.dto.response.*;
 import com.damul.api.main.entity.UserIngredient;
 import com.damul.api.main.repository.UserIngredientRepository;
+import com.damul.api.recipe.entity.Recipe;
+import com.damul.api.recipe.entity.RecipeTag;
+import com.damul.api.recipe.repository.RecipeRepository;
+import com.damul.api.recipe.repository.RecipeTagRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ import java.util.stream.Collectors;
 public class HomeServiceImpl implements HomeService {
 
     private final UserIngredientRepository userIngredientRepository;
+    private final RecipeRepository recipeRepository;
+    private final RecipeTagRepository recipeTagRepository;
 
     @Override
     public IngredientResponse getUserIngredientList(int userId) {
@@ -44,26 +47,18 @@ public class HomeServiceImpl implements HomeService {
         }
 
         List<UserIngredientList> ingredients = userIngredients.stream()
-                .map(ingredient -> UserIngredientList.builder()
-                        .userIngredientId(ingredient.getUserIngredientId())
-                        .categoryId(ingredient.getCategoryId())
-                        .ingredientName(ingredient.getIngredientName())
-                        .ingredientQuantity(ingredient.getIngredientQuantity())
-                        .expirationDate(calculateDaysUntilExpiration(ingredient.getDueDate()))
-                        .storage(ingredient.getIngredientStorage().toString())
-                        .purchaseDate(ingredient.getIngredientUp())
-                        .build())
+                .map(UserIngredientList::from)
                 .collect(Collectors.toList());
 
         return new IngredientResponse(
                 ingredients.stream()
-                        .filter(i -> i.getStorage().equals("FROZEN"))
+                        .filter(i -> i.getStorage().equals("freezer"))
                         .collect(Collectors.toList()),
                 ingredients.stream()
-                        .filter(i -> i.getStorage().equals("REFRIGERATED"))
+                        .filter(i -> i.getStorage().equals("fridge"))
                         .collect(Collectors.toList()),
                 ingredients.stream()
-                        .filter(i -> i.getStorage().equals("ROOM_TEMPERATURE"))
+                        .filter(i -> i.getStorage().equals("roomTemp"))
                         .collect(Collectors.toList())
         );
     }
@@ -107,7 +102,7 @@ public class HomeServiceImpl implements HomeService {
         UserIngredient ingredient = userIngredientRepository.findById(ingredientId)
                 .orElseThrow(() -> new EntityNotFoundException("재료를 찾을 수 없습니다."));
 
-        ingredient.updateQuantity(update.getIngredientquantity());
+        ingredient.updateQuantity(update.getIngredientQuantity());
         log.info("식자재 양 업데이트 성공");
     }
 
@@ -125,6 +120,7 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
+    @Transactional
     public void deleteIngredient(int userIngredientId) {
         log.info("식자재 삭제 시작");
         UserIngredient ingredient = userIngredientRepository.findByIdAndNotDeleted(userIngredientId)
@@ -132,6 +128,40 @@ public class HomeServiceImpl implements HomeService {
 
         log.info("식자재 삭제 성공");
         ingredient.delete();  // 논리적 삭제 처리
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public HomeSuggestedResponse getRecommendedRecipes(Integer userIngredientId, int userId) {
+        log.info("서비스: 레시피 추천 시작 - userId: {}, userIngredientId: {}", userId, userIngredientId);
+
+        List<Recipe> recommendedRecipes;
+        if (userIngredientId != null) {
+            recommendedRecipes = recipeRepository.findRecommendedRecipesByIngredient(userId, userIngredientId);
+        } else {
+            recommendedRecipes = recipeRepository.findRecommendedRecipes(userId);
+        }
+
+        List<SuggestedRecipeList> suggestedRecipes = recommendedRecipes.stream()
+                .limit(5)
+                .map(this::convertToSuggestedRecipeList)
+                .collect(Collectors.toList());
+
+        return new HomeSuggestedResponse(userId, suggestedRecipes);
+    }
+
+    private SuggestedRecipeList convertToSuggestedRecipeList(Recipe recipe) {
+        return SuggestedRecipeList.builder()
+                .recipeId(recipe.getId())
+                .title(recipe.getTitle())
+                .thumbnailUrl(recipe.getThumbnailUrl())
+                .recipeTags(recipeTagRepository.findByRecipeId(recipe.getId()).stream()
+                        .map(recipeTag -> new RecipeTagList(
+                                recipeTag.getTag().getId(),
+                                recipeTag.getTag().getTagName()
+                        ))
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     private int calculateDaysUntilExpiration(LocalDateTime dueDate) {
@@ -148,7 +178,7 @@ public class HomeServiceImpl implements HomeService {
             switch (storage) {
                 case FREEZER -> freezer.add(ingredient);
                 case FRIDGE -> fridge.add(ingredient);
-                case ROOM_TEMPARATURE -> roomTemp.add(ingredient);
+                case ROOM_TEMPERATURE -> roomTemp.add(ingredient);
             }
         }
 
@@ -158,7 +188,7 @@ public class HomeServiceImpl implements HomeService {
     private IngredientStorage determineStorage(int categoryId) {
         if (categoryId <= 10) return IngredientStorage.FREEZER;
         else if (categoryId <= 20) return IngredientStorage.FRIDGE;
-        else return IngredientStorage.ROOM_TEMPARATURE;
+        else return IngredientStorage.ROOM_TEMPERATURE;
     }
 
     private String determineSortField(String orderBy) {
