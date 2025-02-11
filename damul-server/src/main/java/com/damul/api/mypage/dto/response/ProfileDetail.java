@@ -16,6 +16,7 @@ public class ProfileDetail {
     private int followerCount;
     private int followingCount;
     private String selfIntroduction;
+    private boolean followed;
     private List<FoodPreferenceList> foodPreference;
 
 }
