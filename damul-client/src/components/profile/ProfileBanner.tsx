@@ -1,10 +1,11 @@
-import Image from "@/components/common/Image";
 import defaultProfile from "@/assets/profile.png";
 import defaultProfileBg from "@/assets/profile-background.jpg";
-import DamulSearchBox from "../common/DamulSearchBox";
 import { getUser } from "@/service/user";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Command, CommandInput, CommandItem, CommandList } from "../ui/command";
+import DamulInfiniteScrollList from "../common/DamulInfiniteScrollList";
+import { UserSearchResult } from "@/types/profile";
+import UserSearchInfiniteScroll from "./UserSearchInfiniteScroll";
 
 interface ProfileBannerProps {
   nickname: string;
@@ -17,25 +18,10 @@ const ProfileBanner = ({
   imageUrl,
   bgImageUrl,
 }: ProfileBannerProps) => {
-  const [searchKeyword, setSearchKeyword] = useState<string>("");
-  const nav = useNavigate();
-
-  const handleSearch = async (nickname: string) => {
-    const response = await getUser(nickname);
-    if (response) {
-      nav(`/profile/${response.data.id}/info`);
-    }
-  };
-
   return (
     <div>
-      <DamulSearchBox
-        className="rounded-none bg-normal-50 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-        placeholder="유저 검색"
-        onButtonClick={() => handleSearch(searchKeyword)}
-        inputValue={searchKeyword}
-        setInputValue={setSearchKeyword}
-      />
+      <UserSearchInfiniteScroll />
+
       <div className="relative w-full h-44 select-none">
         <img
           src={bgImageUrl ? bgImageUrl : defaultProfileBg}

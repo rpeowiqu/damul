@@ -17,17 +17,20 @@ const ProfileBookmarkPage = () => {
   const { user } = useOutletContext();
   const [sortType, setSortType] = useState("date");
 
-  const fetchData = async (pageParam: number) => {
-    const response = await getBookmarks(user!, {
-      cursor: pageParam,
-      size: 5,
-    });
-    console.log(response);
-    if (response?.status === 204) {
-      return { data: [], meta: { nextCursor: null, hasNext: false } };
-    }
+  const fetchBookmarks = async (pageParam: number) => {
+    try {
+      const response = await getBookmarks(parseInt(user.userId), {
+        cursor: pageParam,
+        size: 5,
+      });
+      if (response?.status === 204) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
 
-    return response?.data;
+      return response?.data;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -69,7 +72,7 @@ const ProfileBookmarkPage = () => {
 
       {/* <DamulInfiniteScrollList
         queryKey={["bookMarks"]}
-        fetchFn={fetchData}
+        fetchFn={fetchBookmarks}
         renderItems={(item: FeedCardProps) => (
           <FeedCard key={item.id} {...item} />
         )}

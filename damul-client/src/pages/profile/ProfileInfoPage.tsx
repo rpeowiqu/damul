@@ -43,11 +43,10 @@ const ProfileInfoPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProfileDetail = async () => {
       try {
         const response = await getProfileDetail(parseInt(user.userId));
         if (response) {
-          console.log(response.data);
           setProfileInfo(response.data);
         }
       } catch (error) {
@@ -57,7 +56,7 @@ const ProfileInfoPage = () => {
       }
     };
 
-    fetchData();
+    fetchProfileDetail();
   }, [user]);
 
   if (isLoading) {

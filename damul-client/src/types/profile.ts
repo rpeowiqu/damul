@@ -5,6 +5,12 @@ export interface ProfileHeader {
   profileBackgroundImageUrl: string;
 }
 
+export interface UserSearchResult {
+  userId: number;
+  nickname: string;
+  profileImageUrl: string;
+}
+
 export interface FoodPreference {
   categoryId: number;
   categoryName: string;

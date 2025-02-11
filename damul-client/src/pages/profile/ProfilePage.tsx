@@ -43,7 +43,7 @@ const ProfilePage = () => {
       return;
     }
 
-    const fetchData = async () => {
+    const fetchHeader = async () => {
       try {
         const response = await getProfileHeader(parseInt(userId));
         if (response) {
@@ -56,7 +56,7 @@ const ProfilePage = () => {
       }
     };
 
-    fetchData();
+    fetchHeader();
   }, [userId]);
 
   if (isLoading) {
