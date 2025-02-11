@@ -51,6 +51,8 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final UserRepository userRepository;
+    private final ChatRoomRepository chatRoomRepository;
+
     private final S3Service s3Service;
 
 
@@ -213,7 +215,8 @@ public class PostServiceImpl implements PostService {
 
 
         // 채팅방 정보 조회
-//        ChatRoom chatRoom = ChatRoomRepository
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPostId(postId)
+
 
 
         // 댓글 목록 조회

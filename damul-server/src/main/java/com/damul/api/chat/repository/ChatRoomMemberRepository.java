@@ -43,5 +43,5 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
 
     List<ChatRoomMember> findAllByUserId(int id);
 
-    int findChatRoomIdByPostId(int postId);
+
 }
