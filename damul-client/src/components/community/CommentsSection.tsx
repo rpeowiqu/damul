@@ -2,24 +2,24 @@ import CommentItem from "./CommentItem";
 import { Comment } from "@/types/community";
 
 interface CommentsSectionProps {
-  recipeId: string;
+  id: string;
   comments: Comment[];
   onReply: (_comment: Comment) => void;
-  currentMemberNum?: number;
-  maxMemberSize?: number;
+  currentChatNum?: number;
+  chatSize?: number;
   status?: string;
-  type?: string;
-  fetchRecipeDetail: () => void;
+  type: string;
+  fetchDetailData: () => void;
 }
 const CommentsSection = ({
-  recipeId,
+  id,
   comments = [],
   onReply,
-  currentMemberNum,
-  maxMemberSize,
+  currentChatNum,
+  chatSize,
   status,
   type,
-  fetchRecipeDetail,
+  fetchDetailData,
 }: CommentsSectionProps) => {
   // 최상위 댓글(대댓글이 아닌 댓글)만 필터링
   const topLevelComments = comments.filter((c) => !c.parentId);
@@ -27,11 +27,11 @@ const CommentsSection = ({
   const StatusMarker = () =>
     status === "ACTIVE" ? (
       <div className="content-center bg-positive-200 px-3 rounded-full cursor-pointer">
-        채팅방 참여하기 {currentMemberNum}/{maxMemberSize}
+        채팅방 참여하기 {currentChatNum}/{chatSize}
       </div>
     ) : (
       <div className="content-center bg-neutral-300 px-3 rounded-full cursor-pointer">
-        채팅방 참여하기 {currentMemberNum}/{maxMemberSize}
+        채팅방 참여하기 {currentChatNum}/{chatSize}
       </div>
     );
 
@@ -47,11 +47,12 @@ const CommentsSection = ({
           return (
             <CommentItem
               key={comment.id}
-              recipeId={recipeId}
+              id={id}
               comment={comment}
               replies={replies}
               onReply={onReply}
-              fetchRecipeDetail={fetchRecipeDetail}
+              fetchDetailData={fetchDetailData}
+              type={type}
             />
           );
         })}

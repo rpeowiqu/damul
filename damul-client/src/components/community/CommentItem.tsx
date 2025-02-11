@@ -4,31 +4,41 @@ import ReplyItem from "./ReplyItem";
 import { Comment } from "@/types/community";
 import { formatDate } from "@/utils/date";
 import { deleteRecipeComment } from "@/service/recipe";
+import { deletePostComment } from "@/service/market";
 
 interface CommentItemProps {
-  recipeId: string;
+  id: string;
   comment: Comment;
   replies: Comment[];
   onReply: (_comment: Comment) => void;
-  fetchRecipeDetail: () => void;
+  fetchDetailData: () => void;
+  type: string;
 }
 const CommentItem = ({
-  recipeId,
+  id,
   comment,
   replies,
   onReply,
-  fetchRecipeDetail
+  fetchDetailData,
+  type,
 }: CommentItemProps) => {
   const deleteComment = async (commentId: number) => {
     const isConfirmed = window.confirm("정말로 댓글을 삭제하시겠습니까?");
+    console.log("CommentItem id 값:", id);
+    // console.log("CommentItem type 값:", type);
 
     if (!isConfirmed) {
       return;
     }
+
     try {
-      const response = await deleteRecipeComment(recipeId, commentId);
+      const response =
+        type === "recipe"
+          ? await deleteRecipeComment({ recipeId: id, commentId })
+          : await deletePostComment({ postId: id, commentId });
+
       console.log(response);
-      fetchRecipeDetail();
+      fetchDetailData();
     } catch (error) {
       console.error(error);
     }
@@ -71,11 +81,11 @@ const CommentItem = ({
       {replies.map((reply) => (
         <ReplyItem
           key={reply.id}
-          recipeId={recipeId}
+          id={id}
           comment={comment}
           reply={reply}
           onReply={onReply}
-          fetchRecipeDetail={fetchRecipeDetail}
+          fetchDetailData={fetchDetailData}
         />
       ))}
     </div>

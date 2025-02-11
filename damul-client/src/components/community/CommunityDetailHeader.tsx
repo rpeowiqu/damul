@@ -9,7 +9,7 @@ interface RecipeHeaderProps {
   type: string;
   status?: string;
   bookmarked?: boolean;
-  recipeId: string;
+  recipeId?: string;
 }
 const CommunityDetailHeader = ({
   title,
@@ -45,7 +45,7 @@ const CommunityDetailHeader = ({
         모집중
       </div>
     ) : (
-      <div className="flex content-center bg-negative-200 text-xs py-0.5 px-2 rounded-full">
+      <div className="flex content-center bg-neutral-300 text-xs py-0.5 px-2 rounded-full">
         모집완료
       </div>
     );
@@ -77,7 +77,9 @@ const CommunityDetailHeader = ({
       ) : (
         <div className="flex flex-col justify-between items-end">
           <StatusMarker />
-          <p className="text-xs text-neutral-500">{createdAt}</p>
+          <p className="text-xs text-neutral-500">
+            {createdAt.split("T")[0] + " " + createdAt.split("T")[1]}
+          </p>
         </div>
       )}
     </div>

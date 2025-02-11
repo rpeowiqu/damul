@@ -55,35 +55,32 @@ export const deletePost = async (postId: string | undefined) => {
 // 게시글 댓글 작성
 export const postPostComment = async ({
   postId,
-  authorId,
   comment,
   parentId,
 }: {
   postId: string;
   authorId: string;
   comment: string;
-  parentId?: string;
+  parentId?: number;
 }) => {
-  const CommentCreate: Record<string, any> = { authorId, comment };
-
-  if (parentId) {
-    CommentCreate.parentId = parentId;
-  }
-
   return apiRequest(() =>
     apiClient.post(`posts/${postId}/comments`, {
-      CommentCreate,
+      comment,
+      ...(parentId !== undefined && { parentId }), // parentId가 있을 경우에만 추가
     }),
   );
 };
 
 // 게시글  댓글 삭제
-export const deletePostComment = async (
-  recipeId: string,
-  commentId: number,
-) => {
+export const deletePostComment = async ({
+  postId,
+  commentId,
+}: {
+  postId: string;
+  commentId: number;
+}) => {
   return apiRequest(() =>
-    apiClient.delete(`/posts/${recipeId}/comments/${commentId}`),
+    apiClient.delete(`/posts/${postId}/comments/${commentId}`),
   );
 };
 

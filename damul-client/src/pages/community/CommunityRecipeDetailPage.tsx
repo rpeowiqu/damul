@@ -6,7 +6,7 @@ import ContentSection from "@/components/community/ContentSection";
 import IngredientsSection from "@/components/community/IngredientsSection";
 import CookingOrdersSection from "@/components/community/CookingOrderSection";
 import CommentsSection from "@/components/community/CommentsSection";
-import FixedCommentInput from "@/components/community/FixedCommentInfo";
+import FixedCommentInfo from "@/components/community/FixedCommentInfo";
 import { getRecipeDetail } from "@/service/recipe";
 
 interface Ingredient {
@@ -76,13 +76,9 @@ const CommunityRecipeDetailPage = () => {
   const [data, setData] = useState<RecipeDetail>(initialRecipeDetail);
 
   const fetchRecipeDetail = async () => {
-    try {
-      const response = await getRecipeDetail(recipeId);
-      console.log(response);
-      setData(response?.data as RecipeDetail);
-    } catch (error) {
-      console.error(error);
-    }
+    const response = await getRecipeDetail(recipeId);
+    console.log(response);
+    setData(response?.data as RecipeDetail);
   };
 
   useEffect(() => {
@@ -124,21 +120,22 @@ const CommunityRecipeDetailPage = () => {
         <IngredientsSection ingredients={data.ingredients} />
         <CookingOrdersSection cookingOrders={data.cookingOrders} />
         <CommentsSection
-          recipeId={data.recipeId}
+          id={data.recipeId}
           comments={data.comments}
           onReply={(comment) => setReplyingTo(comment)}
           type="recipe"
-          fetchRecipeDetail={fetchRecipeDetail}
+          fetchDetailData={fetchRecipeDetail}
         />
       </main>
-      <FixedCommentInput
-        recipeId={recipeId || ""}
+      <FixedCommentInfo
+        id={recipeId || ""}
         replyingTo={replyingTo}
         setReplyingTo={setReplyingTo}
         comment={comment}
         setComment={setComment}
         cancelReply={cancelReply}
-        fetchRecipeDetail={fetchRecipeDetail}
+        fetchDetailData={fetchRecipeDetail}
+        type="recipe"
       />
     </div>
   );

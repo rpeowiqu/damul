@@ -89,10 +89,13 @@ export const postRecipeComment = async ({
 };
 
 // 레시피  댓글 삭제
-export const deleteRecipeComment = async (
-  recipeId: string,
-  commentId: number,
-) => {
+export const deleteRecipeComment = async ({
+  recipeId,
+  commentId,
+}: {
+  recipeId: string;
+  commentId: number;
+}) => {
   return apiRequest(() =>
     apiClient.delete(`/recipes/${recipeId}/comments/${commentId}`),
   );

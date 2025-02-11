@@ -26,6 +26,7 @@ interface PostItem {
   authorId: number;
   authorName: string;
   status: string;
+  viewCnt: number;
 }
 
 const CommunityMarketMainPage = () => {
@@ -132,7 +133,7 @@ const CommunityMarketMainPage = () => {
             createdAt={item.createdAt}
             authorId={item.authorId}
             authorName={item.authorName}
-            viewCnt={20}
+            viewCnt={item.viewCnt}
             status={item.status}
           />
         )}
