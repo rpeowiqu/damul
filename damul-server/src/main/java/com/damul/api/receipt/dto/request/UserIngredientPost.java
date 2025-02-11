@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -11,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserIngredientPost {
 
-    private String purchaseAt;
+    private LocalDate purchaseAt;
     private String storeName;
     private List<RegisterIngredientList> userIngredients;
 

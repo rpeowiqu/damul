@@ -1,6 +1,8 @@
 package com.damul.api.user.service;
 
 import com.damul.api.common.dto.response.CreateResponse;
+import com.damul.api.common.scroll.dto.request.ScrollRequest;
+import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
 import com.damul.api.user.dto.response.UserList;
@@ -20,5 +22,5 @@ public interface UserService {
                        MultipartFile backgroundImage);
 
     // 사용자 목록 조회 및 검색
-    List<UserList> getSearchUserList(String keyword);
+    ScrollResponse<UserList> getSearchUserList(int cursor, int size, String keyword);
 }

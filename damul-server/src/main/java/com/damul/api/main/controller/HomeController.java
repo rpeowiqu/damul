@@ -9,6 +9,8 @@ import com.damul.api.main.dto.response.HomeSuggestedResponse;
 import com.damul.api.main.dto.response.IngredientResponse;
 import com.damul.api.main.dto.response.SelectedIngredientList;
 import com.damul.api.main.service.HomeService;
+import com.damul.api.receipt.dto.request.UserIngredientPost;
+import com.damul.api.receipt.service.UserReceiptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.util.List;
 public class HomeController {
 
     private final HomeService homeService;
+    private final UserReceiptService userReceiptService;
 
     @GetMapping
     public ResponseEntity<?> getUserIngredients(@CurrentUser UserInfo user) {
@@ -96,6 +99,19 @@ public class HomeController {
         homeService.updateQuantity(userIngredientId, userIngredientUpdate);
         log.info("유저 식자재양 수정 성공");
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/ingredients/register")
+    public ResponseEntity<?> registerIngredients(
+            @CurrentUser UserInfo user,
+            @RequestBody UserIngredientPost request
+    ) {
+        log.info("컨트롤러: 식자재 등록 시작 - userId: {}", user.getId());
+
+        userReceiptService.registerIngredients(user.getId(), request);
+
+        log.info("컨트롤러: 식자재 등록 완료 - userId: {}", user.getId());
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/ingredients/{userIngredientId}")

@@ -54,7 +54,6 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
         HAVING COUNT(DISTINCT ui.userIngredientId) > 0
         ORDER BY COUNT(DISTINCT ui.userIngredientId) * 1.0 / COUNT(DISTINCT ri.id) DESC,
                  r.likeCnt * 0.3 DESC
-        LIMIT 5
     """)
     List<Recipe> findRecommendedRecipes(@Param("userId") int userId);
 

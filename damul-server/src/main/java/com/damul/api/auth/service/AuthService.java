@@ -9,6 +9,7 @@ import com.damul.api.auth.entity.Terms;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
+import com.damul.api.auth.jwt.TokenService;
 import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.util.CookieUtil;
@@ -47,6 +48,7 @@ public class AuthService {
     @Value("${admin.password}")
     private String hashedAdminPassword;
 
+    private final TokenService tokenService;
     private final AuthRepository authRepository;
     private final UserRepository userRepository;
     private final TermsRepository termsRepository;
@@ -85,7 +87,7 @@ public class AuthService {
             if (accessTokenCookie.isPresent()) {
                 String accessToken = accessTokenCookie.get().getValue();
                 String email = jwtTokenProvider.getUserEmailFromToken(accessToken);
-                removeRefreshToken(email);
+                tokenService.removeRefreshToken(email);
             }
 
             cookieUtil.deleteCookie(response, "access_token");
@@ -249,20 +251,5 @@ public class AuthService {
                 (int) jwtTokenProvider.getRefreshTokenExpire() / 1000);
 
         log.info("관리자 로그인 성공: {}", admin.getEmail());
-    }
-
-    public String findRefreshToken(String userEmail) {
-        return redisTemplate.opsForValue().get("RT:" + userEmail);
-    }
-
-    public void removeRefreshToken(String userEmail) {
-        redisTemplate.delete("RT:" + userEmail);
-    }
-
-    public boolean validateRefreshToken(String userEmail, String refreshToken) {
-        log.info("refresh token: {}", refreshToken);
-        String storedRefreshToken = findRefreshToken(userEmail);
-        log.info("storedRefreshToken: {}", storedRefreshToken);
-        return storedRefreshToken != null && storedRefreshToken.equals(refreshToken);
     }
 }

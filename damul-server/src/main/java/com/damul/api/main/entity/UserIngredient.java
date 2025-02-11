@@ -28,13 +28,13 @@ public class UserIngredient {
     @Column(name = "ingredient_quantity", nullable = false)
     private int ingredientQuantity;
 
-    @Column(name = "ingredient_up", nullable = false)
-    private LocalDateTime ingredientUp;
+    @Column(name = "ingredient_up")
+    private LocalDateTime ingredientUp = LocalDateTime.now();;
 
-    @Column(name = "ingredient_name", length = 100, nullable = false)
+    @Column(name = "ingredient_name", length = 100)
     private String ingredientName;
 
-    @Column(name = "expiration_date", nullable = false)
+    @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
 
     @Enumerated(EnumType.STRING)
@@ -56,7 +56,7 @@ public class UserIngredient {
         this.userIngredientId = userIngredientId;
         this.categoryId = categoryId;
         this.ingredientQuantity = ingredientQuantity;
-        this.ingredientUp = ingredientUp;
+        this.ingredientUp = (ingredientUp != null) ? ingredientUp : LocalDateTime.now();  // null 체크 추가
         this.ingredientName = ingredientName;
         this.expirationDate = expirationDate;
         this.ingredientStorage = ingredientStorage;

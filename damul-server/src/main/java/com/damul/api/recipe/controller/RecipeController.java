@@ -7,8 +7,8 @@ import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.user.CurrentUser;
+import com.damul.api.main.dto.response.HomeSuggestedResponse;
 import com.damul.api.recipe.dto.request.RecipeRequest;
-import com.damul.api.recipe.dto.response.FamousRecipe;
 import com.damul.api.recipe.dto.response.RecipeDetail;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.repository.RecipeRepository;
@@ -69,9 +69,9 @@ public class RecipeController {
     @GetMapping("/famous")
     public ResponseEntity<?> getFamous() {
         log.info("인기 급상승 레시피 조회 요청");
-        List<FamousRecipe> topRecipes = recipeService.getFamousRecipe();
-        if(topRecipes == null || topRecipes.isEmpty()) {
-            log.info("인기 급상승 레시피 조회 성공 - 데이터없음: {}", topRecipes.size());
+        HomeSuggestedResponse topRecipes = recipeService.getFamousRecipe();
+        if(topRecipes.getSuggestedRecipes() == null || topRecipes.getSuggestedRecipes().isEmpty()) {
+            log.info("인기 급상승 레시피 조회 성공 - 데이터없음: {}", topRecipes.getSuggestedRecipes().size());
             return ResponseEntity.noContent().build();
         }
         log.info("인기 급상승 레시피 조회 성공");
@@ -80,8 +80,9 @@ public class RecipeController {
 
     // 레시피 작성
     @PostMapping
-    public ResponseEntity<?> addRecipe(@RequestPart("recipeRequest") RecipeRequest recipeRequest,
-                                       @RequestPart("mainImage") MultipartFile mainImage,
+    public ResponseEntity<?> addRecipe(@CurrentUser UserInfo userInfo,
+                                       @RequestPart("recipeRequest") RecipeRequest recipeRequest,
+                                       @RequestPart("thumbnailImage") MultipartFile thumbnailImage,
                                        @RequestPart("cookingImages") List<MultipartFile> cookingImages) {
         log.info("레시피 작성 요청");
 
@@ -96,9 +97,10 @@ public class RecipeController {
             );
         }
 
-        log.info("이미지 {}: 파일명={}, 크기={}bytes, ContentType={}", "main", mainImage.getOriginalFilename(),
-                mainImage.getSize(), mainImage.getContentType());
+        log.info("이미지 {}: 파일명={}, 크기={}bytes, ContentType={}", "main", thumbnailImage.getOriginalFilename(),
+                thumbnailImage.getSize(), thumbnailImage.getContentType());
 
+        CreateResponse createResponse = recipeService.addRecipe(userInfo, recipeRequest, thumbnailImage, cookingImages);
 
         return null;
     }
