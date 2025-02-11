@@ -42,7 +42,6 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
       try {
         const response = await fetchFn();
         setsuggestedRecipe(response.data);
-        console.log(response);
       } catch (err) {
         console.log("레시피 정보를 받지 못했습니다.");
       }
