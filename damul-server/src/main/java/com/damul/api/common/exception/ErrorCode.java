@@ -31,6 +31,7 @@ public enum ErrorCode {
 
     // 레시피 관련 에러
     RECIPE_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 레시피가 존재하지 않습니다."),
+    RECIPE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "레시피 저장에 실패하였습니다."),
 
     // 댓글 관련 에러
     COMMENT_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 댓글이 존재하지 않습니다."),

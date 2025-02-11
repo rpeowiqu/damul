@@ -25,7 +25,4 @@ public class RecipeIngredient {
 
     @Column(name = "unit", length = 10)
     private String unit;
-
-    @Column(name = "ingredient_order", nullable = false)
-    private int ingredientOrder;
 }

@@ -8,6 +8,7 @@ import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
+import com.damul.api.config.service.S3Service;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.*;
 import com.damul.api.recipe.entity.*;
@@ -15,7 +16,6 @@ import com.damul.api.recipe.repository.*;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,8 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -44,6 +43,7 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeCommentRepository recipeCommentRepository;
     private final RecipeBookmarkRepository bookmarkRepository;
     private final RecipeLikeRepository likeRepository;
+    private final S3Service s3Service;
 
     private static final String VIEW_COUNT_KEY = "recipe:view";
     private static final long REDIS_DATA_EXPIRE_TIME = 60 * 60 * 24; // 24시간
@@ -227,7 +227,7 @@ public class RecipeServiceImpl implements RecipeService {
         log.info("재료 목록 조회 시작");
         // 4. 재료 목록 조회
         List<IngredientList> ingredients = recipeIngredientRepository
-                .findByRecipeOrderByIngredientOrder(recipe)
+                .findByRecipe(recipe)
                 .stream()
                 .map(ingredient -> IngredientList.builder()
                         .id(ingredient.getId())
@@ -279,7 +279,7 @@ public class RecipeServiceImpl implements RecipeService {
                 .content(recipe.getContent())
                 .bookmarked(isBookmarked)
                 .liked(isLiked)
-                .createdAt(recipe.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .createdAt(recipe.getCreatedAt())
                 .authorId(recipe.getUser().getId())
                 .authorName(recipe.getUser().getNickname())
                 .profileImageUrl(recipe.getUser().getProfileImageUrl())
@@ -294,9 +294,107 @@ public class RecipeServiceImpl implements RecipeService {
 
     // 레시피 작성
     @Override
-    public void addRecipe(RecipeRequest recipeRequest, MultipartFile thumbnailImage, List<MultipartFile> cookingImages) {
+    @Transactional
+    public CreateResponse addRecipe(UserInfo userInfo, RecipeRequest recipeRequest, MultipartFile thumbnailImage, List<MultipartFile> cookingImages) {
         log.info("레시피 작성 시작");
 
+
+        String thumbnailImageUrl = null;
+        List<String> uploadedStepImageUrls = new ArrayList<>();  // 업로드된 이미지 URL 추적
+
+        try {
+            // 썸네일 이미지 처리
+            if (thumbnailImage != null && !thumbnailImage.isEmpty()) {
+                validateImageFile(thumbnailImage);
+                thumbnailImageUrl = s3Service.uploadFile(thumbnailImage);
+                log.info("썸네일 이미지 업로드 완료 - thumbnailImageUrl: {}", thumbnailImageUrl);
+            }
+
+            if(userInfo == null) {
+                log.error("유저가 존재하지 않습니다.");
+                throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+            }
+
+            User user = userRepository.findById(userInfo.getId()).get();
+
+            log.info("레시피 저장 start");
+            // Recipe 엔티티 생성 및 저장
+            Recipe recipe = Recipe.builder()
+                    .title(recipeRequest.getTitle())
+                    .content(recipeRequest.getContent())
+                    .user(user)
+                    .thumbnailUrl(thumbnailImageUrl)
+                    .build();
+
+            recipeRepository.save(recipe);
+            log.info("레시피 저장 완료");
+
+
+
+            RecipeIngredient recipeIngredient = new RecipeIngredient();
+            log.info("레시피 스텝 처리 start");
+            // 레시피 스텝 처리
+            Map<Integer, MultipartFile> cookingImageMap = new HashMap<>();
+            for (int i = 0; i < cookingImages.size(); i++) {
+                cookingImageMap.put(i + 1, cookingImages.get(i));
+            }
+
+            List<RecipeStep> steps = new ArrayList<>();
+            for (CookingOrderList orderDto : recipeRequest.getCookingOrders()) {
+                RecipeStep step = new RecipeStep();
+                step.setRecipe(recipe);
+                step.setStepNumber(orderDto.getId());
+                step.setContent(orderDto.getContent());
+
+                // 해당 순서(id)에 맞는 이미지 파일 처리
+                MultipartFile imageFile = cookingImageMap.get(orderDto.getId());
+                if (imageFile != null && !imageFile.isEmpty()) {
+                    validateImageFile(imageFile);
+                    String imageUrl = s3Service.uploadFile(imageFile);
+                    uploadedStepImageUrls.add(imageUrl);  // 업로드된 URL 추적
+                    step.setImageUrl(imageUrl);
+                    log.info("스텝 {} 이미지 업로드 완료 - imageUrl: {}", orderDto.getId(), imageUrl);
+                }
+
+                steps.add(step);
+                log.info("RecipeStep 저장 완료, stepId: {}", step.getId());
+            }
+
+            recipeStepRepository.saveAll(steps);
+            log.info("레시피 스텝 저장 완료 - 총 {}개", steps.size());
+
+            List<RecipeIngredient> ingredients = new ArrayList<>();
+            for(IngredientList ingredientList : recipeRequest.getIngredients()) {
+
+            }
+            return new CreateResponse();
+        } catch (Exception e) {
+            log.error("레시피 저장 중 오류 발생", e);
+
+            // 업로드된 이미지들 정리
+            if (thumbnailImageUrl != null) {
+                try {
+                    String thumbnailFileName = s3Service.extractFileNameFromUrl(thumbnailImageUrl);
+                    s3Service.deleteFile(thumbnailFileName);
+                    log.info("썸네일 이미지 삭제 완료");
+                } catch (Exception ex) {
+                    log.error("썸네일 이미지 삭제 실패", ex);
+                }
+            }
+
+            // 업로드된 스텝 이미지들 정리
+            for (String imageUrl : uploadedStepImageUrls) {
+                try {
+                    String fileName = s3Service.extractFileNameFromUrl(imageUrl);
+                    s3Service.deleteFile(fileName);
+                    log.info("스텝 이미지 삭제 완료 - imageUrl: {}", imageUrl);
+                } catch (Exception ex) {
+                    log.error("스텝 이미지 삭제 실패 - imageUrl: {}", imageUrl, ex);
+                }
+            }
+
+           throw new BusinessException(ErrorCode.RECIPE_SAVE_FAILED);
+        }
     }
 
     // 레시피 수정
