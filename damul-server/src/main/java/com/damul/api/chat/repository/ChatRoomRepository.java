@@ -81,4 +81,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
             @Param("userId2") int userId2
     );
 
+
+
 }

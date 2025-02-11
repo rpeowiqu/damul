@@ -21,6 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -38,6 +39,14 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
     private final CookieUtil cookieUtil;
     private final long accessTokenExpire;  // 생성자로 주입
     private final long refreshTokenExpire; // 생성자로 주입
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final List<String> excludedUrls = Arrays.asList(
+            "/api/v1/auth/**",
+            "/favicon.ico",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/ws/**"
+    );
 
 
     @Override
@@ -236,5 +245,14 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
         tokenService.removeRefreshToken(userEmail);
         cookieUtil.deleteCookie(response, "access_token");
         cookieUtil.deleteCookie(response, "refresh_token");
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        boolean shouldNotFilter = excludedUrls.stream()
+                .anyMatch(pattern -> pathMatcher.match(pattern, path));
+        log.debug("JWT 필터 제외 여부 확인 - URI: {}, 제외: {}", path, shouldNotFilter);
+        return shouldNotFilter;
     }
 }
