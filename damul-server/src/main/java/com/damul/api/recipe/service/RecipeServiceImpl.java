@@ -266,7 +266,7 @@ public class RecipeServiceImpl implements RecipeService {
                         .profileImageUrl(comment.getUser().getProfileImageUrl())
                         .comment(comment.getComment())
                         .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
-                        .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                        .createdAt(comment.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
 
@@ -329,9 +329,6 @@ public class RecipeServiceImpl implements RecipeService {
             recipeRepository.save(recipe);
             log.info("레시피 저장 완료");
 
-
-
-            RecipeIngredient recipeIngredient = new RecipeIngredient();
             log.info("레시피 스텝 처리 start");
             // 레시피 스텝 처리
             Map<Integer, MultipartFile> cookingImageMap = new HashMap<>();
@@ -363,6 +360,7 @@ public class RecipeServiceImpl implements RecipeService {
             recipeStepRepository.saveAll(steps);
             log.info("레시피 스텝 저장 완료 - 총 {}개", steps.size());
 
+            log.info("레시피 재료 저장 start");
             List<RecipeIngredient> ingredients = new ArrayList<>();
             for(IngredientList ingredientList : recipeRequest.getIngredients()) {
 
