@@ -88,8 +88,8 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
                     log.info("임시토큰으로 제한적 인증 처리: {}", userInfo.getEmail());
                 } else {
                     // 토큰이 유효하지 않은 경우 로그 및 오류 처리
-                    log.warn("유효하지 않은 임시토큰 감지");
-                    // 필요하다면 추가 보안 조치 (예: 쿠키 삭제 등)
+                    log.warn("유효하지 않은 임시토큰 감지 - 쿠키 삭제");
+                    cookieUtil.deleteCookie(response, "temp_token");
                 }
             }
 
