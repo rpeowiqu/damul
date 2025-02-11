@@ -14,3 +14,15 @@ export interface IngredientData {
   roomTemp: Ingredient[];
   expiringSoon?: Ingredient[];
 }
+
+export interface RegisterIngredientData {
+  purchaseAt: string;
+  storeName: string;
+  userIngredients: {
+    ingredientName: "string";
+    categoryId: number;
+    productPrice: number;
+    expirationDate: "string";
+    ingredientStorage: "FREEZER" | "FRIDGE" | "ROOM_TEMP";
+  }[];
+}
