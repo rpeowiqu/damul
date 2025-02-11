@@ -100,7 +100,7 @@ const CommunityRecipeDetailPage = () => {
           title={data.title}
           createdAt={data.createdAt}
           bookmarked={data.bookmarked}
-          recipeId={data.recipeId}
+          id={data.recipeId}
           type="recipe"
         />
         <AuthorInfo

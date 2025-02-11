@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import BookMarkIcon from "../svg/BookMarkIcon";
 import { postRecipeBookMark } from "@/service/recipe";
 import { formatDate } from "@/utils/date";
+import { putPostStatusChange } from "@/service/market";
 
 interface RecipeHeaderProps {
   title: string;
@@ -9,7 +10,7 @@ interface RecipeHeaderProps {
   type: string;
   status?: string;
   bookmarked?: boolean;
-  recipeId?: string;
+  id?: string;
 }
 const CommunityDetailHeader = ({
   title,
@@ -17,9 +18,10 @@ const CommunityDetailHeader = ({
   type,
   status,
   bookmarked,
-  recipeId,
+  id,
 }: RecipeHeaderProps) => {
   const [isBookmarked, setIsBookmarked] = useState(bookmarked);
+  const [isStatusActive, setIsStatusActive] = useState(status);
 
   useEffect(() => {
     setIsBookmarked(bookmarked);
@@ -27,7 +29,7 @@ const CommunityDetailHeader = ({
 
   const bookmarkRecipe = async () => {
     try {
-      const response = await postRecipeBookMark(recipeId);
+      const response = await postRecipeBookMark({ recipeId: id });
       console.log(response?.data);
       if (response?.data) {
         setIsBookmarked(true);
@@ -38,11 +40,27 @@ const CommunityDetailHeader = ({
       console.error(error);
     }
   };
+  const changeStatus = async () => {
+    try {
+      const response = await putPostStatusChange({ postId: id });
+      console.log(response?.data);
+      setIsStatusActive("COMPLETED");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const StatusMarker = () =>
-    status === "ACTIVE" ? (
+    status === "COMPLETED" ? (
       <div className="flex content-center bg-positive-200 text-xs py-0.5 px-2 rounded-full">
         모집중
+      </div>
+    ) : "1" === "1" ? (
+      <div
+        className="flex content-center bg-negative-200 text-xs py-0.5 px-2 rounded-full cursor-pointer"
+        onClick={changeStatus}
+      >
+        모집 완료하기
       </div>
     ) : (
       <div className="flex content-center bg-neutral-300 text-xs py-0.5 px-2 rounded-full">

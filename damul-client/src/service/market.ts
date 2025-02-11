@@ -85,6 +85,10 @@ export const deletePostComment = async ({
 };
 
 // 게시글 현황 변경
-export const putPostStatusChange = async (postId: string) => {
+export const putPostStatusChange = async ({
+  postId,
+}: {
+  postId: string | undefined;
+}) => {
   return apiRequest(() => apiClient.put(`/posts/${postId}/status`));
 };

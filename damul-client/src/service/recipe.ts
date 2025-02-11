@@ -58,7 +58,11 @@ export const postRecipeLike = async (recipeId: string | undefined) => {
 };
 
 // 레시피 북마크
-export const postRecipeBookMark = async (recipeId: string | undefined) => {
+export const postRecipeBookMark = async ({
+  recipeId,
+}: {
+  recipeId: string | undefined;
+}) => {
   return apiRequest(() => apiClient.post(`recipes/${recipeId}/bookmarks`));
 };
 

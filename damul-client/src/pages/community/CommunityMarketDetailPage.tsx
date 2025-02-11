@@ -80,6 +80,7 @@ const CommunityMarketDetailPage = () => {
         title={data.title}
         createdAt={data.createdAt}
         status={data.status}
+        id={data.id}
         type="market"
       />
       <AuthorInfo

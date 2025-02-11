@@ -12,10 +12,9 @@ const ContentSection = ({
 }: ContentSectionProps) => {
   return (
     <>
-      <Image
-        src={contentImageUrl}
-        className="w-full h-64 object-cover rounded-lg"
-      />
+      {contentImageUrl && (
+        <Image src={contentImageUrl} className="w-auto h-auto rounded-lg" />
+      )}
       <div className="py-3 text-start">
         {type === "recipe" ? (
           <>
