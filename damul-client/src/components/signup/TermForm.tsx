@@ -1,74 +1,67 @@
-import { FormEvent, useState, useEffect } from "react";
+import {
+  FormEvent,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import DamulButton from "../common/DamulButton";
 import DamulModal from "../common/DamulModal";
-import termList from "@/constants/terms";
-import { SignUpFormProps } from "@/pages/signup/SignUpPage";
+import useCloseOnBack from "@/hooks/useCloseOnBack";
+import { Term } from "@/pages/signup/SignUpPage";
 
-const checkList = [
-  {
-    id: "checkAge",
-    label: "(필수) 만 14세 이상입니다.",
-  },
-  {
-    id: "checkService",
-    label: "(필수) 서비스 이용약관에 동의",
-  },
-  {
-    id: "checkPrivacy",
-    label: "(필수) 개인정보 수집이용에 동의",
-  },
-  {
-    id: "checkPromotion",
-    label: "(선택) 홍보 및 마케팅 이용에 동의",
-  },
-  {
-    id: "checkMarketing",
-    label: "(선택) 마케팅 개인정보 제3자 제공 동의",
-  },
-];
+export interface TermsFormProps {
+  selectBit: number;
+  setSelectBit: Dispatch<SetStateAction<number>>;
+  terms: Term[];
+  onNext: () => void;
+}
 
-const TermsForm = ({ userInput, setUserInput, onNext }: SignUpFormProps) => {
+const TermsForm = ({
+  selectBit,
+  setSelectBit,
+  terms,
+  onNext,
+}: TermsFormProps) => {
   const [infoText, setInfoText] = useState<string>("");
-
-  // 모달 관련
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useCloseOnBack();
   const [termContent, setTermContent] = useState<string>("");
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 필수 항목(1, 2, 3번)이 모두 체크되었는지 확인
-    const targetBit = (1 << 3) - 1;
-
-    if ((userInput.selectBit & targetBit) !== targetBit) {
-      setInfoText("필수 항목을 모두 체크해 주세요.");
-      return;
+    if (checkRequired()) {
+      onNext();
     }
-
-    onNext?.();
   };
 
   const handleAllCheckChange = (checked: boolean) => {
     if (checked) {
-      setUserInput({ ...userInput, selectBit: (1 << checkList.length) - 1 });
+      setSelectBit((1 << terms.length) - 1);
     } else {
-      setUserInput({ ...userInput, selectBit: 0 });
+      setSelectBit(0);
     }
   };
 
   const handleCheckChange = (index: number) => {
-    if (userInput.selectBit & (1 << index)) {
-      setUserInput({
-        ...userInput,
-        selectBit: userInput.selectBit & ~(1 << index),
-      });
+    if (selectBit & (1 << index)) {
+      setSelectBit(selectBit & ~(1 << index));
     } else {
-      setUserInput({
-        ...userInput,
-        selectBit: userInput.selectBit | (1 << index),
-      });
+      setSelectBit(selectBit | (1 << index));
+    }
+  };
+
+  const checkRequired = () => {
+    // 필수 항목(1, 2, 3번)이 모두 체크되었는지 확인
+    const requiredBit = (1 << 3) - 1;
+    if ((selectBit & requiredBit) === requiredBit) {
+      setInfoText("");
+      return true;
+    } else {
+      setInfoText("필수 항목을 모두 체크해 주세요.");
+      return false;
     }
   };
 
@@ -76,24 +69,28 @@ const TermsForm = ({ userInput, setUserInput, onNext }: SignUpFormProps) => {
     setIsOpen(termContent ? true : false);
   }, [termContent]);
 
+  useEffect(() => {
+    checkRequired();
+  }, [selectBit]);
+
   return (
-    <div className="px-10">
-      <h1 className="text-xl font-black text-normal-700 mt-10">
+    <div className="pt-10">
+      <h1 className="text-lg sm:text-xl font-black text-normal-700">
         서비스 이용약관에 동의해 주세요.
       </h1>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-20 mt-16">
-        <div>
+      <form onSubmit={onSubmit} className="flex flex-col gap-16 mt-16">
+        <div className="relative">
           <div className="flex items-center space-x-3">
             <Checkbox
               id="checkAll"
               className="rounded-full"
-              checked={userInput.selectBit === (1 << checkList.length) - 1}
+              checked={selectBit === (1 << terms.length) - 1}
               onCheckedChange={handleAllCheckChange}
             />
             <Label
               htmlFor="checkAll"
-              className="text-normal-700 text-lg font-bold"
+              className="text-normal-700 text-base sm:text-lg font-bold"
             >
               네, 모두 동의합니다.
             </Label>
@@ -102,25 +99,25 @@ const TermsForm = ({ userInput, setUserInput, onNext }: SignUpFormProps) => {
           <hr className="my-5" />
 
           <div className="flex flex-col gap-3">
-            {checkList.map((item, index) => {
+            {terms.map((item, index) => {
               return (
                 <div className="flex items-center space-x-3" key={item.id}>
                   <Checkbox
-                    id={item.id}
+                    id={String(item.id)}
                     className="rounded-full"
-                    checked={(userInput.selectBit & (1 << index)) !== 0}
+                    checked={(selectBit & (1 << index)) !== 0}
                     onCheckedChange={() => handleCheckChange(index)}
                   />
                   <div className="flex justify-between w-full">
                     <Label
-                      htmlFor={item.id}
-                      className="text-normal-700 text-base"
+                      htmlFor={String(item.id)}
+                      className="text-normal-700 text-sm sm:text-base"
                     >
-                      {item.label}
+                      {item.title}
                     </Label>
                     <p
-                      className="text-normal-300 cursor-pointer"
-                      onClick={() => setTermContent(termList[index])}
+                      className="text-sm sm:text-base text-normal-300 cursor-pointer"
+                      onClick={() => setTermContent(terms[index].content)}
                     >
                       보기
                     </p>
@@ -130,7 +127,9 @@ const TermsForm = ({ userInput, setUserInput, onNext }: SignUpFormProps) => {
             })}
           </div>
 
-          <p className="text-negative-400 text-sm min-h-5 mt-5">{infoText}</p>
+          <p className="absolute -bottom-16 text-sm text-negative-400">
+            {infoText}
+          </p>
         </div>
 
         <DamulButton type="submit" variant="positive" className="w-full">
@@ -138,7 +137,7 @@ const TermsForm = ({ userInput, setUserInput, onNext }: SignUpFormProps) => {
         </DamulButton>
       </form>
 
-      <p className="text-normal-300 text-sm mt-6">
+      <p className="text-normal-300 text-xs sm:text-sm mt-5">
         ‘선택’ 항목에 동의하지 않아도 서비스 이용이 가능합니다. 개인정보 수집 및
         이용에 대한 동의를 거부할 권리가 있으며, 동의 거부 시 회원제 서비스
         이용이 제한됩니다.
