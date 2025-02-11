@@ -3,10 +3,12 @@ package com.damul.api.recipe.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "recipe_ingredients")
 @Getter
+@Setter
 @NoArgsConstructor
 public class RecipeIngredient {
     @Id
@@ -21,7 +23,7 @@ public class RecipeIngredient {
     private String ingredientName;
 
     @Column(name = "amount", nullable = false, precision = 5, scale = 1)
-    private int amount;
+    private String amount;
 
     @Column(name = "unit", length = 10)
     private String unit;
