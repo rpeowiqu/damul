@@ -32,21 +32,27 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
   >("none");
   const nav = useNavigate();
 
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const newStatus = await checkNickname();
-    if (newStatus === "available") {
-      const response = await signUp(userInfo);
-      if (response?.status === 200) {
-        alert("회원가입 되었습니다.");
-        nav("/home", { replace: true });
+    try {
+      const newStatus = await checkNickname();
+      if (newStatus === "available") {
+        const response = await signUp(userInfo);
+        if (response?.status === 200) {
+          alert("회원가입 되었습니다.");
+          nav("/home", { replace: true });
+          setStatus("none");
+          return;
+        }
       }
+      setStatus(newStatus!);
+    } catch (error) {
+      console.error(error);
     }
-    setStatus(newStatus);
   };
 
-  const handleInput = (
+  const handleInputChange = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
@@ -67,16 +73,28 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
     }
   };
 
+  const handleDuplicationCheck = async () => {
+    try {
+      const newStatus = await checkNickname();
+      setStatus(newStatus!);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const checkNickname = async () => {
     if (!isValidNickname(userInfo.nickname)) {
       return "validLength";
     } else {
-      const response = await checkNicknameDuplication(userInfo.nickname);
-      console.log(response);
-      if (!response?.data) {
-        return "available";
-      } else {
-        return "duplicate";
+      try {
+        const response = await checkNicknameDuplication(userInfo.nickname);
+        if (!response.data) {
+          return "available";
+        } else {
+          return "duplicate";
+        }
+      } catch (error) {
+        console.log(error);
       }
     }
   };
@@ -115,7 +133,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
         </h1>
       </div>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-10 mt-10">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-10 mt-10">
         <div>
           <p className="text-sm text-positive-400 font-bold">
             연동된 이메일 계정
@@ -141,7 +159,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
                 type="text"
                 placeholder="닉네임을 입력해 주세요."
                 value={userInfo.nickname}
-                onChange={handleInput}
+                onChange={handleInputChange}
                 className={clsx(
                   "focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0 text-sm",
                   {
@@ -155,10 +173,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
             <DamulButton
               variant="positive"
               className="text-sm"
-              onClick={async () => {
-                const newStatus = await checkNickname();
-                setStatus(newStatus);
-              }}
+              onClick={handleDuplicationCheck}
             >
               중복 확인
             </DamulButton>
@@ -186,7 +201,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
             className="resize-none focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0 text-sm"
             placeholder="회원님에 대해 자유롭게 소개해 보세요."
             value={userInfo.selfIntroduction}
-            onChange={handleInput}
+            onChange={handleInputChange}
           />
           <p className="absolute right-0 -bottom-5 text-xs">
             {userInfo.selfIntroduction.length} / 255
