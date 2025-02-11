@@ -84,30 +84,37 @@ const SettingPage = () => {
     fetchUserSetting();
   }, []);
 
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const newStatus = await checkNickname();
-    if (newStatus === "available") {
-      const response = await modifyUserSetting(
-        myId,
-        {
-          nickname: userSetting.nickname,
-          selfIntroduction: userSetting.selfIntroduction,
-          accessRange: userSetting.accessRange,
-          warningEnabled: userSetting.warningEnabled,
-        },
-        profileFile,
-        backgroundFile,
-      );
-      if (response?.status === 200) {
-        alert("회원정보가 수정되었습니다.");
+    try {
+      const newStatus = await checkNickname();
+      if (newStatus === "available") {
+        const response = await modifyUserSetting(
+          myId,
+          {
+            nickname: userSetting.nickname,
+            selfIntroduction: userSetting.selfIntroduction,
+            accessRange: userSetting.accessRange,
+            warningEnabled: userSetting.warningEnabled,
+          },
+          profileFile,
+          backgroundFile,
+        );
+        if (response?.status === 200) {
+          alert("회원정보가 변경 되었습니다.");
+          nav("/home", { replace: true });
+          setStatus("none");
+          return;
+        }
       }
+      setStatus(newStatus!);
+    } catch (error) {
+      console.error(error);
     }
-    setStatus(newStatus);
   };
 
-  const handleInput = (
+  const handleInputChange = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
@@ -128,15 +135,28 @@ const SettingPage = () => {
     }
   };
 
+  const handleDuplicationCheck = async () => {
+    try {
+      const newStatus = await checkNickname();
+      setStatus(newStatus!);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const checkNickname = async () => {
     if (!isValidNickname(userSetting.nickname)) {
       return "validLength";
     } else {
-      const response = await checkNicknameDuplication(userSetting.nickname);
-      if (!response?.data) {
-        return "available";
-      } else {
-        return "duplicate";
+      try {
+        const response = await checkNicknameDuplication(userSetting.nickname);
+        if (!response.data) {
+          return "available";
+        } else {
+          return "duplicate";
+        }
+      } catch (error) {
+        console.log(error);
       }
     }
   };
@@ -179,7 +199,7 @@ const SettingPage = () => {
   return (
     <div className="px-6 sm:px-10 py-8">
       <h1 className="text-xl font-black text-normal-700">설정</h1>
-      <form onSubmit={onSubmit} className="flex flex-col gap-10 mt-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-10 mt-3">
         <div>
           <p className="text-sm text-positive-400 font-bold">
             프로필 및 배경 이미지
@@ -275,7 +295,7 @@ const SettingPage = () => {
                 type="text"
                 placeholder="닉네임을 입력해 주세요."
                 value={userSetting.nickname}
-                onChange={handleInput}
+                onChange={handleInputChange}
                 className={clsx(
                   "focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0 text-sm",
                   {
@@ -289,10 +309,7 @@ const SettingPage = () => {
             <DamulButton
               variant="positive"
               className="text-sm"
-              onClick={async () => {
-                const newStatus = await checkNickname();
-                setStatus(newStatus);
-              }}
+              onClick={handleDuplicationCheck}
             >
               중복 확인
             </DamulButton>
@@ -320,7 +337,7 @@ const SettingPage = () => {
             className="resize-none focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0 text-sm"
             placeholder="회원님에 대해 자유롭게 소개해 보세요."
             value={userSetting.selfIntroduction}
-            onChange={handleInput}
+            onChange={handleInputChange}
           />
           <p className="absolute right-0 -bottom-5 text-xs">
             {userSetting.selfIntroduction.length} / 255
