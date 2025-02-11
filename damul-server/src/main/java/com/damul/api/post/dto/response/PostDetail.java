@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -21,7 +22,7 @@ public class PostDetail {
     private PostStatus status;
     private String contentImageUrl;
     private String content;
-    private String createdAt;
+    private LocalDateTime createdAt;
     private int viewCnt;
     private int currentChatNum;
     private int chatSize;

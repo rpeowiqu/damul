@@ -23,13 +23,14 @@ import com.damul.api.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,6 +64,7 @@ public class PostServiceImpl implements PostService {
         List<PostStatus> allStatus = new ArrayList<PostStatus>(Arrays.asList(PostStatus.ACTIVE, PostStatus.COMPLETED));
         List<PostStatus> activeStatus = new ArrayList<PostStatus>(Arrays.asList(PostStatus.ACTIVE));
 
+        Pageable pageable = PageRequest.of(0, size + 1);
 
         // 검색어가 있는데 검색 타입이 없는 경우 예외 처리
         if (keyword != null && searchType == null) {
@@ -72,76 +74,72 @@ public class PostServiceImpl implements PostService {
 
         // 전체 조회 검색 x
         if (searchType == null) {
-            // 정렬 x
-            if (orderBy == null) {
-                // 활성화 x
-                if (status == null) {
-                    log.info("검색x 정렬x 활성화x");
-                    posts = postRepository.findAllPosts(
-                            allStatus, cursor, size + 1
-                    );
-                }
-                // 활성화 o
-                else if (status.equals("active")) {
-                    log.info("검색x 정렬x 활성화o");
-                    posts = postRepository.findAllPosts(
-                            activeStatus, cursor, size + 1
-                    );
-                }
-            }
+//            // 정렬 x
+//            if (orderBy == null) {
+//                // 활성화 x
+//                if (status == null) {
+//                    log.info("검색x 정렬x 활성화x");
+//                    posts = postRepository.findAllPosts(
+//                            allStatus, cursor, pageable
+//                    );
+//                }
+//                // 활성화 o
+//                else if (status.equals("active")) {
+//                    log.info("검색x 정렬x 활성화o");
+//                    posts = postRepository.findAllPosts(
+//                            activeStatus, cursor, pageable
+//                    );
+//                }
+//            }
             // 정렬 o
-            else {
-                // 활성화 x
-                if (status == null) {
-                    log.info("검색x 정렬o 활성화x");
-                    posts = postRepository.findAllWithOrder(
-                            allStatus, cursor, size + 1, orderBy
-                    );
-                }
-                // 활성화 o
-                else if (status.equals("active")) {
-                    log.info("검색x 정렬o 활성화o");
-                    posts = postRepository.findAllWithOrder(
-                            activeStatus, cursor, size + 1, orderBy
-                    );
-                }
+            // 활성화 x
+            if (status == null) {
+                log.info("검색x 정렬o 활성화x");
+                posts = postRepository.findAllWithOrder(
+                        allStatus, cursor, pageable, orderBy
+                );
+            }
+            // 활성화 o
+            else if (status.equals("active")) {
+                log.info("검색x 정렬o 활성화o");
+                posts = postRepository.findAllWithOrder(
+                        activeStatus, cursor, pageable, orderBy
+                );
             }
         }
         // 전체 조회 검색 o
         else {
-            // 정렬 x
-            if (orderBy == null) {
-                // 활성화 x
-                if (status == null) {
-                    log.info("검색o 정렬x 활성화x");
-                    posts = postRepository.findBySearch(
-                            allStatus, cursor, size + 1, searchType, keyword
-                    );
-                }
-                // 활성화 o
-                else if (status.equals("active")) {
-                    log.info("검색o 정렬x 활성화o");
-                    posts = postRepository.findBySearch(
-                            activeStatus, cursor, size + 1, searchType, keyword
-                    );
-                }
-            }
+//            // 정렬 x
+//            if (orderBy == null) {
+//                // 활성화 x
+//                if (status == null) {
+//                    log.info("검색o 정렬x 활성화x");
+//                    posts = postRepository.findBySearch(
+//                            allStatus, cursor, pageable, searchType, keyword
+//                    );
+//                }
+//                // 활성화 o
+//                else if (status.equals("active")) {
+//                    log.info("검색o 정렬x 활성화o");
+//                    posts = postRepository.findBySearch(
+//                            activeStatus, cursor, pageable, searchType, keyword
+//                    );
+//                }
+//            }
             // 정렬 o
-            else {
-                // 활성화 x
-                if (status == null) {
-                    log.info("검색o 정렬o 활성화x");
-                    posts = postRepository.findBySearchWithOrder(
-                            allStatus, cursor, size + 1, orderBy, searchType, keyword
-                    );
-                }
-                // 활성화 o
-                else if (status.equals("active")) {
-                    log.info("검색o 정렬o 활성화o");
-                    posts = postRepository.findBySearchWithOrder(
-                            activeStatus, cursor, size + 1, orderBy, searchType, keyword
-                    );
-                }
+            // 활성화 x
+            if (status == null) {
+                log.info("검색o 정렬o 활성화x");
+                posts = postRepository.findBySearchWithOrder(
+                        allStatus, cursor, pageable, orderBy, searchType, keyword
+                );
+            }
+            // 활성화 o
+            else if (status.equals("active")) {
+                log.info("검색o 정렬o 활성화o");
+                posts = postRepository.findBySearchWithOrder(
+                        activeStatus, cursor, pageable, orderBy, searchType, keyword
+                );
             }
         }
 
@@ -225,7 +223,7 @@ public class PostServiceImpl implements PostService {
                         .profileImageUrl(comment.getUser().getProfileImageUrl())
                         .comment(comment.getComment())
                         .parentId(comment.getParentPostComment() != null ? comment.getParentPostComment().getPostCommentId() : null)
-                        .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                        .createdAt(comment.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
 
@@ -238,9 +236,10 @@ public class PostServiceImpl implements PostService {
                 .authorId(post.getUser().getId())
                 .authorName(post.getUser().getNickname())
                 .profileImageUrl(post.getUser().getProfileImageUrl())
+                .status(post.getStatus())
                 .contentImageUrl(post.getThumbnailUrl())
                 .content(post.getContent())
-                .createdAt(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .createdAt(post.getCreatedAt())
                 .viewCnt(post.getViewCnt())
                 .comments(comments)
                 .build();
