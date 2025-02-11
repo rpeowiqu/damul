@@ -42,4 +42,6 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     int countMembersByRoomId(@Param("roomId") int roomId);
 
     List<ChatRoomMember> findAllByUserId(int id);
+
+    int findChatRoomIdByPostId(int postId);
 }
