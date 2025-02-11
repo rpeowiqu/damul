@@ -47,7 +47,6 @@ const ProfileInfoPage = () => {
       try {
         const response = await getProfileDetail(parseInt(user.userId));
         if (response) {
-          console.log(response.data);
           setProfileInfo(response.data);
         }
       } catch (error) {

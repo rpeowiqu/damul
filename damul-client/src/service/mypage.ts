@@ -2,19 +2,19 @@ import toQueryString from "@/utils/toQueryString";
 import apiClient from "./http";
 
 export const getProfileHeader = (userId: number) => {
-  return () => apiClient.get(`/mypages/${userId}/header`);
+  return apiClient.get(`/mypages/${userId}/header`);
 };
 
 export const getProfileDetail = (userId: number) => {
-  return () => apiClient.get(`/mypages/${userId}/profiles`);
+  return apiClient.get(`/mypages/${userId}/profiles`);
 };
 
 export const getProfileBadges = (userId: number) => {
-  return () => apiClient.get(`/mypages/${userId}/badges`);
+  return apiClient.get(`/mypages/${userId}/badges`);
 };
 
 export const getProfileBadge = (userId: number, badgeId: number) => {
-  return () => apiClient.get(`/mypages/${userId}/badges/${badgeId}`);
+  return apiClient.get(`/mypages/${userId}/badges/${badgeId}`);
 };
 
 export const getMyRecipes = (
@@ -22,7 +22,7 @@ export const getMyRecipes = (
   queryParams: { cursor: number; size: number },
 ) => {
   const queryString = toQueryString(queryParams);
-  return () => apiClient.get(`/mypages/${userId}/recipes?${queryString}`);
+  return apiClient.get(`/mypages/${userId}/recipes?${queryString}`);
 };
 
 export const getBookmarks = (
@@ -30,9 +30,9 @@ export const getBookmarks = (
   queryParams: { cursor: number; size: number },
 ) => {
   const queryString = toQueryString(queryParams);
-  return () => apiClient.get(`/mypages/${userId}/bookmarks?${queryString}`);
+  return apiClient.get(`/mypages/${userId}/bookmarks?${queryString}`);
 };
 
 export const getIngredients = (userId: number) => {
-  return () => apiClient.get(`/mypages/${userId}/ingredients`);
+  return apiClient.get(`/mypages/${userId}/ingredients`);
 };

@@ -62,6 +62,11 @@ export const deleteFollower = (userId: number, followerId: number) => {
   return apiClient.delete(`/users/${userId}/followers/${followerId}`);
 };
 
-export const getUser = (nickname: string) => {
-  return apiClient.get(`/users/${nickname}`);
+export const getUser = (queryParams: {
+  keyword: string;
+  cursor: number;
+  size: number;
+}) => {
+  const queryString = toQueryString(queryParams);
+  return apiClient.get(`/users?${queryString}`);
 };
