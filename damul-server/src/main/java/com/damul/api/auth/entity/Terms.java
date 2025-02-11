@@ -1,16 +1,16 @@
 package com.damul.api.auth.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
+@JsonSerialize
 @Table(name = "terms_and_conditions")
 public class Terms {
     @Id

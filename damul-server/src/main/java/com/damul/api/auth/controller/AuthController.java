@@ -13,6 +13,7 @@ import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.user.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,8 +21,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -71,7 +74,7 @@ public class AuthController {
 
     // 약관 동의 후 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@CookieValue(name = "tempToken", required = true) String tempToken,
+    public ResponseEntity<?> signup(@CookieValue(name = "temp_token", required = true) String tempToken,
                                     @RequestBody SignupRequest signupRequest,
                                     HttpServletResponse response) {
         try {
@@ -90,47 +93,17 @@ public class AuthController {
 
     // 약관 동의 및 닉네임, 이메일 조회
     @GetMapping("/consent")
-    public ResponseEntity<?> getTerms(@CookieValue(name="temp_token", required = true) String tempToken) {
+    @Transactional(readOnly = true)
+    public ResponseEntity<UserConsent> getTerms(@CookieValue(name="temp_token", required = true) String tempToken) {
         log.info("약관 동의 조회 요청");
+        UserConsent consent = authService.getConsent(tempToken);
+        log.info("약관 동의 조회 요청 - Email: {}, Nickname: {}, Terms Count: {}",
+                consent.getEmail(),
+                consent.getNickname(),
+                consent.getTerms().size()
+        );
 
-        // temp_token null이면 클라이언트가 인증되지 않은 상태일 수 있음
-        if (tempToken == null) {
-            log.error("tempToken 존재하지 않습니다.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "인증 토큰이 없습니다."));
-        }
-
-        log.info("닉네임 갖고오기");
-        Claims claims = jwtTokenProvider.getClaims(tempToken);
-        String defaultNickname = claims.get("nickname", String.class);
-        String email = claims.get("email", String.class);
-
-        log.info("닉네임 조회 - nickname: {}", defaultNickname);
-        log.info("이메일 조회 - email: {}", email);
-
-        // 임시토큰 검증
-        if(!jwtTokenProvider.validateToken(tempToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "유효하지 않은 토큰입니다."));
-        }
-
-        // 약관 데이터 조회
-        log.info("약관 데이터 조회 시작");
-        List<Terms> terms = termsRepository.findAll();
-        if(terms.size() == 0 || terms.isEmpty()) {
-            log.info("약관 데이터 조회 성공 - 데이터 없음");
-            return ResponseEntity.noContent().build();
-        }
-
-        log.info("약관 데이터 조회 성공, size: {}", terms.size());
-        UserConsent consent = UserConsent.builder()
-                .email(email)
-                .nickname(defaultNickname)
-                .terms(terms)
-                .build();
-
-
-       return ResponseEntity.ok(consent);
+        return ResponseEntity.ok().body(consent);
     }
 
     // 관리자 로그인
