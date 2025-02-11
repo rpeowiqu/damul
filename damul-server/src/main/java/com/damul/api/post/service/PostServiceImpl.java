@@ -153,10 +153,11 @@ public class PostServiceImpl implements PostService {
             log.info("No posts found in JPA query result");
         } else {
             log.info("Found {} posts in JPA query", posts.size());
-            log.info("First posts data: id={}, title={}, userId={}",
+            log.info("First posts data: id={}, title={}, userId={} viewCnt={}",
                     posts.get(0).getId(),
                     posts.get(0).getTitle(),
-                    posts.get(0).getAuthorId());
+                    posts.get(0).getAuthorId(),
+                    posts.get(0).getViewCnt());
         }
 
         return ScrollUtil.createScrollResponse(posts, cursor, size);
@@ -207,7 +208,7 @@ public class PostServiceImpl implements PostService {
         }
 
         // 게시글 정보 조회
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findByPostIdAndStatusNot(postId, PostStatus.DELETED)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
 
         // 채팅방 정보 확인 (참여중 or 인원수(미참여))
@@ -240,6 +241,7 @@ public class PostServiceImpl implements PostService {
                 .contentImageUrl(post.getThumbnailUrl())
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .viewCnt(post.getViewCnt())
                 .comments(comments)
                 .build();
 
