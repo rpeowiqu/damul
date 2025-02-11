@@ -11,9 +11,9 @@ interface RecipeFeedCardProps {
   createdAt: string;
   authorId: number;
   nickname: string;
-  bookmarked: boolean;
-  likeCnt: number;
-  liked: boolean;
+  bookmarked: boolean | undefined;
+  likeCnt: number | undefined;
+  liked: boolean | undefined;
   viewCnt: number;
 }
 

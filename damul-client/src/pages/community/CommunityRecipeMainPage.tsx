@@ -48,12 +48,17 @@ const CommunityRecipeMainPage = () => {
   };
 
   const fetchItems = async (pageParam: number) => {
-    const response = await getRecipes({
-      cursor: pageParam,
-      size: 5,
-      orderBy: orderType,
-    });
-    return response?.data;
+    try {
+      const response = await getRecipes({
+        cursor: pageParam,
+        size: 5,
+        orderBy: orderType,
+      });
+      console.log(response?.data);
+      return response?.data;
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

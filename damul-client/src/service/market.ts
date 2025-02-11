@@ -1,4 +1,4 @@
-import { apiClient, apiRequest } from "./http";
+import apiClient from "./http";
 
 // 게시글 검색 및 전체조회
 export const getPosts = async ({
@@ -34,22 +34,22 @@ export const getPosts = async ({
     params.append("orderBy", orderBy);
   }
 
-  return apiRequest(() => apiClient.get(`/posts?${params.toString()}`));
+  return apiClient.get(`/posts?${params.toString()}`);
 };
 
 // 게시글 상세조회
 export const getPostDetail = async (postId: string | undefined) => {
-  return apiRequest(() => apiClient.get(`/posts/${postId}`));
+  return apiClient.get(`/posts/${postId}`);
 };
 
 // 게시글 작성
 export const postPost = async () => {
-  return apiRequest(() => apiClient.post("posts"));
+  return apiClient.post("posts");
 };
 
 // 게시글 삭제
 export const deletePost = async (postId: string | undefined) => {
-  return apiRequest(() => apiClient.delete(`/posts/${postId}`));
+  return apiClient.delete(`/posts/${postId}`);
 };
 
 // 게시글 댓글 작성
@@ -59,16 +59,13 @@ export const postPostComment = async ({
   parentId,
 }: {
   postId: string;
-  authorId: string;
   comment: string;
   parentId?: number;
 }) => {
-  return apiRequest(() =>
-    apiClient.post(`posts/${postId}/comments`, {
-      comment,
-      ...(parentId !== undefined && { parentId }), // parentId가 있을 경우에만 추가
-    }),
-  );
+  return apiClient.post(`posts/${postId}/comments`, {
+    comment,
+    ...(parentId !== undefined && { parentId }),
+  });
 };
 
 // 게시글  댓글 삭제
@@ -79,9 +76,7 @@ export const deletePostComment = async ({
   postId: string;
   commentId: number;
 }) => {
-  return apiRequest(() =>
-    apiClient.delete(`/posts/${postId}/comments/${commentId}`),
-  );
+  return apiClient.delete(`/posts/${postId}/comments/${commentId}`);
 };
 
 // 게시글 현황 변경
@@ -90,5 +85,5 @@ export const putPostStatusChange = async ({
 }: {
   postId: string | undefined;
 }) => {
-  return apiRequest(() => apiClient.put(`/posts/${postId}/status`));
+  return apiClient.put(`/posts/${postId}/status`);
 };

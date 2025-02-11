@@ -63,14 +63,18 @@ const CommunityMarketMainPage = () => {
   };
 
   const fetchItems = async (pageParam: number) => {
-    const response = await getPosts({
-      cursor: pageParam,
-      size: 5,
-      orderBy: orderType,
-      status: statusType,
-    });
-    console.log(response?.data);
-    return response?.data;
+    try {
+      const response = await getPosts({
+        cursor: pageParam,
+        size: 5,
+        orderBy: orderType,
+        status: statusType,
+      });
+      console.log(response?.data);
+      return response?.data;
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

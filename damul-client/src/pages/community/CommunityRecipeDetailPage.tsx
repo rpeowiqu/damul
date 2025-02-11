@@ -76,9 +76,13 @@ const CommunityRecipeDetailPage = () => {
   const [data, setData] = useState<RecipeDetail>(initialRecipeDetail);
 
   const fetchRecipeDetail = async () => {
-    const response = await getRecipeDetail(recipeId);
-    console.log(response);
-    setData(response?.data as RecipeDetail);
+    try {
+      const response = await getRecipeDetail(recipeId);
+      console.log(response);
+      setData(response?.data as RecipeDetail);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

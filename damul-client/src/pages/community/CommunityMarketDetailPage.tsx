@@ -57,9 +57,13 @@ const CommunityMarketDetailPage = () => {
   const [data, setData] = useState<PostDetail>(initialPostDetail);
 
   const fetchPostDetail = async () => {
-    const response = await getPostDetail(postId);
-    console.log(response);
-    setData(response?.data as PostDetail);
+    try {
+      const response = await getPostDetail(postId);
+      console.log(response);
+      setData(response?.data as PostDetail);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
