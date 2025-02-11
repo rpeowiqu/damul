@@ -82,5 +82,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
     );
 
 
-    Optional<ChatRoom> findChatRoomByPostId(int postId);
+    Optional<ChatRoom> findChatRoomByPost_PostId(int postId);
 }

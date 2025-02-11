@@ -36,6 +36,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -215,7 +216,7 @@ public class PostServiceImpl implements PostService {
 
 
         // 채팅방 정보 조회
-        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPostId(postId)
+        Optional<ChatRoom> chatRoom = chatRoomRepository.findChatRoomByPost_PostId(postId);
 
 
 
@@ -247,8 +248,8 @@ public class PostServiceImpl implements PostService {
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .viewCnt(post.getViewCnt())
-                .currentChatNum()
-                .chatSize()
+                .currentChatNum(chatRoom.get().getId())
+                .chatSize(chatRoom.get().getMemberLimit())
                 .comments(comments)
                 .build();
     }
