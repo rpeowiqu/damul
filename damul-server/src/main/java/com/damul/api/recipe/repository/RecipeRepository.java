@@ -154,7 +154,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             AND r.deleted = false
             AND (:cursor = 0 OR r.id < :cursor)
             ORDER BY r.id DESC
-            LIMIT :size
             """)
     List<MyRecipeList> findMyRecipes(
             @Param("userId") int userId,

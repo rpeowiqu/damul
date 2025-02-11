@@ -167,6 +167,7 @@ public class RestChatController {
         return ResponseEntity.ok(response);
     }
 
+    // 채팅방 인원 수 변경(현재 인원보다 작게 할 수 없음)
     @PatchMapping("/{roomId}/limit")
     public ResponseEntity<ChatRoomLimitResponse> updateMemberLimit(
             @PathVariable int roomId,
