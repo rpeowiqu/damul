@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserIngredientUpdate {
 
-    private int ingredientquantity;
+    private int ingredientQuantity;
 
 }

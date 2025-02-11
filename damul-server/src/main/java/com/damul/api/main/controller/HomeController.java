@@ -92,7 +92,7 @@ public class HomeController {
             @PathVariable int userIngredientId,
             @RequestBody UserIngredientUpdate userIngredientUpdate
             ) {
-        log.info("유저 식자재양 수정 시작 userIngredientId: {}, userIngredientUpdate: {}", userIngredientId, userIngredientUpdate.toString());
+        log.info("유저 식자재양 수정 시작 userIngredientId: {}, userIngredientUpdate: {}", userIngredientId, userIngredientUpdate.getIngredientQuantity());
         homeService.updateQuantity(userIngredientId, userIngredientUpdate);
         log.info("유저 식자재양 수정 성공");
         return ResponseEntity.ok().build();
