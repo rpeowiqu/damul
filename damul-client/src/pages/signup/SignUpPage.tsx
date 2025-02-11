@@ -28,18 +28,25 @@ const SignUpPage = () => {
     selfIntroduction: "",
   });
   const terms = useRef<Term[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await consent();
-      if (response) {
-        setEmail(response.data.email);
-        setUserInfo({ ...userInfo, nickname: response.data.nickname });
-        terms.current = response.data.terms;
+    const fetchSignUpInfo = async () => {
+      try {
+        const response = await consent();
+        if (response) {
+          setEmail(response.data.email);
+          setUserInfo({ ...userInfo, nickname: response.data.nickname });
+          terms.current = response.data.terms;
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchData();
+    fetchSignUpInfo();
   }, []);
 
   const currentForm = () => {
@@ -64,6 +71,10 @@ const SignUpPage = () => {
         );
     }
   };
+
+  if (isLoading) {
+    return null;
+  }
 
   return <div className="px-6 sm:px-10 py-8">{currentForm()}</div>;
 };

@@ -1,8 +1,8 @@
 import toQueryString from "@/utils/toQueryString";
-import { apiClient, apiRequest } from "./http";
+import apiClient from "./http";
 
 export const getUserSetting = (userId: number) => {
-  return apiRequest(() => apiClient.get(`/users/${userId}/settings`));
+  return apiClient.get(`/users/${userId}/settings`);
 };
 
 export const modifyUserSetting = (
@@ -28,13 +28,11 @@ export const modifyUserSetting = (
     formData.append("backgroundImage", backgroundImage);
   }
 
-  return apiRequest(() => apiClient.put(`/users/${userId}/settings`, formData));
+  return apiClient.put(`/users/${userId}/settings`, formData);
 };
 
 export const checkNicknameDuplication = (nickname: string) => {
-  return apiRequest(() =>
-    apiClient.post("/users/check-nickname", { nickname }),
-  );
+  return apiClient.post("/users/check-nickname", { nickname });
 };
 
 export const getFollowers = (
@@ -42,9 +40,7 @@ export const getFollowers = (
   queryParams: { cursor: number; size: number },
 ) => {
   const queryString = toQueryString(queryParams);
-  return apiRequest(() =>
-    apiClient.get(`/users/${userId}/followers?${queryString}`),
-  );
+  return apiClient.get(`/users/${userId}/followers?${queryString}`);
 };
 
 export const getFollowings = (
@@ -52,24 +48,20 @@ export const getFollowings = (
   queryParams: { cursor: number; size: number },
 ) => {
   const queryString = toQueryString(queryParams);
-  return apiRequest(() =>
-    apiClient.get(`/users/${userId}/followings?${queryString}`),
-  );
+  return apiClient.get(`/users/${userId}/followings?${queryString}`);
 };
 
 export const toggleFollow = (followRequest: {
   userId: number;
   targetId: number;
 }) => {
-  return apiRequest(() => apiClient.post("/users/follows", followRequest));
+  return apiClient.post("/users/follows", followRequest);
 };
 
 export const deleteFollower = (userId: number, followerId: number) => {
-  return apiRequest(() =>
-    apiClient.delete(`/users/${userId}/followers/${followerId}`),
-  );
+  return apiClient.delete(`/users/${userId}/followers/${followerId}`);
 };
 
 export const getUser = (nickname: string) => {
-  return apiRequest(() => apiClient.get(`/users?keyword=${nickname}`));
+  return apiClient.get(`/users/${nickname}`);
 };
