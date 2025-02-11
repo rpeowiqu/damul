@@ -29,7 +29,7 @@ const TermsForm = ({
   const [isOpen, setIsOpen] = useCloseOnBack();
   const [termContent, setTermContent] = useState<string>("");
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (checkRequired()) {
@@ -79,7 +79,7 @@ const TermsForm = ({
         서비스 이용약관에 동의해 주세요.
       </h1>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-16 mt-16">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-16 mt-16">
         <div className="relative">
           <div className="flex items-center space-x-3">
             <Checkbox
