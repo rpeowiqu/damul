@@ -4,15 +4,15 @@ import PlusIcon from "@/components/svg/PlusIcon";
 import { useState } from "react";
 
 const initialData = {
-  purchaseAt: "2021-10-10",
-  storeName: "홈플러스",
+  storeName: "",
+  purchaseAt: "",
   userIngredients: [
     {
-      ingredientName: "양파",
-      productPrice: 1000,
-      categoryId: 1,
-      dueDate: "2021-10-20",
-      ingredientStorage: "FREEZER",
+      ingredientName: "",
+      productPrice: 0,
+      categoryId: 0,
+      dueDate: "",
+      ingredientStorage: "FRIDGE",
     },
   ],
 };
@@ -21,22 +21,47 @@ const HomeIngredientsRegisterPage = () => {
   const [ingredientRegisterData, setIngredientRegisterData] =
     useState(initialData);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setIngredientRegisterData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleResetData = () => {
+    setIngredientRegisterData(initialData);
   };
 
-  const handleIngredientChange = (index, key, value) => {
-    setIngredientRegisterData((prev) => {
-      const updatedIngredients = [...prev.userIngredients];
-      updatedIngredients[index] = {
-        ...updatedIngredients[index],
-        [key]: value,
-      };
-      return { ...prev, userIngredients: updatedIngredients };
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index?: number,
+    field?: string,
+  ) => {
+    const { name, value } = e.target;
+
+    setIngredientRegisterData((prevData) => {
+      if (name === "storeName" || name === "purchaseAt") {
+        return {
+          ...prevData,
+          [name]: value,
+        };
+      }
+
+      if (
+        name === "ingredientName" ||
+        name === "productPrice" ||
+        name === "categoryId" ||
+        name === "dueDate" ||
+        name === "ingredientStorage"
+      ) {
+        const updatedIngredients = [...prevData.userIngredients];
+        if (index !== undefined && field !== undefined) {
+          updatedIngredients[index] = {
+            ...updatedIngredients[index],
+            [field]: value,
+          };
+        }
+
+        return {
+          ...prevData,
+          userIngredients: updatedIngredients,
+        };
+      }
+
+      return prevData;
     });
   };
 
@@ -61,12 +86,20 @@ const HomeIngredientsRegisterPage = () => {
       const updatedIngredients = prev.userIngredients.filter(
         (_, i) => i !== index,
       );
+
+      if (prev.userIngredients.length === 1) {
+        return {
+          ...prev,
+          userIngredients: [...ingredientRegisterData.userIngredients],
+        };
+      }
+
       return { ...prev, userIngredients: updatedIngredients };
     });
   };
 
   const totalAmount = ingredientRegisterData.userIngredients.reduce(
-    (sum, item) => sum + item.productPrice,
+    (sum, item) => sum + (Number(item.productPrice) || 0),
     0,
   );
 
@@ -76,57 +109,70 @@ const HomeIngredientsRegisterPage = () => {
         <button type="button">{"<"}</button>
         <p>식자재 등록하기</p>
       </div>
-      <p className="p-4 text-positive-300 font-bold">
+      <p className="text-positive-300 font-bold p-1">
         오늘은 이런 품목을 구매하셨네요!
       </p>
-      <div className="flex justify-end">
-        <button className="flex items-center justify-end text-normal-300 text-sm gap-1">
+      <div className="flex justify-between">
+        <DamulButton
+          onClick={handleResetData}
+          className="flex bg-white items-center justify-end text-normal-300 text-sm gap-1"
+        >
+          <PlusIcon className="w-6 h-full text-normal-300 fill-normal-200 stroke-2 stroke-normal-200" />
+          <p>초기화</p>
+        </DamulButton>
+        <DamulButton className="flex bg-white items-center justify-end text-normal-300 text-sm gap-1">
           <PlusIcon className="w-6 h-full text-normal-300 fill-normal-200 stroke-2 stroke-normal-200" />
           <p>영수증으로 입력하기</p>
-        </button>
+        </DamulButton>
       </div>
 
-      <div className="my-4 flex flex-col gap-4">
+      <div className="my-4 flex flex-col gap-3">
         <div className="flex w-full gap-2">
           <div className="w-full flex flex-col gap-2">
-            <label htmlFor="shop">매장명</label>
+            <label className="cursor-pointer" htmlFor="storeName">
+              매장명
+            </label>
             <input
               name="storeName"
-              id="shop"
+              id="storeName"
               type="text"
               value={ingredientRegisterData.storeName}
-              onChange={handleInputChange}
+              onChange={handleChange}
               className="border-1 w-full focus:outline-positive-300"
             />
           </div>
           <div className="w-full flex flex-col gap-2">
-            <label>날짜</label>
+            <label className="cursor-pointer" htmlFor="purchaseAt">
+              날짜
+            </label>
             <input
               name="purchaseAt"
               type="date"
               value={ingredientRegisterData.purchaseAt}
-              onChange={handleInputChange}
+              onChange={handleChange}
               className="border-1 focus:outline-positive-300"
             />
           </div>
         </div>
-        <div className="flex flex-col gap-4 h-[200px] overflow-y-auto">
+        <div className="flex flex-col gap-4 h-60 overflow-y-auto">
           {ingredientRegisterData.userIngredients.map((ingredient, index) => (
             <IngredientItem
               key={index}
               ingredient={ingredient}
-              onChange={(key, value) =>
-                handleIngredientChange(index, key, value)
-              }
+              onChange={(e) => handleChange(e, index, e.target.name)}
               onDelete={() => removeIngredient(index)}
             />
           ))}
         </div>
       </div>
       <div className="flex justify-end gap-2 font-bold">
-        총 구매 금액: <span className="text-positive-300">{totalAmount}</span>원
+        총 구매 금액:{" "}
+        <span className="text-positive-300">
+          {totalAmount.toLocaleString()}
+        </span>
+        원
       </div>
-      <div className="flex justify-center p-4">
+      <div className="flex justify-center p-2">
         <DamulButton className="bg-normal-200" onClick={addIngredient}>
           +
         </DamulButton>
