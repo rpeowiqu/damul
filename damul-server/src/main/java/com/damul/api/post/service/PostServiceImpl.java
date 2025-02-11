@@ -3,6 +3,8 @@ package com.damul.api.post.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.entity.ChatRoom;
+import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
@@ -49,6 +51,8 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final UserRepository userRepository;
+    private final ChatRoomRepository chatRoomRepository;
+
     private final S3Service s3Service;
 
 
@@ -131,14 +135,14 @@ public class PostServiceImpl implements PostService {
             if (status == null) {
                 log.info("검색o 정렬o 활성화x");
                 posts = postRepository.findBySearchWithOrder(
-                        allStatus, cursor, pageable, orderBy, searchType, keyword
+                        allStatus, cursor, pageable, searchType, keyword, orderBy
                 );
             }
             // 활성화 o
             else if (status.equals("active")) {
                 log.info("검색o 정렬o 활성화o");
                 posts = postRepository.findBySearchWithOrder(
-                        activeStatus, cursor, pageable, orderBy, searchType, keyword
+                        activeStatus, cursor, pageable, searchType, keyword, orderBy
                 );
             }
         }
@@ -209,7 +213,10 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findByPostIdAndStatusNot(postId, PostStatus.DELETED)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
 
-        // 채팅방 정보 확인 (참여중 or 인원수(미참여))
+
+        // 채팅방 정보 조회
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPostId(postId)
+
 
 
         // 댓글 목록 조회
@@ -227,9 +234,8 @@ public class PostServiceImpl implements PostService {
                         .build())
                 .collect(Collectors.toList());
 
+
         // PostDetail 객체 생성 및 반환
-        // status, 채팅방 인원수, 최대 인원수 필요
-        // currentChatNum, chatSize, commentCnt 필요
         return PostDetail.builder()
                 .id(post.getPostId())
                 .title(post.getTitle())
@@ -241,9 +247,10 @@ public class PostServiceImpl implements PostService {
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .viewCnt(post.getViewCnt())
+                .currentChatNum()
+                .chatSize()
                 .comments(comments)
                 .build();
-
     }
 
 
