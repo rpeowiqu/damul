@@ -99,6 +99,7 @@ public class RecipeController {
         log.info("이미지 {}: 파일명={}, 크기={}bytes, ContentType={}", "main", mainImage.getOriginalFilename(),
                 mainImage.getSize(), mainImage.getContentType());
 
+        recipeService.addRecipe(recipeRequest, mainImage, cookingImages);
 
         return null;
     }

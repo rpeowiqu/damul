@@ -152,6 +152,7 @@ public class RecipeServiceImpl implements RecipeService {
         log.info("시작일 - startDate: {}", startDate);
         log.info("종료일 - endDate: {}", endDate);
 
+        Pageable pageable = PageRequest.of(0, 5);
         List<FamousRecipe> topRecipes = recipeRepository.findTop5LikedRecipes(
             startDate, endDate);
 
