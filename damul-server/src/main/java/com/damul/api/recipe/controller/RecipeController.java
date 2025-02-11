@@ -83,6 +83,23 @@ public class RecipeController {
     public ResponseEntity<?> addRecipe(@RequestPart("recipeRequest") RecipeRequest recipeRequest,
                                        @RequestPart("mainImage") MultipartFile mainImage,
                                        @RequestPart("cookingImages") List<MultipartFile> cookingImages) {
+        log.info("레시피 작성 요청");
+
+        // 각 이미지 파일의 상세 정보 출력
+        for (int i = 0; i < cookingImages.size(); i++) {
+            MultipartFile image = cookingImages.get(i);
+            log.info("이미지 {}: 파일명={}, 크기={}bytes, ContentType={}",
+                    i + 1,
+                    image.getOriginalFilename(),
+                    image.getSize(),
+                    image.getContentType()
+            );
+        }
+
+        log.info("이미지 {}: 파일명={}, 크기={}bytes, ContentType={}", "main", mainImage.getOriginalFilename(),
+                mainImage.getSize(), mainImage.getContentType());
+
+
         return null;
     }
 

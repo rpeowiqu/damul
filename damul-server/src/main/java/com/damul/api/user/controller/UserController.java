@@ -20,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
@@ -122,13 +124,13 @@ public class UserController {
     @GetMapping
     public ResponseEntity<?> search(@RequestParam(required = false) String keyword) {
         log.info("사용자 목록 검색/조회 요청 - keyword: {}", keyword);
-        CreateResponse createResponse = userService.getSearchUserList(keyword);
-        if(createResponse == null) {
+        List<UserList> userList = userService.getSearchUserList(keyword);
+        if(userList == null || userList.isEmpty() || userList.size() == 0) {
             log.info("사용자 목록 검색/조회 완료 - 데이터 없음");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
             log.info("사용자 목록 검색/조회 완료");
-            return ResponseEntity.ok(createResponse);
+            return ResponseEntity.ok(userList);
         }
     }
 }

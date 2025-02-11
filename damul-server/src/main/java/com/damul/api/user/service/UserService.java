@@ -3,7 +3,10 @@ package com.damul.api.user.service;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
+import com.damul.api.user.dto.response.UserList;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface UserService {
     // 닉네임 중복확인
@@ -17,5 +20,5 @@ public interface UserService {
                        MultipartFile backgroundImage);
 
     // 사용자 목록 조회 및 검색
-    CreateResponse getSearchUserList(String keyword);
+    List<UserList> getSearchUserList(String keyword);
 }
