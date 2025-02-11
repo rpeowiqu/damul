@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AxiosResponse } from "axios";
 import Autoplay from "embla-carousel-autoplay";
 
 import {
@@ -9,40 +10,44 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { UserRecipes } from "@/types/recipe";
+import { SuggestedRecipe } from "@/types/recipe";
 import { useNavigate } from "react-router-dom";
 
-const DamulCarousel = () => {
+interface DamulCarouselProps {
+  fetchFn: () => Promise<AxiosResponse>;
+}
+
+const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
 
-  const [suggestedRecipe, setsuggestedRecipe] = useState<UserRecipes>();
+  const [suggestedRecipe, setsuggestedRecipe] = useState<SuggestedRecipe[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!api) {
       return;
     }
-    setCount(suggestedRecipe ? suggestedRecipe.suggestedRecipes.length : 0);
+    setCount(suggestedRecipe ? suggestedRecipe.length : 0);
     setCurrent(api.selectedScrollSnap() + 1);
 
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap() + 1);
     });
-  }, [api, suggestedRecipe?.suggestedRecipes.length]);
+  }, [api, suggestedRecipe?.length]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchRecipeData = async () => {
       try {
-        const response = await fetch("/mocks/home/suggested-recipe-list.json");
-        const data = await response.json();
-        setsuggestedRecipe(data);
-      } catch (err: any) {
-        console.log("레시피 데이터를 받아오지 못했습니다.");
+        const response = await fetchFn();
+        setsuggestedRecipe(response.data);
+        console.log(response);
+      } catch (err) {
+        console.log("레시피 정보를 받지 못했습니다.");
       }
     };
-    fetchData();
+    fetchRecipeData();
   }, []);
 
   return (
@@ -53,34 +58,35 @@ const DamulCarousel = () => {
       className="relative w-full"
     >
       <CarouselContent>
-        {suggestedRecipe?.suggestedRecipes.map((recipe, idx) => (
-          <CarouselItem
-            key={`${idx}-${recipe.recipeId}`}
-            className="h-36 cursor-pointer"
-            onClick={() => {
-              navigate("/community/recipe/1");
-            }}
-          >
-            <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
-              <div className="flex gap-1 ">
-                {recipe.recipeTags.map((tag, index) => {
-                  return (
-                    <div
-                      key={`${index}-${tag.tagId}`}
-                      className="font-thin text-xxs"
-                    >{`#${tag.tagName}`}</div>
-                  );
-                })}
+        {suggestedRecipe.length !== 0 &&
+          suggestedRecipe.map((recipe, idx) => (
+            <CarouselItem
+              key={`${idx}-${recipe.recipeId}`}
+              className="h-36 cursor-pointer"
+              onClick={() => {
+                navigate("/community/recipe/1");
+              }}
+            >
+              <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
+                <div className="flex gap-1 ">
+                  {recipe.recipeTags.map((tag, index) => {
+                    return (
+                      <div
+                        key={`${index}-${tag.tagId}`}
+                        className="font-thin text-xxs"
+                      >{`#${tag.tagName}`}</div>
+                    );
+                  })}
+                </div>
+                <div className="font-bold text-2xl">{recipe.title}</div>
               </div>
-              <div className="font-bold text-2xl">{recipe.title}</div>
-            </div>
-            <img
-              src={recipe.thumbnailUrl}
-              className="object-cover w-full h-full"
-              alt="캐러셀이미지"
-            />
-          </CarouselItem>
-        ))}
+              <img
+                src={recipe.thumbnailUrl}
+                className="object-cover w-full h-full"
+                alt="캐러셀이미지"
+              />
+            </CarouselItem>
+          ))}
       </CarouselContent>
       <div className="absolute flex items-center px-2 py-1 space-x-2 text-sm text-white bottom-2 right-2">
         <CarouselPrevious className="bg-transparent border-2 border-white" />
