@@ -3,6 +3,7 @@ package com.damul.api.main.entity;
 import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.receipt.entity.UserReceipt;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
@@ -33,8 +34,8 @@ public class UserIngredient {
     @Column(name = "ingredient_name", length = 100, nullable = false)
     private String ingredientName;
 
-    @Column(name = "due_date", nullable = false)
-    private LocalDateTime dueDate;
+    @Column(name = "expiration_date", nullable = false)
+    private LocalDateTime expirationDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ingredient_storage", nullable = false)
@@ -46,6 +47,23 @@ public class UserIngredient {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;  // 삭제 상태 필드 추가
 
+    @Builder
+    public UserIngredient(UserReceipt userReciept, int userIngredientId, int categoryId,
+                          int ingredientQuantity, LocalDateTime ingredientUp,
+                          String ingredientName, LocalDateTime expirationDate,
+                          IngredientStorage ingredientStorage, double price) {
+        this.userReciept = userReciept;
+        this.userIngredientId = userIngredientId;
+        this.categoryId = categoryId;
+        this.ingredientQuantity = ingredientQuantity;
+        this.ingredientUp = ingredientUp;
+        this.ingredientName = ingredientName;
+        this.expirationDate = expirationDate;
+        this.ingredientStorage = ingredientStorage;
+        this.price = price;
+        this.isDeleted = false;
+    }
+
     // 논리적 삭제를 위한 메서드
     public void delete() {
         this.isDeleted = true;
@@ -54,4 +72,6 @@ public class UserIngredient {
     public void updateQuantity(int quantity) {
         this.ingredientQuantity = quantity;
     }
+
+
 }

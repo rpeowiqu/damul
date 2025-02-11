@@ -22,7 +22,7 @@ public class UserIngredientList {
     private LocalDate purchaseDate;
 
     public static UserIngredientList from(UserIngredient entity) {
-        LocalDate dueDate = entity.getDueDate().toLocalDate();
+        LocalDate dueDate = entity.getExpirationDate().toLocalDate();
         LocalDate now = LocalDateTime.now().toLocalDate();
 
         long daysBetween = ChronoUnit.DAYS.between(dueDate, now);
