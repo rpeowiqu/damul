@@ -36,7 +36,7 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
     @Query("SELECT new com.damul.api.main.dto.response.HomeIngredientDetail(" +
             "ui.userIngredientId, ui.categoryId, ui.ingredientQuantity, " +
             "ui.ingredientUp, ui.ingredientName, " +
-            "CAST(FUNCTION('DATEDIFF', DATE(ui.dueDate), CURRENT_DATE) AS int)) " +
+            "CAST(FUNCTION('DATEDIFF', DATE(ui.expirationDate), CURRENT_DATE) AS int)) " +
             "FROM UserIngredient ui " +
             "WHERE ui.userIngredientId = :ingredientId " +
             "AND ui.isDeleted = false")
