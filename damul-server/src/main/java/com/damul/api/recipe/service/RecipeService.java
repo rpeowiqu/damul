@@ -34,7 +34,7 @@ public interface RecipeService {
                    MultipartFile thumbnailImage, List<MultipartFile> cookingImages);
 
     // 레시피 수정
-    void updateRecipe(RecipeRequest recipeRequest,
+    void updateRecipe(int recipeId, UserInfo userInfo, RecipeRequest recipeRequest,
                       MultipartFile thumbnailImage, List<MultipartFile> cookingImages);
 
     // 레시피 삭제

@@ -2,10 +2,7 @@ package com.damul.api.recipe.entity;
 
 import com.damul.api.auth.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -28,12 +25,15 @@ public class Recipe {
     @Column(name = "id")
     private int id;
 
+    @Setter
     @Column(name = "title", length=200, nullable = false)
     private String title;
 
+    @Setter
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Setter
     @Column(name = "thumbnail_url", length = 255, nullable = false)
     private String thumbnailUrl;
 
