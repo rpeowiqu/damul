@@ -277,7 +277,7 @@ public class PostServiceImpl implements PostService {
 
         Post savedPost = postRepository.save(post);
         log.info("게시글 작성 완료 - ID: {}", savedPost.getPostId());
-        
+
         // 채팅방 연결
 
         return new CreateResponse(savedPost.getPostId());
@@ -314,7 +314,7 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postRequest.getTitle());
         post.setContent(postRequest.getContent());
         post.setThumbnailUrl(thumbnailUrl);
-        
+
         // 채팅방 인원 수정
 
         Post updatedPost = postRepository.save(post);
@@ -384,7 +384,7 @@ public class PostServiceImpl implements PostService {
         PostComment savedComment = postCommentRepository.save(comment);
         return new CreateResponse(savedComment.getPostCommentId());
     }
-    
+
     // 댓글 삭제
     public void deletePostComment(int postId, int commentId, UserInfo userInfo) {
         log.info("댓글 삭제 시작 - postId: {}, commentId: {}", postId, commentId);

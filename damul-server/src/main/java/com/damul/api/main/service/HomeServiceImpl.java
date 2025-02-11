@@ -102,7 +102,7 @@ public class HomeServiceImpl implements HomeService {
         UserIngredient ingredient = userIngredientRepository.findById(ingredientId)
                 .orElseThrow(() -> new EntityNotFoundException("재료를 찾을 수 없습니다."));
 
-        ingredient.updateQuantity(update.getIngredientquantity());
+        ingredient.updateQuantity(update.getIngredientQuantity());
         log.info("식자재 양 업데이트 성공");
     }
 
