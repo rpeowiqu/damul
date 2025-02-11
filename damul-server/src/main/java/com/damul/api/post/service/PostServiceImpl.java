@@ -23,6 +23,8 @@ import com.damul.api.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -63,6 +65,7 @@ public class PostServiceImpl implements PostService {
         List<PostStatus> allStatus = new ArrayList<PostStatus>(Arrays.asList(PostStatus.ACTIVE, PostStatus.COMPLETED));
         List<PostStatus> activeStatus = new ArrayList<PostStatus>(Arrays.asList(PostStatus.ACTIVE));
 
+        Pageable pageable = PageRequest.of(0, size + 1);
 
         // 검색어가 있는데 검색 타입이 없는 경우 예외 처리
         if (keyword != null && searchType == null) {
@@ -78,7 +81,7 @@ public class PostServiceImpl implements PostService {
                 if (status == null) {
                     log.info("검색x 정렬x 활성화x");
                     posts = postRepository.findAllPosts(
-                            allStatus, cursor, size + 1
+                            allStatus, cursor, pageable
                     );
                 }
                 // 활성화 o

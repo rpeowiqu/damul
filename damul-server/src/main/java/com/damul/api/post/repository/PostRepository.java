@@ -5,6 +5,7 @@ import com.damul.api.post.dto.response.PostList;
 import com.damul.api.post.entity.Post;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,7 +18,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     // 기본 조회 (검색 x, 정렬 x, 활성화ox)
     @Query("""
-            SELECT new com.damul.api.post.dto.response.PostList(
+            SELECT DISTINCT new com.damul.api.post.dto.response.PostList(
                         p.postId, p.title, p.thumbnailUrl, p.content, 
                         p.createdAt, p.user.id, p.user.nickname, p.status, p.viewCnt)
             FROM Post p
@@ -25,12 +26,12 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             WHERE p.status IN :statuses
             AND (:cursorId = 0 OR p.postId < :cursorId)
             ORDER BY p.postId DESC
-            LIMIT :size
             """)
     List<PostList> findAllPosts(
             @Param("statuses") List<PostStatus> statuses,
-            @Param("cursorId") int cursorId,
-            @Param("size") int size
+            @Param("cursor") int cursor,
+            Pageable pageable
+
     );
 
     // 검색 (검색 o, 정렬 x, 활성화ox)
