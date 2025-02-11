@@ -131,14 +131,14 @@ public class PostServiceImpl implements PostService {
             if (status == null) {
                 log.info("검색o 정렬o 활성화x");
                 posts = postRepository.findBySearchWithOrder(
-                        allStatus, cursor, pageable, orderBy, searchType, keyword
+                        allStatus, cursor, pageable, searchType, keyword, orderBy
                 );
             }
             // 활성화 o
             else if (status.equals("active")) {
                 log.info("검색o 정렬o 활성화o");
                 posts = postRepository.findBySearchWithOrder(
-                        activeStatus, cursor, pageable, orderBy, searchType, keyword
+                        activeStatus, cursor, pageable, searchType, keyword, orderBy
                 );
             }
         }
