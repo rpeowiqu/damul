@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,7 +87,7 @@ public class PostServiceImpl implements PostService {
                 else if (status.equals("active")) {
                     log.info("검색x 정렬x 활성화o");
                     posts = postRepository.findAllPosts(
-                            activeStatus, cursor, size + 1
+                            activeStatus, cursor, pageable
                     );
                 }
             }
@@ -98,14 +97,14 @@ public class PostServiceImpl implements PostService {
                 if (status == null) {
                     log.info("검색x 정렬o 활성화x");
                     posts = postRepository.findAllWithOrder(
-                            allStatus, cursor, size + 1, orderBy
+                            allStatus, cursor, pageable, orderBy
                     );
                 }
                 // 활성화 o
                 else if (status.equals("active")) {
                     log.info("검색x 정렬o 활성화o");
                     posts = postRepository.findAllWithOrder(
-                            activeStatus, cursor, size + 1, orderBy
+                            activeStatus, cursor, pageable, orderBy
                     );
                 }
             }
@@ -118,14 +117,14 @@ public class PostServiceImpl implements PostService {
                 if (status == null) {
                     log.info("검색o 정렬x 활성화x");
                     posts = postRepository.findBySearch(
-                            allStatus, cursor, size + 1, searchType, keyword
+                            allStatus, cursor, pageable, searchType, keyword
                     );
                 }
                 // 활성화 o
                 else if (status.equals("active")) {
                     log.info("검색o 정렬x 활성화o");
                     posts = postRepository.findBySearch(
-                            activeStatus, cursor, size + 1, searchType, keyword
+                            activeStatus, cursor, pageable, searchType, keyword
                     );
                 }
             }
@@ -135,14 +134,14 @@ public class PostServiceImpl implements PostService {
                 if (status == null) {
                     log.info("검색o 정렬o 활성화x");
                     posts = postRepository.findBySearchWithOrder(
-                            allStatus, cursor, size + 1, orderBy, searchType, keyword
+                            allStatus, cursor, pageable, orderBy, searchType, keyword
                     );
                 }
                 // 활성화 o
                 else if (status.equals("active")) {
                     log.info("검색o 정렬o 활성화o");
                     posts = postRepository.findBySearchWithOrder(
-                            activeStatus, cursor, size + 1, orderBy, searchType, keyword
+                            activeStatus, cursor, pageable, orderBy, searchType, keyword
                     );
                 }
             }
@@ -228,7 +227,7 @@ public class PostServiceImpl implements PostService {
                         .profileImageUrl(comment.getUser().getProfileImageUrl())
                         .comment(comment.getComment())
                         .parentId(comment.getParentPostComment() != null ? comment.getParentPostComment().getPostCommentId() : null)
-                        .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                        .createdAt(comment.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
 
@@ -241,9 +240,10 @@ public class PostServiceImpl implements PostService {
                 .authorId(post.getUser().getId())
                 .authorName(post.getUser().getNickname())
                 .profileImageUrl(post.getUser().getProfileImageUrl())
+                .status(post.getStatus())
                 .contentImageUrl(post.getThumbnailUrl())
                 .content(post.getContent())
-                .createdAt(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .createdAt(post.getCreatedAt())
                 .viewCnt(post.getViewCnt())
                 .comments(comments)
                 .build();

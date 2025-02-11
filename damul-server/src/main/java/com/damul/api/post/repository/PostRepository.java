@@ -24,7 +24,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             FROM Post p
             JOIN p.user u
             WHERE p.status IN :statuses
-            AND (:cursorId = 0 OR p.postId < :cursorId)
+            AND (:cursor = 0 OR p.postId < :cursor)
             ORDER BY p.postId DESC
             """)
     List<PostList> findAllPosts(
@@ -42,16 +42,15 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             FROM Post p
             JOIN p.user u
             WHERE p.status IN :statuses
-            AND (:cursorId = 0 OR p.postId < :cursorId)
+            AND (:cursor = 0 OR p.postId < :cursor)
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
                 OR :searchType = 'content' AND (p.title LIKE %:keyword% OR p.content LIKE %:keyword%))
             ORDER BY p.postId DESC
-            LIMIT :size
             """)
     List<PostList> findBySearch(
             @Param("statuses") List<PostStatus> statuses,
-            @Param("cursorId") int cursorId,
-            @Param("size") int size,
+            @Param("cursor") int cursor,
+            Pageable pageable,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword
     );
@@ -63,9 +62,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                 p.createdAt, p.user.id, p.user.nickname, p.status, p.viewCnt)
             FROM Post p
             JOIN p.user u
-            LEFT JOIN Post prev ON prev.postId = :cursorId
+            LEFT JOIN Post prev ON prev.postId = :cursor
             WHERE p.status IN :statuses
-            AND (:cursorId = 0 OR
+            AND (:cursor = 0 OR
                 (:orderBy = 'views' AND (p.viewCnt < prev.viewCnt OR (p.viewCnt = prev.viewCnt AND p.postId < prev.postId))))
             ORDER BY
             CASE
@@ -73,12 +72,11 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                 ELSE p.postId
             END DESC,
             p.postId DESC
-            LIMIT :size
             """)
     List<PostList> findAllWithOrder(
             @Param("statuses") List<PostStatus> statuses,
-            @Param("cursorId") int cursorId,
-            @Param("size") int size,
+            @Param("cursor") int cursor,
+            Pageable pageable,
             @Param("orderBy") String orderBy
     );
 
@@ -89,9 +87,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                 p.createdAt, p.user.id, p.user.nickname, p.status, p.viewCnt)
             FROM Post p
             JOIN p.user u
-            LEFT JOIN Post prev ON prev.postId = :cursorId
+            LEFT JOIN Post prev ON prev.postId = :cursor
             WHERE p.status IN :statuses
-            AND (:cursorId = 0 OR
+            AND (:cursor = 0 OR
                 (:orderBy = 'views' AND (p.viewCnt < prev.viewCnt OR (p.viewCnt = prev.viewCnt AND p.postId < prev.postId))))
             AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
                 OR :searchType = 'content' AND (p.title LIKE %:keyword% OR p.content LIKE %:keyword%))
@@ -101,12 +99,11 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                 ELSE p.postId
             END DESC,
             p.postId DESC
-            LIMIT :size
             """)
     List<PostList> findBySearchWithOrder(
             @Param("statuses") List<PostStatus> statuses,
-            @Param("cursorId") int cursorId,
-            @Param("size") int size,
+            @Param("cursor") int cursor,
+            Pageable pageable,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword,
             @Param("orderBy") String orderBy
