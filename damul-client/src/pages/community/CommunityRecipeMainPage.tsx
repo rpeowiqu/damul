@@ -13,7 +13,7 @@ import {
 import WriteIcon from "@/components/svg/WriteIcon";
 import { getRecipes } from "@/service/recipe";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
-import FeedCard from "@/components/common/FeedCard";
+import RecipeFeedCard from "@/components/common/RecipeFeedCard";
 
 interface RecipeItem {
   id: number;
@@ -48,12 +48,17 @@ const CommunityRecipeMainPage = () => {
   };
 
   const fetchItems = async (pageParam: number) => {
-    const response = await getRecipes({
-      cursor: pageParam,
-      size: 5,
-      orderBy: orderType,
-    });
-    return response?.data;
+    try {
+      const response = await getRecipes({
+        cursor: pageParam,
+        size: 5,
+        orderBy: orderType,
+      });
+      console.log(response?.data);
+      return response?.data;
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -100,7 +105,7 @@ const CommunityRecipeMainPage = () => {
         fetchFn={fetchItems}
         loadSize={5}
         renderItems={(item: RecipeItem) => (
-          <FeedCard
+          <RecipeFeedCard
             key={item.id}
             id={item.id}
             title={item.title}

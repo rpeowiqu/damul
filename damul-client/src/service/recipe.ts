@@ -1,4 +1,4 @@
-import { apiClient, apiRequest } from "./http";
+import apiClient from "./http";
 
 // 레시피 검색 및 전체조회
 export const getRecipes = async ({
@@ -29,37 +29,41 @@ export const getRecipes = async ({
     params.append("orderBy", orderBy);
   }
 
-  return apiRequest(() => apiClient.get(`/recipes?${params.toString()}`));
+  return apiClient.get(`/recipes?${params.toString()}`);
 };
 
 // 레시피 상세조회
 export const getRecipeDetail = async (recipeId: string | undefined) => {
-  return apiRequest(() => apiClient.get(`/recipes/${recipeId}`));
+  return apiClient.get(`/recipes/${recipeId}`);
 };
 
 // 인기 레시피 조회
 export const getPoppularRecipes = async () => {
-  return apiRequest(() => apiClient.get("recipes/famous"));
+  return apiClient.get("recipes/famous");
 };
 
 // 레시피 작성
 export const postRecipe = async () => {
-  return apiRequest(() => apiClient.post("recipes"));
+  return apiClient.post("recipes");
 };
 
 // 레시피 삭제
 export const deleteRecipe = async (recipeId: string) => {
-  return apiRequest(() => apiClient.delete(`/recipes/${recipeId}`));
+  return apiClient.delete(`/recipes/${recipeId}`);
 };
 
 // 레시피 좋아요
 export const postRecipeLike = async (recipeId: string | undefined) => {
-  return apiRequest(() => apiClient.post(`recipes/${recipeId}/likes`));
+  return apiClient.post(`recipes/${recipeId}/likes`);
 };
 
 // 레시피 북마크
-export const postRecipeBookMark = async (recipeId: string | undefined) => {
-  return apiRequest(() => apiClient.post(`recipes/${recipeId}/bookmarks`));
+export const postRecipeBookMark = async ({
+  recipeId,
+}: {
+  recipeId: string | undefined;
+}) => {
+  return apiClient.post(`recipes/${recipeId}/bookmarks`);
 };
 
 // 레시피 댓글 작성
@@ -83,17 +87,16 @@ export const postRecipeComment = async ({
 
   console.log(CommentCreate);
 
-  return apiRequest(() =>
-    apiClient.post(`recipes/${recipeId}/comments`, CommentCreate),
-  );
+  return apiClient.post(`recipes/${recipeId}/comments`, CommentCreate);
 };
 
 // 레시피  댓글 삭제
-export const deleteRecipeComment = async (
-  recipeId: string,
-  commentId: number,
-) => {
-  return apiRequest(() =>
-    apiClient.delete(`/recipes/${recipeId}/comments/${commentId}`),
-  );
+export const deleteRecipeComment = async ({
+  recipeId,
+  commentId,
+}: {
+  recipeId: string;
+  commentId: number;
+}) => {
+  return apiClient.delete(`/recipes/${recipeId}/comments/${commentId}`);
 };

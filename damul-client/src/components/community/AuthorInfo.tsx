@@ -16,7 +16,7 @@ interface AuthorInfoProps {
   likeCnt?: number;
   liked?: boolean;
   type: string;
-  recipeId: string;
+  recipeId?: string;
 }
 
 const AuthorInfo = ({
@@ -60,15 +60,15 @@ const AuthorInfo = ({
           <Image src={profileImageUrl} className="w-10 h-10 rounded-full" />
           <p className="p-2 text-sm">{authorName}</p>
         </div>
-        {type === "recipe" && (
-          <div className="flex flex-col justify-between">
-            <div className="flex gap-2 items-center justify-end">
-              <div className="flex items-center gap-1">
-                <ViewIcon className="w-4 h-4 stroke-neutral-700" />
-                <p className="text-xs text-neutral-700">
-                  {viewCnt?.toLocaleString()}
-                </p>
-              </div>
+        <div className="flex flex-col justify-between">
+          <div className="flex gap-2 items-center justify-end">
+            <div className="flex items-center gap-1">
+              <ViewIcon className="w-4 h-4 stroke-neutral-700" />
+              <p className="text-xs text-neutral-700">
+                {viewCnt?.toLocaleString()}
+              </p>
+            </div>
+            {type === "recipe" && (
               <div
                 onClick={likeRecipe}
                 className="flex items-center w-12 gap-1 cursor-pointer"
@@ -82,9 +82,9 @@ const AuthorInfo = ({
                   {likesCount?.toLocaleString()}
                 </p>
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
       <div className="flex justify-end">
         <div className="flex items-center gap-0.5 cursor-pointer mr-2">

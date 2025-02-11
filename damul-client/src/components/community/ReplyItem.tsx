@@ -5,18 +5,18 @@ import { formatDate } from "@/utils/date";
 import { deleteRecipeComment } from "@/service/recipe";
 
 interface ReplyItemProps {
-  recipeId: string;
+  id: string;
   comment: Comment;
   reply: Comment;
   onReply: (_comment: Comment) => void;
-  fetchRecipeDetail: () => void;
+  fetchDetailData: () => void;
 }
 const ReplyItem = ({
-  recipeId,
+  id,
   comment,
   reply,
   onReply,
-  fetchRecipeDetail,
+  fetchDetailData,
 }: ReplyItemProps) => {
   const deleteComment = async (commentId: number) => {
     const isConfirmed = window.confirm("정말로 댓글을 삭제하시겠습니까?");
@@ -25,9 +25,9 @@ const ReplyItem = ({
       return;
     }
     try {
-      const response = await deleteRecipeComment(recipeId, commentId);
+      const response = await deleteRecipeComment(id, commentId);
       console.log(response?.data);
-      fetchRecipeDetail();
+      fetchDetailData();
     } catch (error) {
       console.error(error);
     }

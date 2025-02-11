@@ -2,28 +2,31 @@ import { ChangeEvent, KeyboardEvent, Dispatch, SetStateAction } from "react";
 import { Input } from "@/components/ui/input";
 import SendIcon from "../svg/SendIcon";
 import { postRecipeComment } from "@/service/recipe";
+import { postPostComment } from "@/service/market";
 import { Comment } from "@/types/community";
 
 interface CommentInputProps {
-  recipeId: string;
+  id: string;
   parentId?: number;
   placeholder?: string;
   comment: string;
   setComment: Dispatch<SetStateAction<string>>;
   className?: string;
   setReplyingTo: Dispatch<SetStateAction<Comment | null>>;
-  fetchRecipeDetail: () => void;
+  fetchDetailData: () => void;
+  type: string;
 }
 
 const CommentInput = ({
-  recipeId,
+  id,
   parentId,
   placeholder,
   comment,
   setComment,
   className = "",
   setReplyingTo,
-  fetchRecipeDetail,
+  fetchDetailData,
+  type,
 }: CommentInputProps) => {
   // 입력값 변경 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -47,16 +50,25 @@ const CommentInput = ({
   const authorId = "1";
   const submitComment = async () => {
     try {
-      const response = await postRecipeComment({
-        recipeId,
-        authorId,
-        comment,
-        parentId,
-      });
+      const response =
+        type === "recipe"
+          ? await postRecipeComment({
+              recipeId: id,
+              authorId,
+              comment,
+              parentId,
+            })
+          : await postPostComment({
+              postId: id,
+              authorId,
+              comment,
+              parentId,
+            });
+
       console.log(response);
       setReplyingTo(null);
       setComment("");
-      fetchRecipeDetail();
+      fetchDetailData();
     } catch (error) {
       console.error(error);
     }

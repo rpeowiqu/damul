@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import FeedCard from "@/components/common/FeedCard";
+import FeedCard from "@/components/common/RecipeFeedCard";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import { getRecipes } from "@/service/recipe";
 
@@ -55,14 +55,18 @@ const CommunitySearchResultPage = () => {
   };
 
   const fetchItems = async (pageParam: number) => {
-    const response = await getRecipes({
-      cursor: pageParam,
-      size: 5,
-      orderBy: orderType,
-      searchType: searchType,
-      keyword: keyword,
-    });
-    return response?.data;
+    try {
+      const response = await getRecipes({
+        cursor: pageParam,
+        size: 5,
+        orderBy: orderType,
+        searchType: searchType,
+        keyword: keyword,
+      });
+      return response?.data;
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const location = useLocation();

@@ -3,22 +3,24 @@ import CommentInput from "../common/CommentInput";
 import { Comment } from "@/types/community";
 
 interface FixedCommentInfoProps {
-  recipeId: string;
+  id: string;
   replyingTo: Comment | null;
   setReplyingTo: Dispatch<SetStateAction<Comment | null>>;
   comment: string;
   setComment: Dispatch<SetStateAction<string>>;
   cancelReply: () => void;
-  fetchRecipeDetail: () => void;
+  fetchDetailData: () => void;
+  type: string;
 }
 const FixedCommentInfo = ({
-  recipeId,
+  id,
   replyingTo,
   setReplyingTo,
   comment,
   setComment,
   cancelReply,
-  fetchRecipeDetail,
+  fetchDetailData,
+  type,
 }: FixedCommentInfoProps) => {
   return (
     <div className="fixed bottom-16 left-0 w-full pc:w-[598px] pc:left-1/2 pc:-translate-x-1/2 bg-white border-t p-2 shadow-md">
@@ -41,11 +43,12 @@ const FixedCommentInfo = ({
           replyingTo ? "대댓글을 입력해주세요" : "댓글을 입력해주세요"
         }
         parentId={replyingTo?.id}
-        recipeId={recipeId}
+        id={id}
         comment={comment}
         setComment={setComment}
         setReplyingTo={setReplyingTo}
-        fetchRecipeDetail={fetchRecipeDetail}
+        fetchDetailData={fetchDetailData}
+        type={type}
       />
     </div>
   );

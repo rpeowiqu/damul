@@ -182,7 +182,7 @@ const router = createBrowserRouter([
         element: <CommunityMarketPostPage />,
       },
       {
-        path: "community/market/:id",
+        path: "community/market/:postId",
         element: <CommunityMarketDetailPage />,
       },
       {

@@ -6,7 +6,7 @@ interface DamulInfiniteScrollListProps<T> {
   queryKey: string[];
   fetchFn: (pageParam: number) => Promise<{
     data: T[];
-    meta: { nextCursor: number; hasNext: boolean };
+    meta: { nextCursor: number | null; hasNextData: boolean };
   }>;
   initPage?: number;
   loadSize?: number; // 스켈레톤 개수를 출력할 때 사용
@@ -31,10 +31,10 @@ const DamulInfiniteScrollList = <T,>({
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: [queryKey],
-      queryFn: ({ pageParam = 0 }) => fetchFn(pageParam),
+      queryFn: ({ pageParam }) => fetchFn(pageParam),
       initialPageParam: initPage,
       getNextPageParam: (lastPage) =>
-        lastPage.meta.hasNext ? lastPage.meta.nextCursor : undefined, // 커서 사용
+        lastPage.meta?.hasNextData ? lastPage.meta.nextCursor : undefined, // 커서 사용
     });
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const DamulInfiniteScrollList = <T,>({
   return (
     <div className={className}>
       {data?.pages.map((page, pageIndex) =>
-        page.data.map((item, index) =>
+        page.data?.map((item, index) =>
           renderItems(item, index + pageIndex * page.data.length),
         ),
       )}
