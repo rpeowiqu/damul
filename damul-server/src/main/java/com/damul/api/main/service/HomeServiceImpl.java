@@ -164,8 +164,8 @@ public class HomeServiceImpl implements HomeService {
                 .build();
     }
 
-    private int calculateDaysUntilExpiration(LocalDateTime dueDate) {
-        return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), dueDate);
+    private int calculateDaysUntilExpiration(LocalDateTime expirationDate) {
+        return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), expirationDate);
     }
 
     private IngredientResponse categorizeIngredients(List<UserIngredientList> ingredients) {
@@ -195,7 +195,7 @@ public class HomeServiceImpl implements HomeService {
         if (orderBy == null) return "ingredientName";
         return switch (orderBy.toLowerCase()) {
             case "quantity" -> "ingredientQuantity";
-            case "date" -> "dueDate";
+            case "date" -> "expirationDate";
             default -> "ingredientName";
         };
     }
