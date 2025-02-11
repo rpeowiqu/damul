@@ -80,8 +80,9 @@ public class RecipeController {
 
     // 레시피 작성
     @PostMapping
-    public ResponseEntity<?> addRecipe(@RequestPart("recipeRequest") RecipeRequest recipeRequest,
-                                       @RequestPart("mainImage") MultipartFile mainImage,
+    public ResponseEntity<?> addRecipe(@CurrentUser UserInfo userInfo,
+                                       @RequestPart("recipeRequest") RecipeRequest recipeRequest,
+                                       @RequestPart("thumbnailImage") MultipartFile thumbnailImage,
                                        @RequestPart("cookingImages") List<MultipartFile> cookingImages) {
         log.info("레시피 작성 요청");
 
@@ -96,9 +97,10 @@ public class RecipeController {
             );
         }
 
-        log.info("이미지 {}: 파일명={}, 크기={}bytes, ContentType={}", "main", mainImage.getOriginalFilename(),
-                mainImage.getSize(), mainImage.getContentType());
+        log.info("이미지 {}: 파일명={}, 크기={}bytes, ContentType={}", "main", thumbnailImage.getOriginalFilename(),
+                thumbnailImage.getSize(), thumbnailImage.getContentType());
 
+        CreateResponse createResponse = recipeService.addRecipe(userInfo, recipeRequest, thumbnailImage, cookingImages);
 
         return null;
     }

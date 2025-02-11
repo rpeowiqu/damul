@@ -122,15 +122,17 @@ public class UserController {
 
     // 사용자 목록 검색/조회
     @GetMapping
-    public ResponseEntity<?> search(@RequestParam(required = false) String keyword) {
+    public ResponseEntity<?> search(@RequestParam(required = false) String keyword,
+                                    @RequestParam int cursor,
+                                    @RequestParam int size) {
         log.info("사용자 목록 검색/조회 요청 - keyword: {}", keyword);
-        List<UserList> userList = userService.getSearchUserList(keyword);
-        if(userList == null || userList.isEmpty() || userList.size() == 0) {
+        ScrollResponse<UserList> scrollResponse = userService.getSearchUserList(cursor, size, keyword);
+        if(scrollResponse.getData() == null || scrollResponse.getData().isEmpty()) {
             log.info("사용자 목록 검색/조회 완료 - 데이터 없음");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
             log.info("사용자 목록 검색/조회 완료");
-            return ResponseEntity.ok(userList);
+            return ResponseEntity.ok(scrollResponse);
         }
     }
 }

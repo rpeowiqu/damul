@@ -7,6 +7,8 @@ import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
 import com.damul.api.user.dto.response.UserList;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -52,14 +54,17 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT new com.damul.api.user.dto.response.UserList(u.id, u.profileImageUrl, u.nickname) " +
             "FROM User u " +
             "WHERE u.nickname LIKE :keyword " +
+            "AND u.id > :cursor " +  // cursor 기반 페이징 추가
             "ORDER BY CASE " +
             "   WHEN u.nickname = :exactMatch THEN 0 " +  // 정확히 일치
             "   WHEN u.nickname LIKE :startsWith THEN 1 " +  // 검색어로 시작
             "   ELSE 2 " +  // 그 외 포함
-            "END")
-    List<UserList> findUserByNickname(@Param("keyword") String keyword,
-                                      @Param("exactMatch") String exactMatch,
-                                      @Param("startsWith") String startsWith);
+            "END, u.id")  // id로 2차 정렬 추가
+    List<UserList> findByNicknameContainingWithPaging(@Param("keyword") String keyword,
+                                                        @Param("exactMatch") String exactMatch,
+                                                        @Param("startsWith") String startsWith,
+                                                        @Param("cursor") int cursor,
+                                                        Pageable pageable);
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.active = true")
     int countActiveUsers();

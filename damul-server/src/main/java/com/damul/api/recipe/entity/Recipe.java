@@ -2,14 +2,20 @@ package com.damul.api.recipe.entity;
 
 import com.damul.api.auth.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name="recipes")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Recipe {
 
@@ -38,9 +44,11 @@ public class Recipe {
     private int likeCnt;
 
     @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @Column(name = "is_deleted", nullable = false)

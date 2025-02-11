@@ -30,7 +30,7 @@ public interface RecipeService {
     RecipeDetail getRecipeDetail(int recipeId, UserInfo userInfo);
 
     // 레시피 작성
-    void addRecipe(RecipeRequest recipeRequest,
+    CreateResponse addRecipe(UserInfo userInfo, RecipeRequest recipeRequest,
                    MultipartFile thumbnailImage, List<MultipartFile> cookingImages);
 
     // 레시피 수정

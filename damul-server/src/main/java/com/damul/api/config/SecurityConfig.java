@@ -2,6 +2,7 @@ package com.damul.api.config;
 
 import com.damul.api.auth.filter.JwtTokenRefreshFilter;
 import com.damul.api.auth.jwt.JwtTokenProvider;
+import com.damul.api.auth.jwt.TokenService;
 import com.damul.api.auth.oauth2.handler.OAuth2FailureHandler;
 import com.damul.api.auth.oauth2.handler.OAuth2SuccessHandler;
 import com.damul.api.auth.oauth2.service.CustomOAuth2UserService;
@@ -55,7 +56,7 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final JwtTokenProvider jwtTokenProvider;
-    private final AuthService authService;
+    private final TokenService tokenService;
     private final CookieUtil cookieUtil;
 
     @Bean
@@ -82,7 +83,7 @@ public class SecurityConfig {
                 .addFilterBefore(
                         new JwtTokenRefreshFilter(
                                 jwtTokenProvider,
-                                authService,
+                                tokenService,
                                 cookieUtil,
                                 accessTokenExpire,    // SecurityConfig에서 @Value로 가져온 값 전달
                                 refreshTokenExpire    // SecurityConfig에서 @Value로 가져온 값 전달

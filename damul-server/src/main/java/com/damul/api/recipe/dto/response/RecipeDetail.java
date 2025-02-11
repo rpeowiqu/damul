@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -17,7 +18,7 @@ public class RecipeDetail {
     private boolean bookmarked;
     private boolean liked;
     private String content;
-    private String createdAt;
+    private LocalDateTime createdAt;
     private int authorId;
     private String authorName;
     private String profileImageUrl;

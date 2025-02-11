@@ -3,6 +3,7 @@ package com.damul.api.auth.filter;
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
+import com.damul.api.auth.jwt.TokenService;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
 import com.damul.api.common.user.CustomUserDetails;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JwtTokenRefreshFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
-    private final AuthService authService;
+    private final TokenService tokenService;
     private final CookieUtil cookieUtil;
     private final long accessTokenExpire;  // 생성자로 주입
     private final long refreshTokenExpire; // 생성자로 주입
@@ -87,17 +88,17 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
             log.info("1. 추출된 사용자 이메일: {}", userEmail);
 
             // 실제 Redis에 저장된 값 확인
-            String storedToken = authService.findRefreshToken(userEmail);
+            String storedToken = tokenService.findRefreshToken(userEmail);
             log.info("2. Redis에 저장된 토큰: {}", storedToken);
             log.info("3. 현재 쿠키의 토큰: {}", refreshToken);
 
             log.info("4. Redis에서 Refresh Token 검증 시작");
-            boolean isValidInRedis = authService.validateRefreshToken(userEmail, refreshToken);
+            boolean isValidInRedis = tokenService.validateRefreshToken(userEmail, refreshToken);
             log.info("5. Redis 검증 결과: {}", isValidInRedis);
 
             if (!isValidInRedis) {
                 log.error("Redis에 저장된 Refresh Token과 일치하지 않습니다.");
-                authService.removeRefreshToken(userEmail);
+                tokenService.removeRefreshToken(userEmail);
                 cookieUtil.deleteCookie(response, "refresh_token");
                 return;
             }
@@ -144,7 +145,7 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
                 log.info("User Email from refresh token: {}", userEmail);
 
 
-                if (authService.validateRefreshToken(userEmail, refreshToken)) {
+                if (tokenService.validateRefreshToken(userEmail, refreshToken)) {
                     Claims refreshTokenClaims = jwtTokenProvider.getClaims(refreshToken);
 
 
@@ -200,7 +201,7 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
 
     private void handleInvalidToken(HttpServletResponse response, String userEmail) {
         log.error("저장된 리프레시 토큰과 일치하지 않습니다.");
-        authService.removeRefreshToken(userEmail);
+        tokenService.removeRefreshToken(userEmail);
         cookieUtil.deleteCookie(response, "access_token");
         cookieUtil.deleteCookie(response, "refresh_token");
     }
