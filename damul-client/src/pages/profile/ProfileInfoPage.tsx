@@ -157,7 +157,7 @@ const ProfileInfoPage = () => {
 
       <div className="flex flex-col gap-2 p-5 bg-white">
         <h1 className="text-lg font-bold">자기소개</h1>
-        <p className="text-normal-600">
+        <p className="text-normal-600 whitespace-pre-wrap">
           {profileInfo.selfIntroduction}
           <br />
         </p>

@@ -49,7 +49,7 @@ interface UserSetting {
 }
 
 const SettingPage = () => {
-  const myId = useUserStore((state) => state.myId);
+  const { myId, myNickname, setMyNickname, setWarningEnabled } = useUserStore();
   const [userSetting, setUserSetting] = useState<UserSetting>({
     nickname: "",
     email: "",
@@ -102,9 +102,9 @@ const SettingPage = () => {
           backgroundFile,
         );
         if (response?.status === 200) {
+          setMyNickname(userSetting.nickname);
+          setWarningEnabled(userSetting.warningEnabled);
           alert("회원정보가 변경 되었습니다.");
-          nav("/home", { replace: true });
-          setStatus("none");
           return;
         }
       }
@@ -145,6 +145,11 @@ const SettingPage = () => {
   };
 
   const checkNickname = async () => {
+    // 동일한 닉네임을 사용할 경우 사용 가능하다는 문구를 출력한다.
+    if (userSetting.nickname === myNickname) {
+      return "available";
+    }
+
     if (!isValidNickname(userSetting.nickname)) {
       return "validLength";
     } else {
@@ -198,7 +203,13 @@ const SettingPage = () => {
 
   return (
     <div className="px-6 sm:px-10 py-8">
-      <h1 className="text-xl font-black text-normal-700">설정</h1>
+      <div className="flex gap-5">
+        <button className="font-black" onClick={() => nav(-1)}>
+          &lt;
+        </button>
+        <h1 className="text-lg sm:text-xl font-black text-normal-700">설정</h1>
+      </div>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-10 mt-3">
         <div>
           <p className="text-sm text-positive-400 font-bold">
