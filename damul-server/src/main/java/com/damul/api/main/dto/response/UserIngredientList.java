@@ -25,7 +25,7 @@ public class UserIngredientList {
         LocalDate expirationDate = entity.getExpirationDate().toLocalDate();
         LocalDate now = LocalDateTime.now().toLocalDate();
 
-        long daysBetween = ChronoUnit.DAYS.between(expirationDate, now);
+        long daysBetween = ChronoUnit.DAYS.between(now, expirationDate);
 
         return new UserIngredientList(
                 entity.getUserIngredientId(),
