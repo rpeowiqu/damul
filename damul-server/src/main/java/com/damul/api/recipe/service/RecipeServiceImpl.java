@@ -9,6 +9,9 @@ import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.config.service.S3Service;
+import com.damul.api.main.dto.response.HomeSuggestedResponse;
+import com.damul.api.main.dto.response.RecipeTagList;
+import com.damul.api.main.dto.response.SuggestedRecipeList;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.*;
 import com.damul.api.recipe.entity.*;
@@ -145,7 +148,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     // 인기 급상승 레시피 조회 (5개)
     @Override
-    public List<FamousRecipe> getFamousRecipe() {
+    public HomeSuggestedResponse getFamousRecipe() {
         log.info("인기 급상승 조회 시작");
         LocalDateTime endDate = LocalDateTime.now();
         LocalDateTime startDate = endDate.minusDays(3);
@@ -153,18 +156,27 @@ public class RecipeServiceImpl implements RecipeService {
         log.info("종료일 - endDate: {}", endDate);
 
         Pageable pageable = PageRequest.of(0, 5);
-        List<FamousRecipe> topRecipes = recipeRepository.findTop5LikedRecipes(
-            startDate, endDate);
+        List<SuggestedRecipeList> topRecipes = recipeRepository.findTop5LikedRecipes(
+            startDate, endDate, pageable);
 
         log.info("인기 급상승 조회 완료");
 
-        topRecipes.forEach(recipe -> {
-            List<TagDto> tags = recipeRepository.findTagDtosByRecipeId(recipe.getId());
-            recipe.setTag(tags);
-        });
+        // 각 레시피의 태그 정보 조회 및 설정
+        List<SuggestedRecipeList> recipesWithTags = topRecipes.stream()
+                .map(recipe -> {
+                    List<RecipeTagList> recipeTags = recipeRepository.findRecipeTagListByRecipeId(recipe.getRecipeId());
+                    return SuggestedRecipeList.builder()
+                            .recipeId(recipe.getRecipeId())
+                            .title(recipe.getTitle())
+                            .thumbnailUrl(recipe.getThumbnailUrl())
+                            .recipeTags(recipeTags)
+                            .build();
+                })
+                .collect(Collectors.toList());
 
 
-        return topRecipes;
+
+        return new HomeSuggestedResponse(0, recipesWithTags);
     }
 
     // 레시피 상세보기
