@@ -1,24 +1,24 @@
 import { apiClient, apiRequest } from "./http";
 
 // 게시글 검색 및 전체조회
-export const getRecipes = async ({
-  cursor = "0",
-  size = "10",
+export const getPosts = async ({
+  cursor = 0,
+  size = 10,
   searchType,
   keyword,
   status,
   orderBy,
 }: {
-  cursor?: string;
-  size?: string;
+  cursor?: number;
+  size?: number;
   searchType?: string;
   keyword?: string;
-  status?: string;
+  status?: string | null;
   orderBy?: string;
 }) => {
   const params = new URLSearchParams({
-    cursor,
-    size,
+    cursor: cursor.toString(),
+    size: size.toString(),
   });
 
   if (searchType) {
@@ -38,43 +38,28 @@ export const getRecipes = async ({
 };
 
 // 게시글 상세조회
-export const getRecipeDetail = async (postId: string | undefined) => {
+export const getPostDetail = async (postId: string | undefined) => {
   return apiRequest(() => apiClient.get(`/posts/${postId}`));
 };
 
-// 인기 레시피 조회
-export const getPoppularRecipes = async () => {
-  return apiRequest(() => apiClient.get("recipes/famous"));
+// 게시글 작성
+export const postPost = async () => {
+  return apiRequest(() => apiClient.post("posts"));
 };
 
-// 레시피 작성
-export const postRecipe = async () => {
-  return apiRequest(() => apiClient.post("recipes"));
+// 게시글 삭제
+export const deletePost = async (postId: string | undefined) => {
+  return apiRequest(() => apiClient.delete(`/posts/${postId}`));
 };
 
-// 레시피 삭제
-export const deleteRecipe = async (recipeId: string | undefined) => {
-  return apiRequest(() => apiClient.delete(`/recipes/${recipeId}`));
-};
-
-// 레시피 좋아요
-export const postRecipeLike = async (recipeId: string | undefined) => {
-  return apiRequest(() => apiClient.post(`recipes/${recipeId}/likes`));
-};
-
-// 레시피 북마크
-export const postRecipeBookMark = async (recipeId: string | undefined) => {
-  return apiRequest(() => apiClient.post(`recipes/${recipeId}/bookmarks`));
-};
-
-// 레시피 댓글 작성
-export const postRecipeComment = async ({
-  recipeId,
+// 게시글 댓글 작성
+export const postPostComment = async ({
+  postId,
   authorId,
   comment,
   parentId,
 }: {
-  recipeId: string;
+  postId: string;
   authorId: string;
   comment: string;
   parentId?: string;
@@ -86,8 +71,23 @@ export const postRecipeComment = async ({
   }
 
   return apiRequest(() =>
-    apiClient.post(`recipes/${recipeId}/comments`, {
+    apiClient.post(`posts/${postId}/comments`, {
       CommentCreate,
     }),
   );
+};
+
+// 게시글  댓글 삭제
+export const deletePostComment = async (
+  recipeId: string,
+  commentId: number,
+) => {
+  return apiRequest(() =>
+    apiClient.delete(`/posts/${recipeId}/comments/${commentId}`),
+  );
+};
+
+// 게시글 현황 변경
+export const putPostStatusChange = async (postId: string) => {
+  return apiRequest(() => apiClient.put(`/posts/${postId}/status`));
 };

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import FeedCard from "@/components/common/FeedCard";
+import FeedCard from "@/components/common/RecipeFeedCard";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import { getRecipes } from "@/service/recipe";
 

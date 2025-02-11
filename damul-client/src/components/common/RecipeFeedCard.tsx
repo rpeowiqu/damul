@@ -1,9 +1,9 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Image from "./Image";
 import { formatDate } from "@/utils/date";
 import BookMarkIcon from "../svg/BookMarkIcon";
 
-interface FeedCardProps {
+interface RecipeFeedCardProps {
   id: number;
   title: string;
   thumbnailUrl: string;
@@ -11,13 +11,13 @@ interface FeedCardProps {
   createdAt: string;
   authorId: number;
   nickname: string;
-  bookmarked?: boolean;
-  likeCnt?: number;
-  liked?: boolean;
-  viewCnt?: number;
+  bookmarked: boolean;
+  likeCnt: number;
+  liked: boolean;
+  viewCnt: number;
 }
 
-const FeedCard = ({
+const RecipeFeedCard = ({
   id,
   title,
   thumbnailUrl,
@@ -26,33 +26,21 @@ const FeedCard = ({
   nickname,
   bookmarked,
   likeCnt,
-  liked,
   viewCnt,
-}: FeedCardProps) => {
-  const location = useLocation();
-  const { pathname } = location;
-
+}: RecipeFeedCardProps) => {
   const navigate = useNavigate();
-
-  const pathTo = (id: number) => {
-    if (pathname.startsWith("/community/recipe")) {
-      navigate(`/community/recipe/${id}`);
-    } else {
-      navigate(`/community/market/${id}`);
-    }
-  };
 
   return (
     <div
       className="flex relative h-24 my-3 border border-normal-100 rounded-lg hover:border-positive-300 cursor-pointer"
       onClick={() => {
-        pathTo(id);
+        navigate(`/community/recipe/${id}`);
       }}
     >
       <Image
         src={thumbnailUrl}
         alt="썸네일 이미지"
-        className="rounded-s-lg w-32 h-24"
+        className="rounded-s-lg w-32 h-full object-cover"
       />
       <div className="absolute left-1 top-1">
         {bookmarked ? (
@@ -83,4 +71,4 @@ const FeedCard = ({
   );
 };
 
-export default FeedCard;
+export default RecipeFeedCard;
