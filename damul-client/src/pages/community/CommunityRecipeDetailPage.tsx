@@ -113,7 +113,7 @@ const CommunityRecipeDetailPage = () => {
           viewCnt={data.viewCnt}
           likeCnt={data.likeCnt}
           liked={data.liked}
-          recipeId={data.recipeId}
+          id={data.recipeId}
           type="recipe"
         />
         <ContentSection

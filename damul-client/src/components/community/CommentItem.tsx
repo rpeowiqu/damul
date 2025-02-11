@@ -86,6 +86,7 @@ const CommentItem = ({
           reply={reply}
           onReply={onReply}
           fetchDetailData={fetchDetailData}
+          type={type}
         />
       ))}
     </div>

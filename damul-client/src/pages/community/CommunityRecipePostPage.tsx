@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DamulDrawer from "@/components/common/DamulDrawer";
 import PostCard from "@/components/community/PostCard";
 import SubmitButton from "@/components/community/SubmitButton";
@@ -10,8 +11,11 @@ import PostRecipeOrders from "@/components/community/PostRecipeOrders";
 import DamulButton from "@/components/common/DamulButton";
 import { IngredientProps, OrderProps } from "@/types/community";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
+import { postRecipe } from "@/service/recipe";
 
 const CommunityRecipePostPage = () => {
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState<string>("");
   const [tempTitle, setTempTitle] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
@@ -58,8 +62,52 @@ const CommunityRecipePostPage = () => {
     }
   }, [currentDrawerIndex]);
 
+  const submitRecipe = async () => {
+    const formData = new FormData();
+
+    const recipeData = {
+      title,
+      content,
+      ingredients: ingredients.map((ingredient) => ({
+        name: ingredient.name,
+        amount: ingredient.quantity,
+        unit: ingredient.unit,
+      })),
+      cookingOrders: orders.map((order, index) => ({
+        id: index + 1,
+        content: order.description,
+        imageUrl: order.image ? order.image.name : "default.jpg",
+      })),
+    };
+
+    const jsonString = JSON.stringify(recipeData);
+    const recipeBlob = new Blob([jsonString], { type: "application/json" });
+    formData.append("recipeRequest", recipeBlob);
+
+    if (image) {
+      formData.append("thumbnailImage", image);
+    }
+
+    const cookingImagesArray = orders
+      .filter((order) => order.image)
+      .map((order) => order.image as File);
+
+    cookingImagesArray.forEach((file) => {
+      formData.append("cookingImages", file);
+    });
+
+    try {
+      const response = await postRecipe(formData);
+      console.log(response?.data);
+      alert("레시피가 등록되었습니다")
+      navigate("/community/recipe")
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <main className="flex flex-col px-7 py-4 pc:p-6 gap-5">
+    <div className="flex flex-col justify-between px-7 py-4 pc:p-6 gap-5">
       <div
         className="p-4 space-x-5 font-semibold cursor-pointer"
         onClick={() => window.history.back()}
@@ -88,7 +136,11 @@ const CommunityRecipePostPage = () => {
               tempTitle={tempTitle}
             />
           }
-          footerContent={<SubmitButton disabled={tempTitle.length <= 0 || tempTitle.length > 50}/>}
+          footerContent={
+            <SubmitButton
+              disabled={tempTitle.length <= 0 || tempTitle.length > 50}
+            />
+          }
           onFooterClick={() => {
             setTitle(tempTitle);
           }}
@@ -115,7 +167,7 @@ const CommunityRecipePostPage = () => {
               setPreImage={setPreImage}
             />
           }
-          footerContent={<SubmitButton disabled={!tempImage}/>}
+          footerContent={<SubmitButton disabled={!tempImage} />}
           onFooterClick={() => {
             setImage(tempImage);
           }}
@@ -141,7 +193,11 @@ const CommunityRecipePostPage = () => {
               tempContent={tempContent}
             />
           }
-          footerContent={<SubmitButton disabled={tempContent.length <= 0 || tempContent.length > 500}/>}
+          footerContent={
+            <SubmitButton
+              disabled={tempContent.length <= 0 || tempContent.length > 500}
+            />
+          }
           onFooterClick={() => {
             setContent(tempContent);
           }}
@@ -205,17 +261,19 @@ const CommunityRecipePostPage = () => {
         content &&
         ingredients[0].name &&
         orders[0].description && (
-          <div className="absolute bottom-16 left-0 w-full p-6">
+          <div className="w-full">
             <DamulButton
               variant="positive-outline"
               className="w-full"
-              onClick={() => {}}
+              onClick={() => {
+                submitRecipe();
+              }}
             >
               레시피 작성하기
             </DamulButton>
           </div>
         )}
-    </main>
+    </div>
   );
 };
 

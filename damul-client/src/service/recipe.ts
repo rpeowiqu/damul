@@ -43,12 +43,20 @@ export const getPoppularRecipes = async () => {
 };
 
 // 레시피 작성
-export const postRecipe = async () => {
-  return apiClient.post("recipes");
+export const postRecipe = async (formData: FormData) => {
+  return apiClient.post("recipes", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 // 레시피 삭제
-export const deleteRecipe = async (recipeId: string) => {
+export const deleteRecipe = async ({
+  recipeId,
+}: {
+  recipeId: string | undefined;
+}) => {
   return apiClient.delete(`/recipes/${recipeId}`);
 };
 
@@ -98,5 +106,6 @@ export const deleteRecipeComment = async ({
   recipeId: string;
   commentId: number;
 }) => {
+  console.log(recipeId);
   return apiClient.delete(`/recipes/${recipeId}/comments/${commentId}`);
 };
