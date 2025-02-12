@@ -51,7 +51,6 @@ public class ChatRoom {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         status = Status.ACTIVE;
-        memberLimit = 2;
     }
 
     public enum RoomType {
