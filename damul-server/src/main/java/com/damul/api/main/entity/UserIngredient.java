@@ -19,6 +19,7 @@ public class UserIngredient {
     private UserReceipt userReciept;  // int userId → User 객체로 변경
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int userIngredientId;
 

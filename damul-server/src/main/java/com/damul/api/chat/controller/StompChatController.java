@@ -35,7 +35,7 @@ public class StompChatController {
     private final ChatRoomRepository chatRoomRepository;
 
     @Transactional
-    @MessageMapping("/pub/chat/message")
+    @MessageMapping("/chat/room/{roomId}/message")
     public void message(ChatMessage message) {
         try {
             chatMessageRepository.save(message);
