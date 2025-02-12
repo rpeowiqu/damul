@@ -127,10 +127,6 @@ public class RecipeServiceImpl implements RecipeService {
             );
         }
 
-        if (recipes.size() > size) {
-            recipes = recipes.subList(0, size);
-        }
-
         if (recipes.isEmpty()) {
             log.debug("레시피 없음");
         } else {

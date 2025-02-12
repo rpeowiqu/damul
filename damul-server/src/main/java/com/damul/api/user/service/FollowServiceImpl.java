@@ -102,11 +102,6 @@ public class FollowServiceImpl implements FollowService {
             );
         }
 
-        // 마지막 하나를 더 조회했으므로 size보다 큰 경우 다음 데이터가 있다는 의미
-        if (userList.size() > size) {
-            userList = userList.subList(0, size);
-        }
-
         log.info("팔로워 목록 조회 완료");
         return ScrollUtil.createScrollResponse(userList, cursor, size);
     }
@@ -141,9 +136,6 @@ public class FollowServiceImpl implements FollowService {
         }
 
 
-        if (userList.size() > size) {
-            userList = userList.subList(0, size);
-        }
         log.info("팔로잉 목록 조회 완료");
         return ScrollUtil.createScrollResponse(userList, cursor, size);
     }
