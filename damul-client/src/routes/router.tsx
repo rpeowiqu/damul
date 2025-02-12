@@ -46,15 +46,29 @@ import StatisticsHistoryPage from "@/pages/statistics/StatisticsHistoryPage";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: <Layout header={null} footer={null} />,
     children: [
       {
-        index: true,
-        element: <HomePage />,
+        path: "login",
+        element: <LoginPage />,
       },
       {
         path: "signup",
         element: <SignUpPage />,
+      },
+    ],
+  },
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
+        path: "test",
+        element: <TestPage />,
+      },
+      {
+        index: true,
+        element: <HomePage />,
       },
       {
         path: "home",
@@ -213,6 +227,12 @@ const router = createBrowserRouter([
           },
         ],
       },
+    ],
+  },
+  {
+    path: "/",
+    element: <Layout footer={null} />,
+    children: [
       {
         path: "statistics",
         element: <StatisticsPage />,
@@ -234,20 +254,6 @@ const router = createBrowserRouter([
       {
         path: "setting",
         element: <SettingPage />,
-      },
-    ],
-  },
-  {
-    path: "/",
-    element: <Layout header={null} footer={null} />,
-    children: [
-      {
-        path: "login",
-        element: <LoginPage />,
-      },
-      {
-        path: "signup",
-        element: <SignUpPage />,
       },
     ],
   },
