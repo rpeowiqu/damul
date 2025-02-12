@@ -16,10 +16,16 @@ public class IngredientPriceServiceImpl implements IngredientPriceService {
     @Override
     public IngredientPriceResponse getIngredientPrice(String period, String productNo) {
         log.info("식자재 가격 동향 조회 시작");
-
+        String action = null;
         try {
+            if(period.equals("monthly")) {
+                action = "monthlyPriceTrendList";
+            } else if(period.equals("daily")) {
+                action = "dailySalesList";
+            }
+
             String yearCode = "yearlyPriceTrendList";
-            String kamisResponse = kamisApiService.getPrice(period, productNo, yearCode);
+            String kamisResponse = kamisApiService.getPrice(period, productNo, action);
             // Kamis 응답 데이터를 우리 서비스에 맞게 변환
             IngredientPriceResponse response = convertToIngredientPriceResponse(kamisResponse);
 
