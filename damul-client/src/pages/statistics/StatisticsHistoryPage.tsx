@@ -114,8 +114,8 @@ const StatisticsHistoryPage = () => {
             <ReceiptItem key={index} />
           ))}
         </div>
-        <p className="text-end font-black mt-8 text-base">
-          총 지출금액: <span className="text-negative-400">147,000</span>원
+        <p className="text-end font-black mt-5 text-base">
+          총 지출금액 : <span className="text-negative-400">147,000</span>원
         </p>
       </DamulModal>
     </div>

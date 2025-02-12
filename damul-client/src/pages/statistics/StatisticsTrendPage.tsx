@@ -10,6 +10,15 @@ import { useState } from "react";
 import { FruitIcon } from "@/components/svg";
 import DamulButton from "@/components/common/DamulButton";
 import { IngredientTrendInfo } from "@/types/statistics";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { SelectValue } from "@/components/ui/select";
 
 const chartData = [
   { month: "1월", price: 8700 },
@@ -107,16 +116,29 @@ const StatisticsTrendPage = () => {
           </p>
         </div>
 
-        <div className="flex gap-3 mt-5">
-          <DamulButton variant="positive" className="w-20 h-8 sm:w-24 sm:h-10">
-            최근 40일
-          </DamulButton>
-          <DamulButton
-            variant="shadow"
-            className="w-20 h-8 sm:w-24 sm:h-10 shadow-none"
-          >
-            최근 1년
-          </DamulButton>
+        <div className="flex justify-end">
+          <Select>
+            <SelectTrigger className="w-28 h-8 -mb-5">
+              <SelectValue placeholder="조회 기간" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>조회 기간</SelectLabel>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="date"
+                >
+                  최근 40일
+                </SelectItem>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="title"
+                >
+                  최근 1년
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <ChartContainer config={chartConfig} className="my-6">
@@ -161,7 +183,7 @@ const StatisticsTrendPage = () => {
             검색 필터
           </h1>
           <Input
-            className="text-sm sm:text-base bg-normal-50 h-9 rounded-lg border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="text-sm bg-normal-50 h-9 rounded-lg"
             placeholder="찾으시는 식자재를 검색해 주세요."
           />
         </div>
