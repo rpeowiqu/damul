@@ -45,7 +45,8 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
             "/favicon.ico",
             "/v3/api-docs/**",
             "/swagger-ui/**",
-            "/ws/**"
+            "/ws/pub/**",
+            "/ws/sub/**"
     );
 
 

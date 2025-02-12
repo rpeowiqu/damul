@@ -97,7 +97,7 @@ public class SecurityConfig {
                             .requestMatchers("/multibranch-webhook-trigger/invoke*").permitAll()
                             .requestMatchers("/", "/login", "/admin/login", "/api/v1/test/token").permitAll() // 누구나 접근 가능
                             .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
-                            .requestMatchers("/ws/**").permitAll()  // WebSocket 엔드포인트 허용
+                            .requestMatchers("/ws/pub/**", "/ws/sub/**").permitAll()  // WebSocket 엔드포인트 허용
                             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
                             .anyRequest().authenticated();                              // 나머지는 인증 필요
                 })
