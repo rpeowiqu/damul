@@ -3,7 +3,9 @@ package com.damul.api.post.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.entity.ChatRoom;
+import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.chat.service.ChatRoomService;
 import com.damul.api.common.comment.CommentCreate;
@@ -37,7 +39,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,8 @@ public class PostServiceImpl implements PostService {
     private final PostCommentRepository postCommentRepository;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final ChatRoomService chatRoomService;
 
     private final S3Service s3Service;
     private final ChatRoomService chatRoomService;
@@ -81,23 +84,6 @@ public class PostServiceImpl implements PostService {
 
         // 전체 조회 검색 x
         if (searchType == null) {
-//            // 정렬 x
-//            if (orderBy == null) {
-//                // 활성화 x
-//                if (status == null) {
-//                    log.info("검색x 정렬x 활성화x");
-//                    posts = postRepository.findAllPosts(
-//                            allStatus, cursor, pageable
-//                    );
-//                }
-//                // 활성화 o
-//                else if (status.equals("active")) {
-//                    log.info("검색x 정렬x 활성화o");
-//                    posts = postRepository.findAllPosts(
-//                            activeStatus, cursor, pageable
-//                    );
-//                }
-//            }
             // 정렬 o
             // 활성화 x
             if (status == null) {
@@ -116,23 +102,6 @@ public class PostServiceImpl implements PostService {
         }
         // 전체 조회 검색 o
         else {
-//            // 정렬 x
-//            if (orderBy == null) {
-//                // 활성화 x
-//                if (status == null) {
-//                    log.info("검색o 정렬x 활성화x");
-//                    posts = postRepository.findBySearch(
-//                            allStatus, cursor, pageable, searchType, keyword
-//                    );
-//                }
-//                // 활성화 o
-//                else if (status.equals("active")) {
-//                    log.info("검색o 정렬x 활성화o");
-//                    posts = postRepository.findBySearch(
-//                            activeStatus, cursor, pageable, searchType, keyword
-//                    );
-//                }
-//            }
             // 정렬 o
             // 활성화 x
             if (status == null) {
@@ -218,9 +187,15 @@ public class PostServiceImpl implements PostService {
 
 
         // 채팅방 정보 조회
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findChatRoomByPost_PostId(postId);
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_PostId(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
 
+        // 현재 채팅방 참여 인원 수
+        ChatMembersResponse chatMembersResponse = chatRoomService.getChatRoomMembers(chatRoom.getId());
+        int currentChatNum = chatMembersResponse.getTotalMembers();
 
+        // 채팅방 참여 여부
+        boolean entered = chatRoomMemberRepository.existsByRoomIdAndUserId(chatRoom.getId(), userId);
 
         // 댓글 목록 조회
         List<CommentList> comments = postCommentRepository
@@ -250,8 +225,9 @@ public class PostServiceImpl implements PostService {
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .viewCnt(post.getViewCnt())
-                .currentChatNum(chatRoom.get().getId())
-                .chatSize(chatRoom.get().getMemberLimit())
+                .currentChatNum(currentChatNum)
+                .entered(entered)
+                .chatSize(chatRoom.getMemberLimit())
                 .comments(comments)
                 .build();
     }
@@ -325,7 +301,15 @@ public class PostServiceImpl implements PostService {
         post.setContent(postRequest.getContent());
         post.setThumbnailUrl(thumbnailUrl);
 
-        // 채팅방 인원 수정
+
+        // 채팅방 정보 조회
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_PostId(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 채팅방 최대 인원 변경
+        if (chatRoom.getMemberLimit() != postRequest.getChatSize()) {
+            chatRoomService.updateMemberLimit(chatRoom.getId(), postRequest.getChatSize(), userInfo.getId());
+        }
 
         Post updatedPost = postRepository.save(post);
         log.info("게시글 수정 완료 - ID: {}", updatedPost.getPostId());
