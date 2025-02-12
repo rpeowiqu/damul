@@ -6,7 +6,7 @@ interface IngredientItemProps {
     ingredientName: string;
     productPrice: number;
     categoryId: number;
-    dueDate: string;
+    expirationDate: string;
     ingredientStorage: keyof typeof STORAGE_TYPE_CONST;
   };
   onChange: (
@@ -58,8 +58,8 @@ const IngredientItem = ({
             value={ingredient.categoryId}
             onChange={(e) => onChange(e)}
           >
-            {Object.keys(CATEGORYNAME).map((key) => (
-              <option key={key} value={key}>
+            {Object.keys(CATEGORYNAME).map((key, idx) => (
+              <option key={key} value={idx + 1}>
                 {CATEGORYNAME[key as keyof typeof CATEGORYNAME]}
               </option>
             ))}
@@ -80,16 +80,16 @@ const IngredientItem = ({
           />
         </div>
         <div className="flex gap-2 w-full justify-between">
-          <label className="w-20 cursor-pointer" htmlFor="dueDate">
+          <label className="w-20 cursor-pointer" htmlFor="expirationDate">
             소비기한
           </label>
           <input
             type="date"
-            id="dueDate"
-            name="dueDate"
+            id="expirationDate"
+            name="expirationDate"
             className="border-1 w-full cursor-pointer text-right focus:outline-positive-300 p-1"
             onChange={(e) => onChange(e)}
-            value={ingredient.dueDate}
+            value={ingredient.expirationDate}
           />
         </div>
         <div className="flex gap-2 w-full justify-between">

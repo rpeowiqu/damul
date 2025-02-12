@@ -1,28 +1,20 @@
 import DamulButton from "@/components/common/DamulButton";
 import IngredientItem from "@/components/home/IngredientItem";
 import PlusIcon from "@/components/svg/PlusIcon";
+import { initialIngredientRegisterData } from "@/constants/initialData";
+import { postUserIndegredient } from "@/service/home";
+import { RegisterIngredientData } from "@/types/Ingredient";
 import { useState } from "react";
-
-const initialData = {
-  storeName: "",
-  purchaseAt: "",
-  userIngredients: [
-    {
-      ingredientName: "",
-      productPrice: 0,
-      categoryId: 0,
-      dueDate: "",
-      ingredientStorage: "FRIDGE",
-    },
-  ],
-};
+import { useNavigate } from "react-router-dom";
 
 const HomeIngredientsRegisterPage = () => {
   const [ingredientRegisterData, setIngredientRegisterData] =
-    useState(initialData);
+    useState<RegisterIngredientData>(initialIngredientRegisterData);
+
+  const navigate = useNavigate();
 
   const handleResetData = () => {
-    setIngredientRegisterData(initialData);
+    setIngredientRegisterData(initialIngredientRegisterData);
   };
 
   const handleChange = (
@@ -31,6 +23,9 @@ const HomeIngredientsRegisterPage = () => {
     field?: string,
   ) => {
     const { name, value } = e.target;
+    const parsedValue = ["productPrice", "categoryId"].includes(field ?? name)
+      ? Number(value)
+      : value;
 
     setIngredientRegisterData((prevData) => {
       if (name === "storeName" || name === "purchaseAt") {
@@ -44,14 +39,14 @@ const HomeIngredientsRegisterPage = () => {
         name === "ingredientName" ||
         name === "productPrice" ||
         name === "categoryId" ||
-        name === "dueDate" ||
+        name === "expirationDate" ||
         name === "ingredientStorage"
       ) {
         const updatedIngredients = [...prevData.userIngredients];
         if (index !== undefined && field !== undefined) {
           updatedIngredients[index] = {
             ...updatedIngredients[index],
-            [field]: value,
+            [field]: parsedValue,
           };
         }
 
@@ -74,7 +69,7 @@ const HomeIngredientsRegisterPage = () => {
           ingredientName: "",
           productPrice: 0,
           categoryId: 0,
-          dueDate: "",
+          expirationDate: "",
           ingredientStorage: "FRIDGE",
         },
       ],
@@ -102,6 +97,15 @@ const HomeIngredientsRegisterPage = () => {
     (sum, item) => sum + (Number(item.productPrice) || 0),
     0,
   );
+
+  const handleRegisterIngredients = async () => {
+    try {
+      await postUserIndegredient(ingredientRegisterData);
+      navigate("/home");
+    } catch (error: any) {
+      console.log("식자재를 등록하지 못했습니다.");
+    }
+  };
 
   return (
     <div className="flex flex-col p-5">
@@ -177,7 +181,10 @@ const HomeIngredientsRegisterPage = () => {
           +
         </DamulButton>
       </div>
-      <DamulButton className="bg-positive-300 hover:bg-positive-300/60">
+      <DamulButton
+        onClick={handleRegisterIngredients}
+        className="bg-positive-300 hover:bg-positive-300/60"
+      >
         등록
       </DamulButton>
     </div>
