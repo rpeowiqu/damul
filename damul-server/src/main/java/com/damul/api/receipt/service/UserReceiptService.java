@@ -6,4 +6,6 @@ public interface UserReceiptService {
 
     void registerIngredients(int userId, UserIngredientPost request);
 
+
+
 }
