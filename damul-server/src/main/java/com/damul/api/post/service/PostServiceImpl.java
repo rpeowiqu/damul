@@ -5,6 +5,7 @@ import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.repository.ChatRoomRepository;
+import com.damul.api.chat.service.ChatRoomService;
 import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
@@ -55,6 +56,7 @@ public class PostServiceImpl implements PostService {
     private final ChatRoomRepository chatRoomRepository;
 
     private final S3Service s3Service;
+    private final ChatRoomService chatRoomService;
 
 
     // 게시글 전체 조회/검색
@@ -286,6 +288,7 @@ public class PostServiceImpl implements PostService {
         log.info("게시글 작성 완료 - ID: {}", savedPost.getPostId());
 
         // 채팅방 연결
+        chatRoomService.createMultiChatRoomInPost(userInfo.getId(), post.getPostId(), post.getTitle());
 
         return new CreateResponse(savedPost.getPostId());
     }

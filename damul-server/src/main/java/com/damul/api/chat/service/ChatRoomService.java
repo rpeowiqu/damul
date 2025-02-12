@@ -1,6 +1,8 @@
 package com.damul.api.chat.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
+import com.damul.api.chat.dto.request.MultiChatRoomCreate;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.dto.response.ChatRoomLimitResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
@@ -26,5 +28,9 @@ public interface ChatRoomService {
     CreateResponse createDirectChatRoom(int targetUserId, int currentUserId);
 
     ChatRoomLimitResponse updateMemberLimit(int roomId, int newLimit, int userId);
+
+    CreateResponse createMultiChatRoomInPost(int currentUserId, int postId, String postName);
+
+    CreateResponse createMultiChatRoom(MultiChatRoomCreate request, int userId);
 
 }
