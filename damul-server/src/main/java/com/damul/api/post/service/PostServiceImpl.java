@@ -60,6 +60,7 @@ public class PostServiceImpl implements PostService {
 
     private final S3Service s3Service;
 
+
     // 게시글 전체 조회/검색
     @Override
     public ScrollResponse getPosts(UserInfo userInfo, int cursor, int size, String searchType, String keyword, String status, String orderBy) {
