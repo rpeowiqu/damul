@@ -1,80 +1,93 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import CommunityDetailHeader from "@/components/community/CommunityDetailHeader";
 import AuthorInfo from "@/components/community/AuthorInfo";
 import ContentSection from "@/components/community/ContentSection";
 import IngredientsSection from "@/components/community/IngredientsSection";
 import CookingOrdersSection from "@/components/community/CookingOrderSection";
 import CommentsSection from "@/components/community/CommentsSection";
-import FixedCommentInput from "@/components/community/FixedCommentInfo";
-import { Comment } from "@/types/community";
+import FixedCommentInfo from "@/components/community/FixedCommentInfo";
+import { getRecipeDetail } from "@/service/recipe";
+
+interface Ingredient {
+  id: number;
+  name: string;
+  amount: string;
+  unit: string;
+}
+
+interface CookingOrder {
+  id: number;
+  content: string;
+  imageUrl: string;
+}
+
+interface Comment {
+  id: number;
+  userId: number;
+  nickname: string;
+  profileImageUrl: string;
+  comment: string;
+  createdAt: string;
+  parentId?: number;
+}
+
+interface RecipeDetail {
+  recipeId: string;
+  title: string;
+  bookmarked: boolean;
+  liked: boolean;
+  createdAt: string;
+  authorId: number;
+  authorName: string;
+  profileImageUrl: string;
+  viewCnt: number;
+  likeCnt: number;
+  content: string;
+  contentImageUrl: string;
+  ingredients: Ingredient[];
+  cookingOrders: CookingOrder[];
+  comments: Comment[];
+}
 
 const CommunityRecipeDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [comment, setComment] = useState<string>("");
+  const { recipeId } = useParams();
 
-  const mockData = {
-    id: 1,
-    title: "일본 현지 돈가스 만들기",
-    isBookmarked: true,
-    isLiked: false,
-    createdAt: "2024-01-19 23:23",
-    authorId: 2,
-    authorName: "요리사서히인데요",
-    profileImageUrl: "string",
-    viewCnt: 152,
-    likeCnt: 32,
-    content:
-      "돈가스는 오스트리아의 슈니첼을 원형으로, 서양의 커틀릿에서 유래한 일본 요리입니다. 돈가스는 오스트리아의 슈니첼을 원형으로, 서양의 커틀릿에서 유래한 일본 요리입니다.",
-    contentImageUrl: "string",
-    ingredients: [
-      { id: 1, name: "당근", amount: "1/2", unit: "개" },
-      { id: 2, name: "상추", amount: "100", unit: "g" },
-      { id: 3, name: "진간장", amount: "2", unit: "T" },
-    ],
-    cookingOrders: [
-      { id: 1, content: "당근 준비하숑", imageUrl: "string" },
-      { id: 2, content: "당근을 자릅니다", imageUrl: "string" },
-      { id: 3, content: "당근을 볶아요 아주그냥 볶아요", imageUrl: "string" },
-    ],
-    comments: [
-      {
-        id: 1,
-        userId: 1,
-        nickname: "요리사서히",
-        profileImageUrl: "string",
-        comment:
-          "우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당",
-        createdAt: "2025-01-29",
-      },
-      {
-        id: 2,
-        userId: 2,
-        nickname: "토마토러버전종우",
-        profileImageUrl: "string",
-        comment: "인정하는 부분",
-        parentId: 1,
-        createdAt: "2025-01-30",
-      },
-      {
-        id: 3,
-        userId: 1,
-        nickname: "요리사서히",
-        profileImageUrl: "string",
-        comment:
-          "우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당",
-        createdAt: "2025-01-29",
-      },
-      {
-        id: 4,
-        userId: 2,
-        nickname: "토마토러버전종우",
-        profileImageUrl: "string",
-        comment: "인정하는 부분",
-        parentId: 1,
-        createdAt: "2025-01-30",
-      },
-    ],
+  const initialRecipeDetail: RecipeDetail = {
+    recipeId: "0",
+    title: "",
+    bookmarked: false,
+    liked: false,
+    createdAt: "",
+    authorId: 0,
+    authorName: "",
+    profileImageUrl: "",
+    viewCnt: 0,
+    likeCnt: 0,
+    content: "",
+    contentImageUrl: "",
+    ingredients: [],
+    cookingOrders: [],
+    comments: [],
   };
+
+  const [data, setData] = useState<RecipeDetail>(initialRecipeDetail);
+
+  const fetchRecipeDetail = async () => {
+    try {
+      const response = await getRecipeDetail(recipeId);
+      console.log(response);
+      setData(response?.data as RecipeDetail);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecipeDetail();
+  }, []);
 
   const cancelReply = () => {
     setReplyingTo(null);
@@ -88,38 +101,46 @@ const CommunityRecipeDetailPage = () => {
         } mb-8`}
       >
         <CommunityDetailHeader
-          title={mockData.title}
-          createdAt={mockData.createdAt}
-          isBookmarked={mockData.isBookmarked}
+          title={data.title}
+          createdAt={data.createdAt}
+          bookmarked={data.bookmarked}
+          id={data.recipeId}
           type="recipe"
         />
         <AuthorInfo
-          profileImageUrl={mockData.profileImageUrl}
-          authorName={mockData.authorName}
-          viewCnt={mockData.viewCnt}
-          likeCnt={mockData.likeCnt}
-          isLiked={mockData.isLiked}
-          id={mockData.id}
+          profileImageUrl={data.profileImageUrl}
+          authorName={data.authorName}
+          authorId={data.authorId}
+          viewCnt={data.viewCnt}
+          likeCnt={data.likeCnt}
+          liked={data.liked}
+          id={data.recipeId}
           type="recipe"
         />
         <ContentSection
-          contentImageUrl={mockData.contentImageUrl}
-          content={mockData.content}
+          contentImageUrl={data.contentImageUrl}
+          content={data.content}
           type="recipe"
         />
-        <IngredientsSection ingredients={mockData.ingredients} />
-        <CookingOrdersSection cookingOrders={mockData.cookingOrders} />
+        <IngredientsSection ingredients={data.ingredients} />
+        <CookingOrdersSection cookingOrders={data.cookingOrders} />
         <CommentsSection
-          comments={mockData.comments}
+          id={data.recipeId}
+          comments={data.comments}
           onReply={(comment) => setReplyingTo(comment)}
           type="recipe"
+          fetchDetailData={fetchRecipeDetail}
         />
       </main>
-      <FixedCommentInput
+      <FixedCommentInfo
+        id={recipeId || ""}
         replyingTo={replyingTo}
+        setReplyingTo={setReplyingTo}
         comment={comment}
         setComment={setComment}
         cancelReply={cancelReply}
+        fetchDetailData={fetchRecipeDetail}
+        type="recipe"
       />
     </div>
   );

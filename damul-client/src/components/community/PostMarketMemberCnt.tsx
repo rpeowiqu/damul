@@ -1,20 +1,20 @@
 import { Dispatch, SetStateAction, ChangeEvent } from "react";
 
 interface PostMarketMemberCntProps {
-  tempMemberCnt: number;
-  setTempMemberCnt: Dispatch<SetStateAction<number>>;
+  tempChatSize: number;
+  setTempChatSize: Dispatch<SetStateAction<number>>;
 }
 
 const PostMarketMemberCnt = ({
-  tempMemberCnt,
-  setTempMemberCnt,
+  tempChatSize,
+  setTempChatSize,
 }: PostMarketMemberCntProps) => {
   const MAX_COUNT = 100;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     if (!isNaN(value) && value >= 1 && value <= MAX_COUNT) {
-      setTempMemberCnt(value);
+      setTempChatSize(value);
     }
   };
 
@@ -26,7 +26,7 @@ const PostMarketMemberCnt = ({
       <div className="flex items-center gap-3">
         <input
           type="number"
-          value={tempMemberCnt}
+          value={tempChatSize}
           onChange={handleChange}
           min={1}
           max={MAX_COUNT}
