@@ -2,17 +2,24 @@ import { useEffect, useState } from "react";
 import IngredientButton from "./IngredientButton";
 import { CATEGORYNUMBER } from "@/constants/category";
 import { STORAGE_ICON, STORAGE_TYPE } from "@/constants/storage";
-import { ITEM_STATUS, ITEM_STATUS_ICON } from "@/constants/itemStatus";
-import { Ingredient } from "@/types/Ingredient";
+import {
+  EXPIRINGSOON_DAY,
+  ITEM_STATUS,
+  ITEM_STATUS_ICON,
+} from "@/constants/itemStatus";
+import { Ingredient, IngredientData } from "@/types/Ingredient";
 import DamulModal from "../common/DamulModal";
 import IngredientDetail from "./IngredientDetail";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { useIngredientStore } from "@/stores/ingredientStore";
+import { initialIngrdientItem } from "@/constants/initialData";
 
 interface IngredientStorageContainerProps {
   title: keyof typeof STORAGE_TYPE | keyof typeof ITEM_STATUS;
   items: Ingredient[];
   onEdit: boolean;
+  setExpiringSoonItems: React.Dispatch<React.SetStateAction<Ingredient[]>>;
+  setIngredientData: React.Dispatch<React.SetStateAction<IngredientData>>;
 }
 
 const COLUMN_SIZE = {
@@ -22,20 +29,12 @@ const COLUMN_SIZE = {
   default: 2,
 };
 
-const initialData = {
-  userIngredientId: 11111,
-  categoryId: 2,
-  ingredientName: "사과",
-  ingredientQuantity: 50,
-  expirationDate: 30,
-  storage: "roomTemp",
-  purchaseDate: "2025-02-10",
-};
-
 const IngredientStorageContainer = ({
   title,
   items,
   onEdit,
+  setExpiringSoonItems,
+  setIngredientData,
 }: IngredientStorageContainerProps) => {
   const IconComponent =
     title === "expiringSoon" ? ITEM_STATUS_ICON[title] : STORAGE_ICON[title];
@@ -48,7 +47,7 @@ const IngredientStorageContainer = ({
   const [ingredients, setIngredients] = useState<Ingredient[]>(items);
 
   const [selectedIngredient, setSelectedIngredient] =
-    useState<Ingredient>(initialData);
+    useState<Ingredient>(initialIngrdientItem);
 
   const { setSelectedIngredients } = useIngredientStore();
 
@@ -75,6 +74,31 @@ const IngredientStorageContainer = ({
           : item,
       ),
     );
+
+    setIngredientData((prevData) => {
+      const storage = updatedIngredient.storage as
+        | "freezer"
+        | "fridge"
+        | "roomTemp";
+
+      const newData = prevData[storage].map((item) => {
+        return item.userIngredientId === updatedIngredient.userIngredientId
+          ? updatedIngredient
+          : item;
+      });
+
+      return { ...prevData, [storage]: newData };
+    });
+
+    if (updatedIngredient.expirationDate <= EXPIRINGSOON_DAY) {
+      setExpiringSoonItems((prevItems) =>
+        prevItems?.map((item) =>
+          item.userIngredientId === updatedIngredient.userIngredientId
+            ? updatedIngredient
+            : item,
+        ),
+      );
+    }
   };
 
   const deleteIngredient = (deletedIngredient: Ingredient) => {
@@ -83,6 +107,28 @@ const IngredientStorageContainer = ({
         (item) => item.userIngredientId !== deletedIngredient.userIngredientId,
       ),
     );
+
+    setIngredientData((prevData) => {
+      const storage = deletedIngredient.storage as
+        | "freezer"
+        | "fridge"
+        | "roomTemp";
+
+      const newData = prevData[storage].filter((item) => {
+        return item.userIngredientId !== deletedIngredient.userIngredientId;
+      });
+
+      return { ...prevData, [storage]: newData };
+    });
+
+    if (deletedIngredient.expirationDate < 7) {
+      setExpiringSoonItems((prevItems) =>
+        prevItems?.filter(
+          (item) =>
+            item.userIngredientId !== deletedIngredient.userIngredientId,
+        ),
+      );
+    }
   };
 
   useEffect(() => {
@@ -92,7 +138,7 @@ const IngredientStorageContainer = ({
       else if (window.innerWidth >= 480) columns = COLUMN_SIZE.sm;
       else if (window.innerWidth >= 360) columns = COLUMN_SIZE.xs;
 
-      setIsOverColumnLimit(items.length > columns);
+      setIsOverColumnLimit(ingredients.length > columns);
       setIsExpanded(false);
     };
 
@@ -114,7 +160,7 @@ const IngredientStorageContainer = ({
           {title === "expiringSoon" ? ITEM_STATUS[title] : STORAGE_TYPE[title]}
         </p>
       </div>
-      {items.length === 0 ? (
+      {ingredients.length === 0 ? (
         <div className="flex h-10 w-full items-center justify-center">
           식자재가 없습니다.
         </div>
@@ -160,6 +206,7 @@ const IngredientStorageContainer = ({
               <IngredientDetail
                 selectedIngredient={selectedIngredient}
                 setIsDeleteOpen={setIsDeleteOpen}
+                deleteIngredient={deleteIngredient}
                 setIsOpen={setIsOpen}
                 updateIngredient={updateIngredient}
               />

@@ -6,17 +6,26 @@ import UserGreeting from "@/components/home/UserGreeting";
 import MenuButton from "@/components/home/MenuButton";
 import IngredientStorageContainer from "@/components/home/IngredientStorageContainer";
 import IngredientCategoryFilter from "@/components/home/IngredientCategoryFilter";
-
-import { STORAGE_TYPE } from "@/constants/storage";
-import { ITEM_STATUS } from "@/constants/itemStatus";
 import { IngredientData, Ingredient } from "@/types/Ingredient";
 import IngredientEditOverview from "@/components/home/IngredientEditOverview";
 import { getRecommandedRecipe, getUserIndegredient } from "@/service/home";
+import {
+  initialIngrdientData,
+  initialIngrdientEmptyData,
+  initialIngrdientItems,
+} from "@/constants/initialData";
+import { EXPIRINGSOON_DAY } from "@/constants/itemStatus";
 
 const HomePage = () => {
-  const [ingredientData, setIngredientData] = useState<IngredientData>();
+  const [ingredientData, setIngredientData] =
+    useState<IngredientData>(initialIngrdientData);
+
+  const [expiringSoonItems, setExpiringSoonItems] = useState<Ingredient[]>(
+    initialIngrdientItems,
+  );
 
   const [isEditMode, setIsEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleEditClick = () => {
     setIsEditMode((prev) => !prev);
@@ -26,32 +35,35 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         const response = await getUserIndegredient();
-        const expiringSoonItems: Ingredient[] = Object.values(
+        const expiringSoonData: Ingredient[] = Object.values(
           response.data as IngredientData,
         )
           .flat()
           .filter((ingredient: Ingredient) => {
             return (
-              ingredient.expirationDate <= 7 && ingredient.expirationDate > 0
+              ingredient.expirationDate <= EXPIRINGSOON_DAY &&
+              ingredient.expirationDate > 0
             );
           });
 
-        setIngredientData({
-          ...response.data,
-          expiringSoon: expiringSoonItems,
-        });
+        setExpiringSoonItems(expiringSoonData);
+
+        if (response.status === 204) {
+          setIngredientData(initialIngrdientEmptyData);
+        } else {
+          setIngredientData(response.data);
+        }
       } catch (err) {
         console.log("식자재 정보를 받지 못했습니다.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  if (!ingredientData) return null;
-
-  const storageOrder: (keyof typeof STORAGE_TYPE | keyof typeof ITEM_STATUS)[] =
-    ["expiringSoon", "freezer", "fridge", "roomTemp"];
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className={`${isEditMode && "pb-32"}`}>
@@ -67,14 +79,27 @@ const HomePage = () => {
           />
           <IngredientCategoryFilter />
         </div>
-        {storageOrder.map((storage) => {
-          const items = ingredientData[storage] || [];
-          return storage === "expiringSoon" && items.length === 0 ? null : (
+        {expiringSoonItems.length !== 0 && (
+          <IngredientStorageContainer
+            key={`expiringSoon${Math.random()}`}
+            title="expiringSoon"
+            items={expiringSoonItems}
+            onEdit={isEditMode}
+            setIngredientData={setIngredientData}
+            setExpiringSoonItems={setExpiringSoonItems}
+          />
+        )}
+        {Object.keys(ingredientData).map((storage) => {
+          if (storage === "expiringSoon") return null;
+
+          return (
             <IngredientStorageContainer
-              key={storage}
-              title={storage}
-              items={items}
+              key={`${storage}${Math.random()}`}
+              title={storage as keyof IngredientData}
+              items={ingredientData[storage as keyof IngredientData] || []}
               onEdit={isEditMode}
+              setExpiringSoonItems={setExpiringSoonItems}
+              setIngredientData={setIngredientData}
             />
           );
         })}

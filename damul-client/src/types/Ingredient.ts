@@ -12,17 +12,16 @@ export interface IngredientData {
   freezer: Ingredient[];
   fridge: Ingredient[];
   roomTemp: Ingredient[];
-  expiringSoon?: Ingredient[];
 }
 
 export interface RegisterIngredientData {
   purchaseAt: string;
   storeName: string;
   userIngredients: {
-    ingredientName: "string";
+    ingredientName: string;
     categoryId: number;
     productPrice: number;
-    expirationDate: "string";
+    expirationDate: string;
     ingredientStorage: "FREEZER" | "FRIDGE" | "ROOM_TEMP";
   }[];
 }
