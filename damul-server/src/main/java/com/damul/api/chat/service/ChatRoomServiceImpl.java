@@ -445,18 +445,18 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
     private void validateCreator(ChatRoom chatRoom, int userId) {
         if (chatRoom.getCreator().getId() != userId) {
-            throw new BusinessException("채팅방 생성자만 인원 제한을 변경할 수 있습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_ADMIN_REQUIRED, "채팅방 생성자만 인원 제한을 변경할 수 있습니다.");
         }
     }
 
     private void validateNewLimit(ChatRoom chatRoom, int newLimit) {
         if (newLimit < 2) {
-            throw new BusinessException("채팅방 최대 인원은 2명 이상이어야 합니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_INVALID_MEMBER_LIMIT, "채팅방 최대 인원은 2명 이상이어야 합니다.");
         }
 
         int currentMemberCount = chatRoomMemberRepository.countMembersByRoomId(chatRoom.getId());
         if (newLimit < currentMemberCount) {
-            throw new BusinessException(
+            throw new BusinessException(ErrorCode.CHATROOM_INVALID_MEMBER_LIMIT,
                     String.format("현재 참여 중인 인원(%d명)보다 적게 설정할 수 없습니다.", currentMemberCount)
             );
         }
@@ -475,7 +475,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         ChatRoomMember currentMember = members.stream()
                 .filter(m -> m.getUser().getId() == userId)
                 .findFirst()
-                .orElseThrow(() -> new BusinessException("채팅방 멤버가 아닙니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "채팅방 멤버가 아닙니다."));
 
         chatRoomMemberRepository.delete(currentMember);
 
@@ -489,7 +489,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
     private void handleGroupRoomDeletion(ChatRoom chatRoom, ChatRoomMember member) {
         // 그룹 채팅방의 경우 방장만 삭제 가능
         if (!member.getRole().equals("ADMIN")) {
-            throw new BusinessException("방장만 채팅방을 삭제할 수 있습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_ADMIN_REQUIRED, "방장만 채팅방을 삭제할 수 있습니다.");
         }
 
         // 모든 멤버 삭제
@@ -525,7 +525,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
         ChatRoomMember member = chatRoomMemberRepository
                 .findByRoomIdAndUserId(room.getId(), userId)
-                .orElseThrow(() -> new BusinessException("채팅방 멤버가 아닙니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "채팅방 멤버가 아닙니다."));
 
         int unreadCount = chatMessageRepository
                 .countUnreadMessages(room.getId(), member.getLastReadMessageId());
