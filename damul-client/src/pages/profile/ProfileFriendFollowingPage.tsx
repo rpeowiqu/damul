@@ -16,7 +16,7 @@ const ProfileFriendFollowingPage = () => {
     try {
       const response = await getFollowings(parseInt(userId!), {
         cursor: pageParam,
-        size: 5,
+        size: 10,
       });
       if (response?.status === 204) {
         return { data: [], meta: { nextCursor: null, hasNext: false } };
