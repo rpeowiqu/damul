@@ -5,6 +5,8 @@ import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.entity.ChatRoomMember;
 import com.damul.api.chat.repository.ChatMessageRepository;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
@@ -20,7 +22,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
-public class ChatMessageServiceImpl implements ChatMessageService {
+public class ChatMessageServiceImpl extends ChatValidation implements ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
@@ -30,7 +32,11 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     public ScrollResponse<ChatMessage> getChatMessages(int roomId, int cursor, int size, int userId) {
         log.info("서비스: 채팅 메시지 조회 시작 - roomId: {}", roomId);
 
+        validateRoomId(roomId);
+        validateUserId(userId);
+        validateMessageParams(cursor, size);
         validateMembership(roomId, userId);
+
         List<ChatMessage> messages = fetchMessages(roomId, cursor, size);
 
         if (messages.isEmpty()) {
@@ -45,6 +51,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     public UnReadResponse getUnreadMessageCount(int userId) {
         log.info("서비스: 전체 안 읽은 메시지 수 조회 시작 - userId: {}", userId);
 
+        validateUserId(userId);
+
         int unreadCount = chatMessageRepository.countAllUnreadMessages(userId);
 
         log.info("서비스: 전체 안 읽은 메시지 수 조회 완료 - count: {}", unreadCount);
@@ -54,7 +62,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     private void validateMembership(int roomId, int userId) {
         if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
-            throw new IllegalStateException("채팅방 멤버가 아닙니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND);
         }
     }
 
