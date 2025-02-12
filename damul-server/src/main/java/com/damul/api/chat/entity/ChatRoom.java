@@ -82,4 +82,14 @@ public class ChatRoom {
         room.memberLimit = 2;
         return room;
     }
+
+    public static ChatRoom createPostRoom(User creator, Post post, String roomName, int chatSize) {
+        ChatRoom room = new ChatRoom();
+        room.creator = creator;
+        room.post = post;
+        room.roomName = roomName;
+        room.roomType = RoomType.GROUP;
+        room.memberLimit = chatSize;
+        return room;
+    }
 }

@@ -10,6 +10,7 @@ import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
+import com.damul.api.post.entity.Post;
 
 public interface ChatRoomService {
 
@@ -29,7 +30,7 @@ public interface ChatRoomService {
 
     ChatRoomLimitResponse updateMemberLimit(int roomId, int newLimit, int userId);
 
-    CreateResponse createMultiChatRoomInPost(int currentUserId, int postId, String postName);
+    CreateResponse createMultiChatRoomInPost(int currentUserId, Post post, String postName, int chatSize);
 
     CreateResponse createMultiChatRoom(MultiChatRoomCreate request, int userId);
 

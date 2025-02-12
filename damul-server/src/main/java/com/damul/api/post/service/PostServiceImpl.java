@@ -288,7 +288,7 @@ public class PostServiceImpl implements PostService {
         log.info("게시글 작성 완료 - ID: {}", savedPost.getPostId());
 
         // 채팅방 연결
-        chatRoomService.createMultiChatRoomInPost(userInfo.getId(), post.getPostId(), post.getTitle());
+        chatRoomService.createMultiChatRoomInPost(userInfo.getId(), post, post.getTitle(), postRequest.getChatSize());
 
         return new CreateResponse(savedPost.getPostId());
     }
