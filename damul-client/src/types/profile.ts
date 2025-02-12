@@ -18,6 +18,7 @@ export interface FoodPreference {
 }
 
 export interface ProfileInfo {
+  followed: boolean;
   followerCount: number;
   followingCount: number;
   selfIntroduction: string;

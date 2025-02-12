@@ -46,6 +46,20 @@ import HomeIngredientsEditPage from "@/pages/home/HomeIngredientsEditPage";
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <Layout header={null} footer={null} />,
+    children: [
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "signup",
+        element: <SignUpPage />,
+      },
+    ],
+  },
+  {
+    path: "/",
     element: <Layout />,
     children: [
       {
@@ -226,15 +240,15 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <Layout header={null} footer={null} />,
+    element: <Layout footer={null} />,
     children: [
       {
-        path: "login",
-        element: <LoginPage />,
+        path: "setting",
+        element: <SettingPage />,
       },
       {
-        path: "signup",
-        element: <SignUpPage />,
+        path: "alarm",
+        element: <AlarmPage />,
       },
     ],
   },

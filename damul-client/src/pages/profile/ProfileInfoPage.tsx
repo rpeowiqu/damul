@@ -11,6 +11,7 @@ import { ProfileInfo } from "@/types/profile";
 import DamulButton from "@/components/common/DamulButton";
 import useUserStore from "@/stores/user";
 import { getProfileDetail } from "@/service/mypage";
+import { toggleFollow } from "@/service/user";
 
 const chartConfig = {
   categoryPreference: {
@@ -35,6 +36,7 @@ const ProfileInfoPage = () => {
   const { user } = useOutletContext();
   const myId = useUserStore((state) => state.myId);
   const [profileInfo, setProfileInfo] = useState<ProfileInfo>({
+    followed: false,
     followerCount: 0,
     followingCount: 0,
     selfIntroduction: "",
@@ -49,6 +51,7 @@ const ProfileInfoPage = () => {
         if (response) {
           setProfileInfo(response.data);
         }
+        console.log("디테일마운트", response.data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -57,7 +60,28 @@ const ProfileInfoPage = () => {
     };
 
     fetchProfileDetail();
-  }, [user]);
+  }, [user.userId]);
+
+  const handleFollowState = async () => {
+    try {
+      const response = await toggleFollow({
+        userId: myId,
+        targetId: user.userId,
+      });
+      if (response) {
+        const followed = response.data.followed;
+        setProfileInfo({
+          ...profileInfo,
+          followed,
+          followerCount: followed
+            ? profileInfo.followerCount + 1
+            : profileInfo.followerCount - 1,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (isLoading) {
     return null;
@@ -111,7 +135,7 @@ const ProfileInfoPage = () => {
             {profileInfo.followingCount.toLocaleString()}
           </p>
         </Link>
-        {user.userId !== myId && (
+        {myId !== user.userId && (
           <div className="flex flex-col flex-1 justify-center items-center gap-2">
             <DamulButton
               variant="positive"
@@ -121,11 +145,11 @@ const ProfileInfoPage = () => {
               채팅 시작
             </DamulButton>
             <DamulButton
-              variant="positive"
+              variant={`${profileInfo.followed ? "negative" : "positive"}`}
               className="w-20 sm:w-24 h-7 text-sm"
-              onClick={() => {}}
+              onClick={handleFollowState}
             >
-              팔로우
+              {profileInfo.followed ? "언팔로우" : "팔로우"}
             </DamulButton>
           </div>
         )}
@@ -133,7 +157,7 @@ const ProfileInfoPage = () => {
 
       <div className="flex flex-col gap-2 p-5 bg-white">
         <h1 className="text-lg font-bold">자기소개</h1>
-        <p className="text-normal-600">
+        <p className="text-normal-600 whitespace-pre-wrap">
           {profileInfo.selfIntroduction}
           <br />
         </p>
