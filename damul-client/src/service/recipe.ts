@@ -3,7 +3,7 @@ import apiClient from "./http";
 // 레시피 검색 및 전체조회
 export const getRecipes = async ({
   cursor = 0,
-  size = 10,
+  size = 5,
   searchType,
   keyword,
   orderBy,
@@ -77,16 +77,14 @@ export const postRecipeBookMark = async ({
 // 레시피 댓글 작성
 export const postRecipeComment = async ({
   recipeId,
-  authorId,
   comment,
   parentId,
 }: {
   recipeId: string;
-  authorId: string;
   comment: string;
   parentId?: number;
 }) => {
-  const CommentCreate: Record<string, any> = { authorId, comment };
+  const CommentCreate: Record<string, any> = { comment };
 
   if (parentId) {
     CommentCreate.parentId = parentId;

@@ -54,13 +54,11 @@ const CommentInput = ({
         type === "recipe"
           ? await postRecipeComment({
               recipeId: id,
-              authorId,
               comment,
               parentId,
             })
           : await postPostComment({
               postId: id,
-              authorId,
               comment,
               parentId,
             });

@@ -3,7 +3,7 @@ import apiClient from "./http";
 // 게시글 검색 및 전체조회
 export const getPosts = async ({
   cursor = 0,
-  size = 10,
+  size = 5,
   searchType,
   keyword,
   status,
