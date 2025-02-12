@@ -35,7 +35,7 @@ public class RestChatController {
     public ResponseEntity<ScrollResponse<ChatRoomList>> getChatRooms(
             @RequestParam int cursor,
             @RequestParam int size,
-            @CurrentUser User user
+            @CurrentUser UserInfo user
     ) {
         log.info("컨트롤러: 채팅방 목록 조회 시작 - cursor: {}, size: {}", cursor, size);
 
@@ -53,7 +53,7 @@ public class RestChatController {
             @PathVariable int roomId,
             @RequestParam int cursor,
             @RequestParam int size,
-            @CurrentUser User user
+            @CurrentUser UserInfo user
     ) {
         log.info("컨트롤러: 채팅 메시지 조회 시작 - roomId: {}, cursor: {}, size: {}",
                 roomId, cursor, size);
@@ -77,7 +77,7 @@ public class RestChatController {
             @RequestParam(required = false) String keyword,
             @RequestParam int cursor,
             @RequestParam int size,
-            @CurrentUser User user
+            @CurrentUser UserInfo user
     ) {
         log.info("컨트롤러: 채팅방 검색 시작 - keyword: {}, cursor: {}, size: {}",
                 keyword, cursor, size);
