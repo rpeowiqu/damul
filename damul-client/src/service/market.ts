@@ -3,7 +3,7 @@ import apiClient from "./http";
 // 게시글 검색 및 전체조회
 export const getPosts = async ({
   cursor = 0,
-  size = 10,
+  size = 5,
   searchType,
   keyword,
   status,
@@ -45,6 +45,21 @@ export const getPostDetail = async (postId: string | undefined) => {
 // 게시글 작성
 export const postPost = async (formData: FormData) => {
   return apiClient.post("posts", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+// 게시글 수정
+export const putPost = async ({
+  formData,
+  postId,
+}: {
+  formData: FormData;
+  postId: string | undefined;
+}) => {
+  return apiClient.put(`posts/${postId}`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

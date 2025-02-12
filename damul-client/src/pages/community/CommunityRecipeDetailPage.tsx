@@ -110,6 +110,7 @@ const CommunityRecipeDetailPage = () => {
         <AuthorInfo
           profileImageUrl={data.profileImageUrl}
           authorName={data.authorName}
+          authorId={data.authorId}
           viewCnt={data.viewCnt}
           likeCnt={data.likeCnt}
           liked={data.liked}

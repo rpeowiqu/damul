@@ -1,9 +1,6 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
-import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
-import PostFeedCard from "@/components/common/PostFeedCard";
-import PostButton from "@/components/community/PostButton";
 import {
   Select,
   SelectContent,
@@ -14,7 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import WriteIcon from "@/components/svg/WriteIcon";
+import PostFeedCard from "@/components/common/PostFeedCard";
+import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import { getPosts } from "@/service/market";
 
 interface PostItem {
@@ -29,11 +27,16 @@ interface PostItem {
   viewCnt: number;
 }
 
-const CommunityMarketMainPage = () => {
-  const [filterActive, setFlterActive] = useState(false);
-
-  const navigate = useNavigate();
+const CommunityMarketSearchResultPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [filterActive, setFlterActive] = useState(false);
+  const navigate = useNavigate();
+
+  // URL에서 keyword
+  const keyword = searchParams.get("keyword") || "";
+
+  // URL에서 searchType
+  const searchType = searchParams.get("searchType") || "";
 
   // URL의 orderBy 값이 없으면 기본값 'latest' 설정
   const orderType = searchParams.get("orderBy") || "latest";
@@ -49,28 +52,15 @@ const CommunityMarketMainPage = () => {
     setSearchParams(newParams);
   };
 
-  const statusType = searchParams.get("status") || "";
-
-  const handleFilterChange = () => {
-    setFlterActive(!filterActive);
-    const newParams = new URLSearchParams(searchParams);
-    if (!filterActive) {
-      newParams.set("status", "active");
-    } else {
-      newParams.delete("status");
-    }
-    setSearchParams(newParams);
-  };
-
   const fetchItems = async (pageParam: number) => {
     try {
       const response = await getPosts({
         cursor: pageParam,
         size: 5,
         orderBy: orderType,
-        status: statusType,
+        searchType: searchType,
+        keyword: keyword,
       });
-      console.log(response?.data);
       return response?.data;
     } catch (error) {
       console.log(error);
@@ -78,20 +68,22 @@ const CommunityMarketMainPage = () => {
   };
 
   return (
-    <main className="h-full text-center px-4 py-6 pc:px-6 space-y-2">
-      <DamulSearchBox
-        placeholder="원하는 식자재를 검색해보세요."
-        onInputClick={() => {
-          navigate("/community/market/search");
-        }}
-        className="cursor-pointer"
-      />
+    <main className="h-full px-4 py-6 pc:px-6 space-y-2">
+      <div className="flex-grow">
+        <DamulSearchBox
+          placeholder={keyword}
+          onInputClick={() => navigate("/community/market/search")}
+          className="cursor-pointer"
+        />
+      </div>
       <div className="flex justify-between">
         <div className="flex items-center gap-3">
           <Switch
             id="warning"
             checked={filterActive}
-            onCheckedChange={handleFilterChange}
+            onCheckedChange={() => {
+              setFlterActive(!filterActive);
+            }}
             className="data-[state=checked]:bg-positive-200"
           />
           <p
@@ -107,24 +99,26 @@ const CommunityMarketMainPage = () => {
           <SelectContent>
             <SelectGroup>
               <SelectLabel>정렬 조건</SelectLabel>
-              <SelectItem
-                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="latest"
-              >
-                최신순
-              </SelectItem>
-              <SelectItem
-                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="views"
-              >
-                조회수순
-              </SelectItem>
+              <div className="flex flex-col">
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="latest"
+                >
+                  최신순
+                </SelectItem>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="views"
+                >
+                  조회수순
+                </SelectItem>
+              </div>
             </SelectGroup>
           </SelectContent>
         </Select>
       </div>
       <DamulInfiniteScrollList
-        queryKey={["posts", orderType, statusType]}
+        queryKey={["recipes", orderType]}
         fetchFn={fetchItems}
         renderItems={(item: PostItem) => (
           <PostFeedCard
@@ -144,9 +138,8 @@ const CommunityMarketMainPage = () => {
           <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
         }
       />
-      <PostButton to="/community/market/post" icon={<WriteIcon />} />
     </main>
   );
 };
 
-export default CommunityMarketMainPage;
+export default CommunityMarketSearchResultPage;

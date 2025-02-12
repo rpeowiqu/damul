@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import {
   Select,
@@ -10,8 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import FeedCard from "@/components/common/RecipeFeedCard";
+import RecipeFeedCard from "@/components/common/RecipeFeedCard";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import { getRecipes } from "@/service/recipe";
 
@@ -29,9 +27,8 @@ interface RecipeItem {
   viewCnt: number;
 }
 
-const CommunitySearchResultPage = () => {
+const CommunityRecipeSearchResultPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [filterActive, setFlterActive] = useState(false);
   const navigate = useNavigate();
 
   // URL에서 keyword
@@ -69,42 +66,16 @@ const CommunitySearchResultPage = () => {
     }
   };
 
-  const location = useLocation();
-
-  // 현재 URL에서 마지막 `/` 이후의 부분을 제거하여 base path 생성
-  const basePath = location.pathname.replace(/\/[^/]+$/, "").replace(/^\//, "");
-
   return (
     <main className="h-full px-4 py-6 pc:px-6 space-y-2">
       <div className="flex-grow">
         <DamulSearchBox
           placeholder={keyword}
-          onInputClick={() => navigate(`/${basePath}`)}
+          onInputClick={() => navigate("/community/recipe/search")}
           className="cursor-pointer"
         />
       </div>
-      <div className="flex justify-between">
-        {basePath.endsWith("/market/search") ? (
-          <div className="flex items-center gap-3">
-            <Switch
-              id="warning"
-              checked={filterActive}
-              onCheckedChange={() => {
-                setFlterActive(!filterActive);
-              }}
-              className="data-[state=checked]:bg-positive-200"
-            />
-            <p
-              className={`text-sm ${filterActive ? "text-positive-400" : "text-normal-400"}`}
-            >
-              {filterActive
-                ? "진행중인 공구/나눔만 보기"
-                : "모든 공구/나눔 보기"}
-            </p>
-          </div>
-        ) : (
-          <div></div>
-        )}
+      <div className="flex justify-end">
         <Select value={orderType} onValueChange={handleSortChange}>
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
@@ -112,43 +83,24 @@ const CommunitySearchResultPage = () => {
           <SelectContent>
             <SelectGroup>
               <SelectLabel>정렬 조건</SelectLabel>
-              {basePath.endsWith("/recipe/search") ? (
-                <>
-                  <SelectItem
-                    className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                    value="latest"
-                  >
-                    최신순
-                  </SelectItem>
-                  <SelectItem
-                    className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                    value="likes"
-                  >
-                    좋아요순
-                  </SelectItem>
-                  <SelectItem
-                    className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                    value="views"
-                  >
-                    조회수순
-                  </SelectItem>
-                </>
-              ) : (
-                <div className="flex flex-col">
-                  <SelectItem
-                    className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                    value="latest"
-                  >
-                    최신순
-                  </SelectItem>
-                  <SelectItem
-                    className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                    value="views"
-                  >
-                    조회수순
-                  </SelectItem>
-                </div>
-              )}
+              <SelectItem
+                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                value="latest"
+              >
+                최신순
+              </SelectItem>
+              <SelectItem
+                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                value="likes"
+              >
+                추천순
+              </SelectItem>
+              <SelectItem
+                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                value="views"
+              >
+                조회수순
+              </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -156,9 +108,8 @@ const CommunitySearchResultPage = () => {
       <DamulInfiniteScrollList
         queryKey={["recipes", orderType]}
         fetchFn={fetchItems}
-        loadSize={5}
         renderItems={(item: RecipeItem) => (
-          <FeedCard
+          <RecipeFeedCard
             key={item.id}
             id={item.id}
             title={item.title}
@@ -181,4 +132,4 @@ const CommunitySearchResultPage = () => {
   );
 };
 
-export default CommunitySearchResultPage;
+export default CommunityRecipeSearchResultPage;

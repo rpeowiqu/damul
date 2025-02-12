@@ -4,6 +4,7 @@ import ReportButton from "../common/ReportButton";
 import { formatDate } from "@/utils/date";
 import { deleteRecipeComment } from "@/service/recipe";
 import { deletePostComment } from "@/service/market";
+import useUserStore from "@/stores/user";
 
 interface ReplyItemProps {
   id: string;
@@ -19,28 +20,29 @@ const ReplyItem = ({
   reply,
   onReply,
   fetchDetailData,
-  type
+  type,
 }: ReplyItemProps) => {
+  const myId = useUserStore((state) => state.myId);
+
   const deleteComment = async (commentId: number) => {
     const isConfirmed = window.confirm("정말로 댓글을 삭제하시겠습니까?");
 
     if (!isConfirmed) {
-         return;
-       }
-   
-       try {
-         const response =
-           type === "recipe"
-             ? await deleteRecipeComment({ recipeId: id, commentId })
-             : await deletePostComment({ postId: id, commentId });
-   
-         console.log(response);
-         fetchDetailData();
-       } catch (error) {
-         console.error(error);
-       }
-     };
-   
+      return;
+    }
+
+    try {
+      const response =
+        type === "recipe"
+          ? await deleteRecipeComment({ recipeId: id, commentId })
+          : await deletePostComment({ postId: id, commentId });
+
+      console.log(response);
+      fetchDetailData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="ml-6 mt-2 bg-neutral-100 p-2 rounded-md">
@@ -64,12 +66,14 @@ const ReplyItem = ({
         >
           <p className="text-xs">답글</p>
         </div>
-        <div
-          className="flex items-center gap-1"
-          onClick={() => deleteComment(reply.id)}
-        >
-          <p className="text-xs">삭제</p>
-        </div>
+        {reply.userId === myId && (
+          <div
+            className="flex items-center gap-1"
+            onClick={() => deleteComment(reply.id)}
+          >
+            <p className="text-xs">삭제</p>
+          </div>
+        )}
       </div>
     </div>
   );

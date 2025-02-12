@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import DamulDrawer from "@/components/common/DamulDrawer";
 import PostCard from "@/components/community/PostCard";
 import SubmitButton from "@/components/community/SubmitButton";
@@ -9,10 +9,11 @@ import PostContent from "@/components/community/PostContent";
 import PostMarketMemberCnt from "@/components/community/PostMarketMemberCnt";
 import DamulButton from "@/components/common/DamulButton";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
-import { postPost } from "@/service/market";
+import { postPost, putPost, getPostDetail } from "@/service/market";
 
 const CommunityMarketPostPage = () => {
   const navigate = useNavigate();
+  const { postId } = useParams();
 
   const [title, setTitle] = useState<string>("");
   const [tempTitle, setTempTitle] = useState<string>("");
@@ -50,7 +51,9 @@ const CommunityMarketPostPage = () => {
     }
 
     try {
-      const response = await postPost(formData);
+      const response = await (location.pathname.endsWith("edit")
+        ? putPost({ formData, postId })
+        : postPost(formData));
       console.log(response?.data);
       alert("게시글이 등록되었습니다");
       navigate("/community/market");
@@ -58,6 +61,29 @@ const CommunityMarketPostPage = () => {
       console.error(error);
     }
   };
+
+  const fetchPostDetail = async () => {
+    try {
+      const response = await getPostDetail(postId);
+      setTitle(response.data.title);
+      setTempTitle(response.data.title);
+      setImage(response.data.contentImageUrl);
+      setTempImage(response.data.contentImageUrl);
+      setPreImage(response.data.contentImageUrl);
+      setContent(response.data.content);
+      setTempContent(response.data.content);
+      setChatSize(response.data.chatSize);
+      setTempChatSize(response.data.chatSize);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (location.pathname.endsWith("edit")) {
+      fetchPostDetail();
+    }
+  }, []);
 
   return (
     <main className="flex flex-col px-7 py-4 pc:p-6 gap-5">
