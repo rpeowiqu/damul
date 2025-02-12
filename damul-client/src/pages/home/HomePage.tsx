@@ -25,7 +25,6 @@ const HomePage = () => {
   );
 
   const [isEditMode, setIsEditMode] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   const handleEditClick = () => {
     setIsEditMode((prev) => !prev);
@@ -55,15 +54,11 @@ const HomePage = () => {
         }
       } catch (err) {
         console.log("식자재 정보를 받지 못했습니다.");
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
-
-  if (loading) return <div>Loading...</div>;
 
   return (
     <div className={`${isEditMode && "pb-32"}`}>

@@ -170,7 +170,7 @@ const HomeIngredientsRegisterPage = () => {
         </div>
       </div>
       <div className="flex justify-end gap-2 font-bold">
-        총 구매 금액:{" "}
+        총 구매 금액:
         <span className="text-positive-300">
           {totalAmount.toLocaleString()}
         </span>
