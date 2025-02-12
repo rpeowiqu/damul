@@ -3,7 +3,6 @@ package com.damul.api.post.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
-import com.damul.api.chat.controller.RestChatController;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
@@ -117,10 +116,6 @@ public class PostServiceImpl implements PostService {
                         activeStatus, cursor, pageable, searchType, keyword, orderBy
                 );
             }
-        }
-
-        if (posts.size() > size) {
-            posts = posts.subList(0, size);
         }
 
         if (posts.isEmpty()) {
