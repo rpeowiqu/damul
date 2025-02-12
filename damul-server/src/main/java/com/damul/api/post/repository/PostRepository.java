@@ -25,7 +25,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                         p.createdAt, p.user.id, p.user.nickname, p.status, p.viewCnt)
             FROM Post p
             JOIN p.user u
-            LEFT JOIN Post prev ON prev.postId = :cursor
             WHERE p.status IN :statuses
             AND (:cursor = 0 OR p.postId < :cursor)
             ORDER BY p.postId DESC
