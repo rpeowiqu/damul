@@ -10,10 +10,12 @@ import { postRecipeLike } from "@/service/recipe";
 import { useState, useEffect } from "react";
 import { deleteRecipe } from "@/service/recipe";
 import { deletePost } from "@/service/market";
+import useUserStore from "@/stores/user";
 
 interface AuthorInfoProps {
   profileImageUrl: string;
   authorName: string;
+  authorId: number;
   viewCnt?: number;
   likeCnt?: number;
   liked?: boolean;
@@ -24,12 +26,15 @@ interface AuthorInfoProps {
 const AuthorInfo = ({
   profileImageUrl,
   authorName,
+  authorId,
   viewCnt,
   likeCnt = 0,
   liked,
   type,
   id,
 }: AuthorInfoProps) => {
+  const myId = useUserStore((state) => state.myId);
+
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(liked);
   const [likesCount, setLikesCount] = useState(likeCnt);
@@ -90,7 +95,7 @@ const AuthorInfo = ({
             {type === "recipe" && (
               <div
                 onClick={likeRecipe}
-                className="flex items-center w-12 gap-1 cursor-pointer"
+                className="flex items-center gap-1 cursor-pointer"
               >
                 {isLiked ? (
                   <LikesIcon className="w-5 h-5 fill-positive-300 stroke-neutral-500" />
@@ -112,22 +117,26 @@ const AuthorInfo = ({
             <p className="text-xs pc:text-sm">신고하기</p>
           </ReportButton>
         </div>
-        <div
-          className="flex items-center gap-0.5 cursor-pointer mr-1"
-          onClick={() => {
-            navigate(`/community/${type}/${id}/edit`);
-          }}
-        >
-          <WriteIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5" />
-          <p className="text-xs pc:text-sm">수정하기</p>
-        </div>
-        <div
-          className="flex items-center gap-0 cursor-pointer"
-          onClick={clickDeleteRecipe}
-        >
-          <DeleteIcon className="w-5 h-5 pc:w-7 pc:h-7 fill-neutral-700 pb-0.5" />
-          <p className="text-xs pc:text-sm">삭제하기</p>
-        </div>
+        {authorId === myId && (
+          <>
+            <div
+              className="flex items-center gap-0.5 cursor-pointer mr-1"
+              onClick={() => {
+                navigate(`/community/${type}/${id}/edit`);
+              }}
+            >
+              <WriteIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5" />
+              <p className="text-xs pc:text-sm">수정하기</p>
+            </div>
+            <div
+              className="flex items-center gap-0 cursor-pointer"
+              onClick={clickDeleteRecipe}
+            >
+              <DeleteIcon className="w-5 h-5 pc:w-7 pc:h-7 fill-neutral-700 pb-0.5" />
+              <p className="text-xs pc:text-sm">삭제하기</p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

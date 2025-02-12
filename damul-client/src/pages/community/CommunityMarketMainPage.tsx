@@ -126,7 +126,6 @@ const CommunityMarketMainPage = () => {
       <DamulInfiniteScrollList
         queryKey={["posts", orderType, statusType]}
         fetchFn={fetchItems}
-        loadSize={5}
         renderItems={(item: PostItem) => (
           <PostFeedCard
             key={item.id}

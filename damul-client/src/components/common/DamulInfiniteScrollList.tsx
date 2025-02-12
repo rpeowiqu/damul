@@ -1,5 +1,4 @@
 import { ReactNode, useEffect } from "react";
-import { ReactNode, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
@@ -7,7 +6,7 @@ interface DamulInfiniteScrollListProps<T> {
   queryKey: string[];
   fetchFn: (pageParam: number) => Promise<{
     data: T[];
-    meta: { nextCursor: number | null; hasNextData: boolean };
+    meta: { nextCursor: number | null; hasNext: boolean };
   }>;
   initPage?: number;
   renderItems: (item: T, index: number) => ReactNode;
@@ -19,7 +18,6 @@ const DamulInfiniteScrollList = <T,>({
   queryKey,
   fetchFn,
   initPage = 0,
-  loadSize = 1,
   renderItems,
   skeleton,
   className,
@@ -34,17 +32,19 @@ const DamulInfiniteScrollList = <T,>({
       queryKey: [queryKey],
       queryFn: ({ pageParam }) => fetchFn(pageParam),
       initialPageParam: initPage,
-      getNextPageParam: (lastPage) =>
-        lastPage.meta?.hasNextData ? lastPage.meta.nextCursor : undefined, // 커서 사용
+      getNextPageParam: (lastPage) => {
+        console.log("lastPage:", lastPage);
+        return lastPage.meta?.hasNext ? lastPage.meta.nextCursor : undefined;
+      },
     });
 
   useEffect(() => {
+    console.log(isFetchingNextPage);
     if (inView && hasNextPage) {
       fetchNextPage();
       console.log(data);
     }
-  }, [inView]);
-
+  }, [inView, hasNextPage, isFetchingNextPage]);
   return (
     <div className={className}>
       {data?.pages.map((page, pageIndex) =>
@@ -52,7 +52,11 @@ const DamulInfiniteScrollList = <T,>({
           renderItems(item, index + pageIndex * page.data.length),
         ),
       )}
-      {isFetchingNextPage ? skeleton : <div ref={ref}></div>}
+      {isFetchingNextPage ? (
+        skeleton
+      ) : (
+        <div ref={ref} className="bg-red-300"></div>
+      )}
     </div>
   );
 };

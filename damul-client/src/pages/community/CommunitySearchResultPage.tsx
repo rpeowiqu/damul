@@ -124,7 +124,7 @@ const CommunitySearchResultPage = () => {
                     className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
                     value="likes"
                   >
-                    좋아요순
+                    추천순
                   </SelectItem>
                   <SelectItem
                     className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
@@ -156,7 +156,6 @@ const CommunitySearchResultPage = () => {
       <DamulInfiniteScrollList
         queryKey={["recipes", orderType]}
         fetchFn={fetchItems}
-        loadSize={5}
         renderItems={(item: RecipeItem) => (
           <FeedCard
             key={item.id}

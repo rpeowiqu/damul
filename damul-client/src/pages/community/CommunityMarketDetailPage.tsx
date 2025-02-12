@@ -90,6 +90,7 @@ const CommunityMarketDetailPage = () => {
       <AuthorInfo
         profileImageUrl={data.profileImageUrl}
         authorName={data.authorName}
+        authorId={data.authorId}
         viewCnt={data.viewCnt}
         id={data.id}
         type="market"

@@ -5,6 +5,7 @@ import { Comment } from "@/types/community";
 import { formatDate } from "@/utils/date";
 import { deleteRecipeComment } from "@/service/recipe";
 import { deletePostComment } from "@/service/market";
+import useUserStore from "@/stores/user";
 
 interface CommentItemProps {
   id: string;
@@ -22,6 +23,8 @@ const CommentItem = ({
   fetchDetailData,
   type,
 }: CommentItemProps) => {
+  const myId = useUserStore((state) => state.myId);
+
   const deleteComment = async (commentId: number) => {
     const isConfirmed = window.confirm("정말로 댓글을 삭제하시겠습니까?");
     console.log("CommentItem id 값:", id);
@@ -69,14 +72,16 @@ const CommentItem = ({
         >
           <p className="text-xs">답글</p>
         </div>
-        <div
-          className="flex items-center gap-1"
-          onClick={() => {
-            deleteComment(comment.id);
-          }}
-        >
-          <p className="text-xs">삭제</p>
-        </div>
+        {comment.userId === myId && (
+          <div
+            className="flex items-center gap-1"
+            onClick={() => {
+              deleteComment(comment.id);
+            }}
+          >
+            <p className="text-xs">삭제</p>
+          </div>
+        )}
       </div>
       {replies.map((reply) => (
         <ReplyItem

@@ -99,8 +99,8 @@ const CommunityRecipePostPage = () => {
     try {
       const response = await postRecipe(formData);
       console.log(response?.data);
-      alert("레시피가 등록되었습니다")
-      navigate("/community/recipe")
+      alert("레시피가 등록되었습니다");
+      navigate("/community/recipe");
     } catch (error) {
       console.error(error);
     }
