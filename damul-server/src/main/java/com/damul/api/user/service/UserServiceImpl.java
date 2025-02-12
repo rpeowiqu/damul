@@ -149,11 +149,6 @@ public class UserServiceImpl implements UserService {
         log.info("검색어 있음 - 검색어 포함: {}, 정확히 일치: {}, 검색어 시작:{}", cursor, pageable, contains, exactMatch, startsWith);
         List<UserList> userList = userRepository.findByNicknameContainingWithPaging(contains, exactMatch, startsWith, cursor, pageable);
 
-        // 마지막 하나를 더 조회했으므로 size보다 큰 경우 다음 데이터가 있다는 의미
-        if (userList.size() > size) {
-            userList = userList.subList(0, size);
-        }
-
         log.info("사용자 목록 검색 조회 성공");
         return ScrollUtil.createScrollResponse(userList, cursor, size);
     }
