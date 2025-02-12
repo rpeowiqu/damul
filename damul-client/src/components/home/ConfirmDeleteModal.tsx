@@ -16,10 +16,14 @@ const ConfirmDeleteModal = ({
   setIsDeleteOpen,
   deleteIngredient,
 }: ConfirmDeleteModalProps) => {
-  // const { setWarningEnabled } = useUserStore();
+  const myWarningEnabled = useUserStore((state) => state.myWarningEnabled);
+  const setWarningEnabled = useUserStore((state) => state.setWarningEnabled);
   const handleOnDelete = async () => {
     try {
-      await deleteUserIndegredient(ingredient.userIngredientId);
+      await deleteUserIndegredient(
+        ingredient.userIngredientId,
+        myWarningEnabled ? 1 : 0,
+      );
       deleteIngredient(ingredient);
     } catch (error) {
       console.log("식자재 정보를 삭제 하지 못했습니다.");
@@ -29,6 +33,10 @@ const ConfirmDeleteModal = ({
   const handleOnClose = async () => {
     setIsDeleteOpen(false);
     setIsOpen?.(true);
+  };
+
+  const handleDeleteCheck = () => {
+    setWarningEnabled(!myWarningEnabled);
   };
 
   return (
@@ -56,7 +64,12 @@ const ConfirmDeleteModal = ({
       </div>
 
       <div className="flex items-center w-full p-3">
-        <input type="checkbox" id="delete-check" name="delete-check" />
+        <input
+          type="checkbox"
+          id="delete-check"
+          name="delete-check"
+          onClick={handleDeleteCheck}
+        />
         <label
           htmlFor="delete-check"
           className=" cursor-pointer text-sm text-normal-300 pl-2"

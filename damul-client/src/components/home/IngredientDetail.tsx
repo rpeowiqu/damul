@@ -3,12 +3,14 @@ import DeleteIcon from "../svg/DeleteIcon";
 import SaveIcon from "../svg/SaveIcon";
 import { Slider } from "../ui/slider";
 import { CATEGORY, CATEGORYNUMBER } from "@/constants/category";
-import { patchUserIndegredient } from "@/service/home";
+import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
 import { useEffect, useState } from "react";
+import useUserStore from "@/stores/user";
 
 interface IngredientDetailProps {
   selectedIngredient: Ingredient;
   updateIngredient?: (ingredient: Ingredient) => void;
+  deleteIngredient?: (deletedIngredient: Ingredient) => void;
   setIsDeleteOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -53,12 +55,16 @@ const getExpirationDate = (
 const IngredientDetail = ({
   selectedIngredient,
   updateIngredient,
+  deleteIngredient,
   setIsDeleteOpen,
   setIsOpen,
 }: IngredientDetailProps) => {
   const IconComponent = CATEGORY[CATEGORYNUMBER[selectedIngredient.categoryId]];
 
   const [ingredient, setIngredient] = useState<Ingredient>(selectedIngredient);
+
+  const myWarningEnabled = useUserStore((state) => state.myWarningEnabled);
+
   const handleQuantityChange = (value: number[]) => {
     setIngredient((prev) => {
       return {
@@ -68,8 +74,20 @@ const IngredientDetail = ({
     });
   };
 
-  const handleDeleteClick = () => {
-    setIsDeleteOpen(true);
+  const handleDeleteClick = async () => {
+    if (myWarningEnabled) {
+      setIsDeleteOpen(true);
+    } else {
+      try {
+        await deleteUserIndegredient(
+          ingredient.userIngredientId,
+          myWarningEnabled ? 1 : 0,
+        );
+        deleteIngredient?.(ingredient);
+      } catch (error) {
+        console.log("식자재 정보를 삭제 하지 못했습니다.");
+      }
+    }
     setIsOpen?.(false);
   };
 
@@ -79,7 +97,7 @@ const IngredientDetail = ({
         ingredientQuantity: ingredient.ingredientQuantity,
       });
       updateIngredient?.(ingredient);
-    } catch (error) {
+    } catch (error: any) {
       console.error("식자재 정보를 수정하지 못했습니다.");
     }
     setIsOpen?.(false);

@@ -16,10 +16,15 @@ export const patchUserIndegredient = async (
   return apiClient.patch(`/home/ingredients/${ingredientId}`, data);
 };
 
-export const deleteUserIndegredient = async (ingredientId: number) => {
-  return apiClient.delete(`/home/ingredients/${ingredientId}`);
+export const deleteUserIndegredient = async (
+  ingredientId: number,
+  warningEnable: number,
+) => {
+  return apiClient.delete(
+    `/home/ingredients/${ingredientId}?warningEnable=${warningEnable}`,
+  );
 };
 
 export const postUserIndegredient = async (data: RegisterIngredientData) => {
-  return apiClient.post(`/home/register`, data);
+  return apiClient.post(`/home/ingredients/register`, data);
 };
