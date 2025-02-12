@@ -67,7 +67,7 @@ public class UserReceiptServiceImpl implements UserReceiptService {
                     .price(item.getProductPrice())
                     .build();
 
-            userIngredientRepository.save(ingredient);  // 개별적으로 저장
+            userIngredientRepository.save(ingredient);
         });
 
         // Update food preferences
