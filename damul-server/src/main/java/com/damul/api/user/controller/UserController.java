@@ -64,11 +64,12 @@ public class UserController {
 
     // 팔로워 목록 조회
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<?> getFollowers(@RequestParam int cursor,
+    public ResponseEntity<?> getFollowers(@RequestParam(value = "keyword", required = false) String keyword,
+                                          @RequestParam int cursor,
                                           @RequestParam int size,
                                           @PathVariable int userId) {
         log.info("팔로워 목록 조회 요청");
-        ScrollResponse<UserList> userList = followService.getFollowers(cursor, size, userId);
+        ScrollResponse<UserList> userList = followService.getFollowers(keyword, cursor, size, userId);
 
         if(userList.getData().isEmpty() || userList.getData().size() == 0) {
             log.info("팔로워 목록 조회 성공 - 데이터없음");
@@ -82,11 +83,12 @@ public class UserController {
     
     // 팔로잉 목록 조회
     @GetMapping("/{userId}/followings")
-    public ResponseEntity<?> getFollowings(@RequestParam int cursor,
+    public ResponseEntity<?> getFollowings(@RequestParam(value = "keyword", required = false) String keyword,
+                                           @RequestParam int cursor,
                                           @RequestParam int size,
                                           @PathVariable int userId) {
         log.info("팔로잉 목록 조회 요청");
-        ScrollResponse<UserList> userList = followService.getFollowings(cursor, size, userId);
+        ScrollResponse<UserList> userList = followService.getFollowings(keyword, cursor, size, userId);
 
         if(userList.getData().isEmpty() || userList.getData().size() == 0) {
             log.info("팔로잉 목록 조회 성공 - 데이터없음");

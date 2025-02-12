@@ -3,6 +3,7 @@ package com.damul.api.post.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.controller.RestChatController;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
@@ -56,6 +57,7 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final ChatRoomService chatRoomService;
 
     private final S3Service s3Service;
 

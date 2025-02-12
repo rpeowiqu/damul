@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,44 +73,86 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public ScrollResponse<UserList> getFollowers(int cursorId, int size, int followingId ) {
+    public ScrollResponse<UserList> getFollowers(String keyword, int cursor, int size, int followingId ) {
         log.info("팔로워 목록 조회 시작");
-        List<UserList> userLists = followRepository.findFollowersByUserIdAndCursorId(
-                followingId,
-                cursorId,
-                size + 1
-        );
+        List<UserList> userList = null;
+        Pageable pageable = PageRequest.of(0, size + 1);
+
+        if(keywordIsNull(keyword)) {
+            log.info("검색할 닉네임 없음, 전체 조회");
+            userList = followRepository.findFollowersByUserIdAndCursorId(
+                    followingId,
+                    cursor,
+                    pageable
+            );
+        } else {
+            log.info("검색할 닉네임 - keyword: {}", keyword);
+
+            String exactMatch = keyword; // 정확히 일치하는 경우
+            String startsWith = keyword + "%"; // 검색어로 시작하는 경우
+            String contains = "%" + keyword + "%"; // 검색어가 포함된 경우
+
+            userList = followRepository.findFollowerByUserIdAndCursorIdAndNickname(
+                    followingId,
+                    contains,
+                    exactMatch,
+                    startsWith,
+                    cursor,
+                    pageable
+            );
+        }
 
         // 마지막 하나를 더 조회했으므로 size보다 큰 경우 다음 데이터가 있다는 의미
-        if (userLists.size() > size) {
-            userLists = userLists.subList(0, size);
+        if (userList.size() > size) {
+            userList = userList.subList(0, size);
         }
 
         log.info("팔로워 목록 조회 완료");
-        return ScrollUtil.createScrollResponse(userLists, cursorId, size);
+        return ScrollUtil.createScrollResponse(userList, cursor, size);
     }
 
     @Override
-    public ScrollResponse<UserList> getFollowings(int cursorId, int size, int followerId) {
+    public ScrollResponse<UserList> getFollowings(String keyword, int cursor, int size, int followerId) {
         log.info("팔로잉 목록 조회 시작");
-        List<UserList> userLists = followRepository.findFollowingsByUserIdAndCursorId(
-                followerId,
-                cursorId,
-                size + 1
-        );
+        Pageable pageable = PageRequest.of(0, size + 1);
+        List<UserList> userList = null;
 
-        if (userLists.size() > size) {
-            userLists = userLists.subList(0, size);
+        if(keywordIsNull(keyword)) {
+            log.info("검색할 닉네임 없음, 전체 조회 - keyword: {}", keyword);
+            userList = followRepository.findFollowingsByUserIdAndCursorId(
+                    followerId,
+                    cursor,
+                    pageable
+            );
+        } else {
+            log.info("검색할 닉네임 - keyword: {}", keyword);
+            String exactMatch = keyword; // 정확히 일치하는 경우
+            String startsWith = keyword + "%"; // 검색어로 시작하는 경우
+            String contains = "%" + keyword + "%"; // 검색어가 포함된 경우
+
+            userList = followRepository.findFollowingsByUserIdAndCursorIdAndNickname(
+                    followerId,
+                    contains,
+                    exactMatch,
+                    startsWith,
+                    cursor,
+                    pageable
+            );
+        }
+
+
+        if (userList.size() > size) {
+            userList = userList.subList(0, size);
         }
         log.info("팔로잉 목록 조회 완료");
-        return ScrollUtil.createScrollResponse(userLists, cursorId, size);
+        return ScrollUtil.createScrollResponse(userList, cursor, size);
     }
 
     // 팔로워 강제 삭제
     @Override
     public void deleteFollower(int followingId, int followerId) {
         log.info("팔로워 강제 삭제 시작 - userId: {}, followId: {}", followingId, followerId);
-// followingId: 팔로우 당하는 사람 (나)
+        // followingId: 팔로우 당하는 사람 (나)
         // followerId: 팔로우 하는 사람 (삭제하고 싶은 팔로워)
         Follow follow = followRepository.findByFollower_IdAndFollowing_Id(followerId, followingId)
                 .orElseThrow(() -> {
@@ -119,4 +163,7 @@ public class FollowServiceImpl implements FollowService {
         followRepository.delete(follow);
         log.info("팔로워 강제 삭제 성공 - followingId: {}, followerId: {}", followingId, followerId);
     }
+
+
+    private boolean keywordIsNull(String keyword) { return keyword == null || keyword.isEmpty(); }
 }
