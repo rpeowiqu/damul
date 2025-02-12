@@ -71,6 +71,7 @@ public class MyPageServiceImpl implements MyPageService {
         return ProfileDetail.builder()
                 .followerCount(followerCount)
                 .followingCount(followingCount)
+                .followed(followed)
                 .selfIntroduction(targetUser.getSelfIntroduction())
                 .foodPreference(foodPreferences)
                 .build();

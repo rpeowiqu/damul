@@ -186,7 +186,7 @@ public class PostServiceImpl implements PostService {
 
 
         // 채팅방 정보 조회
-        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost(post)
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_PostId(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
 
         // 현재 채팅방 참여 인원 수
@@ -303,7 +303,7 @@ public class PostServiceImpl implements PostService {
 
 
         // 채팅방 정보 조회
-        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost(post)
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_PostId(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
 
         // 채팅방 최대 인원 변경

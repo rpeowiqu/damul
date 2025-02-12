@@ -2,6 +2,7 @@ package com.damul.api.config;
 
 import com.damul.api.chat.socket.StompHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSocketMessageBroker
+@Slf4j
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtDecoder jwtDecoder;
@@ -28,7 +30,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:*") // 실제 운영 환경에서는 구체적인 도메인 지정 필요
+                .setAllowedOriginPatterns("http://localhost:*") // 실제 운영 환경에서는 구체적인 도메인 지정 필요
                 .withSockJS()
                 .setStreamBytesLimit(512 * 1024) // 512KB
                 .setHttpMessageCacheSize(1000)
