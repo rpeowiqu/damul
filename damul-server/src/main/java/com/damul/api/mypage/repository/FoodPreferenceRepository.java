@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FoodPreferenceRepository extends JpaRepository<FoodPreference, Integer> {
@@ -22,5 +23,7 @@ public interface FoodPreferenceRepository extends JpaRepository<FoodPreference, 
         LEFT JOIN FoodPreference fp ON fc.id = fp.category.id AND fp.user.id = :userId
         """)
     List<FoodPreferenceList> findPreferencesByUserId(@Param("userId") int userId);
+
+    Optional<FoodPreference> findByUserIdAndCategoryId(int userId, int categoryId);
 
 }

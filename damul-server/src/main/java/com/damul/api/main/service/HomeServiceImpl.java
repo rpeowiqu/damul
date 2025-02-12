@@ -1,5 +1,6 @@
 package com.damul.api.main.service;
 
+import com.damul.api.auth.entity.User;
 import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.*;
@@ -9,6 +10,7 @@ import com.damul.api.recipe.entity.Recipe;
 import com.damul.api.recipe.entity.RecipeTag;
 import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.recipe.repository.RecipeTagRepository;
+import com.damul.api.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,7 @@ public class HomeServiceImpl implements HomeService {
     private final UserIngredientRepository userIngredientRepository;
     private final RecipeRepository recipeRepository;
     private final RecipeTagRepository recipeTagRepository;
+    private final UserRepository userRepository;
 
     @Override
     public IngredientResponse getUserIngredientList(int userId) {
@@ -121,10 +124,17 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     @Transactional
-    public void deleteIngredient(int userIngredientId) {
+    public void deleteIngredient(int userIngredientId, int userId, Integer warningEnable) {
         log.info("식자재 삭제 시작");
         UserIngredient ingredient = userIngredientRepository.findByIdAndNotDeleted(userIngredientId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 재료입니다."));
+
+        // warningEnable 값이 존재하고 0일 경우 (false로 설정하려는 경우)
+        if (warningEnable != null && warningEnable == 0) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+            user.updateWarningEnabled(false);
+        }
 
         log.info("식자재 삭제 성공");
         ingredient.delete();  // 논리적 삭제 처리
