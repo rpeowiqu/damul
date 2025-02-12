@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DamulDrawer from "@/components/common/DamulDrawer";
 import PostCard from "@/components/community/PostCard";
 import SubmitButton from "@/components/community/SubmitButton";
@@ -8,8 +9,11 @@ import PostContent from "@/components/community/PostContent";
 import PostMarketMemberCnt from "@/components/community/PostMarketMemberCnt";
 import DamulButton from "@/components/common/DamulButton";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
+import { postPost } from "@/service/market";
 
 const CommunityMarketPostPage = () => {
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState<string>("");
   const [tempTitle, setTempTitle] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
@@ -17,8 +21,8 @@ const CommunityMarketPostPage = () => {
   const [preImage, setPreImage] = useState("");
   const [content, setContent] = useState<string>("");
   const [tempContent, setTempContent] = useState<string>("");
-  const [memberCnt, setMemberCnt] = useState<number>(0);
-  const [tempMemberCnt, setTempMemberCnt] = useState<number>(0);
+  const [chatSize, setChatSize] = useState<number>(0);
+  const [tempChatSize, setTempChatSize] = useState<number>(0);
   const [currentDrawerIndex, setCurrentDrawerIndex] = useState<number>(-1);
   const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentDrawerIndex(-1));
 
@@ -27,6 +31,33 @@ const CommunityMarketPostPage = () => {
       setIsOpen(true);
     }
   }, [currentDrawerIndex]);
+
+  const submitPost = async () => {
+    const formData = new FormData();
+
+    const postData = {
+      title,
+      content,
+      chatSize,
+    };
+
+    const jsonString = JSON.stringify(postData);
+    const postBlob = new Blob([jsonString], { type: "application/json" });
+    formData.append("postRequest", postBlob);
+
+    if (image) {
+      formData.append("image", image);
+    }
+
+    try {
+      const response = await postPost(formData);
+      console.log(response?.data);
+      alert("게시글이 등록되었습니다");
+      navigate("/community/market");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <main className="flex flex-col px-7 py-4 pc:p-6 gap-5">
@@ -57,7 +88,7 @@ const CommunityMarketPostPage = () => {
           }
           footerContent={
             <SubmitButton
-            disabled={tempTitle.length <= 0 || tempTitle.length > 50}
+              disabled={tempTitle.length <= 0 || tempTitle.length > 50}
             />
           }
           onFooterClick={() => {
@@ -86,7 +117,7 @@ const CommunityMarketPostPage = () => {
               setPreImage={setPreImage}
             />
           }
-          footerContent={<SubmitButton disabled={!tempImage}/>}
+          footerContent={<SubmitButton disabled={!tempImage} />}
           onFooterClick={() => {
             setImage(tempImage);
           }}
@@ -112,7 +143,7 @@ const CommunityMarketPostPage = () => {
               tempContent={tempContent}
             />
           }
-          footerContent={<SubmitButton disabled={!tempContent}/>}
+          footerContent={<SubmitButton disabled={!tempContent} />}
           onFooterClick={() => {
             setContent(tempContent);
           }}
@@ -129,28 +160,30 @@ const CommunityMarketPostPage = () => {
             <PostCard
               title="인원수"
               description="참여 인원수를 입력해주세요"
-              isEmpty={memberCnt === 0}
+              isEmpty={chatSize === 0}
             />
           }
           headerContent={
             <PostMarketMemberCnt
-              setTempMemberCnt={setTempMemberCnt}
-              tempMemberCnt={tempMemberCnt}
+              setTempChatSize={setTempChatSize}
+              tempChatSize={tempChatSize}
             />
           }
-          footerContent={<SubmitButton disabled={memberCnt == 0}/>}
+          footerContent={<SubmitButton disabled={tempChatSize == 0} />}
           onFooterClick={() => {
-            setMemberCnt(tempMemberCnt);
+            setChatSize(tempChatSize);
           }}
           onTriggerClick={() => setCurrentDrawerIndex(3)}
         />
       </div>
-      {title && image && content && memberCnt > 0 && (
-        <div className="absolute bottom-16 left-0 w-full p-6">
+      {title && image && content && chatSize > 0 && (
+        <div className="w-full">
           <DamulButton
             variant="positive-outline"
             className="w-full"
-            onClick={() => {}}
+            onClick={() => {
+              submitPost();
+            }}
           >
             공구/나눔 게시글 작성하기
           </DamulButton>

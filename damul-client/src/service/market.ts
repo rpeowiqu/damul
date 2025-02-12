@@ -43,12 +43,20 @@ export const getPostDetail = async (postId: string | undefined) => {
 };
 
 // 게시글 작성
-export const postPost = async () => {
-  return apiClient.post("posts");
+export const postPost = async (formData: FormData) => {
+  return apiClient.post("posts", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 // 게시글 삭제
-export const deletePost = async (postId: string | undefined) => {
+export const deletePost = async ({
+  postId,
+}: {
+  postId: string | undefined;
+}) => {
   return apiClient.delete(`/posts/${postId}`);
 };
 

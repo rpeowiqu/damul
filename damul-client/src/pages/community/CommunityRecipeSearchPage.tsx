@@ -1,5 +1,5 @@
 import CommunitySearch from "@/components/community/CommunitySearch";
-import DamulCarousel from "@/components/common/DamulCarousel";
+import PopularRecipeCarousel from "@/components/community/PopularRecipeCarousel";
 import PostButton from "@/components/community/PostButton";
 import WriteIcon from "@/components/svg/WriteIcon";
 
@@ -11,7 +11,7 @@ const CommunityRecipeSearchPage = () => {
         type="recipe"
       />
       <h3 className="px-2 font-semibold text-md">인기 급상승 레시피</h3>
-      <DamulCarousel />
+      <PopularRecipeCarousel />
       <PostButton to="/community/recipe/post" icon={<WriteIcon />} />
     </main>
   );

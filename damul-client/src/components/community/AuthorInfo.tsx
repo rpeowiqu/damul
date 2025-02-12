@@ -8,6 +8,8 @@ import DeleteIcon from "../svg/DeleteIcon";
 import ReportButton from "../common/ReportButton";
 import { postRecipeLike } from "@/service/recipe";
 import { useState, useEffect } from "react";
+import { deleteRecipe } from "@/service/recipe";
+import { deletePost } from "@/service/market";
 
 interface AuthorInfoProps {
   profileImageUrl: string;
@@ -16,7 +18,7 @@ interface AuthorInfoProps {
   likeCnt?: number;
   liked?: boolean;
   type: string;
-  recipeId?: string;
+  id: string;
 }
 
 const AuthorInfo = ({
@@ -26,7 +28,7 @@ const AuthorInfo = ({
   likeCnt = 0,
   liked,
   type,
-  recipeId,
+  id,
 }: AuthorInfoProps) => {
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(liked);
@@ -35,11 +37,11 @@ const AuthorInfo = ({
   useEffect(() => {
     setIsLiked(liked);
     setLikesCount(likeCnt);
-  }, [liked, likeCnt, recipeId]);
+  }, [liked, likeCnt, id]);
 
   const likeRecipe = async () => {
     try {
-      const response = await postRecipeLike(recipeId);
+      const response = await postRecipeLike(id);
       console.log(response?.data);
       if (response?.data) {
         setIsLiked(true);
@@ -50,6 +52,23 @@ const AuthorInfo = ({
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const clickDeleteRecipe = async () => {
+    if (!confirm("정말 삭제하시겠습니까?")) {
+      return;
+    }
+    try {
+      const response =
+        type === "recipe"
+          ? await deleteRecipe({ recipeId: id })
+          : await deletePost({ postId: id });
+
+      navigate("/community/recipe");
+      console.log(response);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -96,13 +115,16 @@ const AuthorInfo = ({
         <div
           className="flex items-center gap-0.5 cursor-pointer mr-1"
           onClick={() => {
-            navigate(`/community/${type}/${recipeId}/edit`);
+            navigate(`/community/${type}/${id}/edit`);
           }}
         >
           <WriteIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5" />
           <p className="text-xs pc:text-sm">수정하기</p>
         </div>
-        <div className="flex items-center gap-0 cursor-pointer">
+        <div
+          className="flex items-center gap-0 cursor-pointer"
+          onClick={clickDeleteRecipe}
+        >
           <DeleteIcon className="w-5 h-5 pc:w-7 pc:h-7 fill-neutral-700 pb-0.5" />
           <p className="text-xs pc:text-sm">삭제하기</p>
         </div>

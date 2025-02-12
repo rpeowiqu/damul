@@ -3,6 +3,7 @@ import { Comment } from "@/types/community";
 import ReportButton from "../common/ReportButton";
 import { formatDate } from "@/utils/date";
 import { deleteRecipeComment } from "@/service/recipe";
+import { deletePostComment } from "@/service/market";
 
 interface ReplyItemProps {
   id: string;
@@ -10,6 +11,7 @@ interface ReplyItemProps {
   reply: Comment;
   onReply: (_comment: Comment) => void;
   fetchDetailData: () => void;
+  type: string;
 }
 const ReplyItem = ({
   id,
@@ -17,21 +19,28 @@ const ReplyItem = ({
   reply,
   onReply,
   fetchDetailData,
+  type
 }: ReplyItemProps) => {
   const deleteComment = async (commentId: number) => {
     const isConfirmed = window.confirm("정말로 댓글을 삭제하시겠습니까?");
 
     if (!isConfirmed) {
-      return;
-    }
-    try {
-      const response = await deleteRecipeComment(id, commentId);
-      console.log(response?.data);
-      fetchDetailData();
-    } catch (error) {
-      console.error(error);
-    }
-  };
+         return;
+       }
+   
+       try {
+         const response =
+           type === "recipe"
+             ? await deleteRecipeComment({ recipeId: id, commentId })
+             : await deletePostComment({ postId: id, commentId });
+   
+         console.log(response);
+         fetchDetailData();
+       } catch (error) {
+         console.error(error);
+       }
+     };
+   
 
   return (
     <div className="ml-6 mt-2 bg-neutral-100 p-2 rounded-md">
