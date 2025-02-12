@@ -53,7 +53,12 @@ public enum ErrorCode {
     FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제를 실패하였습니다."),
 
     // 게시글 관련 에러
-    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다.");
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
+
+    // 채팅 관련 에러
+    CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방을 찾을 수 없습니다."),
+    CHATROOM_MEMBER_NOT_FOUND(HttpStatus.FORBIDDEN, "채팅방 멤버가 아닙니다."),
+    CHATROOM_ACCESS_DENIED(HttpStatus.FORBIDDEN, "채팅방에 접근 권한이 없습니다.");
 
 
     private final HttpStatus status;
