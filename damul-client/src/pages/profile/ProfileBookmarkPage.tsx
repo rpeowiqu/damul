@@ -11,17 +11,36 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import FeedList from "@/components/common/FeedList";
+import { getBookmarks } from "@/service/mypage";
 
 const ProfileBookmarkPage = () => {
   const { user } = useOutletContext();
   const [sortType, setSortType] = useState("date");
 
+  const fetchBookmarks = async (pageParam: number) => {
+    try {
+      const response = await getBookmarks(parseInt(user.userId), {
+        cursor: pageParam,
+        size: 5,
+      });
+      if (response?.status === 204) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
+
+      return response?.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2 p-5 bg-white">
       <div className="flex flex-col gap-2">
-        <h1 className="text-lg font-bold">{user.nickname}님이 작성한 레시피</h1>
+        <h1 className="text-lg font-bold">
+          {user.nickname}님이 북마크한 레시피
+        </h1>
         <p className="text-normal-600">
-          회원님이 직접 만들고 공유한 레시피들이에요.
+          회원님이 관심있어 하는 레시피들이에요.
         </p>
       </div>
 
@@ -50,6 +69,14 @@ const ProfileBookmarkPage = () => {
         </Select>
       </div>
       <FeedList type="profile/bookmark" />
+
+      {/* <DamulInfiniteScrollList
+        queryKey={["bookMarks"]}
+        fetchFn={fetchBookmarks}
+        renderItems={(item: FeedCardProps) => (
+          <FeedCard key={item.id} {...item} />
+        )}
+      /> */}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
@@ -9,7 +10,6 @@ interface DamulInfiniteScrollListProps<T> {
     meta: { nextCursor: number | null; hasNextData: boolean };
   }>;
   initPage?: number;
-  loadSize?: number; // 스켈레톤 개수를 출력할 때 사용
   renderItems: (item: T, index: number) => ReactNode;
   skeleton?: ReactNode;
   className?: string;
@@ -28,6 +28,7 @@ const DamulInfiniteScrollList = <T,>({
     triggerOnce: false,
     threshold: 0,
   });
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: [queryKey],
@@ -51,14 +52,7 @@ const DamulInfiniteScrollList = <T,>({
           renderItems(item, index + pageIndex * page.data.length),
         ),
       )}
-
-      {isFetchingNextPage ? (
-        Array.from({ length: loadSize }).map((_, index) => (
-          <div key={index}>{skeleton}</div>
-        ))
-      ) : (
-        <div ref={ref}></div>
-      )}
+      {isFetchingNextPage ? skeleton : <div ref={ref}></div>}
     </div>
   );
 };

@@ -44,6 +44,20 @@ import TestPage from "@/pages/TestPage";
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <Layout header={null} footer={null} />,
+    children: [
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "signup",
+        element: <SignUpPage />,
+      },
+    ],
+  },
+  {
+    path: "/",
     element: <Layout />,
     children: [
       {
@@ -211,23 +225,15 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "setting",
-        element: <SettingPage />,
-      },
     ],
   },
   {
     path: "/",
-    element: <Layout header={null} footer={null} />,
+    element: <Layout footer={null} />,
     children: [
       {
-        path: "login",
-        element: <LoginPage />,
-      },
-      {
-        path: "signup",
-        element: <SignUpPage />,
+        path: "setting",
+        element: <SettingPage />,
       },
     ],
   },
