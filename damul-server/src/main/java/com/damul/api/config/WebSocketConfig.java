@@ -1,6 +1,6 @@
 package com.damul.api.config;
 
-import com.damul.api.chat.socket.StompHandler;
+import com.damul.api.common.socket.StompHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;

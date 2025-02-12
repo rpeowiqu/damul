@@ -1,7 +1,6 @@
 package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
-import com.damul.api.auth.entity.type.Role;
 import com.damul.api.chat.dto.MemberRole;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.MultiChatRoomCreate;
@@ -19,7 +18,6 @@ import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
-import com.damul.api.post.dto.PostStatus;
 import com.damul.api.post.entity.Post;
 import com.damul.api.post.repository.PostRepository;
 import com.damul.api.user.repository.UserRepository;
@@ -369,7 +367,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional
     public CreateResponse createMultiChatRoomInPost(int currentUserId, Post post, String postName, int chatSize) {
-        log.info("서비스: 게시글 채팅방 생성 시작 - userId: {}, postId: {}", currentUserId, post.getPostId());
+        log.info("서비스: 게시글 채팅방 생성 시작 - userId: {}, postId: {}, chatSize: {}", currentUserId, post.getPostId(), chatSize);
 
         // 방장 유저 조회
         User creator = userRepository.findById(currentUserId)
