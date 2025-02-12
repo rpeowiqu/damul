@@ -190,10 +190,6 @@ public class RecipeServiceImpl implements RecipeService {
         }
         int userId = checkUserInfo(userInfo);
         log.info("레시피 상세조회 및 조회수 증가 시작 - recipeId: {}, userId: {}", recipeId, userInfo.getId());
-        if(userId == 0) {
-            log.error("UserInfo Id값 조회 불가 - userId: {}", userId);
-            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
-        }
 
 
         // 1. Redis에서 조회수 확인 및 증가

@@ -57,11 +57,7 @@ public class RecipeController {
                                                   @CurrentUser UserInfo userInfo) {
         log.info("레시피 상세 조회 시작");
         RecipeDetail detail = recipeService.getRecipeDetail(recipeId, userInfo);
-        if(detail == null) {
-            log.error("레시피 상세 조회 실패 - recipeId: {}", recipeId);
-            throw new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND);
-        }
-
+        log.info("레시피 상세 조회 성공");
         return ResponseEntity.ok(detail);
     }
 

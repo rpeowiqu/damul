@@ -47,7 +47,6 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
             WHEN f.follower.nickname LIKE :startsWith THEN 1
             ELSE 2
         END, f.id DESC
-    LIMIT :size
     """)
     List<UserList> findFollowerByUserIdAndCursorIdAndNickname(@Param("followingId") int followingId,
                                                               @Param("contains") String contains,
