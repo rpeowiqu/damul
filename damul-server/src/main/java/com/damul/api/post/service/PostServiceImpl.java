@@ -56,7 +56,6 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
-    private final ChatRoomService chatRoomService;
 
     private final S3Service s3Service;
 
