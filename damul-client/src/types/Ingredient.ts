@@ -22,6 +22,6 @@ export interface RegisterIngredientData {
     categoryId: number;
     productPrice: number;
     expirationDate: string;
-    ingredientStorage: "FREEZER" | "FRIDGE" | "ROOM_TEMP";
+    ingredientStorage: "FREEZER" | "FRIDGE" | "ROOM_TEMPERATURE";
   }[];
 }
