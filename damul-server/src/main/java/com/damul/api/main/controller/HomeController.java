@@ -115,9 +115,12 @@ public class HomeController {
     }
 
     @DeleteMapping("/ingredients/{userIngredientId}")
-    public ResponseEntity<?> deleteUserIngredient(@PathVariable int userIngredientId) {
-        log.info("유저 식자재 삭제 시작 userIngredientId: {}", userIngredientId);
-        homeService.deleteIngredient(userIngredientId);
+    public ResponseEntity<?> deleteUserIngredient(
+            @PathVariable int userIngredientId,
+            @RequestParam(required = false) Integer warningEnable,
+            @CurrentUser UserInfo user) {
+        log.info("유저 식자재 삭제 시작 userIngredientId: {}, warningEnable: {}", userIngredientId, warningEnable);
+        homeService.deleteIngredient(userIngredientId, user.getId(), warningEnable);
         log.info("유저 식자재 삭제 성공");
         return ResponseEntity.ok().build();
     }

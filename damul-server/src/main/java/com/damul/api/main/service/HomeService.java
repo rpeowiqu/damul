@@ -20,7 +20,7 @@ public interface HomeService {
 
     SelectedIngredientList getSelectedIngredientList(List<Integer> ingredientIds);
 
-    void deleteIngredient(int userIngredientId);
+    void deleteIngredient(int userIngredientId, int userId, Integer warningEnable);
 
     HomeSuggestedResponse getRecommendedRecipes(Integer userIngredientId, int userId);
 
