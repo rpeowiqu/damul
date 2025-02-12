@@ -39,12 +39,31 @@ import ChattingStartPage from "@/pages/chat/ChattingStartPage";
 import HomeIngredientsRegisterPage from "@/pages/home/HomeIngredientsRegisterPage";
 import ChattingSearchResultPage from "@/pages/chat/ChattingSearchResultPage";
 import ChattingRoomPage from "@/pages/chat/ChattingRoomPage";
+import TestPage from "@/pages/TestPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <Layout header={null} footer={null} />,
+    children: [
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "signup",
+        element: <SignUpPage />,
+      },
+    ],
+  },
+  {
+    path: "/",
     element: <Layout />,
     children: [
+      {
+        path: "test",
+        element: <TestPage />,
+      },
       {
         index: true,
         element: <HomePage />,
@@ -206,23 +225,15 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "setting",
-        element: <SettingPage />,
-      },
     ],
   },
   {
     path: "/",
-    element: <Layout header={null} footer={null} />,
+    element: <Layout footer={null} />,
     children: [
       {
-        path: "login",
-        element: <LoginPage />,
-      },
-      {
-        path: "signup",
-        element: <SignUpPage />,
+        path: "setting",
+        element: <SettingPage />,
       },
     ],
   },

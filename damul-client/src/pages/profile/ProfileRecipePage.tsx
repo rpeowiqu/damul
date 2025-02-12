@@ -11,10 +11,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import FeedList from "@/components/common/FeedList";
+import { getMyRecipes } from "@/service/mypage";
+import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
+import FeedCard from "@/components/common/FeedCard";
 
 const ProfileRecipePage = () => {
   const { user } = useOutletContext();
   const [sortType, setSortType] = useState("date");
+
+  const fetchRecipes = async (pageParam: number) => {
+    try {
+      const response = await getMyRecipes(parseInt(user.userId), {
+        cursor: pageParam,
+        size: 5,
+      });
+      if (response?.status === 204) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
+
+      return response?.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2 p-5 bg-white">
@@ -50,6 +69,14 @@ const ProfileRecipePage = () => {
         </Select>
       </div>
       <FeedList type="profile/recipe" />
+
+      {/* <DamulInfiniteScrollList
+        queryKey={["myRecipes"]}
+        fetchFn={fetchRecipes}
+        renderItems={(item: FeedCardProps) => (
+          <FeedCard key={item.id} {...item} />
+        )}
+      /> */}
     </div>
   );
 };
