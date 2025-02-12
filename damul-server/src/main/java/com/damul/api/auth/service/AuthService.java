@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    @Value("${admin.password}")
+    @Value("${spring.security.admin.password}")
     private String hashedAdminPassword;
 
     private final TokenService tokenService;
