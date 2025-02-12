@@ -42,6 +42,7 @@ import ChattingRoomPage from "@/pages/chat/ChattingRoomPage";
 import StatisticsPage from "@/pages/statistics/StatisticsPage";
 import StatisticsTrendPage from "@/pages/statistics/StatisticsTrendPage";
 import StatisticsHistoryPage from "@/pages/statistics/StatisticsHistoryPage";
+import TestPage from "@/pages/TestPage";
 
 const router = createBrowserRouter([
   {
@@ -227,12 +228,6 @@ const router = createBrowserRouter([
           },
         ],
       },
-    ],
-  },
-  {
-    path: "/",
-    element: <Layout footer={null} />,
-    children: [
       {
         path: "statistics",
         element: <StatisticsPage />,
@@ -251,6 +246,12 @@ const router = createBrowserRouter([
           },
         ],
       },
+    ],
+  },
+  {
+    path: "/",
+    element: <Layout footer={null} />,
+    children: [
       {
         path: "setting",
         element: <SettingPage />,

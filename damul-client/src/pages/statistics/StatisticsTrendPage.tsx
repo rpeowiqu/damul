@@ -1,5 +1,4 @@
-import { TrendingUp } from "lucide-react";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -7,6 +6,10 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { FruitIcon } from "@/components/svg";
+import DamulButton from "@/components/common/DamulButton";
+import { IngredientTrendInfo } from "@/types/statistics";
 
 const chartData = [
   { month: "1월", price: 8700 },
@@ -36,6 +39,39 @@ const categoryData = [
   "기타",
 ];
 
+const trendDummyData: IngredientTrendInfo = [
+  {
+    categoryId: 1,
+    ingredientName: "삼겹살",
+    ingredientCode: 1,
+  },
+  {
+    categoryId: 2,
+    ingredientName: "삼겹살",
+    ingredientCode: 21,
+  },
+  {
+    categoryId: 2,
+    ingredientName: "목살",
+    ingredientCode: 22,
+  },
+  {
+    categoryId: 3,
+    ingredientName: "바나나",
+    ingredientCode: 14,
+  },
+  {
+    categoryId: 3,
+    ingredientName: "수박",
+    ingredientCode: 16,
+  },
+  {
+    categoryId: 4,
+    ingredientName: "당근",
+    ingredientCode: 66,
+  },
+];
+
 const chartConfig = {
   price: {
     label: "배추 봄(1kg)",
@@ -44,6 +80,20 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const StatisticsTrendPage = () => {
+  const [categoryBit, setCategoryBit] = useState<number>(0);
+
+  const handleSelectCategory = (index: number) => {
+    if (categoryBit & (1 << index)) {
+      setCategoryBit(categoryBit & ~(1 << index));
+    } else {
+      setCategoryBit(categoryBit | (1 << index));
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <div className="px-6 sm:px-10 py-8 bg-white">
@@ -57,13 +107,26 @@ const StatisticsTrendPage = () => {
           </p>
         </div>
 
+        <div className="flex gap-3 mt-5">
+          <DamulButton variant="positive" className="w-20 h-8 sm:w-24 sm:h-10">
+            최근 40일
+          </DamulButton>
+          <DamulButton
+            variant="shadow"
+            className="w-20 h-8 sm:w-24 sm:h-10 shadow-none"
+          >
+            최근 1년
+          </DamulButton>
+        </div>
+
         <ChartContainer config={chartConfig} className="my-6">
           <LineChart
             accessibilityLayer
             data={chartData}
             margin={{
-              left: 12,
-              right: 12,
+              top: 10,
+              left: 15,
+              right: 15,
             }}
           >
             <CartesianGrid vertical={false} />
@@ -80,30 +143,68 @@ const StatisticsTrendPage = () => {
               stroke="var(--color-price)"
               strokeWidth={2}
               dot={true}
-            />
+            >
+              <LabelList
+                dataKey="price"
+                position="top"
+                fill="var(--color-price)"
+                className="text-xxxs xs:text-xxs sm:text-xs"
+              />
+            </Line>
           </LineChart>
         </ChartContainer>
       </div>
 
-      <div className="flex flex-col gap-3 px-6 sm:px-10 py-8 bg-white">
-        <h1 className="text-lg sm:text-xl font-black text-normal-700">
-          검색 필터
-        </h1>
+      <div className="flex flex-col gap-5 px-6 sm:px-10 py-8 bg-white">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-lg sm:text-xl font-black text-normal-700">
+            검색 필터
+          </h1>
+          <Input
+            className="text-sm sm:text-base bg-normal-50 h-9 rounded-lg border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+            placeholder="찾으시는 식자재를 검색해 주세요."
+          />
+        </div>
 
-        <Input
-          className="text-sm sm:text-base bg-normal-50 h-9 rounded-lg border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-          placeholder="찾으시는 식자재를 검색해 주세요."
-        />
-
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           <p className="text-sm text-normal-300">대분류</p>
-          <div className="grid grid-cols-4 xs:grid-cols-5 gap-3 border border-normal-50 p-3 rounded-xl">
+          <div className="grid grid-cols-5 gap-3 border border-normal-100 p-3 rounded-xl">
             {categoryData.map((item, index) => (
+              <label key={index} className="cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="hidden peer"
+                  checked={(categoryBit & (1 << index)) != 0}
+                  onChange={() => handleSelectCategory(index)}
+                />
+                <div className="text-xs xs:text-sm bg-normal-50 border-none rounded-xl text-normal-400 text-center py-1 peer-checked:bg-positive-300 peer-checked:text-white">
+                  {item}
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-end text-sm">총 8개의 검색 결과</p>
+          <div className="h-52 overflow-y-auto">
+            {Array.from({ length: 8 }).map((item, index) => (
               <div
                 key={index}
-                className="text-sm bg-normal-50 border-none rounded-xl text-normal-400 text-center py-1"
+                className="flex items-center gap-4 p-2 border-b border-normal-100 hover:bg-normal-50"
               >
-                {item}
+                <FruitIcon className="size-8" />
+                <div className="flex flex-col flex-1">
+                  <p className="text-sm text-normal-200">과일</p>
+                  <p className="font-bold">사과(1kg)</p>
+                </div>
+                <DamulButton
+                  variant="normal"
+                  className="h-8 text-xs xs:text-sm"
+                  onClick={scrollToTop}
+                >
+                  가격 동향 보기
+                </DamulButton>
               </div>
             ))}
           </div>
