@@ -6,6 +6,7 @@ import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.*;
 import com.damul.api.main.entity.UserIngredient;
 import com.damul.api.main.repository.UserIngredientRepository;
+import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
 import com.damul.api.recipe.entity.RecipeTag;
 import com.damul.api.recipe.repository.RecipeRepository;
@@ -142,14 +143,23 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     @Transactional(readOnly = true)
-    public HomeSuggestedResponse getRecommendedRecipes(Integer userIngredientId, int userId) {
-        log.info("서비스: 레시피 추천 시작 - userId: {}, userIngredientId: {}", userId, userIngredientId);
+    public HomeSuggestedResponse getRecommendedRecipes(int userId) {
+        log.info("서비스: 레시피 추천 시작 - userId: {}", userId);
 
-        List<Recipe> recommendedRecipes;
-        if (userIngredientId != null) {
-            recommendedRecipes = recipeRepository.findRecommendedRecipesByIngredient(userId, userIngredientId);
-        } else {
-            recommendedRecipes = recipeRepository.findRecommendedRecipes(userId);
+        List<RecipeList> recommendedRecipes = new ArrayList<>();
+
+        // 1. 재료 유사도 기반으로 레시피 조회
+        List<RecipeList> similarRecipes = recipeRepository.findRecipesByIngredientSimilarity(userId);
+        recommendedRecipes.addAll(similarRecipes);
+
+        // 2. 5개가 안되면 인기있는 레시피로 채우기
+        if (recommendedRecipes.size() < 5) {
+            List<RecipeList> popularRecipes = recipeRepository.findPopularRecipes().stream()
+                    .filter(recipe -> recommendedRecipes.stream()
+                            .noneMatch(r -> r.getId() == recipe.getId()))
+                    .limit(5 - recommendedRecipes.size())
+                    .collect(Collectors.toList());
+            recommendedRecipes.addAll(popularRecipes);
         }
 
         List<SuggestedRecipeList> suggestedRecipes = recommendedRecipes.stream()
@@ -160,7 +170,7 @@ public class HomeServiceImpl implements HomeService {
         return new HomeSuggestedResponse(userId, suggestedRecipes);
     }
 
-    private SuggestedRecipeList convertToSuggestedRecipeList(Recipe recipe) {
+    private SuggestedRecipeList convertToSuggestedRecipeList(RecipeList recipe) {
         return SuggestedRecipeList.builder()
                 .recipeId(recipe.getId())
                 .title(recipe.getTitle())
