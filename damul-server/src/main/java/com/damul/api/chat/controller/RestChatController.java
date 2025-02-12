@@ -4,6 +4,7 @@ import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.ChatRoomLimitUpdate;
+import com.damul.api.chat.dto.request.MultiChatRoomCreate;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.dto.response.ChatRoomLimitResponse;
 import com.damul.api.chat.dto.response.ChatRoomList;
@@ -164,6 +165,15 @@ public class RestChatController {
 
         CreateResponse response = chatRoomService.createDirectChatRoom(userId, currentUser.getId());
 
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/rooms")
+    public ResponseEntity<CreateResponse> createMultiChatRoom(
+            @RequestBody MultiChatRoomCreate request,
+            @CurrentUser UserInfo user) {
+        log.info("단체 채팅 생성 시작 userId: {}", user.getId());
+        CreateResponse response = chatRoomService.createMultiChatRoom(request, user.getId());
         return ResponseEntity.ok(response);
     }
 

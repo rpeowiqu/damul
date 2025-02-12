@@ -1,7 +1,10 @@
 package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.auth.entity.type.Role;
+import com.damul.api.chat.dto.MemberRole;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
+import com.damul.api.chat.dto.request.MultiChatRoomCreate;
 import com.damul.api.chat.dto.response.ChatMember;
 import com.damul.api.chat.dto.response.ChatMembersResponse;
 import com.damul.api.chat.dto.response.ChatRoomLimitResponse;
@@ -16,6 +19,9 @@ import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
+import com.damul.api.post.dto.PostStatus;
+import com.damul.api.post.entity.Post;
+import com.damul.api.post.repository.PostRepository;
 import com.damul.api.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +44,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -209,6 +216,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 chatRoom,
                 user,
                 request.getNickname(),
+                MemberRole.MEMBER,
                 lastMessageId
         );
 
@@ -253,13 +261,87 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom savedRoom = chatRoomRepository.save(newRoom);
 
         // 채팅방 멤버 추가
-        ChatRoomMember currentMember = ChatRoomMember.create(savedRoom, currentUser, currentUser.getNickname(), 0);
-        ChatRoomMember targetMember = ChatRoomMember.create(savedRoom, targetUser, targetUser.getNickname(), 0);
+        ChatRoomMember currentMember = ChatRoomMember.create(savedRoom, currentUser, currentUser.getNickname(), MemberRole.MEMBER, 0);
+        ChatRoomMember targetMember = ChatRoomMember.create(savedRoom, targetUser, targetUser.getNickname(), MemberRole.MEMBER, 0);
 
         chatRoomMemberRepository.save(currentMember);
         chatRoomMemberRepository.save(targetMember);
 
         log.info("서비스: 1:1 채팅방 생성 완료 - roomId: {}", savedRoom.getId());
+
+        return new CreateResponse(savedRoom.getId());
+    }
+
+    @Override
+    @Transactional
+    public CreateResponse createMultiChatRoom(MultiChatRoomCreate request, int userId) {
+        log.info("서비스: 단체 채팅방 생성 시작 - userId: {}, memberCount: {}",
+                userId, request.getUsers().size() + 1);
+
+        // 방장 유저 조회
+        User creator = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+
+        // 초대할 유저들 존재 여부 확인
+        List<User> members = request.getUsers().stream()
+                .map(member -> userRepository.findById(member.getId())
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                String.format("존재하지 않는 사용자입니다. (userId: %d)", member.getId()))))
+                .collect(Collectors.toList());
+
+        // 자기 자신 초대 방지 검증
+        if (members.stream().anyMatch(member -> member.getId() == userId)) {
+            throw new IllegalArgumentException("자기 자신은 초대할 수 없습니다.");
+        }
+
+        // 채팅방 이름 생성 (방장 포함 모든 멤버의 닉네임을 ", "로 구분)
+        String roomName = creator.getNickname() + ", " +
+                request.getUsers().stream()
+                        .map(ChatRoomEntryExitCreate::getNickname)
+                        .collect(Collectors.joining(", "));
+
+        // 채팅방 생성
+        ChatRoom newRoom = ChatRoom.createDirectRoom(
+                creator,
+                roomName
+        );
+
+        ChatRoom savedRoom = chatRoomRepository.save(newRoom);
+
+        // 방장 멤버 추가
+        ChatRoomMember creatorMember = ChatRoomMember.create(
+                savedRoom,
+                creator,
+                creator.getNickname(),
+                MemberRole.ADMIN,
+                0
+        );
+        chatRoomMemberRepository.save(creatorMember);
+
+        // 초대된 멤버들 추가
+        for (int i = 0; i < members.size(); i++) {
+            User member = members.get(i);
+            ChatRoomEntryExitCreate memberDto = request.getUsers().get(i);
+
+            ChatRoomMember newMember = ChatRoomMember.create(
+                    savedRoom,
+                    member,
+                    memberDto.getNickname(),  // DTO에서 제공된 닉네임 사용
+                    MemberRole.MEMBER,
+                    0
+            );
+            chatRoomMemberRepository.save(newMember);
+        }
+
+        // 시스템 메시지 생성
+        String systemMessage = String.format("%s님이 ", creator.getNickname()) +
+                request.getUsers().stream()
+                        .map(ChatRoomEntryExitCreate::getNickname)
+                        .collect(Collectors.joining(", ")) +
+                "님을 초대하였습니다.";
+        createSystemMessage(savedRoom, systemMessage);
+
+        log.info("서비스: 단체 채팅방 생성 완료 - roomId: {}", savedRoom.getId());
 
         return new CreateResponse(savedRoom.getId());
     }
@@ -283,6 +365,52 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         return new ChatRoomLimitResponse(roomId, newLimit);
     }
+
+    @Override
+    @Transactional
+    public CreateResponse createMultiChatRoomInPost(int currentUserId, Post post, String postName, int chatSize) {
+        log.info("서비스: 게시글 채팅방 생성 시작 - userId: {}, postId: {}", currentUserId, post.getPostId());
+
+        // 방장 유저 조회
+        User creator = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+
+        // 이미 해당 게시글의 채팅방이 존재하는지 확인
+        Optional<ChatRoom> existingRoom = chatRoomRepository.findChatRoomByPost_PostId(post.getPostId());
+        if (existingRoom.isPresent()) {
+            log.info("서비스: 이미 존재하는 채팅방 반환 - roomId: {}", existingRoom.get().getId());
+            return new CreateResponse(existingRoom.get().getId());
+        }
+
+        // 채팅방 생성 (방장만 포함된 채팅방)
+        ChatRoom newRoom = ChatRoom.createPostRoom(
+                creator,
+                post,
+                postName,
+                chatSize
+        );
+
+        ChatRoom savedRoom = chatRoomRepository.save(newRoom);
+
+        // 방장 멤버 추가
+        ChatRoomMember creatorMember = ChatRoomMember.create(
+                savedRoom,
+                creator,
+                creator.getNickname(),
+                MemberRole.ADMIN,
+                0
+        );
+        chatRoomMemberRepository.save(creatorMember);
+
+        // 시스템 메시지 생성
+        String systemMessage = String.format("%s님이 채팅방을 생성하였습니다.", creator.getNickname());
+        createSystemMessage(savedRoom, systemMessage);
+
+        log.info("서비스: 게시글 채팅방 생성 완료 - roomId: {}", savedRoom.getId());
+
+        return new CreateResponse(savedRoom.getId());
+    }
+
 
     private void validateRoomStatus(ChatRoom chatRoom) {
         if (chatRoom.getStatus() == ChatRoom.Status.INACTIVE) {

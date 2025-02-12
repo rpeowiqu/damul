@@ -24,4 +24,7 @@ public class Badge {
     @Column(name = "description", length = 255, nullable = false)
     private String description;
 
+    @Column(name = "catch_phrase", length = 255)
+    private String catchPhrase;
+
 }

@@ -59,6 +59,7 @@ public class PostServiceImpl implements PostService {
     private final ChatRoomService chatRoomService;
 
     private final S3Service s3Service;
+    private final ChatRoomService chatRoomService;
 
 
     // 게시글 전체 조회/검색
@@ -262,9 +263,8 @@ public class PostServiceImpl implements PostService {
         Post savedPost = postRepository.save(post);
         log.info("게시글 작성 완료 - ID: {}", savedPost.getPostId());
 
-        // Todo: 채팅방 생성 api 받아오기
-        // 채팅방 생성
-//        chatRoomService.채팅방생성 (userInfo.getId())
+        // 채팅방 연결
+        chatRoomService.createMultiChatRoomInPost(userInfo.getId(), post, post.getTitle(), postRequest.getChatSize());
 
         return new CreateResponse(savedPost.getPostId());
     }
