@@ -1,5 +1,8 @@
 package com.damul.api.receipt.controller;
 
+import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.common.user.CurrentUser;
+import com.damul.api.receipt.dto.response.ReceiptCalendarResponse;
 import com.damul.api.receipt.service.UserReceiptService;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +22,13 @@ public class ReceiptController {
 
     // 나의 구매이력 조회
     @GetMapping("calendar")
-    public ResponseEntity<?> getMonthlyReceipts(@RequestParam(value = "year", required = false) int year,
+    public ResponseEntity<?> getMonthlyReceipts(@CurrentUser UserInfo userInfo,
+                                                @RequestParam(value = "year", required = false) int year,
                                                 @RequestParam(value = "month", required = false) int month) {
 
-        log.info("구매 이력 전체 조회 - year: {}, month: {}", year, month);
-
-        return null;
+        log.info("월별 영수증 조회 요청 - year: {}, month: {}", year, month);
+        ReceiptCalendarResponse receiptCalendarResponse = userReceiptService.getMonthlyReceipt(userInfo, year, month);
+        log.info("월별 영수증 조회 완료 - year: {}, month: {}", year, month);
+        return ResponseEntity.ok(receiptCalendarResponse);
     }
 }
