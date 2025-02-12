@@ -26,7 +26,7 @@ public class UserIngredient {
     private int categoryId;
 
     @Column(name = "ingredient_quantity", nullable = false)
-    private int ingredientQuantity;
+    private int ingredientQuantity = 100;
 
     @Column(name = "ingredient_up")
     private LocalDateTime ingredientUp = LocalDateTime.now();;
