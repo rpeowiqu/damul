@@ -95,8 +95,8 @@ public class RecipeController {
     public ResponseEntity<?> updateRecipe(@PathVariable int recipeId,
                                           @CurrentUser UserInfo userInfo,
                                           @RequestPart("recipeRequest") RecipeRequest recipeRequest,
-                                          @RequestPart("thumbnailImage") MultipartFile thumbnailImage,
-                                          @RequestPart("cookingImages") List<MultipartFile> cookingImages) {
+                                          @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
+                                          @RequestPart(value = "cookingImages", required = false) List<MultipartFile> cookingImages) {
         log.info("레시피 수정 요청");
         recipeService.updateRecipe(recipeId, userInfo, recipeRequest, thumbnailImage, cookingImages);
         log.info("레시피 수정 완료");

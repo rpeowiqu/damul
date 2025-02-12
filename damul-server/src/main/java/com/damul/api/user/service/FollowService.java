@@ -9,10 +9,10 @@ public interface FollowService {
     FollowResponse toggleFollow(int userId, int targetId);
 
     // 팔로워 목록 조회
-    ScrollResponse<UserList> getFollowers(int cursorId, int size, int userId);
+    ScrollResponse<UserList> getFollowers(String keyword, int cursorId, int size, int userId);
 
     // 팔로잉 목록 조회
-    ScrollResponse<UserList> getFollowings(int cursorId, int size, int userId);
+    ScrollResponse<UserList> getFollowings(String keyword, int cursorId, int size, int userId);
 
     // 팔로워 삭제
     void deleteFollower(int userId, int followId);
