@@ -85,6 +85,7 @@ const CommunityMarketDetailPage = () => {
         createdAt={data.createdAt}
         status={data.status}
         id={data.id}
+        authorId={data.authorId}
         type="market"
       />
       <AuthorInfo

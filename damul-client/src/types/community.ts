@@ -1,14 +1,14 @@
 export interface IngredientProps {
   id: number;
   name: string;
-  quantity: string;
+  amount: string;
   unit: string;
 }
 
 export interface OrderProps {
   id: number;
-  description: string;
-  image: File | null;
+  content: string;
+  imageUrl: File | null;
 }
 
 export interface Comment {

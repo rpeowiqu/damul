@@ -51,6 +51,21 @@ export const postPost = async (formData: FormData) => {
   });
 };
 
+// 게시글 수정
+export const putPost = async ({
+  formData,
+  postId,
+}: {
+  formData: FormData;
+  postId: string | undefined;
+}) => {
+  return apiClient.put(`posts/${postId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
 // 게시글 삭제
 export const deletePost = async ({
   postId,

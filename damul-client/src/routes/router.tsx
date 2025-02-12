@@ -10,7 +10,8 @@ import CommunityMarketMainPage from "@/pages/community/CommunityMarketMainPage";
 import CommunityMarketSearchPage from "@/pages/community/CommunityMarketSearchPage";
 import CommunityMarketPostPage from "@/pages/community/CommunityMarketPostPage";
 import CommunityMarketDetailPage from "@/pages/community/CommunityMarketDetailPage";
-import CommunitySearchResultPage from "@/pages/community/CommunitySearchResultPage";
+import CommunityRecipeSearchResultPage from "@/pages/community/CommunityRecipeSearchResultPage";
+import CommunityMarketSearchResultPage from "@/pages/community/CommunityMarketSearchResultPage";
 import ProfilePage from "@/pages/profile/ProfilePage";
 import ProfileInfoPage from "@/pages/profile/ProfileInfoPage";
 import ProfileBadgePage from "@/pages/profile/ProfileBadgePage";
@@ -147,7 +148,7 @@ const router = createBrowserRouter([
               },
               {
                 path: "search/:keyword",
-                element: <CommunitySearchResultPage />,
+                element: <CommunityRecipeSearchResultPage />,
               },
             ],
           },
@@ -169,7 +170,7 @@ const router = createBrowserRouter([
               },
               {
                 path: "search/result",
-                element: <CommunitySearchResultPage />,
+                element: <CommunityMarketSearchResultPage />,
               },
             ],
           },
@@ -185,7 +186,7 @@ const router = createBrowserRouter([
         element: <CommunityRecipeDetailPage />,
       },
       {
-        path: "community/recipe/:id/edit",
+        path: "community/recipe/:recipeId/edit",
         element: <CommunityRecipePostPage />,
       },
       {
@@ -197,7 +198,7 @@ const router = createBrowserRouter([
         element: <CommunityMarketDetailPage />,
       },
       {
-        path: "community/market/:id/edit",
+        path: "community/market/:postId/edit",
         element: <CommunityMarketPostPage />,
       },
       {

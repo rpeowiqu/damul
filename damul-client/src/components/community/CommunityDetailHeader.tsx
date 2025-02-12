@@ -3,6 +3,7 @@ import BookMarkIcon from "../svg/BookMarkIcon";
 import { postRecipeBookMark } from "@/service/recipe";
 import { formatDate } from "@/utils/date";
 import { putPostStatusChange } from "@/service/market";
+import useUserStore from "@/stores/user";
 
 interface RecipeHeaderProps {
   title: string;
@@ -11,6 +12,7 @@ interface RecipeHeaderProps {
   status?: string;
   bookmarked?: boolean;
   id?: string;
+  authorId?: number;
 }
 const CommunityDetailHeader = ({
   title,
@@ -19,9 +21,12 @@ const CommunityDetailHeader = ({
   status,
   bookmarked,
   id,
+  authorId,
 }: RecipeHeaderProps) => {
   const [isBookmarked, setIsBookmarked] = useState(bookmarked);
   const [isStatusActive, setIsStatusActive] = useState(status);
+
+  const myId = useUserStore((state) => state.myId);
 
   useEffect(() => {
     setIsBookmarked(bookmarked);
@@ -52,10 +57,10 @@ const CommunityDetailHeader = ({
 
   const StatusMarker = () =>
     status === "COMPLETED" ? (
-      <div className="flex content-center bg-positive-200 text-xs py-0.5 px-2 rounded-full">
-        모집중
+      <div className="flex content-center bg-neutral-300 text-xs py-0.5 px-2 rounded-full">
+        모집완료
       </div>
-    ) : "1" === "1" ? (
+    ) : myId === authorId ? (
       <div
         className="flex content-center bg-negative-200 text-xs py-0.5 px-2 rounded-full cursor-pointer"
         onClick={changeStatus}
@@ -63,8 +68,8 @@ const CommunityDetailHeader = ({
         모집 완료하기
       </div>
     ) : (
-      <div className="flex content-center bg-neutral-300 text-xs py-0.5 px-2 rounded-full">
-        모집완료
+      <div className="flex content-center bg-positive-200 text-xs py-0.5 px-2 rounded-full">
+        모집중
       </div>
     );
 

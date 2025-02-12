@@ -51,6 +51,21 @@ export const postRecipe = async (formData: FormData) => {
   });
 };
 
+// 레시피 수정
+export const putRecipe = async ({
+  formData,
+  recipeId,
+}: {
+  formData: FormData;
+  recipeId: string | undefined;
+}) => {
+  return apiClient.put(`recipes/${recipeId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
 // 레시피 삭제
 export const deleteRecipe = async ({
   recipeId,
