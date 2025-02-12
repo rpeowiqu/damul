@@ -22,8 +22,11 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 등록된 이메일입니다."),
 
 
+    // API 요청 관련
+    EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API 요청에 실패하였습니다"),
+
     // 데이터베이스 관련 에러
-    DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다."),
+    DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다"),
 
     // 팔로우 관련 에러
     FOLLOW_ERROR(HttpStatus.BAD_REQUEST, "팔로우 처리 중 오류가 발생했습니다."),
