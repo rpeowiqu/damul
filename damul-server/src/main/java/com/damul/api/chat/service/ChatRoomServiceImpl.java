@@ -12,7 +12,6 @@ import com.damul.api.chat.entity.ChatRoomMember;
 import com.damul.api.chat.repository.ChatMessageRepository;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
-import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
@@ -246,7 +245,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         User currentUser = userRepository.getReferenceById(currentUserId);
 
         // 채팅방 생성
-        ChatRoom newRoom = ChatRoom.                             (
+        ChatRoom newRoom = ChatRoom.createDirectRoom(
                 currentUser,
                 String.format("%s,%s의 대화방", currentUser.getNickname(), targetUser.getNickname())
         );
