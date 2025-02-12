@@ -177,7 +177,7 @@ public class RecipeServiceImpl implements RecipeService {
 
 
 
-        return new HomeSuggestedResponse(0, recipesWithTags);
+        return new HomeSuggestedResponse(recipesWithTags);
     }
 
     // 레시피 상세보기

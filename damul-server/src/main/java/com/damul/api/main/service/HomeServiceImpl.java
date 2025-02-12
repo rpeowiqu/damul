@@ -167,7 +167,7 @@ public class HomeServiceImpl implements HomeService {
                 .map(this::convertToSuggestedRecipeList)
                 .collect(Collectors.toList());
 
-        return new HomeSuggestedResponse(userId, suggestedRecipes);
+        return new HomeSuggestedResponse(suggestedRecipes);
     }
 
     private SuggestedRecipeList convertToSuggestedRecipeList(RecipeList recipe) {

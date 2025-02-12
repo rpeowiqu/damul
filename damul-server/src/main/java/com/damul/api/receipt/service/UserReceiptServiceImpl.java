@@ -38,7 +38,7 @@ public class UserReceiptServiceImpl implements UserReceiptService {
     @Override
     @Transactional
     public void registerIngredients(int userId, UserIngredientPost request) {
-        log.info("영수증 등록 시작 {} with id {}", userId, request);
+        log.info("영수증 등록 시작 {} with request {}", userId, request);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
@@ -50,34 +50,33 @@ public class UserReceiptServiceImpl implements UserReceiptService {
                 .build();
 
         UserReceipt savedReceipt = userReceiptRepository.save(receipt);
-        log.info("영수증 등록 성공 {} with id {}", user, savedReceipt);
+        log.info("영수증 등록 성공 user: {}, receipt: {}", user.getId(), savedReceipt.getId());
 
         Map<Integer, Integer> categoryCount = new HashMap<>();
 
-        // Create UserIngredients
-        List<UserIngredient> ingredients = request.getUserIngredients().stream()
-                .map(item -> {
-                    categoryCount.merge(item.getCategoryId(), 1, Integer::sum);
+        // Create and save UserIngredients one by one
+        request.getUserIngredients().forEach(item -> {
+            categoryCount.merge(item.getCategoryId(), 1, Integer::sum);
 
-                    return UserIngredient.builder()
-                        .userReciept(savedReceipt)
-                        .categoryId(item.getCategoryId())
-                        .ingredientName(item.getIngredientName())
-                        .expirationDate(item.getExpirationDate().atStartOfDay())
-                        .ingredientStorage(item.getIngredientStorage())
-                        .price(item.getProductPrice())
-                        .build();
-                })
-                .collect(Collectors.toList());
+            UserIngredient ingredient = UserIngredient.builder()
+                    .userReciept(savedReceipt)
+                    .categoryId(item.getCategoryId())
+                    .ingredientName(item.getIngredientName())
+                    .expirationDate(item.getExpirationDate().atStartOfDay())
+                    .ingredientStorage(item.getIngredientStorage())
+                    .price(item.getProductPrice())
+                    .build();
 
-        userIngredientRepository.saveAll(ingredients);
+            userIngredientRepository.save(ingredient);  // 개별적으로 저장
+        });
 
+        // Update food preferences
         categoryCount.forEach((categoryId, count) -> {
-            FoodPreference preference = foodPreferenceRepository.findByUserIdAndCategoryId(userId, categoryId)
+            FoodPreference preference = foodPreferenceRepository
+                    .findByUserIdAndCategoryId(userId, categoryId)
                     .orElseGet(() -> {
-                        // 선호도 데이터가 없는 경우 새로 생성
                         FoodCategory category = foodCategoryRepository.findById(categoryId)
-                                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+                                .orElseThrow(() -> new EntityNotFoundException("Category not found: " + categoryId));
 
                         return FoodPreference.builder()
                                 .user(user)
@@ -86,11 +85,10 @@ public class UserReceiptServiceImpl implements UserReceiptService {
                                 .build();
                     });
 
-            // 선호도 증가 (예: 각 식재료당 1점씩 증가)
             preference.increaseCategoryPreference(count);
             foodPreferenceRepository.save(preference);
         });
-        log.info("식자재 등록 성공 {} with id {}", user, savedReceipt);
-    }
 
+        log.info("식자재 등록 완료 user: {}, receipt: {}", user.getId(), savedReceipt.getId());
+    }
 }
