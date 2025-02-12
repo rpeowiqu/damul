@@ -59,8 +59,6 @@ public class PostServiceImpl implements PostService {
     private final ChatRoomService chatRoomService;
 
     private final S3Service s3Service;
-    private final ChatRoomService chatRoomService;
-
 
     // 게시글 전체 조회/검색
     @Override
