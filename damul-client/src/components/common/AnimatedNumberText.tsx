@@ -6,6 +6,7 @@ interface AnimatedNumberTextProps {
   className?: string;
   prefix?: string;
   suffix?: string;
+  callback?: () => void;
 }
 
 const AnimatedNumberText = ({
@@ -14,6 +15,7 @@ const AnimatedNumberText = ({
   className,
   prefix,
   suffix,
+  callback,
 }: AnimatedNumberTextProps) => {
   const [count, setCount] = useState<number>(0);
 
@@ -29,6 +31,7 @@ const AnimatedNumberText = ({
         requestAnimationFrame(updateCounter);
       } else {
         setCount(targetValue);
+        callback?.();
       }
     };
 
