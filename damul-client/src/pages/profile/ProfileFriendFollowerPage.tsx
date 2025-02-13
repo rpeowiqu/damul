@@ -3,8 +3,10 @@ import { getFollowers } from "@/service/user";
 import FriendItem, { FriendItemProps } from "@/components/profile/FriendItem";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import DamulButton from "@/components/common/DamulButton";
+import useUserStore from "@/stores/user";
 
 const ProfileFriendFollowerPage = () => {
+  const myId = useUserStore((state) => state.myId);
   const { userId } = useParams();
   // const { searchTerm } = useOutletContext();
 
@@ -30,20 +32,24 @@ const ProfileFriendFollowerPage = () => {
       fetchFn={fetchFollowers}
       renderItems={(item: FriendItemProps) => (
         <FriendItem key={item.userId} {...item}>
-          <DamulButton
-            variant="positive"
-            className="h-7 sm:h-10 text-xs xs:text-sm"
-            onClick={() => {}}
-          >
-            채팅 시작
-          </DamulButton>
-          <DamulButton
-            variant="negative"
-            className="h-7 sm:h-10 text-xs xs:text-sm"
-            onClick={() => {}}
-          >
-            친구 삭제
-          </DamulButton>
+          {myId === parseInt(userId!) && (
+            <>
+              <DamulButton
+                variant="positive"
+                className="h-7 sm:h-10 text-xs xs:text-sm"
+                onClick={() => {}}
+              >
+                채팅 시작
+              </DamulButton>
+              <DamulButton
+                variant="negative"
+                className="h-7 sm:h-10 text-xs xs:text-sm"
+                onClick={() => {}}
+              >
+                친구 삭제
+              </DamulButton>
+            </>
+          )}
         </FriendItem>
       )}
     />

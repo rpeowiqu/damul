@@ -51,7 +51,6 @@ const ProfileInfoPage = () => {
         if (response) {
           setProfileInfo(response.data);
         }
-        console.log("디테일마운트", response.data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -88,10 +87,6 @@ const ProfileInfoPage = () => {
   }
 
   const getFavoriteFoodText = () => {
-    if (profileInfo.foodPreference.length === 0) {
-      return <p className="text-normal-600">아직 등록된 식자재가 없어요.</p>;
-    }
-
     const favoriteFood = profileInfo.foodPreference.reduce(
       (maxItem, item, index) =>
         item.categoryPreference > maxItem.item.categoryPreference
@@ -99,6 +94,10 @@ const ProfileInfoPage = () => {
           : maxItem,
       { item: profileInfo.foodPreference[0], index: 0 },
     );
+
+    if (favoriteFood.item.categoryPreference === 0) {
+      return <p className="text-normal-600">아직 등록된 식자재가 없어요.</p>;
+    }
 
     return (
       <p className="text-normal-600">
@@ -116,10 +115,10 @@ const ProfileInfoPage = () => {
 
   return (
     <div className="flex flex-col gap-3 h-full">
-      <div className="flex items-center font-bold min-h-24 bg-white">
+      <div className="flex items-center min-h-24 bg-white">
         <Link
           to={`/profile/${user.userId}/friend/follower`}
-          className="flex flex-col items-center flex-1 border-r border-normal-50"
+          className="flex flex-col items-center flex-1 font-bold border-r border-normal-50 hover:text-normal-500"
         >
           <p className="text-sm">팔로워</p>
           <p className="text-lg">
@@ -128,7 +127,7 @@ const ProfileInfoPage = () => {
         </Link>
         <Link
           to={`/profile/${user.userId}/friend/following`}
-          className="flex flex-col items-center flex-1 border-r border-normal-50"
+          className="flex flex-col items-center flex-1 font-bold border-r border-normal-50 hover:text-normal-500"
         >
           <p className="text-sm">팔로잉</p>
           <p className="text-lg">

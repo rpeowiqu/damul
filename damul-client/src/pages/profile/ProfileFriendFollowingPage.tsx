@@ -55,20 +55,24 @@ const ProfileFriendFollowingPage = () => {
       fetchFn={fetchFollowings}
       renderItems={(item: FriendItemProps) => (
         <FriendItem key={item.userId} {...item}>
-          <DamulButton
-            variant="positive"
-            className="sm:w-20 h-7 sm:h-10 text-xs sm:text-sm"
-            onClick={() => {}}
-          >
-            채팅 시작
-          </DamulButton>
-          <DamulButton
-            variant={checkSet.has(item.userId) ? "positive" : "negative"}
-            className="sm:w-20 h-7 sm:h-10 text-xs sm:text-sm"
-            onClick={() => handleFollowState(item.userId)}
-          >
-            {checkSet.has(item.userId) ? "팔로우" : "언팔로우"}
-          </DamulButton>
+          {myId === parseInt(userId!) && (
+            <>
+              <DamulButton
+                variant="positive"
+                className="sm:w-20 h-7 sm:h-10 text-xs sm:text-sm"
+                onClick={() => {}}
+              >
+                채팅 시작
+              </DamulButton>
+              <DamulButton
+                variant={checkSet.has(item.userId) ? "positive" : "negative"}
+                className="sm:w-20 h-7 sm:h-10 text-xs sm:text-sm"
+                onClick={() => handleFollowState(item.userId)}
+              >
+                {checkSet.has(item.userId) ? "팔로우" : "언팔로우"}
+              </DamulButton>
+            </>
+          )}
         </FriendItem>
       )}
     />
