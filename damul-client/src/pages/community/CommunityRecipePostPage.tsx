@@ -9,7 +9,7 @@ import PostContent from "@/components/community/PostContent";
 import PostRecipeIngrediants from "@/components/community/PostRecipeIngrediants";
 import PostRecipeOrders from "@/components/community/PostRecipeOrders";
 import DamulButton from "@/components/common/DamulButton";
-import { IngredientProps, OrderProps } from "@/types/community";
+import { Ingredient, OrderProps } from "@/types/community";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { postRecipe, putRecipe, getRecipeDetail } from "@/service/recipe";
 
@@ -25,7 +25,7 @@ const CommunityRecipePostPage = () => {
   const [preImage, setPreImage] = useState("");
   const [content, setContent] = useState<string>("");
   const [tempContent, setTempContent] = useState<string>("");
-  const [ingredients, setIngredients] = useState<IngredientProps[]>([
+  const [ingredients, setIngredients] = useState<Ingredient[]>([
     {
       id: 0,
       name: "",
@@ -33,7 +33,7 @@ const CommunityRecipePostPage = () => {
       unit: "",
     },
   ]);
-  const [tempIngredients, setTempIngredients] = useState<IngredientProps[]>([
+  const [tempIngredients, setTempIngredients] = useState<Ingredient[]>([
     {
       id: 0,
       name: "",

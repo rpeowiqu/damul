@@ -1,13 +1,13 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { IngredientProps } from "@/types/community";
+import { Ingredient } from "@/types/community";
 import PostRecipeIngrediantForm from "@/components/community/PostRecipeIngrediantForm";
 import SubmitButton from "./SubmitButton";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import DamulDrawer from "@/components/common/DamulDrawer";
 
 interface PostRecipeIngrediantsProps {
-  setTempIngredients: Dispatch<SetStateAction<IngredientProps[]>>;
-  tempIngredients: IngredientProps[];
+  setTempIngredients: Dispatch<SetStateAction<Ingredient[]>>;
+  tempIngredients: Ingredient[];
 }
 
 const PostRecipeIngrediants = ({
@@ -31,7 +31,7 @@ const PostRecipeIngrediants = ({
       return;
     }
 
-    const newIngredient: IngredientProps = {
+    const newIngredient: Ingredient = {
       id: Date.now(),
       name,
       amount,
