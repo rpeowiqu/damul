@@ -5,6 +5,7 @@ import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.util.ScrollUtil;
+import com.damul.api.user.dto.response.FollowList;
 import com.damul.api.user.dto.response.FollowResponse;
 import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.entity.Follow;
@@ -73,14 +74,14 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public ScrollResponse<UserList> getFollowers(String keyword, int cursor, int size, int followingId ) {
+    public ScrollResponse<FollowList> getFollowers(String keyword, int cursor, int size, int followingId ) {
         log.info("팔로워 목록 조회 시작");
-        List<UserList> userList = null;
+        List<FollowList> followLists = null;
         Pageable pageable = PageRequest.of(0, size + 1);
 
         if(keywordIsNull(keyword)) {
             log.info("검색할 닉네임 없음, 전체 조회");
-            userList = followRepository.findFollowersByUserIdAndCursorId(
+            followLists = followRepository.findFollowersByUserIdAndCursorId(
                     followingId,
                     cursor,
                     pageable
@@ -92,7 +93,7 @@ public class FollowServiceImpl implements FollowService {
             String startsWith = keyword + "%"; // 검색어로 시작하는 경우
             String contains = "%" + keyword + "%"; // 검색어가 포함된 경우
 
-            userList = followRepository.findFollowerByUserIdAndCursorIdAndNickname(
+            followLists = followRepository.findFollowerByUserIdAndCursorIdAndNickname(
                     followingId,
                     contains,
                     exactMatch,
@@ -103,18 +104,18 @@ public class FollowServiceImpl implements FollowService {
         }
 
         log.info("팔로워 목록 조회 완료");
-        return ScrollUtil.createScrollResponse(userList, cursor, size);
+        return ScrollUtil.createScrollResponse(followLists, cursor, size);
     }
 
     @Override
-    public ScrollResponse<UserList> getFollowings(String keyword, int cursor, int size, int followerId) {
+    public ScrollResponse<FollowList> getFollowings(String keyword, int cursor, int size, int followerId) {
         log.info("팔로잉 목록 조회 시작");
         Pageable pageable = PageRequest.of(0, size + 1);
-        List<UserList> userList = null;
+        List<FollowList> followLists = null;
 
         if(keywordIsNull(keyword)) {
             log.info("검색할 닉네임 없음, 전체 조회 - keyword: {}", keyword);
-            userList = followRepository.findFollowingsByUserIdAndCursorId(
+            followLists = followRepository.findFollowingsByUserIdAndCursorId(
                     followerId,
                     cursor,
                     pageable
@@ -125,7 +126,7 @@ public class FollowServiceImpl implements FollowService {
             String startsWith = keyword + "%"; // 검색어로 시작하는 경우
             String contains = "%" + keyword + "%"; // 검색어가 포함된 경우
 
-            userList = followRepository.findFollowingsByUserIdAndCursorIdAndNickname(
+            followLists = followRepository.findFollowingsByUserIdAndCursorIdAndNickname(
                     followerId,
                     contains,
                     exactMatch,
@@ -137,7 +138,7 @@ public class FollowServiceImpl implements FollowService {
 
 
         log.info("팔로잉 목록 조회 완료");
-        return ScrollUtil.createScrollResponse(userList, cursor, size);
+        return ScrollUtil.createScrollResponse(followLists, cursor, size);
     }
 
     // 팔로워 강제 삭제
