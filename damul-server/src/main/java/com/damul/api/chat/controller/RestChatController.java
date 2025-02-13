@@ -57,7 +57,7 @@ public class RestChatController {
         log.info("컨트롤러: 채팅 메시지 조회 시작 - roomId: {}, cursor: {}, size: {}",
                 roomId, cursor, size);
 
-        ScrollResponse<ChatMessageResponse> response = chatMessageService.getChatMessages(
+        ChatScrollResponse<ChatMessageResponse> response = chatMessageService.getChatMessages(
                 roomId,
                 cursor,
                 size,
