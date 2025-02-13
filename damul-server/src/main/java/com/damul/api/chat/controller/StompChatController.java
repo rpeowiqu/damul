@@ -1,17 +1,9 @@
 package com.damul.api.chat.controller;
 
 import com.damul.api.auth.entity.User;
-import com.damul.api.chat.dto.MessageType;
-import com.damul.api.chat.dto.ReadStatus;
-import com.damul.api.chat.dto.TypingStatus;
-import com.damul.api.chat.entity.ChatMessage;
-import com.damul.api.chat.entity.ChatRoom;
-import com.damul.api.chat.entity.ChatRoomMember;
-import com.damul.api.chat.repository.ChatMessageRepository;
-import com.damul.api.chat.repository.ChatRoomMemberRepository;
-import com.damul.api.chat.repository.ChatRoomRepository;
+import com.damul.api.chat.dto.request.*;
+import com.damul.api.chat.service.WebSocketService;
 import com.damul.api.common.exception.BusinessException;
-import com.damul.api.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -20,123 +12,47 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class StompChatController {
 
-    private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final WebSocketService webSocketService;
     private final SimpMessageSendingOperations messagingTemplate;
-    private final ChatRoomRepository chatRoomRepository;
 
-    @Transactional
     @MessageMapping("/chat/room/{roomId}/message")
-    public void message(ChatMessage message) {
-        try {
-            chatMessageRepository.save(message);
-            messagingTemplate.convertAndSend("/sub/chat/room/" + message.getRoom().getId(), message);
-
-            if (message.getMessageType() == MessageType.TEXT) {
-                updateUnreadCount(message);
-            }
-        } catch (Exception e) {
-            log.error("메시지 처리 중 오류 발생", e);
-            handleMessageError(message.getRoom().getId(), e);
-        }
+    public void message(@DestinationVariable int roomId,
+                        ChatMessageCreate messageRequest, // 이미지를 bitcode로 받는 방식 혹은 http 통신으로 이미지만 받는 방식
+                        @AuthenticationPrincipal User sender) {
+        webSocketService.handleMessage(roomId, messageRequest, sender);
     }
+
+//    @MessageMapping("/chat/room/{roomId}/image")
+//    public void handleImageMessage(@DestinationVariable int roomId,
+//                                   ChatMessageCreate imageRequest,
+//                                   @AuthenticationPrincipal User user) {
+//        webSocketService.handleImageMessage(roomId, imageRequest, user);
+//    }
 
     @MessageMapping("/chat/room/{roomId}/enter")
     public void enter(@DestinationVariable int roomId, @AuthenticationPrincipal User user) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND));
-
-        validateChatRoomMember(roomId, user.getId());
-
-        ChatMessage enterMessage = ChatMessage.createEnterMessage(room, user);
-        chatMessageRepository.save(enterMessage);
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, enterMessage);
+        webSocketService.handleEnter(roomId, user);
     }
 
     @MessageMapping("/chat/room/{roomId}/leave")
     public void leave(@DestinationVariable int roomId, @AuthenticationPrincipal User user) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND));
-
-        validateChatRoomMember(roomId, user.getId());
-
-        ChatMessage leaveMessage = ChatMessage.createLeaveMessage(room, user);
-        chatMessageRepository.save(leaveMessage);
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, leaveMessage);
+        webSocketService.handleLeave(roomId, user);
     }
 
     @MessageMapping("/chat/typing")
-    public void typing(int roomId, @AuthenticationPrincipal User user, boolean isTyping) {
-        ChatRoomMember member = validateChatRoomMember(roomId, user.getId());
-
-        TypingStatus status = new TypingStatus(
-                roomId,
-                user.getId(),
-                member.getNickname(),
-                isTyping
-        );
-
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId + "/typing", status);
+    public void typing(ChatTypingMessage typingRequest, @AuthenticationPrincipal User user) {
+        webSocketService.handleTyping(typingRequest.getRoomId(), user, typingRequest.isTyping());
     }
 
     @MessageMapping("/chat/read")
-    public void messageRead(int roomId, @AuthenticationPrincipal User user, int messageId) {
-        ChatRoomMember member = validateChatRoomMember(roomId, user.getId());
-
-        member.updateLastReadMessageId(messageId);
-        chatRoomMemberRepository.save(member);
-
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId + "/read",
-                new ReadStatus(roomId, user.getId(), messageId));
-    }
-
-    @MessageMapping("/chat/file")
-    public void handleFileMessage(ChatRoom room, String content, String fileUrl, @AuthenticationPrincipal User user) {
-        try {
-            ChatMessage message = ChatMessage.createFileMessage(room, user, content, fileUrl);
-            chatMessageRepository.save(message);
-            messagingTemplate.convertAndSend("/sub/chat/room/" + room.getId(), message);
-            updateUnreadCount(message);
-        } catch (Exception e) {
-            log.error("파일 메시지 처리 중 오류 발생", e);
-            handleMessageError(room.getId(), e);
-        }
-    }
-
-    private ChatRoomMember validateChatRoomMember(int roomId, int userId) {
-        return chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND));
-    }
-
-    private void updateUnreadCount(ChatMessage message) {
-        List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(message.getRoom().getId());
-        for (ChatRoomMember member : members) {
-            if (member.getUser().getId() != message.getSender().getId()) {
-                messagingTemplate.convertAndSend(
-                        "/sub/chat/unread/" + member.getUser().getId(),
-                        chatMessageRepository.countUnreadMessages(message.getRoom().getId(), member.getLastReadMessageId())
-                );
-            }
-        }
-    }
-
-    private void handleMessageError(int roomId, Exception e) {
-        String errorMessage;
-        if (e instanceof BusinessException) {
-            errorMessage = e.getMessage();
-        } else {
-            errorMessage = "메시지 처리 중 오류가 발생했습니다.";
-        }
-        messagingTemplate.convertAndSend("/sub/chat/error/" + roomId, errorMessage);
+    public void messageRead(ChatReadRequest readRequest, @AuthenticationPrincipal User user) {
+        webSocketService.handleMessageRead(readRequest.getRoomId(), user, readRequest.getMessageId());
     }
 
     @MessageExceptionHandler
@@ -145,8 +61,10 @@ public class StompChatController {
         if (e instanceof BusinessException) {
             BusinessException be = (BusinessException) e;
             messagingTemplate.convertAndSend("/sub/chat/errors",
-                    new ErrorResponse(be.getErrorCode().getStatus().value(),
-                            be.getMessage()));
+                    new ErrorResponse(
+                            be.getErrorCode().getStatus().value(),
+                            be.getMessage()
+                    ));
         } else {
             messagingTemplate.convertAndSend("/sub/chat/errors",
                     new ErrorResponse(500, "서버 내부 오류가 발생했습니다."));
