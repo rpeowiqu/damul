@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import ChattingListInfo from "@/components/chat/ChattingListInfo";
 import PostButton from "@/components/community/PostButton";
-import WebSocketComponent from "./WebSocketComponent";
 import { getChattingList } from "@/service/chatting";
 import ChattingListInfiniteScroll from "@/components/chat/ChattingListInfiniteScroll";
 import ChattingListItem from "@/components/chat/ChattingListItem";
@@ -67,7 +66,6 @@ const ChattingMainPage = () => {
           <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
         }
       />
-      {/* <WebSocketComponent /> */}
     </div>
   );
 };

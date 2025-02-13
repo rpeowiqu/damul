@@ -1,4 +1,4 @@
-import { useRef, useState, ChangeEvent, useEffect } from "react";
+import { useRef, useState, ChangeEvent, useEffect, KeyboardEvent } from "react";
 import { useParams } from "react-router-dom";
 import ChattingBubble from "@/components/chat/ChattingBubble";
 import SendIcon from "@/components/svg/SendIcon";
@@ -6,10 +6,12 @@ import ChattingMenuButton from "@/components/chat/ChattingMenuButton";
 import { getChattingContents } from "@/service/chatting";
 import { ChatMessage } from "@/types/chat";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
+import { useStompClient } from "@/hooks/useStompClient";
 
 const ChattingRoomPage = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { roomId } = useParams();
+  const { sendMessage } = useStompClient({ roomId: Number(roomId) });
 
   const [message, setMessage] = useState("");
   const [image, setImage] = useState<string | null>(null);
@@ -19,6 +21,13 @@ const ChattingRoomPage = () => {
     const textarea = e.target;
     textarea.style.height = "auto";
     textarea.style.height = `${textarea.scrollHeight}px`;
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // 기본 엔터 동작 방지
+      handleSendMessage();
+    }
   };
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -35,13 +44,8 @@ const ChattingRoomPage = () => {
   const handleImageRemove = () => {
     setImage(null);
   };
-  const [data, setData] = useState<ChatMessage | null>(null);
 
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "instant" });
-    }
-  }, [data]);
+  const [chatData, setChatData] = useState<ChatMessage[]>([]);
 
   const fetchItems = async (pageParam: number) => {
     try {
@@ -50,8 +54,9 @@ const ChattingRoomPage = () => {
         cursor: pageParam,
         size: 5,
       });
-      console.log(response?.data);
-      setData(response?.data.data);
+      if (response?.data) {
+        setChatData(response.data);
+      }
       return response?.data;
     } catch (error) {
       console.log(error);
@@ -59,24 +64,30 @@ const ChattingRoomPage = () => {
   };
 
   useEffect(() => {
-    fetchItems(0);
-  }, []);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "instant" });
+    }
+  }, [chatData]);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      sendMessage({ messageType: "TEXT", content: message });
+      setMessage("");
+    } else if (image) {
+      sendMessage({ messageType: "IMAGE", fileUrl: image });
+      setImage(null);
+    } else {
+      return;
+    }
+  };
 
   return (
     <main className="h-full text-center py-6 space-y-2">
       <div className="fixed flex top-14 p-5 items-center justify-between border-b-1 border-neutral-200 bg-white font-semibold text-start h-12 pc:h-16 w-full pc:w-[598px]">
-        <p>토마토러버전종우 (4)</p>
+        <p>토마토러버전종우(4)</p>
         <ChattingMenuButton roomId={5} />
       </div>
       <div className="flex-1 justify-end overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
-        {/* {data?.map((msg) => {
-          const isMyMessage = msg.senderId === myId;
-          return <ChattingBubble isMyMessage={isMyMessage} msg={msg} />;
-        })} */}
         <DamulInfiniteScrollList
           queryKey={["chats"]}
           fetchFn={fetchItems}
@@ -123,12 +134,16 @@ const ChattingRoomPage = () => {
           <textarea
             value={message}
             onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
             className="flex-1 border rounded-md px-5 py-2 focus:outline-none text-sm resize-none min-h-[2rem] max-h-[6rem]"
             placeholder="메시지 입력"
             rows={1}
           />
         )}
-        <button className="self-end ml-2 border-2 border-positive-300 text-white p-1 pc:p-2 rounded-full">
+        <button
+          onClick={handleSendMessage}
+          className="self-end ml-2 border-2 border-positive-300 text-white p-1 pc:p-2 rounded-full"
+        >
           <SendIcon className="w-5 h-5 pc:w-6 pc:h-6 fill-positive-400" />
         </button>
       </div>

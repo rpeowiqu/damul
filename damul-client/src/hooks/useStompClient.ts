@@ -1,41 +1,43 @@
-import { useEffect, useRef, useState } from "react";
-import { Client, IMessage } from "@stomp/stompjs";
+import { useEffect, useRef } from "react";
+import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
-// Extend the Options type to include withCredentials
 interface ExtendedOptions extends SockJS.Options {
   withCredentials: boolean;
 }
 
-const WebSocketComponent = () => {
-  const wsUrl = "http://localhost:8080/ws"; // 웹소켓 서버 주소
-  const stompClientRef = useRef<Client | null>(null);
-  const roomId = 5; // 채팅방 ID
-  const [messages, setMessages] = useState<string[]>([]);
+interface SendChattingProps {
+  roomId: number;
+}
 
-  useEffect(() => {
-    // 1️⃣ STOMP 클라이언트 생성
+interface sendMessage {
+  messageType: string;
+  content?: string;
+  fileUrl?: string;
+}
+
+export const useStompClient = ({ roomId }: SendChattingProps) => {
+  const wsUrl = import.meta.env.VITE_WS_BASE_URL;
+  const stompClientRef = useRef<Client | null>(null);
+
+  const initializeStompClient = () => {
     const stompClient = new Client({
       webSocketFactory: () =>
         new SockJS(wsUrl, null, {
           transports: ["websocket"],
-          withCredentials: true, // Add this line
+          withCredentials: true,
         } as ExtendedOptions),
       onConnect: (frame) => {
         console.log("Connected: " + frame);
-
-        // 구독 설정 (/sub/... 으로 시작)
-        stompClient.subscribe("/sub/chat/room/1", (message) => {
+        stompClient.subscribe(`/sub/chat/room/${roomId}`, (message) => {
           const receivedMessage = JSON.parse(message.body);
           console.log("Received:", receivedMessage);
-          // 메시지 처리 로직
         });
       },
       onStompError: (frame) => {
         console.error("Broker reported error: " + frame.headers["message"]);
         console.error("Additional details:", frame.body);
       },
-
       onWebSocketError: (event) => {
         console.error("WebSocket error:", event);
       },
@@ -43,6 +45,10 @@ const WebSocketComponent = () => {
 
     stompClient.activate();
     stompClientRef.current = stompClient;
+  };
+
+  useEffect(() => {
+    initializeStompClient();
 
     return () => {
       if (stompClientRef.current) {
@@ -51,19 +57,18 @@ const WebSocketComponent = () => {
         });
       }
     };
-  }, []);
+  }, [roomId]);
 
-  // 메시지 전송 함수
-  const sendMessage = () => {
+  const sendMessage = ({ messageType, content, fileUrl }: sendMessage) => {
     if (!stompClientRef.current || !stompClientRef.current.connected) {
       console.warn("🚨 STOMP 클라이언트가 연결되지 않음");
       return;
     }
 
     const message = {
-      messageType: "TEXT",
-      content: "Hello, WebSocket!",
-      fileUrl: "",
+      messageType,
+      content,
+      fileUrl,
       room: { id: roomId },
     };
 
@@ -75,17 +80,5 @@ const WebSocketComponent = () => {
     console.log("📤 메시지 전송:", message);
   };
 
-  return (
-    <div>
-      <h2>React STOMP WebSocket</h2>
-      <button onClick={sendMessage}>메시지 보내기</button>
-      <ul>
-        {messages.map((msg, index) => (
-          <li key={index}>{msg}</li>
-        ))}
-      </ul>
-    </div>
-  );
+  return { sendMessage };
 };
-
-export default WebSocketComponent;
