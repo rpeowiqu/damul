@@ -1,18 +1,13 @@
 package com.damul.api.chat.controller;
 
 import com.damul.api.auth.dto.response.UserInfo;
-import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.ChatRoomLimitUpdate;
 import com.damul.api.chat.dto.request.MultiChatRoomCreate;
-import com.damul.api.chat.dto.response.ChatMembersResponse;
-import com.damul.api.chat.dto.response.ChatRoomLimitResponse;
-import com.damul.api.chat.dto.response.ChatRoomList;
-import com.damul.api.chat.dto.response.UnReadResponse;
+import com.damul.api.chat.dto.response.*;
 import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.service.ChatMessageService;
 import com.damul.api.chat.service.ChatRoomService;
-import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
@@ -52,8 +47,8 @@ public class RestChatController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{roomId}")
-    public ResponseEntity<ScrollResponse<ChatMessage>> getChatMessages(
+    @GetMapping("/rooms/{roomId}")
+    public ResponseEntity<?> getChatMessages(
             @PathVariable int roomId,
             @RequestParam int cursor,
             @RequestParam int size,
@@ -62,7 +57,7 @@ public class RestChatController {
         log.info("컨트롤러: 채팅 메시지 조회 시작 - roomId: {}, cursor: {}, size: {}",
                 roomId, cursor, size);
 
-        ScrollResponse<ChatMessage> response = chatMessageService.getChatMessages(
+        ScrollResponse<ChatMessageResponse> response = chatMessageService.getChatMessages(
                 roomId,
                 cursor,
                 size,

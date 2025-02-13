@@ -1,5 +1,6 @@
 package com.damul.api.chat.service;
 
+import com.damul.api.chat.dto.response.ChatMessageResponse;
 import com.damul.api.chat.dto.response.UnReadResponse;
 import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.entity.ChatRoomMember;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,22 +31,28 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<ChatMessage> getChatMessages(int roomId, int cursor, int size, int userId) {
-        log.info("서비스: 채팅 메시지 조회 시작 - roomId: {}", roomId);
+    public ScrollResponse<ChatMessageResponse> getChatMessages(int roomId, int cursor, int size, int userId) {
+        log.info("서비스: 채팅 메시지 조회 시작 - roomId: {}, cursor: {}, size: {}, userId: {}", roomId, cursor, size, userId);
 
         validateRoomId(roomId);
         validateUserId(userId);
         validateMessageParams(cursor, size);
         validateMembership(roomId, userId);
 
-        List<ChatMessage> messages = fetchMessages(roomId, cursor, size);
+        int lastReadMessageId = chatRoomMemberRepository.findLastReadMessageIdByUserIdAndRoomId(userId, roomId);
+        List<ChatMessage> messages = fetchMessages(roomId, cursor, lastReadMessageId);
 
         if (messages.isEmpty()) {
             return createEmptyResponse();
         }
 
+        Collections.reverse(messages);
+        List<ChatMessageResponse> messageResponses = messages.stream()
+                .map(this::convertToChatMessageResponse)
+                .collect(Collectors.toList());
+
         log.info("서비스: 채팅 메시지 조회 성공 - roomId: {}", roomId);
-        return createScrollResponse(messages, roomId);
+        return createScrollResponse(messageResponses, roomId);
     }
 
     @Override
@@ -60,27 +68,39 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         return new UnReadResponse(unreadCount);
     }
 
+    private ChatMessageResponse convertToChatMessageResponse(ChatMessage chatMessage) {
+        int unReadCount = calculateUnreadCount(chatMessage);  // 읽지 않은 수를 계산하는 메서드
+        return ChatMessageResponse.from(chatMessage, unReadCount);
+    }
+
+    private int calculateUnreadCount(ChatMessage chatMessage) {
+        return chatRoomMemberRepository.countUnreadMembers(
+                chatMessage.getRoom().getId(),
+                chatMessage.getId()
+        );
+    }
+
     private void validateMembership(int roomId, int userId) {
         if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
             throw new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND);
         }
     }
 
-    private List<ChatMessage> fetchMessages(int roomId, int cursor, int size) {
+    private List<ChatMessage> fetchMessages(int roomId, int cursor, int lastReadMessageId) {
         return cursor == 0
-                ? chatMessageRepository.findFirstPageByRoomId(roomId, size)
-                : chatMessageRepository.findPreviousMessages(roomId, cursor, size);
+                ? chatMessageRepository.findInitialMessages(roomId, lastReadMessageId)
+                : chatMessageRepository.findPreviousMessages(roomId, cursor);
     }
 
-    private ScrollResponse<ChatMessage> createEmptyResponse() {
+    private ScrollResponse<ChatMessageResponse> createEmptyResponse() {
         return new ScrollResponse<>(
                 Collections.emptyList(),
                 new CursorPageMetaInfo(0, false)
         );
     }
 
-    private ScrollResponse<ChatMessage> createScrollResponse(List<ChatMessage> messages, int roomId) {
-        int nextCursor = messages.get(messages.size() - 1).getId();
+    private ScrollResponse<ChatMessageResponse> createScrollResponse(List<ChatMessageResponse> messages, int roomId) {
+        int nextCursor = messages.get(0).getId();
         boolean hasNext = chatMessageRepository.existsByRoomIdAndIdLessThan(roomId, nextCursor);
 
         return new ScrollResponse<>(
