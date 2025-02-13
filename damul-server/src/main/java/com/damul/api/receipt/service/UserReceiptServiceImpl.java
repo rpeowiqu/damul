@@ -1,15 +1,22 @@
 package com.damul.api.receipt.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.main.entity.UserIngredient;
 import com.damul.api.main.repository.UserIngredientRepository;
 import com.damul.api.mypage.entity.FoodCategory;
 import com.damul.api.mypage.entity.FoodPreference;
 import com.damul.api.mypage.repository.FoodCategoryRepository;
 import com.damul.api.mypage.repository.FoodPreferenceRepository;
+import com.damul.api.receipt.dto.request.RegisterIngredientList;
 import com.damul.api.receipt.dto.request.UserIngredientPost;
+import com.damul.api.receipt.dto.response.DailyReceiptInfo;
+import com.damul.api.receipt.dto.response.ReceiptCalendarResponse;
 import com.damul.api.receipt.entity.UserReceipt;
 import com.damul.api.receipt.repository.UserReceiptRepository;
+import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,43 +43,60 @@ public class UserReceiptServiceImpl implements UserReceiptService {
     @Override
     @Transactional
     public void registerIngredients(int userId, UserIngredientPost request) {
-        log.info("영수증 등록 시작 {} with request {}", userId, request);
+        log.info("영수증 등록 시작 - userId: {}", userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        // Create UserReceipt
+        // 총 구매 금액 계산
+        int totalAmount = request.getUserIngredients().stream()
+                .mapToInt(RegisterIngredientList::getProductPrice)
+                .sum();
+
+        // Create UserReceipt with totalAmount
         UserReceipt receipt = UserReceipt.builder()
                 .user(user)
                 .storeName(request.getStoreName())
                 .purchaseAt(request.getPurchaseAt().atStartOfDay())
+                .totalAmount(totalAmount)  // 총액 추가
                 .build();
 
         UserReceipt savedReceipt = userReceiptRepository.save(receipt);
-        log.info("영수증 등록 성공 user: {}, receipt: {}", user.getId(), savedReceipt.getId());
+        log.info("영수증 등록 완료 - receiptId: {}, totalAmount: {}", savedReceipt.getId(), totalAmount);
 
+        // 카테고리별 카운트 맵
         Map<Integer, Integer> categoryCount = new HashMap<>();
 
-        // Create and save UserIngredients one by one
-        request.getUserIngredients().forEach(item -> {
-            categoryCount.merge(item.getCategoryId(), 1, Integer::sum);
+        // 식자재 등록
+        List<UserIngredient> ingredients = request.getUserIngredients().stream()
+                .map(item -> {
+                    // 카테고리 카운트 증가
+                    categoryCount.merge(item.getCategoryId(), 1, Integer::sum);
 
-            UserIngredient ingredient = UserIngredient.builder()
-                    .userReciept(savedReceipt)
-                    .categoryId(item.getCategoryId())
-                    .ingredientQuantity(100)
-                    .ingredientName(item.getIngredientName())
-                    .expirationDate(item.getExpirationDate().atStartOfDay())
-                    .ingredientStorage(item.getIngredientStorage())
-                    .price(item.getProductPrice())
-                    .build();
+                    return UserIngredient.builder()
+                            .userReciept(savedReceipt)
+                            .categoryId(item.getCategoryId())
+                            .ingredientQuantity(100)
+                            .ingredientName(item.getIngredientName())
+                            .expirationDate(item.getExpirationDate().atStartOfDay())
+                            .ingredientStorage(item.getIngredientStorage())
+                            .price(item.getProductPrice())
+                            .build();
+                })
+                .collect(Collectors.toList());
 
-            userIngredientRepository.save(ingredient);
-        });
+        userIngredientRepository.saveAll(ingredients);
+        log.info("식자재 등록 완료 - count: {}", ingredients.size());
 
-        // Update food preferences
+        // 선호도 업데이트
+        updateFoodPreferences(user, categoryCount);
+        log.info("식자재 선호도 업데이트 완료");
+    }
+
+    private void updateFoodPreferences(User user, Map<Integer, Integer> categoryCount) {
         categoryCount.forEach((categoryId, count) -> {
             FoodPreference preference = foodPreferenceRepository
-                    .findByUserIdAndCategoryId(userId, categoryId)
+                    .findByUserIdAndCategoryId(user.getId(), categoryId)
                     .orElseGet(() -> {
                         FoodCategory category = foodCategoryRepository.findById(categoryId)
                                 .orElseThrow(() -> new EntityNotFoundException("Category not found: " + categoryId));
@@ -89,7 +111,33 @@ public class UserReceiptServiceImpl implements UserReceiptService {
             preference.increaseCategoryPreference(count);
             foodPreferenceRepository.save(preference);
         });
+    }
 
-        log.info("식자재 등록 완료 user: {}, receipt: {}", user.getId(), savedReceipt.getId());
+    @Override
+    public ReceiptCalendarResponse getMonthlyReceipt(UserInfo userInfo, int year, int month) {
+        log.info("월별 영수증 조회 서비스 시작");
+
+        // 유효성 검증
+        if(month < 1 || month > 12) {
+            log.error("잘못된 월 입력 - month: {}", month);
+            throw new BusinessException(ErrorCode.INVALID_MONTH);
+        }
+
+        int userId = userInfo.getId();
+
+        // 월별 총액 조회 (null일 경우 0으로 처리)
+        int monthlyTotal = Optional.ofNullable(
+                        userReceiptRepository.calculateMonthlyTotal(userId, year, month))
+                .orElse(0);
+
+        List<DailyReceiptInfo> dailyReceipts = userReceiptRepository.findDailyReceipts(userId, year, month);
+
+
+        log.info("월별 영수증 조회 완료 - 총액: {}, 일수: {}", monthlyTotal, dailyReceipts.size());
+
+        return ReceiptCalendarResponse.builder()
+                .monthlyTotalAmount(monthlyTotal)
+                .dailyReceiptInfoList(dailyReceipts)
+                .build();
     }
 }
