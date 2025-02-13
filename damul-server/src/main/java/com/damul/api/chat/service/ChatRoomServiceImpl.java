@@ -71,7 +71,6 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 .collect(Collectors.toList());
 
         ChatRoom lastRoom = rooms.get(rooms.size() - 1);
-        System.out.println(chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId()));
         LocalDateTime lastMessageTime = chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId());
 
         if (lastMessageTime == null) {
