@@ -36,7 +36,7 @@ public class RestChatController {
             @RequestParam int size,
             @CurrentUser UserInfo user
     ) {
-        log.info("컨트롤러: 채팅방 목록 조회 시작 - cursor: {}, size: {}", cursor, size);
+        log.info("컨트롤러: 채팅방 목록 조회 시작 - cursor: {}, size: {}, cursorTime: {}", cursor, size, cursorTime);
 
         ScrollResponse<ChatRoomList> response = chatRoomService.getChatRooms(cursorTime, cursor, size, user.getId());
 
@@ -90,7 +90,7 @@ public class RestChatController {
                 user.getId()
         );
 
-        if (response.getResults().getData().isEmpty()) {
+        if (response.getData().isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
