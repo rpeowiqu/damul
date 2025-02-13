@@ -15,8 +15,8 @@ public interface UserBadgeRepository extends JpaRepository<UserBadge, Integer> {
     @Query("""
             SELECT new com.damul.api.mypage.dto.response.BadgeList(
                 ub.badge.id,
-                ub.badge.name,
-                ub.level
+                ub.badge.title,
+                ub.badge.level
             )
             FROM UserBadge ub
             WHERE ub.user.id = :userId
@@ -29,7 +29,7 @@ public interface UserBadgeRepository extends JpaRepository<UserBadge, Integer> {
             SELECT COUNT(DISTINCT ub.user.id)
             FROM UserBadge ub
             WHERE ub.badge.id = :badgeId
-            AND ub.level > :userLevel
+            AND ub.badge.level > :userLevel
             """)
     int countUsersWithHigherLevel(@Param("badgeId") int badgeId, @Param("userLevel") int userLevel);
 }

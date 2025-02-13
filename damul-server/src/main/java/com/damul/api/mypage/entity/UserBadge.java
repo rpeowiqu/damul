@@ -26,12 +26,6 @@ public class UserBadge {
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
 
-    @Column(name = "level", nullable = false)
-    private byte level;
-
-    @Column(name = "count", nullable = false)
-    private int count;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

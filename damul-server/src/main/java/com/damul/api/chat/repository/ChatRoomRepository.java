@@ -15,21 +15,21 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
 
     // 커서 기반 채팅방 목록 조회
     @Query(value = """
-    SELECT DISTINCT cr.* 
-    FROM chat_rooms cr 
-    INNER JOIN chat_room_members crm ON cr.id = crm.room_id 
-    LEFT JOIN (
-        SELECT room_id, MAX(created_at) as last_message_time
-        FROM chat_messages
-        GROUP BY room_id
-    ) last_msg ON cr.id = last_msg.room_id
-    WHERE cr.status = 'ACTIVE' 
-    AND crm.user_id = :userId
-    AND (
-        last_msg.last_message_time < :cursorTime 
-        OR (last_msg.last_message_time = :cursorTime AND cr.id < :cursorId)
-    )
-    ORDER BY last_msg.last_message_time DESC, cr.id DESC
+        SELECT DISTINCT cr.*\s
+         FROM chat_rooms cr\s
+         INNER JOIN chat_room_members crm ON cr.id = crm.room_id\s
+         LEFT JOIN (
+             SELECT room_id, MAX(created_at) as last_message_time
+             FROM chat_messages
+             GROUP BY room_id
+         ) last_msg ON cr.id = last_msg.room_id
+         WHERE cr.status = 'ACTIVE'\s
+         AND crm.user_id = :userId
+         AND (
+             COALESCE(last_msg.last_message_time, cr.created_at) < :cursorTime\s
+             OR (COALESCE(last_msg.last_message_time, cr.created_at) = :cursorTime AND cr.id < :cursorId)
+         )
+         ORDER BY COALESCE(last_msg.last_message_time, cr.created_at) DESC, cr.id DESC
     """, nativeQuery = true)
     List<ChatRoom> findRoomsWithCursor(
             @Param("userId") int userId,
@@ -51,11 +51,11 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
         AND crm.user_id = :userId
         AND (:keyword IS NULL OR cr.room_name LIKE CONCAT('%', :keyword, '%'))
         AND (
-            last_msg.last_message_time < :cursorTime 
-            OR (last_msg.last_message_time = :cursorTime AND cr.id < :cursorId)
+            COALESCE(last_msg.last_message_time, cr.created_at) < :cursorTime 
+            OR (COALESCE(last_msg.last_message_time, cr.created_at) = :cursorTime AND cr.id < :cursorId)
         )
-        ORDER BY last_msg.last_message_time DESC, cr.id DESC
-        """, nativeQuery = true)
+        ORDER BY COALESCE(last_msg.last_message_time, cr.created_at) DESC, cr.id DESC
+    """, nativeQuery = true)
     List<ChatRoom> findRoomsWithCursorAndKeyword(
             @Param("userId") int userId,
             @Param("cursorTime") LocalDateTime cursorTime,

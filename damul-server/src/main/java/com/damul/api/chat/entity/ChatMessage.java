@@ -44,7 +44,9 @@ public class ChatMessage {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        messageType = MessageType.TEXT;
+        if (messageType == null) {
+            messageType = MessageType.TEXT;
+        }
     }
 
     public static ChatMessage createSystemMessage(ChatRoom room, String content) {
