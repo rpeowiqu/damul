@@ -2,7 +2,7 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MemberRole;
-import com.damul.api.chat.dto.request.ChatCursorPageMetaInfo;
+import com.damul.api.chat.dto.response.ChatCursorPageMetaInfo;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.MultiChatRoomCreate;
 import com.damul.api.chat.dto.response.ChatMember;
@@ -24,7 +24,6 @@ import com.damul.api.common.scroll.dto.response.SearchResponse;
 import com.damul.api.post.entity.Post;
 import com.damul.api.post.repository.PostRepository;
 import com.damul.api.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

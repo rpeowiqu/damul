@@ -1,4 +1,4 @@
-package com.damul.api.chat.dto.request;
+package com.damul.api.chat.dto.response;
 
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import lombok.AllArgsConstructor;
@@ -13,6 +13,7 @@ public class ChatCursorPageMetaInfo extends CursorPageMetaInfo {
     private final LocalDateTime nextCursorTime;
 
     public ChatCursorPageMetaInfo(LocalDateTime nextCursorTime, int nextCursor, boolean hasNext) {
+        super(nextCursor, hasNext);
         this.nextCursorTime = nextCursorTime;
     }
 
