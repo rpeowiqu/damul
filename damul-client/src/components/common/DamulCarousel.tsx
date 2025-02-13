@@ -21,9 +21,13 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
+  const navigate = useNavigate();
 
   const [suggestedRecipe, setsuggestedRecipe] = useState<SuggestedRecipe[]>([]);
-  const navigate = useNavigate();
+
+  const handleCarouselItemClick = (idx: number) => {
+    navigate(`/community/recipe/${suggestedRecipe[idx].recipeId}`);
+  };
 
   useEffect(() => {
     if (!api) {
@@ -62,9 +66,7 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
             <CarouselItem
               key={`${idx}-${recipe.recipeId}`}
               className="h-36 cursor-pointer"
-              onClick={() => {
-                navigate("/community/recipe/1");
-              }}
+              onClick={() => handleCarouselItemClick(idx)}
             >
               <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
                 <div className="flex gap-1 ">
