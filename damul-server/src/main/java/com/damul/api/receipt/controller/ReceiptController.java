@@ -8,10 +8,7 @@ import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -21,7 +18,7 @@ public class ReceiptController {
     private final UserReceiptService userReceiptService;
 
     // 나의 구매이력 조회
-    @GetMapping("calendar")
+    @GetMapping("/calendar")
     public ResponseEntity<?> getMonthlyReceipts(@CurrentUser UserInfo userInfo,
                                                 @RequestParam(value = "year", required = false) int year,
                                                 @RequestParam(value = "month", required = false) int month) {
@@ -30,5 +27,16 @@ public class ReceiptController {
         ReceiptCalendarResponse receiptCalendarResponse = userReceiptService.getMonthlyReceipt(userInfo, year, month);
         log.info("월별 영수증 조회 완료 - year: {}, month: {}", year, month);
         return ResponseEntity.ok(receiptCalendarResponse);
+    }
+
+    // 나의 영수증 보기(상세조회)
+    @GetMapping("{receiptId}")
+    public ResponseEntity<?> getReceiptById(UserInfo userInfo,
+                                            @PathVariable("receiptId") int receiptId) {
+        log.info("영수증 상세 조회 요청 - receiptId: {}", receiptId);
+
+
+        log.info("영수증 상세 조회 성공 - receiptId: {}", receiptId);
+        return null;
     }
 }

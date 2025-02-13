@@ -18,6 +18,7 @@ public enum ErrorCode {
     INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, "검색타입이 존재하지 않습니다"),
     INVALID_COMMENT(HttpStatus.BAD_REQUEST, "댓글이 존재하지 않습니다"),
     INVALID_MONTH(HttpStatus.BAD_REQUEST, "유효하지 않은 월입니다. 1에서 12 사이의 값을 입력해주세요"),
+    INVALID_PERIOD(HttpStatus.BAD_REQUEST, "유효하지 않은 PERIOD 입니다. yearly, recent 중 입력해주세요"),
 
     // 중복 관련 에러
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 등록된 이메일입니다."),
