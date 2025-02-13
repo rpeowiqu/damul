@@ -3,6 +3,7 @@ package com.damul.api.chat.service;
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MemberRole;
 import com.damul.api.chat.dto.response.ChatMessageResponse;
+import com.damul.api.chat.dto.response.ChatScrollResponse;
 import com.damul.api.chat.dto.response.UnReadResponse;
 import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.entity.ChatRoom;
@@ -38,23 +39,22 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
 
     @Override
     @Transactional  // ✨ readOnly 제거 (멤버 추가 필요할 수 있으므로)
-    public ScrollResponse<ChatMessageResponse> getChatMessages(int roomId, int cursor, int size, int userId) {
+    public ChatScrollResponse<ChatMessageResponse> getChatMessages(int roomId, int cursor, int size, int userId) {
         log.info("서비스: 채팅 메시지 조회 시작 - roomId: {}, cursor: {}, size: {}, userId: {}", roomId, cursor, size, userId);
 
         validateRoomId(roomId);
         validateUserId(userId);
         validateMessageParams(cursor, size);
 
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND, "존재하지 않는 채팅방입니다."));
+        int currentMemberCount = chatRoomMemberRepository.countMembersByRoomId(roomId);;
         // ✨ 멤버십 확인 및 신규 멤버 처리 로직 추가
         if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
-            ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                    .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND, "존재하지 않는 채팅방입니다."));
-
             if (chatRoom.getStatus() == ChatRoom.Status.INACTIVE) {
                 throw new BusinessException(ErrorCode.CHATROOM_INACTIVE, "비활성화된 채팅방입니다.");
             }
 
-            int currentMemberCount = chatRoomMemberRepository.countMembersByRoomId(roomId);
             if (currentMemberCount >= chatRoom.getMemberLimit()) {
                 throw new BusinessException(ErrorCode.CHATROOM_FULL, "채팅방 인원이 가득 찼습니다.");
             }
@@ -99,7 +99,7 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
                 .collect(Collectors.toList());
 
         log.info("서비스: 채팅 메시지 조회 성공 - roomId: {}", roomId);
-        return createScrollResponse(messageResponses, roomId);
+        return createScrollResponse(messageResponses, roomId, chatRoom.getRoomName(), currentMemberCount);
     }
 
     @Override
@@ -133,20 +133,24 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
                 : chatMessageRepository.findPreviousMessages(roomId, cursor);
     }
 
-    private ScrollResponse<ChatMessageResponse> createEmptyResponse() {
-        return new ScrollResponse<>(
+    private ChatScrollResponse<ChatMessageResponse> createEmptyResponse() {
+        return new ChatScrollResponse<>(
                 Collections.emptyList(),
-                new CursorPageMetaInfo(0, false)
+                new CursorPageMetaInfo(0, false),
+                null,
+                0
         );
     }
 
-    private ScrollResponse<ChatMessageResponse> createScrollResponse(List<ChatMessageResponse> messages, int roomId) {
+    private ChatScrollResponse<ChatMessageResponse> createScrollResponse(List<ChatMessageResponse> messages, int roomId, String roomName, int memberNum) {
         int nextCursor = messages.get(0).getId();
         boolean hasNext = chatMessageRepository.existsByRoomIdAndIdLessThan(roomId, nextCursor);
 
-        return new ScrollResponse<>(
+        return new ChatScrollResponse<>(
                 messages,
-                new CursorPageMetaInfo(nextCursor, hasNext)
+                new CursorPageMetaInfo(nextCursor, hasNext),
+                roomName,
+                memberNum
         );
     }
 }
