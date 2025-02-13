@@ -1,5 +1,5 @@
 import Image from "../common/Image";
-import { ChatMessage } from "@/types/chat";
+import { ChatMessage } from "@/types/chatting";
 import useUserStore from "../../stores/user";
 
 interface ChattingBubbleProps {

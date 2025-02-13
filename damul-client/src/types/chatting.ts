@@ -1,3 +1,13 @@
+export interface ChattingItem {
+  id: number;
+  title: string;
+  thumbnailUrl: string;
+  memberNum: number;
+  lastMessage: string;
+  lastMessageTime: string;
+  unReadNum: number;
+}
+
 export interface ChattingListItemProps {
   id: number;
   title: string;
@@ -28,4 +38,10 @@ export interface ChatResponse {
     nextCursor: number;
     hasNext: boolean;
   };
+}
+
+export interface ChattingMember {
+  id: number;
+  nickname: string;
+  profileImageUrl: string;
 }

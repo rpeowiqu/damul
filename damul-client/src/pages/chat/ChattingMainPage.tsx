@@ -5,16 +5,7 @@ import PostButton from "@/components/community/PostButton";
 import { getChattingList } from "@/service/chatting";
 import ChattingListInfiniteScroll from "@/components/chat/ChattingListInfiniteScroll";
 import ChattingListItem from "@/components/chat/ChattingListItem";
-
-interface ChattingItem {
-  id: number;
-  title: string;
-  thumbnailUrl: string;
-  memberNum: number;
-  lastMessage: string;
-  lastMessageTime: string;
-  unReadNum: number;
-}
+import { ChattingItem } from "@/types/chatting";
 
 const ChattingMainPage = () => {
   const navigate = useNavigate();
@@ -51,17 +42,7 @@ const ChattingMainPage = () => {
       <ChattingListInfiniteScroll
         queryKey={["chattRooms"]}
         fetchFn={fetchItems}
-        renderItems={(item: ChattingItem) => (
-          <ChattingListItem
-            id={item.id}
-            title={item.title}
-            thumbnailUrl={item.thumbnailUrl}
-            memberNum={item.memberNum}
-            lastMessage={item.lastMessage}
-            lastMessageTime={item.lastMessageTime}
-            unReadNum={item.unReadNum}
-          />
-        )}
+        renderItems={(item: ChattingItem) => <ChattingListItem {...item} />}
         skeleton={
           <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
         }

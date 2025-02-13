@@ -4,7 +4,7 @@ import ChattingBubble from "@/components/chat/ChattingBubble";
 import SendIcon from "@/components/svg/SendIcon";
 import ChattingMenuButton from "@/components/chat/ChattingMenuButton";
 import { getChattingContents } from "@/service/chatting";
-import { ChatMessage } from "@/types/chat";
+import { ChatMessage } from "@/types/chatting";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import { useStompClient } from "@/hooks/useStompClient";
 
@@ -46,6 +46,8 @@ const ChattingRoomPage = () => {
   };
 
   const [chatData, setChatData] = useState<ChatMessage[]>([]);
+  const [memberNum, setMemberNum] = useState(0);
+  const [roomName, setRoomName] = useState("");
 
   const fetchItems = async (pageParam: number) => {
     try {
@@ -56,6 +58,8 @@ const ChattingRoomPage = () => {
       });
       if (response?.data) {
         setChatData(response.data);
+        setMemberNum(response.data.memberNum);
+        setRoomName(response.data.roomName);
       }
       return response?.data;
     } catch (error) {
@@ -84,7 +88,9 @@ const ChattingRoomPage = () => {
   return (
     <main className="h-full text-center py-6 space-y-2">
       <div className="fixed flex top-14 p-5 items-center justify-between border-b-1 border-neutral-200 bg-white font-semibold text-start h-12 pc:h-16 w-full pc:w-[598px]">
-        <p>토마토러버전종우(4)</p>
+        <p>
+          {roomName}({memberNum})
+        </p>
         <ChattingMenuButton roomId={5} />
       </div>
       <div className="flex-1 justify-end overflow-y-auto p-4 py-10 pc:py-14 space-y-4">

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Image from "../common/Image";
 import ChatAlarm from "../footer/ChatAlram";
 import { formatDate } from "@/utils/date";
-import { ChattingListItemProps } from "@/types/chat";
+import { ChattingListItemProps } from "@/types/chatting";
 
 const ChattingListItem = ({
   id,
