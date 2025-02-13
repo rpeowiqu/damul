@@ -1,18 +1,20 @@
 import { useOutletContext, useParams } from "react-router-dom";
-import { getFollowers } from "@/service/user";
+import { deleteFollower, getFollowers } from "@/service/user";
 import FriendItem, { FriendItemProps } from "@/components/profile/FriendItem";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import DamulButton from "@/components/common/DamulButton";
 import useUserStore from "@/stores/user";
+import queryClient from "@/utils/queryClient";
 
 const ProfileFriendFollowerPage = () => {
   const myId = useUserStore((state) => state.myId);
   const { userId } = useParams();
-  // const { searchTerm } = useOutletContext();
+  const { searchKeyword } = useOutletContext();
 
   const fetchFollowers = async (pageParam: number) => {
     try {
       const response = await getFollowers(parseInt(userId!), {
+        keyword: searchKeyword,
         cursor: pageParam,
         size: 10,
       });
@@ -21,6 +23,15 @@ const ProfileFriendFollowerPage = () => {
       }
 
       return response?.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteFriend = async (userId: number) => {
+    try {
+      await deleteFollower(myId, userId!);
+      queryClient.invalidateQueries({ queryKey: ["follower"] });
     } catch (error) {
       console.error(error);
     }
@@ -41,10 +52,11 @@ const ProfileFriendFollowerPage = () => {
               >
                 채팅 시작
               </DamulButton>
+
               <DamulButton
                 variant="negative"
                 className="h-7 sm:h-10 text-xs xs:text-sm"
-                onClick={() => {}}
+                onClick={() => handleDeleteFriend(item.userId)}
               >
                 친구 삭제
               </DamulButton>

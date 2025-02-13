@@ -4,6 +4,7 @@ import {
   MouseEventHandler,
   Dispatch,
   SetStateAction,
+  FocusEventHandler,
 } from "react";
 import { Input } from "@/components/ui/input";
 import SearchIcon from "../svg/SearchIcon";
@@ -15,6 +16,8 @@ interface SearchBoxProps {
   inputValue?: string;
   setInputValue?: Dispatch<SetStateAction<string>>; // 상태 업데이트 함수
   className?: string; // 추가된 스타일링 prop
+  onFocus?: FocusEventHandler<HTMLInputElement>;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
 }
 
 const DamulSearchBox = ({
@@ -23,7 +26,9 @@ const DamulSearchBox = ({
   onButtonClick,
   inputValue,
   setInputValue,
-  className = "",
+  className,
+  onFocus,
+  onBlur,
 }: SearchBoxProps) => {
   // 입력값 변경 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +61,8 @@ const DamulSearchBox = ({
         onChange={handleInputChange}
         value={inputValue}
         onKeyDown={handleKeyDown}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
       <button
         type="button"

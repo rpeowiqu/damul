@@ -7,14 +7,15 @@ import useUserStore from "@/stores/user";
 import { useState } from "react";
 
 const ProfileFriendFollowingPage = () => {
-  const { userId } = useParams();
   const myId = useUserStore((state) => state.myId);
-  // const { searchTerm } = useOutletContext();
+  const { userId } = useParams();
+  const { searchKeyword } = useOutletContext();
   const [checkSet, setCheckSet] = useState<Set<number>>(new Set());
 
   const fetchFollowings = async (pageParam: number) => {
     try {
       const response = await getFollowings(parseInt(userId!), {
+        keyword: searchKeyword,
         cursor: pageParam,
         size: 10,
       });
