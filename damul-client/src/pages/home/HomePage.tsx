@@ -25,6 +25,11 @@ const HomePage = () => {
   );
 
   const [isEditMode, setIsEditMode] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [filterCategory, setFilterCategory] = useState("0");
+
+  const [filteredIngredientData, setFilteredIngredientData] =
+    useState<IngredientData>(initialIngrdientData);
 
   const handleEditClick = () => {
     setIsEditMode((prev) => !prev);
@@ -50,13 +55,44 @@ const HomePage = () => {
             );
           });
         setExpiringSoonItems(expiringSoonData);
-      } catch (err) {
+      } catch (err: any) {
         console.log("식자재 정보를 받지 못했습니다.");
       }
     };
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    let filteredData = { ...ingredientData };
+
+    if (filterCategory !== "0") {
+      filteredData = Object.keys(filteredData).reduce((acc, key) => {
+        const storage = key as keyof IngredientData;
+        const filteredItems = filteredData[storage].filter(
+          (item) => item.categoryId === parseInt(filterCategory),
+        );
+        return { ...acc, [storage]: filteredItems };
+      }, {} as IngredientData);
+    }
+
+    if (searchKeyword.trim() !== "") {
+      filteredData = Object.keys(filteredData).reduce((acc, key) => {
+        const storage = key as keyof IngredientData;
+        const filteredItems = filteredData[storage].filter((item) =>
+          item.ingredientName.includes(searchKeyword),
+        );
+        return { ...acc, [storage]: filteredItems };
+      }, {} as IngredientData);
+    }
+
+    setFilteredIngredientData(filteredData);
+  }, [searchKeyword, filterCategory, ingredientData]);
+
+  const viewData =
+    searchKeyword.length > 0 || filterCategory !== "0"
+      ? filteredIngredientData
+      : ingredientData;
 
   return (
     <div className={`${isEditMode && "pb-32"}`}>
@@ -69,12 +105,17 @@ const HomePage = () => {
           <DamulSearchBox
             className="w-full"
             placeholder="찾으시는 식자재를 검색해보세요."
+            setInputValue={setSearchKeyword}
+            onInputClick={() => {
+              setSearchKeyword("");
+            }}
+            inputValue={searchKeyword}
           />
-          <IngredientCategoryFilter />
+          <IngredientCategoryFilter onValueChange={setFilterCategory} />
         </div>
         {expiringSoonItems.length !== 0 && (
           <IngredientStorageContainer
-            key={`expiringSoon${Math.random()}`}
+            key={`expiringSoon ${expiringSoonItems.length}`}
             title="expiringSoon"
             items={expiringSoonItems}
             onEdit={isEditMode}
@@ -82,14 +123,17 @@ const HomePage = () => {
             setExpiringSoonItems={setExpiringSoonItems}
           />
         )}
-        {Object.keys(ingredientData).map((storage) => {
+
+        {Object.keys(viewData).map((storage) => {
           if (storage === "expiringSoon") return null;
 
           return (
             <IngredientStorageContainer
               key={`${storage}${Math.random()}`}
               title={storage as keyof IngredientData}
-              items={ingredientData[storage as keyof IngredientData] || []}
+              items={
+                filteredIngredientData[storage as keyof IngredientData] || []
+              }
               onEdit={isEditMode}
               setExpiringSoonItems={setExpiringSoonItems}
               setIngredientData={setIngredientData}
