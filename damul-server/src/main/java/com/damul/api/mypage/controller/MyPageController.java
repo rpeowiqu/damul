@@ -101,7 +101,7 @@ public class MyPageController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{userId}/bookmark")
+    @GetMapping("/{userId}/bookmarks")
     public ResponseEntity<?> getBookmarks(
             @PathVariable int userId,
             @RequestParam(defaultValue = "0") int cursor,
