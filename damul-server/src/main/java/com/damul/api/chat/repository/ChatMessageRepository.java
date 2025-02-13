@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,5 +65,14 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
             "JOIN ChatRoomMember crm ON cm.room = crm.room " +
             "WHERE crm.user.id = :userId")
     int countAllUnreadMessages(@Param("userId") int userId);
+
+    @Query(value = """
+        SELECT created_at 
+        FROM chat_messages 
+        WHERE room_id = :roomId 
+        ORDER BY created_at DESC 
+        LIMIT 1
+        """, nativeQuery = true)
+    LocalDateTime findLastMessageTimeByRoomId(@Param("roomId") int roomId);
 
 }

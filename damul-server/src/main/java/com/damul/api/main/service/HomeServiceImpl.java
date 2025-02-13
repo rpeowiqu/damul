@@ -1,6 +1,8 @@
 package com.damul.api.main.service;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.*;
@@ -40,30 +42,13 @@ public class HomeServiceImpl implements HomeService {
     public IngredientResponse getUserIngredientList(int userId) {
         log.info("사용자 식자재 전체 가져오기 시작 - userId: {}", userId);
 
+        validateUserId(userId);
         List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(userId);
 
-        if (userIngredients.isEmpty()) {
-            return new IngredientResponse(
-                    Collections.emptyList(),
-                    Collections.emptyList(),
-                    Collections.emptyList()
-            );
-        }
-
-        List<UserIngredientList> ingredients = userIngredients.stream()
-                .map(UserIngredientList::from)
-                .collect(Collectors.toList());
-
         return new IngredientResponse(
-                ingredients.stream()
-                        .filter(i -> i.getStorage().equals("freezer"))
-                        .collect(Collectors.toList()),
-                ingredients.stream()
-                        .filter(i -> i.getStorage().equals("fridge"))
-                        .collect(Collectors.toList()),
-                ingredients.stream()
-                        .filter(i -> i.getStorage().equals("roomTemp"))
-                        .collect(Collectors.toList())
+                filterByStorage(userIngredients, "freezer"),
+                filterByStorage(userIngredients, "fridge"),
+                filterByStorage(userIngredients, "roomTemp")
         );
     }
 
@@ -71,74 +56,75 @@ public class HomeServiceImpl implements HomeService {
     @Transactional(readOnly = true)
     public IngredientResponse getSearchUserIngredientList(int userId, String keyword,
                                                           String orderByDir, String orderBy) {
-        log.info("사용자 식자재 검색 가져오기 시작");
+        validateUserId(userId);
+        validateSortParameters(orderByDir, orderBy);
 
-        Sort.Direction direction = Sort.Direction.ASC;
-        if (orderByDir != null && orderByDir.equalsIgnoreCase("desc")) {
-            direction = Sort.Direction.DESC;
-        }
-
+        Sort.Direction direction = getSortDirection(orderByDir);
         String sortBy = determineSortField(orderBy);
         Sort sort = Sort.by(direction, sortBy);
 
         List<UserIngredient> userIngredients = userIngredientRepository
-                .findByUserIdAndIngredientNameContaining(userId, keyword, sort);
+                .findByUserIdAndIngredientNameContaining(userId, keyword != null ? keyword : "", sort);
 
-        List<UserIngredientList> ingredientDtos = userIngredients.stream()
+        return categorizeIngredients(userIngredients.stream()
                 .map(UserIngredientList::from)
-                .collect(Collectors.toList());
-
-        return categorizeIngredients(ingredientDtos);
+                .collect(Collectors.toList()));
     }
 
     @Override
     public HomeIngredientDetail getUserIngredientDetail(int ingredientId) {
         log.info("사용자 식자재 상세 가져오기 시작");
-        HomeIngredientDetail homeIngredientDetail = userIngredientRepository.findHomeIngredientDetailById(ingredientId);
-        log.info("사용자 식자재 상세 가져오기 성공");
-        return homeIngredientDetail;
+        HomeIngredientDetail detail = userIngredientRepository.findHomeIngredientDetailById(ingredientId);
+        if (detail == null) {
+            throw new BusinessException(ErrorCode.INGREDIENT_NOT_FOUND);
+        }
+        return detail;
     }
 
     @Override
     @Transactional
     public void updateQuantity(int ingredientId, UserIngredientUpdate update) {
-        log.info("식자재 양 업데이트 시작");
+        validateIngredientQuantity(update.getIngredientQuantity());
+
         UserIngredient ingredient = userIngredientRepository.findById(ingredientId)
-                .orElseThrow(() -> new EntityNotFoundException("재료를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.INGREDIENT_NOT_FOUND));
 
         ingredient.updateQuantity(update.getIngredientQuantity());
-        log.info("식자재 양 업데이트 성공");
     }
 
     @Override
     public SelectedIngredientList getSelectedIngredientList(List<Integer> ingredientIds) {
-        log.info("선택된 식자재 조회 시작");
+        if (ingredientIds == null || ingredientIds.isEmpty()) {
+            throw new BusinessException(ErrorCode.EMPTY_INGREDIENT_LIST);
+        }
+
         List<UserIngredient> ingredients = userIngredientRepository.findAllById(ingredientIds);
 
         if (ingredients.isEmpty()) {
-            throw new EntityNotFoundException("선택된 식자재가 없습니다.");
+            throw new BusinessException(ErrorCode.INGREDIENT_NOT_FOUND);
         }
 
-        log.info("선택된 식자재 조회 성공");
         return SelectedIngredientList.from(ingredients);
     }
 
     @Override
     @Transactional
     public void deleteIngredient(int userIngredientId, int userId, Integer warningEnable) {
-        log.info("식자재 삭제 시작");
         UserIngredient ingredient = userIngredientRepository.findByIdAndNotDeleted(userIngredientId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 재료입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.INGREDIENT_NOT_FOUND));
 
-        // warningEnable 값이 존재하고 0일 경우 (false로 설정하려는 경우)
+        // 권한 검증
+        if (ingredient.getUserReciept().getUser().getId() != userId) {
+            throw new BusinessException(ErrorCode.INGREDIENT_ACCESS_DENIED);
+        }
+
         if (warningEnable != null && warningEnable == 0) {
             User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
             user.updateWarningEnabled(false);
         }
 
-        log.info("식자재 삭제 성공");
-        ingredient.delete();  // 논리적 삭제 처리
+        ingredient.delete();
     }
 
     @Override
@@ -168,6 +154,50 @@ public class HomeServiceImpl implements HomeService {
                 .collect(Collectors.toList());
 
         return new HomeSuggestedResponse(suggestedRecipes);
+    }
+
+    private void validateUserId(int userId) {
+        if (userId <= 0) {
+            throw new BusinessException(ErrorCode.INVALID_ID);
+        }
+        if (!userRepository.existsById(userId)) {
+            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+        }
+    }
+
+    private void validateSortParameters(String orderByDir, String orderBy) {
+        if (orderByDir != null && !orderByDir.equalsIgnoreCase("asc") && !orderByDir.equalsIgnoreCase("desc")) {
+            throw new BusinessException(ErrorCode.INVALID_SORT_DIRECTION);
+        }
+        if (orderBy != null && !isValidSortField(orderBy)) {
+            throw new BusinessException(ErrorCode.INVALID_SORT_FIELD);
+        }
+    }
+
+    // 이거 프론트랑 상의 필요
+    private boolean isValidSortField(String orderBy) {
+        return orderBy.equalsIgnoreCase("quantity") ||
+                orderBy.equalsIgnoreCase("date") ||
+                orderBy.equalsIgnoreCase("name");
+    }
+
+    private void validateIngredientQuantity(Integer quantity) {
+        if (quantity == null || quantity < 0) {
+            throw new BusinessException(ErrorCode.INVALID_INGREDIENT_QUANTITY);
+        }
+    }
+
+    private Sort.Direction getSortDirection(String orderByDir) {
+        return (orderByDir != null && orderByDir.equalsIgnoreCase("desc"))
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+    }
+
+    private List<UserIngredientList> filterByStorage(List<UserIngredient> ingredients, String storage) {
+        return ingredients.stream()
+                .map(UserIngredientList::from)
+                .filter(i -> i.getStorage().equals(storage))
+                .collect(Collectors.toList());
     }
 
     private SuggestedRecipeList convertToSuggestedRecipeList(RecipeList recipe) {

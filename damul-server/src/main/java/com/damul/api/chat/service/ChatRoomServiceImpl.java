@@ -2,6 +2,7 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MemberRole;
+import com.damul.api.chat.dto.response.ChatCursorPageMetaInfo;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.MultiChatRoomCreate;
 import com.damul.api.chat.dto.response.ChatMember;
@@ -15,18 +16,22 @@ import com.damul.api.chat.repository.ChatMessageRepository;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.common.dto.response.CreateResponse;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
 import com.damul.api.post.entity.Post;
 import com.damul.api.post.repository.PostRepository;
 import com.damul.api.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +41,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
-public class ChatRoomServiceImpl implements ChatRoomService {
+public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
@@ -46,44 +51,54 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<ChatRoomList> getChatRooms(int cursor, int size, int userId) {
-        log.info("서비스: 채팅방 목록 조회 시작");
-
-        List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursor(cursor, size);
+    public ScrollResponse<ChatRoomList> getChatRooms(LocalDateTime cursorTime, int cursorId, int size, int userId) {
+        List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursor(userId, convertSeoulToUTC(cursorTime), cursorId);
 
         if (rooms.isEmpty()) {
             return new ScrollResponse<>(
                     Collections.emptyList(),
-                    new CursorPageMetaInfo(0, false)
+                    new ChatCursorPageMetaInfo(cursorTime, cursorId, false)
             );
+        }
+
+        boolean hasNext = rooms.size() > size;
+        if (hasNext) {
+            rooms = rooms.subList(0, size);
         }
 
         List<ChatRoomList> chatRoomLists = rooms.stream()
                 .map(room -> convertToChatRoomList(room, userId))
                 .collect(Collectors.toList());
 
-        int lastId = rooms.get(rooms.size() - 1).getId();
-        boolean hasNext = chatRoomRepository.existsByIdLessThanAndKeyword(lastId, null);
+        ChatRoom lastRoom = rooms.get(rooms.size() - 1);
+        LocalDateTime lastMessageTime = convertUtcToSeoul(chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId()));
+        if (lastMessageTime == null) {
+            lastMessageTime = lastRoom.getCreatedAt();  // 메시지가 없는 경우 채팅방 생성 시간 사용
+        }
 
         return new ScrollResponse<>(
                 chatRoomLists,
-                new CursorPageMetaInfo(lastId, hasNext)
+                new ChatCursorPageMetaInfo(lastMessageTime, lastRoom.getId(), hasNext)
         );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public SearchResponse<ChatRoomList> searchChatRooms(String keyword, int cursor, int size, int userId) {
+    public SearchResponse<ChatRoomList> searchChatRooms(String keyword, LocalDateTime cursorTime, int cursorId, int size, int userId) {
         log.info("서비스: 채팅방 검색 시작 - keyword: {}", keyword);
 
+        validateUserId(userId);
+        validateSearchParams(keyword, cursorId, size);
+
         List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursorAndKeyword(
-                cursor > 0 ? cursor : null,
-                keyword,
-                size
+                userId,
+                convertSeoulToUTC(cursorTime),
+                cursorId,
+                keyword
         );
 
-        ScrollResponse<ChatRoomList> results = processRoomResults(rooms, userId);
-        int totalCount = chatRoomRepository.countByKeyword(keyword);
+        ScrollResponse<ChatRoomList> results = processRoomResults(rooms, size, userId);
+        int totalCount = chatRoomRepository.countByKeywordAndUserId(keyword, userId);
 
         log.info("서비스: 채팅방 검색 완료 - 총 결과 수: {}", totalCount);
         return new SearchResponse<>(results, totalCount);
@@ -93,6 +108,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public ChatMembersResponse getChatRoomMembers(int roomId) {
         log.info("서비스: 채팅방 멤버 목록 조회 시작 - roomId: {}", roomId);
 
+        validateRoomId(roomId);
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND));
+        validateRoomStatus(chatRoom.getStatus());
         // 채팅방 멤버 조회
         List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(roomId);
 
@@ -104,7 +123,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         List<ChatMember> chatMembers = members.stream()
                 .map(member -> {
                     User user = userRepository.findById(member.getUser().getId())
-                            .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
+                            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
                     return ChatMember.builder()
                             .id(user.getId())
@@ -126,12 +145,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void deleteChatRoom(int roomId, int userId) {
         log.info("서비스: 채팅방 삭제 시작 - roomId: {}", roomId);
 
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 채팅방입니다."));
+        validateRoomId(roomId);
+        validateUserId(userId);
 
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND));
+        validateRoomStatus(chatRoom.getStatus());
         // 채팅방 멤버 확인
         ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
-                .orElseThrow(() -> new IllegalStateException("채팅방 멤버가 아닙니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND));
 
         if (chatRoom.getRoomType() == ChatRoom.RoomType.PRIVATE) {
             handlePrivateRoomDeletion(chatRoom, userId);
@@ -147,29 +169,35 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void kickMember(int roomId, int memberId, int adminId) {
         log.info("서비스: 채팅방 멤버 추방 시작 - roomId: {}, memberId: {}", roomId, memberId);
 
+        validateRoomId(roomId);
+        validateUserId(memberId);
+        validateUserId(adminId);
+
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 채팅방입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND));
+
+        validateRoomStatus(chatRoom.getStatus());
 
         // 개인 채팅방은 추방 불가
         if (chatRoom.getRoomType() == ChatRoom.RoomType.PRIVATE) {
-            throw new IllegalStateException("개인 채팅방에서는 추방할 수 없습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_MEMBER_KICK_DENIED, "개인 채팅방에서는 추방할 수 없습니다.");
         }
 
         // 방장 권한 확인
         ChatRoomMember admin = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, adminId)
-                .orElseThrow(() -> new IllegalStateException("채팅방 멤버가 아닙니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "채팅방 멤버가 아닙니다."));
 
         if (!admin.getRole().equals("ADMIN")) {
-            throw new IllegalStateException("방장만 멤버를 추방할 수 있습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_MEMBER_KICK_DENIED, "방장만 멤버를 추방할 수 있습니다.");
         }
 
         // 추방할 멤버 확인
         ChatRoomMember memberToKick = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, memberId)
-                .orElseThrow(() -> new IllegalStateException("추방할 멤버가 존재하지 않습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "추방할 멤버가 존재하지 않습니다."));
 
         // 방장은 추방할 수 없음
         if (memberToKick.getRole().equals("ADMIN")) {
-            throw new IllegalStateException("방장은 추방할 수 없습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_MEMBER_KICK_DENIED, "방장은 추방할 수 없습니다.");
         }
 
         // 시스템 메시지 생성
@@ -187,19 +215,19 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         log.info("서비스: 채팅방 입장 시작 - roomId: {}, userId: {}", roomId, request.getId());
 
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 채팅방입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND, "존재하지 않는 채팅방입니다."));
 
         if (chatRoom.getStatus() == ChatRoom.Status.INACTIVE) {
-            throw new IllegalStateException("비활성화된 채팅방입니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_INACTIVE, "비활성화된 채팅방입니다.");
         }
 
         if (chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, request.getId())) {
-            throw new IllegalStateException("이미 채팅방에 참여중입니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_ALREADY_MEMBER, "이미 채팅방에 참여중입니다.");
         }
 
         int currentMemberCount = chatRoomMemberRepository.countMembersByRoomId(roomId);
         if (currentMemberCount >= chatRoom.getMemberLimit()) {
-            throw new IllegalStateException("채팅방 인원이 가득 찼습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_FULL, "채팅방 인원이 가득 찼습니다.");
         }
 
         User user = userRepository.getReferenceById(request.getId());
@@ -232,7 +260,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         // 자기 자신과의 채팅방 생성 방지
         if (targetUserId == currentUserId) {
-            throw new IllegalArgumentException("자기 자신과 채팅할 수 없습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_SELF_CHAT_DENIED, "자기 자신과 채팅할 수 없습니다.");
         }
 
         // 이미 존재하는 1:1 채팅방 확인
@@ -246,7 +274,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         // 대화 상대 존재 확인
         User targetUser = userRepository.findById(targetUserId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         User currentUser = userRepository.getReferenceById(currentUserId);
 
@@ -278,12 +306,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         // 방장 유저 조회
         User creator = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         // 초대할 유저들 존재 여부 확인
         List<User> members = request.getUsers().stream()
                 .map(member -> userRepository.findById(member.getId())
-                        .orElseThrow(() -> new EntityNotFoundException(
+                        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND,
                                 String.format("존재하지 않는 사용자입니다. (userId: %d)", member.getId()))))
                 .collect(Collectors.toList());
 
@@ -350,7 +378,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 roomId, newLimit, userId);
 
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 채팅방입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND, "존재하지 않는 채팅방입니다."));
 
         validateRoomStatus(chatRoom);
         validateRoomType(chatRoom);
@@ -371,7 +399,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         // 방장 유저 조회
         User creator = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         // 이미 해당 게시글의 채팅방이 존재하는지 확인
         Optional<ChatRoom> existingRoom = chatRoomRepository.findChatRoomByPost_PostId(post.getPostId());
@@ -412,30 +440,30 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     private void validateRoomStatus(ChatRoom chatRoom) {
         if (chatRoom.getStatus() == ChatRoom.Status.INACTIVE) {
-            throw new IllegalStateException("비활성화된 채팅방입니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_INACTIVE, "비활성화된 채팅방입니다.");
         }
     }
 
     private void validateRoomType(ChatRoom chatRoom) {
         if (chatRoom.getRoomType() == ChatRoom.RoomType.PRIVATE) {
-            throw new IllegalStateException("1:1 채팅방은 인원 제한을 변경할 수 없습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_UPDATE_DENIED,"1:1 채팅방은 인원 제한을 변경할 수 없습니다.");
         }
     }
 
     private void validateCreator(ChatRoom chatRoom, int userId) {
         if (chatRoom.getCreator().getId() != userId) {
-            throw new IllegalStateException("채팅방 생성자만 인원 제한을 변경할 수 있습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_ADMIN_REQUIRED, "채팅방 생성자만 인원 제한을 변경할 수 있습니다.");
         }
     }
 
     private void validateNewLimit(ChatRoom chatRoom, int newLimit) {
         if (newLimit < 2) {
-            throw new IllegalArgumentException("채팅방 최대 인원은 2명 이상이어야 합니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_INVALID_MEMBER_LIMIT, "채팅방 최대 인원은 2명 이상이어야 합니다.");
         }
 
         int currentMemberCount = chatRoomMemberRepository.countMembersByRoomId(chatRoom.getId());
         if (newLimit < currentMemberCount) {
-            throw new IllegalStateException(
+            throw new BusinessException(ErrorCode.CHATROOM_INVALID_MEMBER_LIMIT,
                     String.format("현재 참여 중인 인원(%d명)보다 적게 설정할 수 없습니다.", currentMemberCount)
             );
         }
@@ -454,7 +482,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoomMember currentMember = members.stream()
                 .filter(m -> m.getUser().getId() == userId)
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("채팅방 멤버가 아닙니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "채팅방 멤버가 아닙니다."));
 
         chatRoomMemberRepository.delete(currentMember);
 
@@ -468,7 +496,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private void handleGroupRoomDeletion(ChatRoom chatRoom, ChatRoomMember member) {
         // 그룹 채팅방의 경우 방장만 삭제 가능
         if (!member.getRole().equals("ADMIN")) {
-            throw new IllegalStateException("방장만 채팅방을 삭제할 수 있습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_ADMIN_REQUIRED, "방장만 채팅방을 삭제할 수 있습니다.");
         }
 
         // 모든 멤버 삭제
@@ -479,20 +507,34 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomRepository.save(chatRoom);
     }
 
-    private ScrollResponse<ChatRoomList> processRoomResults(List<ChatRoom> rooms, int userId) {
+    private ScrollResponse<ChatRoomList> processRoomResults(List<ChatRoom> rooms, int size, int userId) {
         if (rooms.isEmpty()) {
-            return new ScrollResponse<>(Collections.emptyList(),
-                    new CursorPageMetaInfo(0, false));
+            return new ScrollResponse<>(
+                    Collections.emptyList(),
+                    new ChatCursorPageMetaInfo(LocalDateTime.now(), 0, false)
+            );
+        }
+
+        boolean hasNext = rooms.size() > size;
+        if (hasNext) {
+            rooms = rooms.subList(0, size);
         }
 
         List<ChatRoomList> chatRoomLists = rooms.stream()
+                .limit(size)
                 .map(room -> convertToChatRoomList(room, userId))
                 .collect(Collectors.toList());
 
-        int lastId = rooms.get(rooms.size() - 1).getId();
-        boolean hasNext = chatRoomRepository.existsByIdLessThanAndKeyword(lastId, null);
+        ChatRoom lastRoom = rooms.get(rooms.size() - 1);
+        LocalDateTime lastMessageTime = convertUtcToSeoul(chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId()));
+        if (lastMessageTime == null) {
+            lastMessageTime = lastRoom.getCreatedAt();
+        }
 
-        return new ScrollResponse<>(chatRoomLists, new CursorPageMetaInfo(lastId, hasNext));
+        return new ScrollResponse<>(
+                chatRoomLists,
+                new ChatCursorPageMetaInfo(lastMessageTime, lastRoom.getId(), hasNext)
+        );
     }
 
     private ChatRoomList convertToChatRoomList(ChatRoom room, int userId) {
@@ -504,7 +546,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         ChatRoomMember member = chatRoomMemberRepository
                 .findByRoomIdAndUserId(room.getId(), userId)
-                .orElseThrow(() -> new IllegalStateException("채팅방 멤버가 아닙니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "채팅방 멤버가 아닙니다."));
 
         int unreadCount = chatMessageRepository
                 .countUnreadMessages(room.getId(), member.getLastReadMessageId());
@@ -518,6 +560,19 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .lastMessageTime(lastMessage != null ? lastMessage.getCreatedAt().toString() : "")
                 .unReadNum(unreadCount)
                 .build();
+    }
+
+    private LocalDateTime convertSeoulToUTC(LocalDateTime seoulDateTime) {
+        ZoneId seoulZone = ZoneId.of("Asia/Seoul");
+        ZonedDateTime seoulZoned = seoulDateTime.atZone(seoulZone);
+        return seoulZoned.withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime();
+    }
+
+    private LocalDateTime convertUtcToSeoul(LocalDateTime utcTime) {
+        return utcTime
+                .atZone(ZoneId.of("UTC"))
+                .withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+                .toLocalDateTime();
     }
 
 }
