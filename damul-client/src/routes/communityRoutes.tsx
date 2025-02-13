@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 const CommunityPage = lazy(() => import("@/pages/community/CommunityPage"));
@@ -36,11 +36,7 @@ const CommunityMarketDetailPage = lazy(
 const communityRoutes = [
   {
     path: "community",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <CommunityPage />
-      </Suspense>
-    ),
+    element: <CommunityPage />,
     children: [
       {
         index: true,
@@ -48,69 +44,37 @@ const communityRoutes = [
       },
       {
         path: "recipe",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <Outlet />
-          </Suspense>
-        ),
+        element: <Outlet />,
         children: [
           {
             index: true,
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <CommunityRecipeMainPage />
-              </Suspense>
-            ),
+            element: <CommunityRecipeMainPage />,
           },
           {
             path: "search",
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <CommunityRecipeSearchPage />
-              </Suspense>
-            ),
+            element: <CommunityRecipeSearchPage />,
           },
           {
             path: "search/:keyword",
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <CommunityRecipeSearchResultPage />
-              </Suspense>
-            ),
+            element: <CommunityRecipeSearchResultPage />,
           },
         ],
       },
       {
         path: "market",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <Outlet />
-          </Suspense>
-        ),
+        element: <Outlet />,
         children: [
           {
             index: true,
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <CommunityMarketMainPage />
-              </Suspense>
-            ),
+            element: <CommunityMarketMainPage />,
           },
           {
             path: "search",
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <CommunityMarketSearchPage />
-              </Suspense>
-            ),
+            element: <CommunityMarketSearchPage />,
           },
           {
             path: "search/result",
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <CommunityMarketSearchResultPage />
-              </Suspense>
-            ),
+            element: <CommunityMarketSearchResultPage />,
           },
         ],
       },
@@ -118,51 +82,27 @@ const communityRoutes = [
   },
   {
     path: "community/recipe/post",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <CommunityRecipePostPage />
-      </Suspense>
-    ),
+    element: <CommunityRecipePostPage />,
   },
   {
     path: "community/recipe/:recipeId",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <CommunityRecipeDetailPage />
-      </Suspense>
-    ),
+    element: <CommunityRecipeDetailPage />,
   },
   {
     path: "community/recipe/:recipeId/edit",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <CommunityRecipePostPage />
-      </Suspense>
-    ),
+    element: <CommunityRecipePostPage />,
   },
   {
     path: "community/market/post",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <CommunityMarketPostPage />
-      </Suspense>
-    ),
+    element: <CommunityMarketPostPage />,
   },
   {
     path: "community/market/:postId",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <CommunityMarketDetailPage />
-      </Suspense>
-    ),
+    element: <CommunityMarketDetailPage />,
   },
   {
     path: "community/market/:postId/edit",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <CommunityMarketPostPage />
-      </Suspense>
-    ),
+    element: <CommunityMarketPostPage />,
   },
 ];
 

@@ -1,8 +1,7 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 
 const ProfilePage = lazy(() => import("@/pages/profile/ProfilePage"));
-const ProfileInfoPage = lazy(() => import("@/pages/profile/ProfileInfoPage"));
 const ProfileBadgePage = lazy(() => import("@/pages/profile/ProfileBadgePage"));
 const ProfileRecipePage = lazy(
   () => import("@/pages/profile/ProfileRecipePage"),
@@ -23,14 +22,12 @@ const ProfileFriendFollowingPage = lazy(
   () => import("@/pages/profile/ProfileFriendFollowingPage"),
 );
 
+const ProfileInfoPage = lazy(() => import("@/pages/profile/ProfileInfoPage"));
+
 const profileRoutes = [
   {
     path: "profile/:userId",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <ProfilePage />
-      </Suspense>
-    ),
+    element: <ProfilePage />,
     children: [
       {
         index: true,
@@ -38,53 +35,29 @@ const profileRoutes = [
       },
       {
         path: "info",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ProfileInfoPage />
-          </Suspense>
-        ),
+        element: <ProfileInfoPage />,
       },
       {
         path: "badge",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ProfileBadgePage />
-          </Suspense>
-        ),
+        element: <ProfileBadgePage />,
       },
       {
         path: "recipe",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ProfileRecipePage />
-          </Suspense>
-        ),
+        element: <ProfileRecipePage />,
       },
       {
         path: "bookmark",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ProfileBookmarkPage />
-          </Suspense>
-        ),
+        element: <ProfileBookmarkPage />,
       },
       {
         path: "ingredients",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ProfileIngredientsPage />
-          </Suspense>
-        ),
+        element: <ProfileIngredientsPage />,
       },
     ],
   },
   {
     path: "profile/:userId/friend",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <ProfileFriendPage />
-      </Suspense>
-    ),
+    element: <ProfileFriendPage />,
     children: [
       {
         index: true,
@@ -92,19 +65,11 @@ const profileRoutes = [
       },
       {
         path: "follower",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ProfileFriendFollowerPage />
-          </Suspense>
-        ),
+        element: <ProfileFriendFollowerPage />,
       },
       {
         path: "following",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ProfileFriendFollowingPage />
-          </Suspense>
-        ),
+        element: <ProfileFriendFollowingPage />,
       },
     ],
   },

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 
 const AdminLoginPage = lazy(() => import("@/pages/admin/AdminLoginPage"));
@@ -18,59 +18,31 @@ const AdminPostMarketPage = lazy(
 const adminRoutes = [
   {
     path: "/admin/login",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <AdminLoginPage />
-      </Suspense>
-    ),
+    element: <AdminLoginPage />,
   },
   {
     path: "/admin",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <AdminPage />
-      </Suspense>
-    ),
+    element: <AdminPage />,
     children: [
       {
         path: "reports",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <AdminReportPage />
-          </Suspense>
-        ),
+        element: <AdminReportPage />,
       },
       {
         path: "reports/:reportId",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ReportDetail />
-          </Suspense>
-        ),
+        element: <ReportDetail />,
       },
       {
         path: "users",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <AdminUserPage />
-          </Suspense>
-        ),
+        element: <AdminUserPage />,
       },
       {
         path: "users/:userId",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <UserDetail />
-          </Suspense>
-        ),
+        element: <UserDetail />,
       },
       {
         path: "posts",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <AdminPostPage />
-          </Suspense>
-        ),
+        element: <AdminPostPage />,
         children: [
           {
             index: true,
@@ -78,11 +50,7 @@ const adminRoutes = [
           },
           {
             path: "recipe",
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <AdminPostRecipePage />
-              </Suspense>
-            ),
+            element: <AdminPostRecipePage />,
           },
           {
             path: "recipe/:id",
@@ -90,11 +58,7 @@ const adminRoutes = [
           },
           {
             path: "market",
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <AdminPostMarketPage />
-              </Suspense>
-            ),
+            element: <AdminPostMarketPage />,
           },
           {
             path: "share/:id",

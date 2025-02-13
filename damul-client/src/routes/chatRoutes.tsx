@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 
 const ChattingMainPage = lazy(() => import("@/pages/chat/ChattingMainPage"));
 const ChattingRoomPage = lazy(() => import("@/pages/chat/ChattingRoomPage"));
@@ -16,43 +16,23 @@ const chatRoutes = [
     children: [
       {
         index: true,
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ChattingMainPage />
-          </Suspense>
-        ),
+        element: <ChattingMainPage />,
       },
       {
         path: ":roomId",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ChattingRoomPage />
-          </Suspense>
-        ),
+        element: <ChattingRoomPage />,
       },
       {
         path: "search",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ChattingSearchPage />
-          </Suspense>
-        ),
+        element: <ChattingSearchPage />,
       },
       {
         path: "search/:keyword",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ChattingSearchResultPage />
-          </Suspense>
-        ),
+        element: <ChattingSearchResultPage />,
       },
       {
         path: "create",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ChattingStartPage />
-          </Suspense>
-        ),
+        element: <ChattingStartPage />,
       },
     ],
   },

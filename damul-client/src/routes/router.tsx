@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "@/components/common/Layout";
 import homeRoutes from "./homeRoutes";
@@ -20,39 +20,23 @@ const router = createBrowserRouter([
     children: [
       {
         path: "login",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <LoginPage />
-          </Suspense>
-        ),
-        handle: { noHeaderNoFooter: true },
+        element: <LoginPage />,
+        handle: { header: false, footer: false },
       },
       {
         path: "signup",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <SignUpPage />
-          </Suspense>
-        ),
-        handle: { noHeaderNoFooter: true },
+        element: <SignUpPage />,
+        handle: { header: false, footer: false },
       },
       {
         path: "setting",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <SettingPage />
-          </Suspense>
-        ),
-        handle: { noFooter: true },
+        element: <SettingPage />,
+        handle: { header: true, footer: false },
       },
       {
         path: "alarm",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <AlarmPage />
-          </Suspense>
-        ),
-        handle: { noFooter: true },
+        element: <AlarmPage />,
+        handle: { header: true, footer: false },
       },
       ...homeRoutes,
       ...chatRoutes,

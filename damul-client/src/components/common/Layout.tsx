@@ -1,47 +1,35 @@
-import { ReactNode } from "react";
-import { Outlet, useMatches } from "react-router-dom"; // useMatches 추가
+import { Suspense } from "react";
+import { Outlet, useMatches } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "@/utils/queryClient";
 
 interface RouteHandle {
-  noHeaderNoFooter?: boolean;
-  noHeader?: boolean;
-  noFooter?: boolean;
+  header?: boolean;
+  footer?: boolean;
 }
 
-interface LayoutProps {
-  header?: ReactNode;
-  footer?: ReactNode;
-}
-
-const Layout = ({ header = <Header />, footer = <Footer /> }: LayoutProps) => {
+const Layout = () => {
   const routeMatch = useMatches().find((match) => match.handle);
 
   const layoutConfig: RouteHandle = routeMatch?.handle || {};
 
-  const finalHeader = layoutConfig.noHeaderNoFooter
-    ? null
-    : layoutConfig.noHeader
-      ? null
-      : header;
-  const finalFooter = layoutConfig.noHeaderNoFooter
-    ? null
-    : layoutConfig.noFooter
-      ? null
-      : footer;
+  const HeaderComponent = (layoutConfig.header ?? true) ? Header() : null;
+  const FooterComponent = (layoutConfig.footer ?? true) ? Footer() : null;
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col w-full min-w-[320px] max-w-[600px] h-full min-h-screen mx-auto bg-white pc:border-x border-normal-100">
-        {finalHeader}
+        {HeaderComponent}
 
         <main className="flex flex-col flex-1 pt-14 pb-16">
-          <Outlet />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Outlet />
+          </Suspense>
         </main>
 
-        {finalFooter}
+        {FooterComponent}
       </div>
     </QueryClientProvider>
   );

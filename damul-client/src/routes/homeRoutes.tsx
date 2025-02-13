@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 
 const HomePage = lazy(() => import("@/pages/home/HomePage"));
 const HomeIngredientsRegisterPage = lazy(
@@ -11,27 +11,15 @@ const HomeIngredientsEditPage = lazy(
 const homeRoutes = [
   {
     path: "home",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <HomePage />
-      </Suspense>
-    ),
+    element: <HomePage />,
   },
   {
     path: "home/register",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <HomeIngredientsRegisterPage />
-      </Suspense>
-    ),
+    element: <HomeIngredientsRegisterPage />,
   },
   {
     path: "home/edit",
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <HomeIngredientsEditPage />
-      </Suspense>
-    ),
+    element: <HomeIngredientsEditPage />,
   },
 ];
 
