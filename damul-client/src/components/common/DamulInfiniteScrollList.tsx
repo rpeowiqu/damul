@@ -6,7 +6,7 @@ interface DamulInfiniteScrollListProps<T> {
   queryKey: string[];
   fetchFn: (pageParam: number) => Promise<{
     data: T[];
-    meta: { nextCursor: number | null; hasNext: boolean };
+    meta: { nextCursor: number; hasNext: boolean };
   }>;
   initPage?: number;
   renderItems: (item: T, index: number) => ReactNode;
@@ -29,34 +29,27 @@ const DamulInfiniteScrollList = <T,>({
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: [queryKey],
-      queryFn: ({ pageParam }) => fetchFn(pageParam),
+      queryKey,
+      queryFn: ({ pageParam = 0 }) => fetchFn(pageParam),
       initialPageParam: initPage,
-      getNextPageParam: (lastPage) => {
-        console.log("lastPage:", lastPage);
-        return lastPage.meta?.hasNext ? lastPage.meta.nextCursor : undefined;
-      },
+      getNextPageParam: (lastPage) =>
+        lastPage.meta.hasNext ? lastPage.meta.nextCursor : undefined,
     });
 
   useEffect(() => {
-    console.log(isFetchingNextPage);
     if (inView && hasNextPage) {
       fetchNextPage();
-      console.log(data);
     }
-  }, [inView, hasNextPage, isFetchingNextPage]);
+  }, [inView]);
+
   return (
     <div className={className}>
       {data?.pages.map((page, pageIndex) =>
-        page.data?.map((item, index) =>
+        page.data.map((item, index) =>
           renderItems(item, index + pageIndex * page.data.length),
         ),
       )}
-      {isFetchingNextPage ? (
-        skeleton
-      ) : (
-        <div ref={ref} className="bg-red-300"></div>
-      )}
+      {isFetchingNextPage ? skeleton : <div ref={ref}></div>}
     </div>
   );
 };

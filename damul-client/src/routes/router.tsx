@@ -217,7 +217,7 @@ const router = createBrowserRouter([
             element: <ChattingSearchPage />,
           },
           {
-            path: "search/:keyword",
+            path: "search/result",
             element: <ChattingSearchResultPage />,
           },
           {

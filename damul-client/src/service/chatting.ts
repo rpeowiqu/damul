@@ -2,13 +2,17 @@ import apiClient from "./http";
 
 // 레시피 상세조회
 export const getChattingList = async ({
+  cursorTime,
   cursor = 0,
   size = 5,
 }: {
+  cursorTime: string;
   cursor?: number;
   size?: number;
 }) => {
-  return apiClient.get(`chats/rooms?cursor=${cursor}&size=${size}`);
+  return apiClient.get(
+    `chats/rooms?cursorTime=${cursorTime}&cursor=${cursor}&size=${size}`,
+  );
 };
 
 // 채팅방 내용조회
@@ -17,7 +21,7 @@ export const getChattingContents = async ({
   cursor = 0,
   size = 5,
 }: {
-  roomId: string;
+  roomId: string | undefined;
   cursor?: number;
   size?: number;
 }) => {
@@ -27,15 +31,17 @@ export const getChattingContents = async ({
 // 채팅방 검색
 export const getSearchedChattingList = async ({
   keyword,
+  cursorTime,
   cursor = 0,
   size = 5,
 }: {
   keyword: string;
+  cursorTime: string;
   cursor?: number;
   size?: number;
 }) => {
   return apiClient.get(
-    `chats/search?cursor=${cursor}&size=${size}&keyword=${keyword}`,
+    `chats/search?keyword=${keyword}&cursorTime=${cursorTime}&cursor=${cursor}&size=${size}&`,
   );
 };
 
@@ -67,8 +73,8 @@ export const deleteMember = async ({
 // 메세지 읽음 처리
 
 // 안 읽은 메세지 수 조회
-export const getunreads = async () => {
-  return apiClient.delete(`chats/unreads`);
+export const getUnreads = async () => {
+  return apiClient.get(`chats/unreads`);
 };
 
 // 공구나눔 채팅방 입장하기

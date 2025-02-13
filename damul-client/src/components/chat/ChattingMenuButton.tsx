@@ -2,6 +2,7 @@ import MenuIcon from "@/components/svg/MenuIcon";
 import { useEffect, useRef, useState } from "react";
 import Image from "../common/Image";
 import ExitIcon from "../svg/ExitIcon";
+import { getChattingMembers } from "@/service/chatting";
 
 const mockData = [
   { id: 1, name: "나", imageUrl: "" },
@@ -10,7 +11,11 @@ const mockData = [
   { id: 4, name: "사용자3", imageUrl: "" },
 ];
 
-const ChattingMenuButton = () => {
+interface ChattingMenuButtonProps {
+  roomId: number;
+}
+
+const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -26,6 +31,22 @@ const ChattingMenuButton = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, []);
+
+  const fetchItems = async () => {
+    try {
+      const response = await getChattingMembers({
+        roomId: roomId,
+      });
+      console.log(response?.data);
+      return response?.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    // fetchItems();
   }, []);
 
   return (

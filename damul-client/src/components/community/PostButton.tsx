@@ -3,7 +3,7 @@ import DamulButton from "../common/DamulButton";
 
 interface PostButtonProps {
   to: string;
-  icon: JSX.Element;
+  icon: JSX.Element | string;
 }
 
 const PostButton = ({ to, icon }: PostButtonProps) => {
@@ -15,8 +15,8 @@ const PostButton = ({ to, icon }: PostButtonProps) => {
         <div className="absolute z-40 flex flex-col items-center w-20 bottom-20 right-5 pc:right-10">
           <div>
             <DamulButton
-            variant="normal-outline"
-            className="rounded-full w-12 h-12"
+              variant="normal-outline"
+              className="rounded-full w-12 h-12 text-xl"
               onClick={() => {
                 navigate(`${to}`);
               }}
