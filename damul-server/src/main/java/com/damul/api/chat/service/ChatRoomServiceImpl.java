@@ -52,7 +52,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
     @Override
     @Transactional(readOnly = true)
     public ScrollResponse<ChatRoomList> getChatRooms(LocalDateTime cursorTime, int cursorId, int size, int userId) {
-        List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursor(userId, convertSeoulToUTC(cursorTime), cursorId);
+        List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursor(userId, cursorTime, cursorId);
 
         if (rooms.isEmpty()) {
             return new ScrollResponse<>(
@@ -71,7 +71,9 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 .collect(Collectors.toList());
 
         ChatRoom lastRoom = rooms.get(rooms.size() - 1);
-        LocalDateTime lastMessageTime = convertUtcToSeoul(chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId()));
+        System.out.println(chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId()));
+        LocalDateTime lastMessageTime = chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId());
+
         if (lastMessageTime == null) {
             lastMessageTime = lastRoom.getCreatedAt();  // 메시지가 없는 경우 채팅방 생성 시간 사용
         }
@@ -92,7 +94,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
         List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursorAndKeyword(
                 userId,
-                convertSeoulToUTC(cursorTime),
+                cursorTime,
                 cursorId,
                 keyword
         );
@@ -526,7 +528,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 .collect(Collectors.toList());
 
         ChatRoom lastRoom = rooms.get(rooms.size() - 1);
-        LocalDateTime lastMessageTime = convertUtcToSeoul(chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId()));
+        LocalDateTime lastMessageTime = chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId());
         if (lastMessageTime == null) {
             lastMessageTime = lastRoom.getCreatedAt();
         }

@@ -4,16 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-public class SearchResponse<T> {
+public class SearchResponse<T> extends ScrollResponse<T> {
 
-    private ScrollResponse<T> results;
     private int count;
 
-    public SearchResponse<T> make(ScrollResponse<T> res, int count) {
-        return new SearchResponse<>(res, count);
+    public SearchResponse(ScrollResponse<T> result, int count) {
+        super(result.getData(), result.getMeta());
+        this.count = count;
     }
 
 }
