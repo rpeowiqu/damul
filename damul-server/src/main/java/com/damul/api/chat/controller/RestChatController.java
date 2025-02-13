@@ -19,8 +19,11 @@ import com.damul.api.common.scroll.dto.response.SearchResponse;
 import com.damul.api.common.user.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1/chats")
@@ -33,13 +36,14 @@ public class RestChatController {
 
     @GetMapping("/rooms")
     public ResponseEntity<ScrollResponse<ChatRoomList>> getChatRooms(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorTime,
             @RequestParam int cursor,
             @RequestParam int size,
             @CurrentUser UserInfo user
     ) {
         log.info("컨트롤러: 채팅방 목록 조회 시작 - cursor: {}, size: {}", cursor, size);
 
-        ScrollResponse<ChatRoomList> response = chatRoomService.getChatRooms(cursor, size, user.getId());
+        ScrollResponse<ChatRoomList> response = chatRoomService.getChatRooms(cursorTime, cursor, size, user.getId());
 
         if (response.getData().isEmpty()) {
             return ResponseEntity.noContent().build();

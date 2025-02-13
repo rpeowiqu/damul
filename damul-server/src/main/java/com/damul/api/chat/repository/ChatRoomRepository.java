@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,15 +15,27 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
 
     // 커서 기반 채팅방 목록 조회
     @Query(value = """
-            SELECT cr.* 
-            FROM chat_rooms cr 
-            WHERE cr.id < :cursorId 
-            AND cr.status = 'ACTIVE' 
-            ORDER BY cr.id DESC 
-            LIMIT :size""", nativeQuery = true)
+    SELECT DISTINCT cr.* 
+    FROM chat_rooms cr 
+    INNER JOIN chat_room_members crm ON cr.id = crm.room_id 
+    LEFT JOIN (
+        SELECT room_id, MAX(created_at) as last_message_time
+        FROM chat_messages
+        GROUP BY room_id
+    ) last_msg ON cr.id = last_msg.room_id
+    WHERE cr.status = 'ACTIVE' 
+    AND crm.user_id = :userId
+    AND (
+        last_msg.last_message_time < :cursorTime 
+        OR (last_msg.last_message_time = :cursorTime AND cr.id < :cursorId)
+    )
+    ORDER BY last_msg.last_message_time DESC, cr.id DESC
+    """, nativeQuery = true)
     List<ChatRoom> findRoomsWithCursor(
-            @Param("cursorId") int cursorId,
-            @Param("size") int size);
+            @Param("userId") int userId,
+            @Param("cursorTime") LocalDateTime cursorTime,
+            @Param("cursorId") int cursorId
+    );
 
     // 키워드로 채팅방 검색 (무한 스크롤)
     @Query(value = """
@@ -47,7 +60,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
                 AND cr.id < :id 
                 AND (:keyword IS NULL OR cr.room_name LIKE CONCAT('%', :keyword, '%'))
             )""", nativeQuery = true)
-    boolean existsByIdLessThanAndKeyword(
+    Long existsByIdLessThanAndKeyword(
             @Param("id") int id,
             @Param("keyword") String keyword
     );
@@ -83,4 +96,24 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
 
 
     Optional<ChatRoom> findChatRoomByPost_PostId(int postId);
+
+    @Query(value = """
+    SELECT EXISTS(
+        SELECT 1 FROM chat_rooms cr 
+        INNER JOIN chat_room_members crm ON cr.id = crm.room_id 
+        LEFT JOIN (
+            SELECT room_id, MAX(created_at) as last_message_time
+            FROM chat_messages
+            GROUP BY room_id
+        ) last_msg ON cr.id = last_msg.room_id
+        WHERE cr.status = 'ACTIVE' 
+        AND crm.user_id = :userId
+        AND (last_msg.last_message_time < :lastMessageTime OR 
+            (last_msg.last_message_time = :lastMessageTime AND cr.id < :roomId))
+    )""", nativeQuery = true)
+    Long existsByLastMessageTimeBeforeAndRoomIdLessThan(
+            @Param("userId") int userId,
+            @Param("lastMessageTime") LocalDateTime lastMessageTime,
+            @Param("roomId") int roomId
+    );
 }

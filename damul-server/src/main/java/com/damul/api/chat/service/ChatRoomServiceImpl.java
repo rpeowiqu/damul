@@ -2,6 +2,7 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MemberRole;
+import com.damul.api.chat.dto.request.ChatCursorPageMetaInfo;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.MultiChatRoomCreate;
 import com.damul.api.chat.dto.response.ChatMember;
@@ -29,6 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -48,31 +52,34 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<ChatRoomList> getChatRooms(int cursor, int size, int userId) {
-        log.info("서비스: 채팅방 목록 조회 시작");
-
-        validateUserId(userId);
-        validateMessageParams(cursor, size);
-
-        List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursor(cursor, size);
+    public ScrollResponse<ChatRoomList> getChatRooms(LocalDateTime cursorTime, int cursorId, int size, int userId) {
+        List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursor(userId, convertSeoulToUTC(cursorTime), cursorId);
 
         if (rooms.isEmpty()) {
             return new ScrollResponse<>(
                     Collections.emptyList(),
-                    new CursorPageMetaInfo(0, false)
+                    new ChatCursorPageMetaInfo(cursorTime, cursorId, false)
             );
+        }
+
+        boolean hasNext = rooms.size() > size;
+        if (hasNext) {
+            rooms = rooms.subList(0, size);
         }
 
         List<ChatRoomList> chatRoomLists = rooms.stream()
                 .map(room -> convertToChatRoomList(room, userId))
                 .collect(Collectors.toList());
 
-        int lastId = rooms.get(rooms.size() - 1).getId();
-        boolean hasNext = chatRoomRepository.existsByIdLessThanAndKeyword(lastId, null);
+        ChatRoom lastRoom = rooms.get(rooms.size() - 1);
+        LocalDateTime lastMessageTime = convertUtcToSeoul(chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId()));
+        if (lastMessageTime == null) {
+            lastMessageTime = lastRoom.getCreatedAt();  // 메시지가 없는 경우 채팅방 생성 시간 사용
+        }
 
         return new ScrollResponse<>(
                 chatRoomLists,
-                new CursorPageMetaInfo(lastId, hasNext)
+                new ChatCursorPageMetaInfo(lastMessageTime, lastRoom.getId(), hasNext)
         );
     }
 
@@ -511,7 +518,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 .collect(Collectors.toList());
 
         int lastId = rooms.get(rooms.size() - 1).getId();
-        boolean hasNext = chatRoomRepository.existsByIdLessThanAndKeyword(lastId, null);
+        boolean hasNext = chatRoomRepository.existsByIdLessThanAndKeyword(lastId, null) == 1;
 
         return new ScrollResponse<>(chatRoomLists, new CursorPageMetaInfo(lastId, hasNext));
     }
@@ -539,6 +546,19 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 .lastMessageTime(lastMessage != null ? lastMessage.getCreatedAt().toString() : "")
                 .unReadNum(unreadCount)
                 .build();
+    }
+
+    private LocalDateTime convertSeoulToUTC(LocalDateTime seoulDateTime) {
+        ZoneId seoulZone = ZoneId.of("Asia/Seoul");
+        ZonedDateTime seoulZoned = seoulDateTime.atZone(seoulZone);
+        return seoulZoned.withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime();
+    }
+
+    private LocalDateTime convertUtcToSeoul(LocalDateTime utcTime) {
+        return utcTime
+                .atZone(ZoneId.of("UTC"))
+                .withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+                .toLocalDateTime();
     }
 
 }
