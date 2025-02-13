@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -17,15 +20,23 @@ public class IngredientPriceServiceImpl implements IngredientPriceService {
     public IngredientPriceResponse getIngredientPrice(String period, String productNo) {
         log.info("식자재 가격 동향 조회 시작");
         String action = null;
+
+        LocalDate today = LocalDate.now();
+        String regDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        log.info("현재 시간 - regDay: {}", regDay);
         try {
-            if(period.equals("monthly")) {
+
+            if(period.equals("yearly")) {
                 action = "monthlyPriceTrendList";
-            } else if(period.equals("daily")) {
-                action = "dailySalesList";
+            } else if(period.equals("recent")) {
+                action = "recentlyPriceTrendList";
+            } else {
+                log.error("잘못된 period 입니다.");
+                throw new BusinessException(ErrorCode.INVALID_PERIOD);
             }
 
-            String yearCode = "yearlyPriceTrendList";
-            String kamisResponse = kamisApiService.getPrice(period, productNo, action);
+
+            String kamisResponse = kamisApiService.getPrice(regDay, productNo, action);
             // Kamis 응답 데이터를 우리 서비스에 맞게 변환
             IngredientPriceResponse response = convertToIngredientPriceResponse(kamisResponse);
 

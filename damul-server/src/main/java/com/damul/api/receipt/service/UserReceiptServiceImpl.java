@@ -14,6 +14,8 @@ import com.damul.api.receipt.dto.request.RegisterIngredientList;
 import com.damul.api.receipt.dto.request.UserIngredientPost;
 import com.damul.api.receipt.dto.response.DailyReceiptInfo;
 import com.damul.api.receipt.dto.response.ReceiptCalendarResponse;
+import com.damul.api.receipt.dto.response.ReceiptDetail;
+import com.damul.api.receipt.dto.response.ReceiptDetailResponse;
 import com.damul.api.receipt.entity.UserReceipt;
 import com.damul.api.receipt.repository.UserReceiptRepository;
 import com.damul.api.recipe.repository.RecipeRepository;
@@ -138,6 +140,25 @@ public class UserReceiptServiceImpl implements UserReceiptService {
         return ReceiptCalendarResponse.builder()
                 .monthlyTotalAmount(monthlyTotal)
                 .dailyReceiptInfoList(dailyReceipts)
+                .build();
+    }
+
+    @Override
+    public ReceiptDetailResponse getReceiptDetail(UserInfo userInfo, int receiptId) {
+        log.info("영수증 상세보기 시작");
+
+        log.info("영수증 상세 내용 조회 시작");
+        List<ReceiptDetail> receiptDetails = userReceiptRepository.findReceiptDetailsByReceiptId(receiptId);
+        log.info("영수증 상세 내용 조회 완료");
+
+        UserReceipt userReceipt = userReceiptRepository.findUserReceiptById(receiptId);
+
+
+        log.info("영수증 상세보기 완료");
+        return ReceiptDetailResponse.builder()
+                .storeName(userReceipt.getStoreName())
+                .receiptDetails(receiptDetails)
+                .totalPrice(userReceipt.getTotalAmount())
                 .build();
     }
 }

@@ -21,9 +21,10 @@ public class KamisApiService {
 
     private static final String KAMIS_BASE_URL = "http://www.kamis.or.kr/service/price/xml.do";
     private static final String KAMIS_API_ID = "5234";
+    private static final String KAMIS_RETURN_TYPE = "json";
 
-    public String getPrice(String period, String productNo, String action) {
-        log.info("Kamis API 호출 시작 - period: {}, productNo: {}", period, productNo);
+    public String getPrice(String regDay, String productNo, String action) {
+        log.info("Kamis API 호출 시작 - regDay: {}, productNo: {}, action: {}", regDay, productNo, action);
 
         try {
             String response = webClientBuilder.baseUrl(KAMIS_BASE_URL)
@@ -37,8 +38,8 @@ public class KamisApiService {
                             .queryParam("action", action)
                             .queryParam("p_cert_key", apiKey)
                             .queryParam("p_cert_id", KAMIS_API_ID)
-                            .queryParam("p_returntype", "json")
-                            .queryParam("p_regday", period)
+                            .queryParam("p_returntype", KAMIS_RETURN_TYPE)
+                            .queryParam("p_regday", regDay)
                             .queryParam("p_productno", productNo)
                             .build())
                     .retrieve()

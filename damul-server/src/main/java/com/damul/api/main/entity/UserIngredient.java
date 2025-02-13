@@ -43,7 +43,7 @@ public class UserIngredient {
     private IngredientStorage ingredientStorage;
 
     @Column(name = "price")
-    private double price;
+    private int price;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;  // 삭제 상태 필드 추가
@@ -52,7 +52,7 @@ public class UserIngredient {
     public UserIngredient(UserReceipt userReciept, int userIngredientId, int categoryId,
                           int ingredientQuantity, LocalDateTime ingredientUp,
                           String ingredientName, LocalDateTime expirationDate,
-                          IngredientStorage ingredientStorage, double price) {
+                          IngredientStorage ingredientStorage, int price) {
         this.userReciept = userReciept;
         this.userIngredientId = userIngredientId;
         this.categoryId = categoryId;
