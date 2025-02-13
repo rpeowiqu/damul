@@ -3,18 +3,24 @@ package com.damul.api.ingredient.service;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.ingredient.dto.response.IngredientPriceResponse;
+import com.damul.api.ingredient.dto.response.IngredientsCategoryList;
+import com.damul.api.ingredient.dto.response.IngredientsCategoryResponse;
+import com.damul.api.receipt.entity.FoodCategories;
+import com.damul.api.receipt.repository.FoodCategoriesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class IngredientPriceServiceImpl implements IngredientPriceService {
     private final KamisApiService kamisApiService;
+    private final FoodCategoriesRepository foodCategoriesRepository;
 
     @Override
     public IngredientPriceResponse getIngredientPrice(String period, String productNo) {
@@ -48,10 +54,22 @@ public class IngredientPriceServiceImpl implements IngredientPriceService {
         }
     }
 
+    @Override
+    public IngredientsCategoryResponse getIngredientsCategory() {
+        log.info("식자재 대분류 조회 시작");
+        List<FoodCategories> foodCategories = foodCategoriesRepository.findAll();
+        log.info("식자재 대분류 조회 완료");
+        return IngredientsCategoryResponse.builder()
+                .categories(foodCategories)
+                .build();
+    }
+
 
     private IngredientPriceResponse convertToIngredientPriceResponse(String kamisResponse) {
         // Kamis API 응답을 우리 서비스의 응답 형식으로 변환하는 로직
         // TODO: 실제 변환 로직 구현
         return null;
     }
+
+
 }
