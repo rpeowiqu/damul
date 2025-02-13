@@ -43,4 +43,10 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
 
     List<ChatRoomMember> findAllByUserId(int id);
 
+    @Query("SELECT COUNT(m) FROM ChatRoomMember m WHERE m.room.id = :roomId AND m.lastReadMessageId < :messageId")
+    int countUnreadMembers(@Param("roomId") int roomId, @Param("messageId") int messageId);
+
+    @Query("SELECT m.lastReadMessageId FROM ChatRoomMember m WHERE m.user.id = :userId AND m.room.id = :roomId")
+    int findLastReadMessageIdByUserIdAndRoomId(@Param("userId") int userId, @Param("roomId") int roomId);
+
 }

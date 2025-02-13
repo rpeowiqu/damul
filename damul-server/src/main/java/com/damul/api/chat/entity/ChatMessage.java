@@ -2,6 +2,7 @@ package com.damul.api.chat.entity;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MessageType;
+import com.damul.api.chat.dto.response.ChatMessageResponse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
