@@ -115,12 +115,12 @@ public class MyPageServiceImpl implements MyPageService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_BADGE_NOT_FOUND, "획득하지 않은 뱃지입니다."));
 
         Badge badge = userBadge.getBadge();
-        double rankPercentage = calculateRankPercentage(badgeId, userBadge.getLevel());
+        double rankPercentage = calculateRankPercentage(badgeId, userBadge.getBadge().getLevel());
         String achieveCondition = generateAchieveCondition(badge);
 
         return BadgeDetail.builder()
                 .id(badge.getId())
-                .title(badge.getName())
+                .title(badge.getTitle())
                 .description(badge.getDescription())
                 .createdAt(userBadge.getCreatedAt())
                 .rank(rankPercentage)
