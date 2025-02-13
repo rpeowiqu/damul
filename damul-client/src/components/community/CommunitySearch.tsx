@@ -14,12 +14,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface CommunitySearch {
+interface CommunitySearchProps {
   placeholder: string;
   type: string;
 }
 
-const CommunitySearch = ({ placeholder, type }: CommunitySearch) => {
+const CommunitySearch = ({ placeholder, type }: CommunitySearchProps) => {
   const {
     recentSearches,
     handleAddSearch,
@@ -71,8 +71,9 @@ const CommunitySearch = ({ placeholder, type }: CommunitySearch) => {
               placeholder={placeholder}
               onButtonClick={(content) => {
                 handleAddSearch(content);
-                navigate(`/community/${type}/search/result?keyword=${encodeURIComponent(content)}&searchType=${searchType}`);
-
+                navigate(
+                  `/community/${type}/search/result?keyword=${encodeURIComponent(content)}&searchType=${searchType}`,
+                );
               }}
               inputValue={inputValue}
               setInputValue={setInputValue}
