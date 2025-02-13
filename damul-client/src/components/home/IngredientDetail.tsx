@@ -115,7 +115,7 @@ const IngredientDetail = ({
 
       <div className="flex items-center justify-center w-full gap-4">
         <div className="flex items-center justify-center w-full border-2 p-6 rounded-full border-normal-50">
-          <IconComponent className="w-full h-full" />
+          <IconComponent className="w-full h-full max-h-40" />
         </div>
 
         <div className="flex flex-col w-full gap-3">
