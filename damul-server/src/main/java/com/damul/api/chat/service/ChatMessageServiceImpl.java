@@ -1,16 +1,21 @@
 package com.damul.api.chat.service;
 
+import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.MemberRole;
 import com.damul.api.chat.dto.response.ChatMessageResponse;
 import com.damul.api.chat.dto.response.UnReadResponse;
 import com.damul.api.chat.entity.ChatMessage;
+import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.entity.ChatRoomMember;
 import com.damul.api.chat.repository.ChatMessageRepository;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
+import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,16 +33,58 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
 
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final UserRepository userRepository;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional  // ✨ readOnly 제거 (멤버 추가 필요할 수 있으므로)
     public ScrollResponse<ChatMessageResponse> getChatMessages(int roomId, int cursor, int size, int userId) {
         log.info("서비스: 채팅 메시지 조회 시작 - roomId: {}, cursor: {}, size: {}, userId: {}", roomId, cursor, size, userId);
 
         validateRoomId(roomId);
         validateUserId(userId);
         validateMessageParams(cursor, size);
-        validateMembership(roomId, userId);
+
+        // ✨ 멤버십 확인 및 신규 멤버 처리 로직 추가
+        if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
+            ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND, "존재하지 않는 채팅방입니다."));
+
+            if (chatRoom.getStatus() == ChatRoom.Status.INACTIVE) {
+                throw new BusinessException(ErrorCode.CHATROOM_INACTIVE, "비활성화된 채팅방입니다.");
+            }
+
+            int currentMemberCount = chatRoomMemberRepository.countMembersByRoomId(roomId);
+            if (currentMemberCount >= chatRoom.getMemberLimit()) {
+                throw new BusinessException(ErrorCode.CHATROOM_FULL, "채팅방 인원이 가득 찼습니다.");
+            }
+
+            User user = userRepository.getReferenceById(userId);
+
+            ChatMessage lastMessage = chatMessageRepository
+                    .findFirstByRoomIdOrderByCreatedAtDesc(roomId)
+                    .orElse(null);
+
+            int lastMessageId = lastMessage != null ? lastMessage.getId() : 0;
+
+            ChatRoomMember newMember = ChatRoomMember.create(
+                    chatRoom,
+                    user,
+                    user.getNickname(), // ✨ 기본 닉네임으로 유저 닉네임 사용
+                    MemberRole.MEMBER,
+                    lastMessageId
+            );
+
+            chatRoomMemberRepository.save(newMember);
+
+            ChatMessage systemMessage = ChatMessage.createSystemMessage(
+                    chatRoom,
+                    String.format("%s님이 입장하셨습니다.", user.getNickname())
+            );
+            chatMessageRepository.save(systemMessage);
+            log.info("서비스: 새로운 멤버 추가 완료 - roomId: {}, userId: {}", roomId, userId);
+        }
+        // validateMembership(roomId, userId); // ✨ 제거 (위에서 이미 처리됨)
 
         int lastReadMessageId = chatRoomMemberRepository.findLastReadMessageIdByUserIdAndRoomId(userId, roomId);
         List<ChatMessage> messages = fetchMessages(roomId, cursor, lastReadMessageId);
@@ -78,12 +125,6 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
                 chatMessage.getRoom().getId(),
                 chatMessage.getId()
         );
-    }
-
-    private void validateMembership(int roomId, int userId) {
-        if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
-            throw new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND);
-        }
     }
 
     private List<ChatMessage> fetchMessages(int roomId, int cursor, int lastReadMessageId) {
