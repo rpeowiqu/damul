@@ -1,8 +1,10 @@
 package com.damul.api.receipt.controller;
 
+import com.amazonaws.Response;
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.receipt.dto.response.ReceiptCalendarResponse;
+import com.damul.api.receipt.dto.response.ReceiptDetailResponse;
 import com.damul.api.receipt.service.UserReceiptService;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,14 +31,14 @@ public class ReceiptController {
         return ResponseEntity.ok(receiptCalendarResponse);
     }
 
+
     // 나의 영수증 보기(상세조회)
     @GetMapping("{receiptId}")
     public ResponseEntity<?> getReceiptById(UserInfo userInfo,
                                             @PathVariable("receiptId") int receiptId) {
         log.info("영수증 상세 조회 요청 - receiptId: {}", receiptId);
-
-
+        ReceiptDetailResponse receiptDetailResponse = userReceiptService.getReceiptDetail(userInfo, receiptId);
         log.info("영수증 상세 조회 성공 - receiptId: {}", receiptId);
-        return null;
+        return ResponseEntity.ok(receiptDetailResponse);
     }
 }

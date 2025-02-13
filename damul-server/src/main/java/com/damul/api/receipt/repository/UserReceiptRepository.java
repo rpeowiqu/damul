@@ -1,6 +1,7 @@
 package com.damul.api.receipt.repository;
 
 import com.damul.api.receipt.dto.response.DailyReceiptInfo;
+import com.damul.api.receipt.dto.response.ReceiptDetail;
 import com.damul.api.receipt.entity.UserReceipt;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,4 +32,19 @@ public interface UserReceiptRepository extends JpaRepository<UserReceipt, Intege
             @Param("userId") int userId,
             @Param("year") int year,
             @Param("month") int month);
+
+
+
+    @Query("""
+            SELECT new com.damul.api.receipt.dto.response.ReceiptDetail(
+            ui.ingredientName, fc.categoryName, ui.price)
+            FROM UserIngredient ui 
+            JOIN FoodCategory fc
+            ON fc.id = ui.categoryId
+            AND ui.userReciept.id = :receiptId
+            """)
+    List<ReceiptDetail> findReceiptDetailsByReceiptId(int receiptId);
+
+
+    UserReceipt findUserReceiptById(Integer id);
 }
