@@ -84,20 +84,21 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
     @Override
     @Transactional(readOnly = true)
-    public SearchResponse<ChatRoomList> searchChatRooms(String keyword, int cursor, int size, int userId) {
+    public SearchResponse<ChatRoomList> searchChatRooms(String keyword, LocalDateTime cursorTime, int cursorId, int size, int userId) {
         log.info("서비스: 채팅방 검색 시작 - keyword: {}", keyword);
 
         validateUserId(userId);
-        validateSearchParams(keyword, cursor, size);
+        validateSearchParams(keyword, cursorId, size);
 
         List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursorAndKeyword(
-                cursor > 0 ? cursor : null,
-                keyword,
-                size
+                userId,
+                convertSeoulToUTC(cursorTime),
+                cursorId,
+                keyword
         );
 
-        ScrollResponse<ChatRoomList> results = processRoomResults(rooms, userId);
-        int totalCount = chatRoomRepository.countByKeyword(keyword);
+        ScrollResponse<ChatRoomList> results = processRoomResults(rooms, size, userId);
+        int totalCount = chatRoomRepository.countByKeywordAndUserId(keyword, userId);
 
         log.info("서비스: 채팅방 검색 완료 - 총 결과 수: {}", totalCount);
         return new SearchResponse<>(results, totalCount);
@@ -506,20 +507,34 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         chatRoomRepository.save(chatRoom);
     }
 
-    private ScrollResponse<ChatRoomList> processRoomResults(List<ChatRoom> rooms, int userId) {
+    private ScrollResponse<ChatRoomList> processRoomResults(List<ChatRoom> rooms, int size, int userId) {
         if (rooms.isEmpty()) {
-            return new ScrollResponse<>(Collections.emptyList(),
-                    new CursorPageMetaInfo(0, false));
+            return new ScrollResponse<>(
+                    Collections.emptyList(),
+                    new ChatCursorPageMetaInfo(LocalDateTime.now(), 0, false)
+            );
+        }
+
+        boolean hasNext = rooms.size() > size;
+        if (hasNext) {
+            rooms = rooms.subList(0, size);
         }
 
         List<ChatRoomList> chatRoomLists = rooms.stream()
+                .limit(size)
                 .map(room -> convertToChatRoomList(room, userId))
                 .collect(Collectors.toList());
 
-        int lastId = rooms.get(rooms.size() - 1).getId();
-        boolean hasNext = chatRoomRepository.existsByIdLessThanAndKeyword(lastId, null) == 1;
+        ChatRoom lastRoom = rooms.get(rooms.size() - 1);
+        LocalDateTime lastMessageTime = convertUtcToSeoul(chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId()));
+        if (lastMessageTime == null) {
+            lastMessageTime = lastRoom.getCreatedAt();
+        }
 
-        return new ScrollResponse<>(chatRoomLists, new CursorPageMetaInfo(lastId, hasNext));
+        return new ScrollResponse<>(
+                chatRoomLists,
+                new ChatCursorPageMetaInfo(lastMessageTime, lastRoom.getId(), hasNext)
+        );
     }
 
     private ChatRoomList convertToChatRoomList(ChatRoom room, int userId) {

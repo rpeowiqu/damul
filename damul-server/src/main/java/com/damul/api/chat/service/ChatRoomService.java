@@ -18,7 +18,7 @@ public interface ChatRoomService {
 
     ScrollResponse<ChatRoomList> getChatRooms(LocalDateTime cursorTime, int cursorId, int size, int userId);
 
-    SearchResponse<ChatRoomList> searchChatRooms(String keyword, int cursor, int size, int userId);
+    SearchResponse<ChatRoomList> searchChatRooms(String keyword, LocalDateTime cursorTime, int cursorId, int size, int userId);
 
     ChatMembersResponse getChatRoomMembers(int roomId);
 

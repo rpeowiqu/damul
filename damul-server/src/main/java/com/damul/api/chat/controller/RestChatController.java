@@ -79,6 +79,7 @@ public class RestChatController {
     @GetMapping("/search")
     public ResponseEntity<SearchResponse<ChatRoomList>> searchChatRooms(
             @RequestParam(required = false) String keyword,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorTime,
             @RequestParam int cursor,
             @RequestParam int size,
             @CurrentUser UserInfo user
@@ -88,6 +89,7 @@ public class RestChatController {
 
         SearchResponse<ChatRoomList> response = chatRoomService.searchChatRooms(
                 keyword,
+                cursorTime,
                 cursor,
                 size,
                 user.getId()
