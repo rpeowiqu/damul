@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 const HomeIngredientsEditPage = () => {
   const { selectedIngredients } = useIngredientStore();
-  const navigation = useNavigate();
+  const navigate = useNavigate();
 
   const [ingredients, setIngredients] =
     useState<Ingredient[]>(selectedIngredients);
@@ -31,7 +31,9 @@ const HomeIngredientsEditPage = () => {
     <div className="flex flex-col p-5">
       <div className="flex flex-col mb-5">
         <div className="flex w-full gap-6 items-center text-xl font-bold">
-          <button type="button">{"<"}</button>
+          <button onClick={() => navigate("/home")} type="button">
+            {"<"}
+          </button>
           <p>선택된 식자재 리스트</p>
         </div>
         <div className="flex justify-end">
@@ -44,7 +46,7 @@ const HomeIngredientsEditPage = () => {
         {ingredients.length === 0 && (
           <div className="flex w-full flex-col h-60 items-center gap-5 justify-center">
             <p>편집할 식자재가 없습니다.</p>
-            <DamulButton onClick={() => navigation("/home")}>
+            <DamulButton onClick={() => navigate("/home")}>
               홈으로 이동
             </DamulButton>
           </div>

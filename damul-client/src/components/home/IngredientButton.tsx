@@ -1,12 +1,12 @@
 import { MouseEventHandler } from "react";
-import { CATEGORY } from "@/constants/category";
+import { CATEGORY_INFO } from "@/constants/category";
 import DamulButton from "../common/DamulButton";
 import AlertCircleIcon from "../svg/AlertCircleIcon";
 import { useIngredientStore } from "@/stores/ingredientStore";
 
 interface IngredientButtonProps {
   id: number;
-  variant: keyof typeof CATEGORY;
+  variant: number;
   name: string;
   quantity: number;
   expirationDate: number;
@@ -23,7 +23,7 @@ const IngredientButton = ({
   onClick,
   onEdit,
 }: IngredientButtonProps) => {
-  const IconComponent = CATEGORY[variant];
+  const IconComponent = Object.values(CATEGORY_INFO)[variant - 1].icon;
 
   const { selectedIngredients } = useIngredientStore();
 

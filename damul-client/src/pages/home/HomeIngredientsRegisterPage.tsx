@@ -7,6 +7,8 @@ import { RegisterIngredientData } from "@/types/Ingredient";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const LIMIT_ADD_COUNT = 50;
+
 const HomeIngredientsRegisterPage = () => {
   const [ingredientRegisterData, setIngredientRegisterData] =
     useState<RegisterIngredientData>(initialIngredientRegisterData);
@@ -61,19 +63,25 @@ const HomeIngredientsRegisterPage = () => {
   };
 
   const addIngredient = () => {
-    setIngredientRegisterData((prev) => ({
-      ...prev,
-      userIngredients: [
-        ...prev.userIngredients,
-        {
-          ingredientName: "",
-          productPrice: 0,
-          categoryId: 0,
-          expirationDate: "",
-          ingredientStorage: "FRIDGE",
-        },
-      ],
-    }));
+    if (ingredientRegisterData.userIngredients.length <= LIMIT_ADD_COUNT) {
+      setIngredientRegisterData((prev) => ({
+        ...prev,
+        userIngredients: [
+          ...prev.userIngredients,
+          {
+            ingredientName: "",
+            productPrice: 0,
+            categoryId: 0,
+            expirationDate: "",
+            ingredientStorage: "FRIDGE",
+          },
+        ],
+      }));
+    } else {
+      alert(
+        "효과적인 식자재 등록을 위해 식자재 등록 후 이용해주시길 바랍니다.",
+      );
+    }
   };
 
   const removeIngredient = (index: number) => {
@@ -110,7 +118,9 @@ const HomeIngredientsRegisterPage = () => {
   return (
     <div className="flex flex-col p-5">
       <div className="flex w-full gap-6 items-center text-xl font-bold">
-        <button type="button">{"<"}</button>
+        <button type="button" onClick={() => navigate("/home")}>
+          {"<"}
+        </button>
         <p>식자재 등록하기</p>
       </div>
       <p className="text-positive-300 font-bold p-1">
@@ -161,7 +171,7 @@ const HomeIngredientsRegisterPage = () => {
         <div className="flex flex-col gap-4 h-60 overflow-y-auto">
           {ingredientRegisterData.userIngredients.map((ingredient, index) => (
             <IngredientItem
-              key={index}
+              key={`${ingredient.categoryId} ${index}`}
               ingredient={ingredient}
               onChange={(e) => handleChange(e, index, e.target.name)}
               onDelete={() => removeIngredient(index)}

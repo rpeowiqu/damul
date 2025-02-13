@@ -1,4 +1,4 @@
-import { CATEGORYNAME } from "@/constants/category";
+import { CATEGORY_INFO } from "@/constants/category";
 import { STORAGE_TYPE_CONST } from "@/constants/storage";
 
 interface IngredientItemProps {
@@ -16,6 +16,8 @@ interface IngredientItemProps {
   ) => void;
   onDelete: () => void;
 }
+
+const MAX_PRODUCT_PRICE = 1000000;
 
 const IngredientItem = ({
   ingredient,
@@ -58,9 +60,9 @@ const IngredientItem = ({
             value={ingredient.categoryId}
             onChange={(e) => onChange(e)}
           >
-            {Object.keys(CATEGORYNAME).map((key, idx) => (
-              <option key={key} value={idx + 1}>
-                {CATEGORYNAME[key as keyof typeof CATEGORYNAME]}
+            {Object.values(CATEGORY_INFO).map((category) => (
+              <option key={category.number} value={category.number}>
+                {category.name}
               </option>
             ))}
           </select>
@@ -74,7 +76,18 @@ const IngredientItem = ({
             id="productPrice"
             name="productPrice"
             className="border-1 w-full cursor-pointer text-right focus:outline-positive-300 p-1"
-            onChange={(e) => onChange(e)}
+            onChange={(e) => {
+              let value = e.target.value;
+              if (value === "" || parseInt(value) < 0) {
+                value = "0";
+              }
+              if (
+                /^\d*\.?\d{0,0}$/.test(value) &&
+                parseInt(value) <= MAX_PRODUCT_PRICE
+              ) {
+                onChange(e);
+              }
+            }}
             value={ingredient.productPrice}
             onFocus={(e) => e.target.select()}
           />

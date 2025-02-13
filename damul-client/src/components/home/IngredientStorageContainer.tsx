@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import IngredientButton from "./IngredientButton";
-import { CATEGORYNUMBER } from "@/constants/category";
 import { STORAGE_ICON, STORAGE_TYPE } from "@/constants/storage";
 import {
   EXPIRINGSOON_DAY,
@@ -173,7 +172,7 @@ const IngredientStorageContainer = ({
               return (
                 <IngredientButton
                   key={idx}
-                  variant={CATEGORYNUMBER[ingredient.categoryId]}
+                  variant={ingredient.categoryId}
                   name={ingredient.ingredientName}
                   quantity={ingredient.ingredientQuantity}
                   expirationDate={ingredient.expirationDate}

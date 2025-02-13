@@ -2,7 +2,7 @@ import { Ingredient } from "@/types/Ingredient";
 import DeleteIcon from "../svg/DeleteIcon";
 import SaveIcon from "../svg/SaveIcon";
 import { Slider } from "../ui/slider";
-import { CATEGORY, CATEGORYNUMBER } from "@/constants/category";
+import { CATEGORY_INFO } from "@/constants/category";
 import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
 import { useEffect, useState } from "react";
 import useUserStore from "@/stores/user";
@@ -59,7 +59,8 @@ const IngredientDetail = ({
   setIsDeleteOpen,
   setIsOpen,
 }: IngredientDetailProps) => {
-  const IconComponent = CATEGORY[CATEGORYNUMBER[selectedIngredient.categoryId]];
+  const IconComponent =
+    Object.values(CATEGORY_INFO)[selectedIngredient.categoryId - 1].icon;
 
   const [ingredient, setIngredient] = useState<Ingredient>(selectedIngredient);
 
