@@ -34,6 +34,11 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         const response = await getUserIndegredient();
+        if (response.status === 204) {
+          setIngredientData(initialIngrdientEmptyData);
+        } else {
+          setIngredientData(response.data);
+        }
         const expiringSoonData: Ingredient[] = Object.values(
           response.data as IngredientData,
         )
@@ -44,14 +49,7 @@ const HomePage = () => {
               ingredient.expirationDate > 0
             );
           });
-
         setExpiringSoonItems(expiringSoonData);
-
-        if (response.status === 204) {
-          setIngredientData(initialIngrdientEmptyData);
-        } else {
-          setIngredientData(response.data);
-        }
       } catch (err) {
         console.log("식자재 정보를 받지 못했습니다.");
       }
