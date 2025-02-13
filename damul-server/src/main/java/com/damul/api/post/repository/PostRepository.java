@@ -46,7 +46,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             LEFT JOIN Post prev ON prev.postId = :cursor
             WHERE p.status IN :statuses
             AND (:cursor = 0 OR
-                (:orderBy = 'views' AND (p.viewCnt < prev.viewCnt OR (p.viewCnt = prev.viewCnt AND p.postId < prev.postId))))
+                ((:orderBy = 'views' AND (p.viewCnt < prev.viewCnt OR (p.viewCnt = prev.viewCnt AND p.postId < prev.postId)))
+                OR (:orderBy = 'latest' AND p.postId < :cursor)))
             ORDER BY
             CASE
                 WHEN :orderBy = 'views' THEN p.viewCnt
@@ -72,7 +73,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             WHERE p.status IN :statuses
             AND (:cursor = 0 OR
                 ((:orderBy = 'views' AND (p.viewCnt < prev.viewCnt OR (p.viewCnt = prev.viewCnt AND p.postId < prev.postId)))
-                OR (:orderBy != 'views' AND p.postId < :cursor)))
+                OR (:orderBy = 'latest' AND p.postId < :cursor)))
             AND ((:searchType = 'author' AND u.nickname LIKE %:keyword%)
                 OR :searchType = 'content' AND (p.title LIKE %:keyword% OR p.content LIKE %:keyword%))
             ORDER BY
