@@ -97,7 +97,7 @@ public class RestChatController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{roomId}/members")
+    @GetMapping("/rooms/{roomId}/members")
     public ResponseEntity<?> getChatRoomMembers(@PathVariable int roomId) {
         log.info("컨트롤러: 채팅방 멤버 목록 조회 시작 - roomId: {}", roomId);
 
