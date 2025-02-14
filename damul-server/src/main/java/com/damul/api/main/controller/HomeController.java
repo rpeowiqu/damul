@@ -42,16 +42,10 @@ public class HomeController {
     }
 
     @GetMapping("/recommandation")
-    public ResponseEntity<HomeSuggestedResponse> getRecommendedRecipes(
-            @RequestParam(required = false) Integer userIngredientId,
-            @CurrentUser UserInfo user
-    ) {
+    public ResponseEntity<HomeSuggestedResponse> getRecommendedRecipes(@CurrentUser UserInfo user) {
         log.info("컨트롤러: 레시피 추천 시작 - userId: {}", user.getId());
 
-        HomeSuggestedResponse response = homeService.getRecommendedRecipes(
-                userIngredientId,
-                user.getId()
-        );
+        HomeSuggestedResponse response = homeService.getRecommendedRecipes(user.getId());
 
         if (response.getSuggestedRecipes().isEmpty()) {
             return ResponseEntity.noContent().build();

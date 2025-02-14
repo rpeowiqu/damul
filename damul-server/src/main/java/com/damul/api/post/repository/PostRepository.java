@@ -36,27 +36,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     );
 
-//    // 검색 (검색 o, 정렬 x, 활성화ox)
-//    @Query("""
-//            SELECT new com.damul.api.post.dto.response.PostList(
-//                p.postId, p.title, p.thumbnailUrl, p.content,
-//                p.createdAt, p.user.id, p.user.nickname, p.status, p.viewCnt)
-//            FROM Post p
-//            JOIN p.user u
-//            WHERE p.status IN :statuses
-//            AND (:cursor = 0 OR p.postId < :cursor)
-//            AND (:searchType = 'author' AND u.nickname LIKE %:keyword%
-//                OR :searchType = 'content' AND (p.title LIKE %:keyword% OR p.content LIKE %:keyword%))
-//            ORDER BY p.postId DESC
-//            """)
-//    List<PostList> findBySearch(
-//            @Param("statuses") List<PostStatus> statuses,
-//            @Param("cursor") int cursor,
-//            Pageable pageable,
-//            @Param("searchType") String searchType,
-//            @Param("keyword") String keyword
-//    );
-
     // 검색 (검색 x, 정렬 o, 활성화ox)
     @Query("""
             SELECT new com.damul.api.post.dto.response.PostList(
@@ -67,7 +46,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             LEFT JOIN Post prev ON prev.postId = :cursor
             WHERE p.status IN :statuses
             AND (:cursor = 0 OR
-                (:orderBy = 'views' AND (p.viewCnt < prev.viewCnt OR (p.viewCnt = prev.viewCnt AND p.postId < prev.postId))))
+                ((:orderBy = 'views' AND (p.viewCnt < prev.viewCnt OR (p.viewCnt = prev.viewCnt AND p.postId < prev.postId)))
+                OR (:orderBy = 'latest' AND p.postId < :cursor)))
             ORDER BY
             CASE
                 WHEN :orderBy = 'views' THEN p.viewCnt
@@ -93,7 +73,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             WHERE p.status IN :statuses
             AND (:cursor = 0 OR
                 ((:orderBy = 'views' AND (p.viewCnt < prev.viewCnt OR (p.viewCnt = prev.viewCnt AND p.postId < prev.postId)))
-                OR (:orderBy != 'views' AND p.postId < :cursor)))
+                OR (:orderBy = 'latest' AND p.postId < :cursor)))
             AND ((:searchType = 'author' AND u.nickname LIKE %:keyword%)
                 OR :searchType = 'content' AND (p.title LIKE %:keyword% OR p.content LIKE %:keyword%))
             ORDER BY

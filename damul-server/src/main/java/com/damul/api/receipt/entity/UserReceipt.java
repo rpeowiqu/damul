@@ -32,11 +32,15 @@ public class UserReceipt {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "total_amount")
+    private int totalAmount;
+
     @Builder
-    public UserReceipt(User user, String storeName, LocalDateTime purchaseAt) {
+    public UserReceipt(User user, String storeName, LocalDateTime purchaseAt, int totalAmount) {
         this.user = user;
         this.storeName = storeName;
         this.purchaseAt = purchaseAt;
         this.createdAt = LocalDateTime.now();
+        this.totalAmount = totalAmount;
     }
 }

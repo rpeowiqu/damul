@@ -22,6 +22,6 @@ public interface HomeService {
 
     void deleteIngredient(int userIngredientId, int userId, Integer warningEnable);
 
-    HomeSuggestedResponse getRecommendedRecipes(Integer userIngredientId, int userId);
+    HomeSuggestedResponse getRecommendedRecipes(int userId);
 
 }

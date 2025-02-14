@@ -7,6 +7,7 @@ import com.damul.api.common.user.CurrentUser;
 import com.damul.api.user.dto.request.CheckNicknameRequest;
 import com.damul.api.user.dto.request.FollowRequest;
 import com.damul.api.user.dto.request.SettingUpdate;
+import com.damul.api.user.dto.response.FollowList;
 import com.damul.api.user.dto.response.FollowResponse;
 import com.damul.api.user.dto.response.SettingResponse;
 import com.damul.api.user.dto.response.UserList;
@@ -71,15 +72,15 @@ public class UserController {
                                           @RequestParam int size,
                                           @CurrentUser UserInfo userInfo) {
         log.info("팔로워 목록 조회 요청");
-        ScrollResponse<UserList> userList = followService.getFollowers(keyword, cursor, size, userInfo.getId());
+        ScrollResponse<FollowList> followList = followService.getFollowers(keyword, cursor, size, userInfo.getId());
 
-        if(userList.getData().isEmpty() || userList.getData().size() == 0) {
+        if(followList.getData().isEmpty() || followList.getData().size() == 0) {
             log.info("팔로워 목록 조회 성공 - 데이터없음");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
-        log.info("팔로워 목록 조회 성공, 개수: {}", userList.getData().size());
-        return ResponseEntity.ok(userList);
+        log.info("팔로워 목록 조회 성공, 개수: {}", followList.getData().size());
+        return ResponseEntity.ok(followList);
     }
 
     
@@ -90,15 +91,15 @@ public class UserController {
                                           @RequestParam int size,
                                           @CurrentUser UserInfo userInfo) {
         log.info("팔로잉 목록 조회 요청");
-        ScrollResponse<UserList> userList = followService.getFollowings(keyword, cursor, size, userInfo.getId());
+        ScrollResponse<FollowList> followList = followService.getFollowings(keyword, cursor, size, userInfo.getId());
 
-        if(userList.getData().isEmpty() || userList.getData().size() == 0) {
+        if(followList.getData().isEmpty() || followList.getData().size() == 0) {
             log.info("팔로잉 목록 조회 성공 - 데이터없음");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
-        log.info("팔로잉 목록 조회 성공, 개수: {}", userList.getData().size());
-        return ResponseEntity.ok(userList);
+        log.info("팔로잉 목록 조회 성공, 개수: {}", followList.getData().size());
+        return ResponseEntity.ok(followList);
     }
 
     // 팔로우/언팔로우

@@ -6,9 +6,7 @@ import com.damul.api.auth.jwt.TokenService;
 import com.damul.api.auth.oauth2.handler.OAuth2FailureHandler;
 import com.damul.api.auth.oauth2.handler.OAuth2SuccessHandler;
 import com.damul.api.auth.oauth2.service.CustomOAuth2UserService;
-import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,9 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -30,8 +26,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +91,7 @@ public class SecurityConfig {
                             .requestMatchers("/multibranch-webhook-trigger/invoke*").permitAll()
                             .requestMatchers("/", "/login", "/admin/login", "/api/v1/test/token").permitAll() // 누구나 접근 가능
                             .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
-                            .requestMatchers("/ws/**").permitAll()  // WebSocket 엔드포인트 허용
+                            .requestMatchers("/ws/pub/**", "/ws/sub/**").permitAll()  // WebSocket 엔드포인트 허용
                             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
                             .anyRequest().authenticated();                              // 나머지는 인증 필요
                 })

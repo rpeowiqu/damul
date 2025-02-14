@@ -12,11 +12,13 @@ import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
 import com.damul.api.post.entity.Post;
 
+import java.time.LocalDateTime;
+
 public interface ChatRoomService {
 
-    ScrollResponse<ChatRoomList> getChatRooms(int cursor, int size, int userId);
+    ScrollResponse<ChatRoomList> getChatRooms(LocalDateTime cursorTime, int cursorId, int size, int userId);
 
-    SearchResponse<ChatRoomList> searchChatRooms(String keyword, int cursor, int size, int userId);
+    SearchResponse<ChatRoomList> searchChatRooms(String keyword, LocalDateTime cursorTime, int cursorId, int size, int userId);
 
     ChatMembersResponse getChatRoomMembers(int roomId);
 

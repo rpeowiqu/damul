@@ -35,7 +35,7 @@ public class PostController {
                                          @RequestParam(required = false) String searchType,
                                          @RequestParam(required = false) String keyword,
                                          @RequestParam(required = false) String status,
-                                         @RequestParam(defaultValue = "createdAt") String orderBy) {
+                                         @RequestParam(defaultValue = "latest") String orderBy) {
             log.info("게시글 목록 검색 시작");
             log.info("Searching posts with searchType: {}, keyword: {}, status: {}, orderBy: {}", searchType, keyword, status, orderBy);
 
