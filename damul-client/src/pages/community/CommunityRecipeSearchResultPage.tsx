@@ -42,7 +42,7 @@ const CommunityRecipeSearchResultPage = () => {
     try {
       const response = await getRecipes({
         cursor: pageParam,
-        size: 5,
+        size: 10,
         orderBy: orderType,
         searchType: searchType,
         keyword: keyword,
