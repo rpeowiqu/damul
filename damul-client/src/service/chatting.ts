@@ -6,7 +6,7 @@ export const getChattingList = async ({
   cursor = 0,
   size = 5,
 }: {
-  cursorTime: string;
+  cursorTime: string | Date;
   cursor?: number;
   size?: number;
 }) => {
@@ -46,7 +46,11 @@ export const getSearchedChattingList = async ({
 };
 
 // 채팅방 멤버 목록 조회
-export const getChattingMembers = async ({ roomId }: { roomId: number }) => {
+export const getChattingMembers = async ({
+  roomId,
+}: {
+  roomId: string | undefined;
+}) => {
   return apiClient.get(`chats/rooms/${roomId}/members`);
 };
 

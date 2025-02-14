@@ -6,6 +6,7 @@ import adminRoutes from "./adminRoutes";
 import chatRoutes from "./chatRoutes";
 import profileRoutes from "./profileRoutes";
 import communityRoutes from "./communityRoutes";
+import statisticsRoutes from "./statisticsRoutes";
 import NotFoundPage from "@/pages/notFound/NotFoundPage";
 
 const LoginPage = lazy(() => import("@/pages/login/LoginPage"));
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
       ...profileRoutes,
       ...communityRoutes,
       ...adminRoutes,
+      ...statisticsRoutes,
     ],
   },
   {

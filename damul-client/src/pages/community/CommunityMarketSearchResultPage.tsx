@@ -45,7 +45,7 @@ const CommunityMarketSearchResultPage = () => {
     try {
       const response = await getPosts({
         cursor: pageParam,
-        size: 5,
+        size: 10,
         orderBy: orderType,
         searchType: searchType,
         keyword: keyword,
