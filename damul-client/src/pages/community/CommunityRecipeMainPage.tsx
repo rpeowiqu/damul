@@ -38,7 +38,7 @@ const CommunityRecipeMainPage = () => {
     try {
       const response = await getRecipes({
         cursor: pageParam,
-        size: 5,
+        size: 10,
         orderBy: orderType,
       });
       console.log(response?.data);

@@ -6,7 +6,7 @@ import { getChattingMembers } from "@/service/chatting";
 import { ChattingMember } from "@/types/chatting";
 
 interface ChattingMenuButtonProps {
-  roomId: number;
+  roomId: string | undefined;
 }
 
 const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
@@ -34,7 +34,7 @@ const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
       const response = await getChattingMembers({
         roomId: roomId,
       });
-      console.log(response?.data);
+      console.log("ㅇㅇ", response?.data);
       setMemberData(response?.data.content);
       setMemberCnt(response?.data.totalMembers);
       return response?.data;

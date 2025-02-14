@@ -91,7 +91,7 @@ const ChattingRoomPage = () => {
         <p>
           {roomName}({memberNum})
         </p>
-        <ChattingMenuButton roomId={5} />
+        <ChattingMenuButton roomId={roomId} />
       </div>
       <div className="flex-1 justify-end overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
         <DamulInfiniteScrollList
