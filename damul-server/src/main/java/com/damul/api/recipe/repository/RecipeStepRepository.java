@@ -10,4 +10,8 @@ import java.util.List;
 @Repository
 public interface RecipeStepRepository extends JpaRepository<RecipeStep, Integer> {
     List<RecipeStep> findByRecipeOrderByStepNumber(Recipe recipe);
+
+    void deleteByRecipeId(int recipeId);
+
+    List<RecipeStep> findByRecipeId(int recipeId);
 }

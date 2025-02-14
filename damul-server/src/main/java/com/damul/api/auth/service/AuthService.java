@@ -9,6 +9,7 @@ import com.damul.api.auth.entity.Terms;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
+import com.damul.api.auth.jwt.TokenService;
 import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.util.CookieUtil;
@@ -44,9 +45,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    @Value("${admin.password}")
+    @Value("${spring.security.admin.password}")
     private String hashedAdminPassword;
 
+    private final TokenService tokenService;
     private final AuthRepository authRepository;
     private final UserRepository userRepository;
     private final TermsRepository termsRepository;
@@ -85,7 +87,7 @@ public class AuthService {
             if (accessTokenCookie.isPresent()) {
                 String accessToken = accessTokenCookie.get().getValue();
                 String email = jwtTokenProvider.getUserEmailFromToken(accessToken);
-                removeRefreshToken(email);
+                tokenService.removeRefreshToken(email);
             }
 
             cookieUtil.deleteCookie(response, "access_token");
@@ -174,9 +176,13 @@ public class AuthService {
     // 약관동의 및 이메일,닉네임 조회
     public UserConsent getConsent(String tempToken) {
         log.info("약관동의 및 이메일, 닉네임 조회 시작");
+        if(tempToken == null) {
+            log.error("tempToken이 존재하지 않습니다");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
+        }
         if(!jwtTokenProvider.validateToken(tempToken)) {
             log.error("유효하지 않은 토큰입니다");
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         Claims claims = jwtTokenProvider.getClaims(tempToken);
@@ -194,11 +200,13 @@ public class AuthService {
         }
 
         log.info("약관 데이터 조회 성공, size: {}", terms.size());
-        return UserConsent.builder()
+        UserConsent consent = UserConsent.builder()
                 .email(email)
                 .nickname(defaultNickname)
                 .terms(terms)
                 .build();
+
+        return consent;
     }
 
     public Map<String, String> generateTokens(Authentication authentication) {
@@ -249,20 +257,5 @@ public class AuthService {
                 (int) jwtTokenProvider.getRefreshTokenExpire() / 1000);
 
         log.info("관리자 로그인 성공: {}", admin.getEmail());
-    }
-
-    public String findRefreshToken(String userEmail) {
-        return redisTemplate.opsForValue().get("RT:" + userEmail);
-    }
-
-    public void removeRefreshToken(String userEmail) {
-        redisTemplate.delete("RT:" + userEmail);
-    }
-
-    public boolean validateRefreshToken(String userEmail, String refreshToken) {
-        log.info("refresh token: {}", refreshToken);
-        String storedRefreshToken = findRefreshToken(userEmail);
-        log.info("storedRefreshToken: {}", storedRefreshToken);
-        return storedRefreshToken != null && storedRefreshToken.equals(refreshToken);
     }
 }

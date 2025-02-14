@@ -3,6 +3,11 @@ package com.damul.api.post.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.response.ChatMembersResponse;
+import com.damul.api.chat.entity.ChatRoom;
+import com.damul.api.chat.repository.ChatRoomMemberRepository;
+import com.damul.api.chat.repository.ChatRoomRepository;
+import com.damul.api.chat.service.ChatRoomService;
 import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
@@ -23,13 +28,14 @@ import com.damul.api.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,6 +54,10 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final UserRepository userRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final ChatRoomService chatRoomService;
+
     private final S3Service s3Service;
 
 
@@ -63,6 +73,7 @@ public class PostServiceImpl implements PostService {
         List<PostStatus> allStatus = new ArrayList<PostStatus>(Arrays.asList(PostStatus.ACTIVE, PostStatus.COMPLETED));
         List<PostStatus> activeStatus = new ArrayList<PostStatus>(Arrays.asList(PostStatus.ACTIVE));
 
+        Pageable pageable = PageRequest.of(0, size + 1);
 
         // 검색어가 있는데 검색 타입이 없는 경우 예외 처리
         if (keyword != null && searchType == null) {
@@ -72,91 +83,50 @@ public class PostServiceImpl implements PostService {
 
         // 전체 조회 검색 x
         if (searchType == null) {
-            // 정렬 x
-            if (orderBy == null) {
-                // 활성화 x
-                if (status == null) {
-                    log.info("검색x 정렬x 활성화x");
-                    posts = postRepository.findAllPosts(
-                            allStatus, cursor, size + 1
-                    );
-                }
-                // 활성화 o
-                else if (status.equals("active")) {
-                    log.info("검색x 정렬x 활성화o");
-                    posts = postRepository.findAllPosts(
-                            activeStatus, cursor, size + 1
-                    );
-                }
-            }
             // 정렬 o
-            else {
-                // 활성화 x
-                if (status == null) {
-                    log.info("검색x 정렬o 활성화x");
-                    posts = postRepository.findAllWithOrder(
-                            allStatus, cursor, size + 1, orderBy
-                    );
-                }
-                // 활성화 o
-                else if (status.equals("active")) {
-                    log.info("검색x 정렬o 활성화o");
-                    posts = postRepository.findAllWithOrder(
-                            activeStatus, cursor, size + 1, orderBy
-                    );
-                }
+            // 활성화 x
+            if (status == null) {
+                log.info("검색x 정렬o 활성화x");
+                posts = postRepository.findAllWithOrder(
+                        allStatus, cursor, pageable, orderBy
+                );
+            }
+            // 활성화 o
+            else if (status.equals("active")) {
+                log.info("검색x 정렬o 활성화o");
+                posts = postRepository.findAllWithOrder(
+                        activeStatus, cursor, pageable, orderBy
+                );
             }
         }
         // 전체 조회 검색 o
         else {
-            // 정렬 x
-            if (orderBy == null) {
-                // 활성화 x
-                if (status == null) {
-                    log.info("검색o 정렬x 활성화x");
-                    posts = postRepository.findBySearch(
-                            allStatus, cursor, size + 1, searchType, keyword
-                    );
-                }
-                // 활성화 o
-                else if (status.equals("active")) {
-                    log.info("검색o 정렬x 활성화o");
-                    posts = postRepository.findBySearch(
-                            activeStatus, cursor, size + 1, searchType, keyword
-                    );
-                }
-            }
             // 정렬 o
-            else {
-                // 활성화 x
-                if (status == null) {
-                    log.info("검색o 정렬o 활성화x");
-                    posts = postRepository.findBySearchWithOrder(
-                            allStatus, cursor, size + 1, orderBy, searchType, keyword
-                    );
-                }
-                // 활성화 o
-                else if (status.equals("active")) {
-                    log.info("검색o 정렬o 활성화o");
-                    posts = postRepository.findBySearchWithOrder(
-                            activeStatus, cursor, size + 1, orderBy, searchType, keyword
-                    );
-                }
+            // 활성화 x
+            if (status == null) {
+                log.info("검색o 정렬o 활성화x");
+                posts = postRepository.findBySearchWithOrder(
+                        allStatus, cursor, pageable, searchType, keyword, orderBy
+                );
             }
-        }
-
-        if (posts.size() > size) {
-            posts = posts.subList(0, size);
+            // 활성화 o
+            else if (status.equals("active")) {
+                log.info("검색o 정렬o 활성화o");
+                posts = postRepository.findBySearchWithOrder(
+                        activeStatus, cursor, pageable, searchType, keyword, orderBy
+                );
+            }
         }
 
         if (posts.isEmpty()) {
             log.info("No posts found in JPA query result");
         } else {
             log.info("Found {} posts in JPA query", posts.size());
-            log.info("First posts data: id={}, title={}, userId={}",
+            log.info("First posts data: id={}, title={}, userId={} viewCnt={}",
                     posts.get(0).getId(),
                     posts.get(0).getTitle(),
-                    posts.get(0).getAuthorId());
+                    posts.get(0).getAuthorId(),
+                    posts.get(0).getViewCnt());
         }
 
         return ScrollUtil.createScrollResponse(posts, cursor, size);
@@ -207,11 +177,20 @@ public class PostServiceImpl implements PostService {
         }
 
         // 게시글 정보 조회
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findByPostIdAndStatusNot(postId, PostStatus.DELETED)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
 
-        // 채팅방 정보 확인 (참여중 or 인원수(미참여))
 
+        // 채팅방 정보 조회
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_PostId(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 현재 채팅방 참여 인원 수
+        ChatMembersResponse chatMembersResponse = chatRoomService.getChatRoomMembers(chatRoom.getId());
+        int currentChatNum = chatMembersResponse.getTotalMembers();
+
+        // 채팅방 참여 여부
+        boolean entered = chatRoomMemberRepository.existsByRoomIdAndUserId(chatRoom.getId(), userId);
 
         // 댓글 목록 조회
         List<CommentList> comments = postCommentRepository
@@ -224,25 +203,28 @@ public class PostServiceImpl implements PostService {
                         .profileImageUrl(comment.getUser().getProfileImageUrl())
                         .comment(comment.getComment())
                         .parentId(comment.getParentPostComment() != null ? comment.getParentPostComment().getPostCommentId() : null)
-                        .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                        .createdAt(comment.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
 
+
         // PostDetail 객체 생성 및 반환
-        // status, 채팅방 인원수, 최대 인원수 필요
-        // currentChatNum, chatSize, commentCnt 필요
         return PostDetail.builder()
                 .id(post.getPostId())
                 .title(post.getTitle())
                 .authorId(post.getUser().getId())
                 .authorName(post.getUser().getNickname())
                 .profileImageUrl(post.getUser().getProfileImageUrl())
+                .status(post.getStatus())
                 .contentImageUrl(post.getThumbnailUrl())
                 .content(post.getContent())
-                .createdAt(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .createdAt(post.getCreatedAt())
+                .viewCnt(post.getViewCnt())
+                .currentChatNum(currentChatNum)
+                .entered(entered)
+                .chatSize(chatRoom.getMemberLimit())
                 .comments(comments)
                 .build();
-
     }
 
 
@@ -275,8 +257,9 @@ public class PostServiceImpl implements PostService {
 
         Post savedPost = postRepository.save(post);
         log.info("게시글 작성 완료 - ID: {}", savedPost.getPostId());
-        
+
         // 채팅방 연결
+        chatRoomService.createMultiChatRoomInPost(userInfo.getId(), post, post.getTitle(), postRequest.getChatSize());
 
         return new CreateResponse(savedPost.getPostId());
     }
@@ -312,8 +295,16 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postRequest.getTitle());
         post.setContent(postRequest.getContent());
         post.setThumbnailUrl(thumbnailUrl);
-        
-        // 채팅방 인원 수정
+
+
+        // 채팅방 정보 조회
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_PostId(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 채팅방 최대 인원 변경
+        if (chatRoom.getMemberLimit() != postRequest.getChatSize()) {
+            chatRoomService.updateMemberLimit(chatRoom.getId(), postRequest.getChatSize(), userInfo.getId());
+        }
 
         Post updatedPost = postRepository.save(post);
         log.info("게시글 수정 완료 - ID: {}", updatedPost.getPostId());
@@ -382,7 +373,7 @@ public class PostServiceImpl implements PostService {
         PostComment savedComment = postCommentRepository.save(comment);
         return new CreateResponse(savedComment.getPostCommentId());
     }
-    
+
     // 댓글 삭제
     public void deletePostComment(int postId, int commentId, UserInfo userInfo) {
         log.info("댓글 삭제 시작 - postId: {}, commentId: {}", postId, commentId);

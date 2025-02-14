@@ -11,7 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 public class HomeSuggestedResponse {
 
-    private int userId;
     private List<SuggestedRecipeList> suggestedRecipes;
 
 }

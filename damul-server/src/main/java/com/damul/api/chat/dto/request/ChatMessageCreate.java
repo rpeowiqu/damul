@@ -4,6 +4,7 @@ import com.damul.api.chat.dto.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @NoArgsConstructor
@@ -12,6 +13,6 @@ public class ChatMessageCreate {
 
     private MessageType messageType;  // ENUM('TEXT', 'IMAGE', 'FILE')
     private String content;
-    private String fileUrl;
+    private String image;
 
 }

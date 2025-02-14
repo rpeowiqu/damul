@@ -25,6 +25,7 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
             "ORDER BY cm.joinedAt ASC")
     List<ChatRoomMember> findAllByRoomId(@Param("roomId") int roomId);
 
+    // 채팅방에 내가 참여중인지
     boolean existsByRoomIdAndUserId(int roomId, int userId);
 
     // 채팅방 멤버 삭제
@@ -41,4 +42,11 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     int countMembersByRoomId(@Param("roomId") int roomId);
 
     List<ChatRoomMember> findAllByUserId(int id);
+
+    @Query("SELECT COUNT(m) FROM ChatRoomMember m WHERE m.room.id = :roomId AND m.lastReadMessageId < :messageId")
+    int countUnreadMembers(@Param("roomId") int roomId, @Param("messageId") int messageId);
+
+    @Query("SELECT m.lastReadMessageId FROM ChatRoomMember m WHERE m.user.id = :userId AND m.room.id = :roomId")
+    int findLastReadMessageIdByUserIdAndRoomId(@Param("userId") int userId, @Param("roomId") int roomId);
+
 }

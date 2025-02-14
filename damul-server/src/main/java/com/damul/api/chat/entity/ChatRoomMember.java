@@ -2,6 +2,7 @@ package com.damul.api.chat.entity;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.Role;
+import com.damul.api.chat.dto.MemberRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,7 +33,7 @@ public class ChatRoomMember {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private Role role;
+    private MemberRole role;
 
     @Column(name = "joined_at", nullable = false, updatable = false)
     private LocalDateTime joinedAt;
@@ -43,7 +44,7 @@ public class ChatRoomMember {
     @PrePersist
     protected void onCreate() {
         joinedAt = LocalDateTime.now();
-        role = Role.USER;
+        role = MemberRole.MEMBER;
         lastReadMessageId = 0;
     }
 
@@ -51,11 +52,12 @@ public class ChatRoomMember {
         this.lastReadMessageId = messageId;
     }
 
-    public static ChatRoomMember create(ChatRoom room, User user, String nickname, Integer lastReadMessageId) {
+    public static ChatRoomMember create(ChatRoom room, User user, String nickname, MemberRole role, Integer lastReadMessageId) {
         ChatRoomMember member = new ChatRoomMember();
         member.room = room;
         member.user = user;
         member.nickname = nickname;
+        member.role = role;
         member.lastReadMessageId = lastReadMessageId;
         return member;
     }

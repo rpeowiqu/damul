@@ -15,7 +15,7 @@ spring:
       ddl-auto: none    # 스키마 자동 생성/수정 비활성화
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
 
   servlet:
     multipart:
@@ -102,8 +102,8 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
+      maximum-pool-size: 2
+      minimum-idle: 1
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
@@ -119,11 +119,14 @@ jwt:
 
 logging:
   level:
-    org.hibernate.SQL: debug
-    org.hibernate.type: trace
-    org.springframework.security: debug
+    root: INFO                     # 기본 로그 레벨
+    org.hibernate.SQL: DEBUG       # 실행되는 쿼리문 확인
+    org.hibernate.orm.jdbc.bind: TRACE  # 쿼리 파라미터 값 확인 (최신 하이버네이트 6.x 버전)
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    com.damul.api.recipe: DEBUG    # 레시피 관련 패키지 로깅
+    org.springframework.security: INFO   # 시큐리티는 필요할 때만 DEBUG로
+    com.damul.api: DEBUG          # 우리 애플리케이션 로그
+    org.springframework.data.repository.config: WARN  # 또는 ERROR
+
 
 redirect:
   frontUrl: ${FRONT_URL}
@@ -144,10 +147,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        highlight_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.MySQLDialect
 

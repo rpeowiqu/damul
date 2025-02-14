@@ -1,15 +1,22 @@
 package com.damul.api.user.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.common.scroll.util.ScrollCursor;
+import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.config.service.S3Service;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
+import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -38,23 +45,23 @@ public class UserServiceImpl implements UserService {
     public SettingResponse getSetting(int userId) {
         log.info("설정 조회 시작 - userId: {}", userId);
 
-        Optional<User> userOptional  = userRepository.findById(userId);
-        if(userOptional.isPresent()) {
-            User user = userOptional.get();
-            SettingResponse settingResponse = SettingResponse.builder()
-                    .email(user.getEmail())
-                    .nickname(user.getNickname())
-                    .profileImageUrl(user.getProfileImageUrl())
-                    .selfIntroduction(user.getSelfIntroduction())
-                    .profileBackgroundImageUrl(user.getProfileBackgroundImageUrl())
-                    .accessRange(user.getAccessRange().name())
-                    .warningEnabled(user.isWarningEnabled())
-                    .build();
 
-            return settingResponse;
-        } else {
-            throw new BusinessException(ErrorCode.USER_FORBIDDEN);
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("해당 유저를 찾을 수 없습니다. - userId: {}", userId);
+                    return new BusinessException(ErrorCode.USER_FORBIDDEN);
+                });
+
+        SettingResponse settingResponse = SettingResponse.builder()
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .profileImageUrl(user.getProfileImageUrl())
+                .selfIntroduction(user.getSelfIntroduction())
+                .profileBackgroundImageUrl(user.getProfileBackgroundImageUrl())
+                .accessRange(user.getAccessRange().name())
+                .warningEnabled(user.isWarningEnabled())
+                .build();
+        return settingResponse;
     }
 
     // 설정 수정
@@ -62,8 +69,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateUserSettings(int userId, SettingUpdate setting, MultipartFile profileImage,
                               MultipartFile backgroundImage) {
-        log.info("설정 수정 시작");
-        log.info("유저 검색 - userId: {}", userId);
+        log.info("설정 수정 시작 - userId: {}", userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("해당 유저를 찾을 수 없습니다. - userId: {}", userId);
@@ -71,7 +78,7 @@ public class UserServiceImpl implements UserService {
                 });
         log.info("유저 검색 완료 - userNickname: {}", user.getNickname());
 
-        log.info("backgrounImage : {}", backgroundImage);
+        log.info("backgroundImage : {}", backgroundImage);
         log.info("profileImage : {}", profileImage);
         // 프로필 이미지 처리
         if (profileImage != null && !profileImage.isEmpty()) {
@@ -113,13 +120,9 @@ public class UserServiceImpl implements UserService {
             setting.setBackgroundImageUrl(backgroundImageUrl);
         }
 
-        log.info("nickname: {}", setting.getNickname());
-        log.info("selfIntroduction: {}", setting.getSelfIntroduction());
-        log.info("accessRange: {}", setting.getAccessRange());
-        log.info("warningEnabled: {}", setting.isWarningEnabled());
         // 사용자 설정 업데이트
         user.updateSettings(setting);
-        log.info("설정 수정 완료");
+        log.info("설정 수정 성공");
     }
 
     private Object extractKeyFromUrl(String profileImageUrl) {
@@ -129,18 +132,22 @@ public class UserServiceImpl implements UserService {
 
     // 사용자 목록 조회 및 검색
     @Override
-    public CreateResponse getSearchUserList(String keyword) {
+    public ScrollResponse<UserList> getSearchUserList(int cursor, int size, String keyword) {
         if(keyword == null || keyword.isEmpty()) {
             log.info("검색어 없음");
             throw new BusinessException(ErrorCode.USER_NICKNAME_NOT_PROVIDED);
         }
 
+        String exactMatch = keyword; // 정확히 일치하는 경우
+        String startsWith = keyword + "%"; // 검색어로 시작하는 경우
+        String contains = "%" + keyword + "%"; // 검색어가 포함된 경우
+        Pageable pageable = PageRequest.of(0, size + 1);
 
-        log.info("검색어 있음 - 검색어: {}", keyword);
-        CreateResponse createResponse = userRepository.findUserByNickname(keyword);
+        log.info("검색어 있음 - 검색어 포함: {}, 정확히 일치: {}, 검색어 시작:{}", cursor, pageable, contains, exactMatch, startsWith);
+        List<UserList> userList = userRepository.findByNicknameContainingWithPaging(contains, exactMatch, startsWith, cursor, pageable);
 
-
-        return createResponse;
+        log.info("사용자 목록 검색 조회 성공");
+        return ScrollUtil.createScrollResponse(userList, cursor, size);
     }
 
 

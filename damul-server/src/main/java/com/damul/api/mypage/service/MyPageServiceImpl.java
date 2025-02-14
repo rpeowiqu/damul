@@ -2,7 +2,8 @@ package com.damul.api.mypage.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
-import com.damul.api.auth.entity.type.AccessRange;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.mypage.dto.response.*;
@@ -16,7 +17,6 @@ import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.user.dto.response.FollowResponse;
 import com.damul.api.user.repository.FollowRepository;
 import com.damul.api.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class MyPageServiceImpl implements MyPageService {
         log.info("서비스: 마이페이지 헤더 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         validateAccessPermission(targetUser, currentUser);
 
@@ -59,17 +59,19 @@ public class MyPageServiceImpl implements MyPageService {
         log.info("서비스: 마이페이지 프로필 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         validateAccessPermission(targetUser, currentUser);
 
         int followerCount = followRepository.countByFollowingId(userId);
         int followingCount = followRepository.countByFollowerId(userId);
+        Boolean followed = followRepository.existsByFollowerIdAndFollowingId(currentUser.getId(), userId);
         List<FoodPreferenceList> foodPreferences = foodPreferenceRepository.findPreferencesByUserId(userId);
 
         return ProfileDetail.builder()
                 .followerCount(followerCount)
                 .followingCount(followingCount)
+                .followed(followed)
                 .selfIntroduction(targetUser.getSelfIntroduction())
                 .foodPreference(foodPreferences)
                 .build();
@@ -88,7 +90,7 @@ public class MyPageServiceImpl implements MyPageService {
         log.info("서비스: 마이페이지 뱃지 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         validateAccessPermission(targetUser, currentUser);
 
@@ -105,20 +107,20 @@ public class MyPageServiceImpl implements MyPageService {
         log.info("서비스: 마이페이지 뱃지 상세 조회 시작 - userId: {}, badgeId: {}", userId, badgeId);
 
         User targetUser = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         validateAccessPermission(targetUser, currentUser);
 
         UserBadge userBadge = userBadgeRepository.findByUserIdAndBadgeId(userId, badgeId)
-                .orElseThrow(() -> new EntityNotFoundException("획득하지 않은 뱃지입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_BADGE_NOT_FOUND, "획득하지 않은 뱃지입니다."));
 
         Badge badge = userBadge.getBadge();
-        double rankPercentage = calculateRankPercentage(badgeId, userBadge.getLevel());
+        double rankPercentage = calculateRankPercentage(badgeId, userBadge.getBadge().getLevel());
         String achieveCondition = generateAchieveCondition(badge);
 
         return BadgeDetail.builder()
                 .id(badge.getId())
-                .title(badge.getName())
+                .title(badge.getTitle())
                 .description(badge.getDescription())
                 .createdAt(userBadge.getCreatedAt())
                 .rank(rankPercentage)
@@ -132,7 +134,7 @@ public class MyPageServiceImpl implements MyPageService {
         log.info("서비스: 마이페이지 레시피 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         validateAccessPermission(targetUser, currentUser);
 
@@ -160,7 +162,7 @@ public class MyPageServiceImpl implements MyPageService {
         log.info("서비스: 마이페이지 북마크 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         validateAccessPermission(targetUser, currentUser);
 
@@ -195,12 +197,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     private void validateAccessPermission(User targetUser, UserInfo currentUser) {
         if (!targetUser.isActive()) {
-            throw new IllegalStateException("비활성화된 사용자입니다.");
-        }
-
-        if (targetUser.getAccessRange() == AccessRange.PRIVATE
-                && (targetUser.getId() != currentUser.getId())) {
-            throw new IllegalStateException("비공개 프로필입니다.");
+            throw new BusinessException(ErrorCode.USER_INACTIVE, "비활성화된 사용자입니다.");
         }
     }
 }

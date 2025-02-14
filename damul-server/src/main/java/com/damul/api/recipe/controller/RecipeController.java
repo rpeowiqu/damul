@@ -7,8 +7,8 @@ import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.user.CurrentUser;
+import com.damul.api.main.dto.response.HomeSuggestedResponse;
 import com.damul.api.recipe.dto.request.RecipeRequest;
-import com.damul.api.recipe.dto.response.FamousRecipe;
 import com.damul.api.recipe.dto.response.RecipeDetail;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.repository.RecipeRepository;
@@ -57,11 +57,7 @@ public class RecipeController {
                                                   @CurrentUser UserInfo userInfo) {
         log.info("레시피 상세 조회 시작");
         RecipeDetail detail = recipeService.getRecipeDetail(recipeId, userInfo);
-        if(detail == null) {
-            log.error("레시피 상세 조회 실패 - recipeId: {}", recipeId);
-            throw new BusinessException(ErrorCode.RECIPE_ID_NOT_FOUND);
-        }
-
+        log.info("레시피 상세 조회 성공");
         return ResponseEntity.ok(detail);
     }
 
@@ -69,9 +65,9 @@ public class RecipeController {
     @GetMapping("/famous")
     public ResponseEntity<?> getFamous() {
         log.info("인기 급상승 레시피 조회 요청");
-        List<FamousRecipe> topRecipes = recipeService.getFamousRecipe();
-        if(topRecipes == null || topRecipes.isEmpty()) {
-            log.info("인기 급상승 레시피 조회 성공 - 데이터없음: {}", topRecipes.size());
+        HomeSuggestedResponse topRecipes = recipeService.getFamousRecipe();
+        if(topRecipes.getSuggestedRecipes() == null || topRecipes.getSuggestedRecipes().isEmpty()) {
+            log.info("인기 급상승 레시피 조회 성공 - 데이터없음: {}", topRecipes.getSuggestedRecipes().size());
             return ResponseEntity.noContent().build();
         }
         log.info("인기 급상승 레시피 조회 성공");
@@ -80,19 +76,26 @@ public class RecipeController {
 
     // 레시피 작성
     @PostMapping
-    public ResponseEntity<?> addRecipe(@RequestPart("recipeRequest") RecipeRequest recipeRequest,
-                                       @RequestPart("mainImage") MultipartFile mainImage,
+    public ResponseEntity<?> addRecipe(@CurrentUser UserInfo userInfo,
+                                       @RequestPart("recipeRequest") RecipeRequest recipeRequest,
+                                       @RequestPart("thumbnailImage") MultipartFile thumbnailImage,
                                        @RequestPart("cookingImages") List<MultipartFile> cookingImages) {
-        return null;
+        log.info("레시피 작성 요청");
+        CreateResponse createResponse = recipeService.addRecipe(userInfo, recipeRequest, thumbnailImage, cookingImages);
+        log.info("레시피 작성 완료");
+        return ResponseEntity.ok(createResponse);
     }
 
     // 레시피 수정
     @PutMapping("/{recipeId}")
     public ResponseEntity<?> updateRecipe(@PathVariable int recipeId,
+                                          @CurrentUser UserInfo userInfo,
                                           @RequestPart("recipeRequest") RecipeRequest recipeRequest,
-                                          @RequestPart("thumbnailImage") MultipartFile thumbnailImage,
-                                          @RequestPart("cookingImages") List<MultipartFile> cookingImages) {
-        recipeService.updateRecipe(recipeRequest, thumbnailImage, cookingImages);
+                                          @RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
+                                          @RequestPart(value = "cookingImages", required = false) List<MultipartFile> cookingImages) {
+        log.info("레시피 수정 요청");
+        recipeService.updateRecipe(recipeId, userInfo, recipeRequest, thumbnailImage, cookingImages);
+        log.info("레시피 수정 완료");
         return ResponseEntity.ok().build();
     }
 

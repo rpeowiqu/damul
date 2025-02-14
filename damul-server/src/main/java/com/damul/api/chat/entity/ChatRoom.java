@@ -1,6 +1,7 @@
 package com.damul.api.chat.entity;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,9 +19,9 @@ public class ChatRoom {
     @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private User creator;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "post_id", referencedColumnName = "id")
-//    private Post post;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    private Post post;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,7 +51,6 @@ public class ChatRoom {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         status = Status.ACTIVE;
-        memberLimit = 2;
     }
 
     public enum RoomType {
@@ -79,6 +79,16 @@ public class ChatRoom {
         room.roomName = roomName;
         room.roomType = RoomType.PRIVATE;
         room.memberLimit = 2;
+        return room;
+    }
+
+    public static ChatRoom createPostRoom(User creator, Post post, String roomName, int chatSize) {
+        ChatRoom room = new ChatRoom();
+        room.creator = creator;
+        room.post = post;
+        room.roomName = roomName;
+        room.roomType = RoomType.GROUP;
+        room.memberLimit = chatSize;
         return room;
     }
 }

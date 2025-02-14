@@ -1,4 +1,4 @@
-package com.damul.api.chat.socket;
+package com.damul.api.common.socket;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.entity.ChatMessage;

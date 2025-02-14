@@ -1,12 +1,12 @@
 package com.damul.api.recipe.repository;
 
+import com.damul.api.main.dto.response.RecipeTagList;
+import com.damul.api.main.dto.response.SuggestedRecipeList;
 import com.damul.api.mypage.dto.response.MyRecipeList;
-import com.damul.api.recipe.dto.response.FamousRecipe;
 import com.damul.api.recipe.dto.response.RecipeList;
-import com.damul.api.recipe.dto.response.TagDto;
 import com.damul.api.recipe.entity.Recipe;
-import com.damul.api.recipe.entity.Tag;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -154,7 +154,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             AND r.deleted = false
             AND (:cursor = 0 OR r.id < :cursor)
             ORDER BY r.id DESC
-            LIMIT :size
             """)
     List<MyRecipeList> findMyRecipes(
             @Param("userId") int userId,
@@ -162,30 +161,27 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             @Param("size") int size
     );
 
-    @Query(value = """
-        SELECT r.id, r.title, r.thumbnail_url
-        FROM recipes r
-        INNER JOIN (
-            SELECT recipe_id, COUNT(*) as like_count
-            FROM recipe_like
-            WHERE created_at BETWEEN :startDate AND :endDate
-            GROUP BY recipe_id
-            ORDER BY like_count DESC
-            LIMIT 5
-        ) top_likes ON r.id = top_likes.recipe_id
-        WHERE r.is_deleted = false
-        """, nativeQuery = true)
-    List<FamousRecipe> findTop5LikedRecipes(@Param("startDate") LocalDateTime startDate,
-                                            @Param("endDate") LocalDateTime endDate);
-
+    @Query("""
+    SELECT new com.damul.api.main.dto.response.SuggestedRecipeList(
+        r.id, r.title, r.thumbnailUrl)
+    FROM Recipe r
+    JOIN RecipeLike rl ON r.id = rl.recipe.id
+    WHERE rl.createdAt BETWEEN :startDate AND :endDate
+    AND r.deleted = false
+    GROUP BY r.id, r.title, r.thumbnailUrl
+    ORDER BY COUNT(rl.id) DESC
+    """)
+    List<SuggestedRecipeList> findTop5LikedRecipes(@Param("startDate") LocalDateTime startDate,
+                                                   @Param("endDate") LocalDateTime endDate,
+                                                   Pageable pageable);
 
     @Query("""
-    SELECT new com.damul.api.recipe.dto.response.TagDto(t.id, t.tagName)
+    SELECT new com.damul.api.main.dto.response.RecipeTagList(t.id, t.tagName)
     FROM Tag t 
     JOIN RecipeTag rt ON t.id = rt.tag.id 
     WHERE rt.recipe.id = :recipeId
     """)
-    List<TagDto> findTagDtosByRecipeId(@Param("recipeId") Integer recipeId);
+    List<RecipeTagList> findRecipeTagListByRecipeId(@Param("recipeId") Integer recipeId);
 
 
     boolean existsByUserIdAndIdLessThan(int userId, int id);
@@ -197,4 +193,40 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     void softDeleteRecipe(@Param("recipeId") int recipeId);
 
     Optional<Recipe> findByIdAndDeletedFalse(int recipeId);
+
+    @Query("""
+    SELECT DISTINCT new com.damul.api.recipe.dto.response.RecipeList(
+        r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
+        r.user.id, r.user.nickname, r.viewCnt, r.likeCnt,
+        false, false)
+    FROM Recipe r
+    JOIN r.user u
+    JOIN RecipeIngredient ri ON ri.recipe.id = r.id
+    LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
+        AND ui.userReciept.user.id = :userId
+        AND ui.isDeleted = false
+    WHERE r.deleted = false
+    GROUP BY r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
+             r.user.id, r.user.nickname, r.viewCnt, r.likeCnt
+    HAVING COUNT(DISTINCT CASE WHEN ui.userIngredientId IS NOT NULL THEN ri.id END) > 0
+    ORDER BY 
+        CAST(COUNT(DISTINCT CASE WHEN ui.userIngredientId IS NOT NULL THEN ri.id END) AS float) 
+        / CAST(COUNT(DISTINCT ri.id) AS float) DESC,
+        r.likeCnt DESC, 
+        r.viewCnt DESC
+    """)
+    List<RecipeList> findRecipesByIngredientSimilarity(@Param("userId") int userId);
+
+    @Query("""
+    SELECT DISTINCT new com.damul.api.recipe.dto.response.RecipeList(
+        r.id, r.title, r.thumbnailUrl, r.content, r.createdAt,
+        r.user.id, r.user.nickname, r.viewCnt, r.likeCnt,
+        false, false)
+    FROM Recipe r
+    WHERE r.deleted = false
+    ORDER BY r.likeCnt DESC, r.viewCnt DESC
+    """)
+    List<RecipeList> findPopularRecipes();
+
 }
+

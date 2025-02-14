@@ -78,4 +78,8 @@ public class User {
         this.accessRange = settingUpdate.getAccessRange();
         this.warningEnabled = settingUpdate.isWarningEnabled();
     }
+
+    public void updateWarningEnabled(boolean warningEnabled) {
+        this.warningEnabled = warningEnabled;
+    }
 }

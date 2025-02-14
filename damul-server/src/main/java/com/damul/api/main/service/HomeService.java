@@ -2,6 +2,7 @@ package com.damul.api.main.service;
 
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.HomeIngredientDetail;
+import com.damul.api.main.dto.response.HomeSuggestedResponse;
 import com.damul.api.main.dto.response.IngredientResponse;
 import com.damul.api.main.dto.response.SelectedIngredientList;
 
@@ -19,6 +20,8 @@ public interface HomeService {
 
     SelectedIngredientList getSelectedIngredientList(List<Integer> ingredientIds);
 
-    void deleteIngredient(int userIngredientId);
+    void deleteIngredient(int userIngredientId, int userId, Integer warningEnable);
+
+    HomeSuggestedResponse getRecommendedRecipes(int userId);
 
 }
