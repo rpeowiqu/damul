@@ -3,8 +3,7 @@ import datetime
 from config import settings
 import json
 
-from PIL import Image   # 이미지 크기 조절
-import numpy as np
+import re
 
 def get_settings():
     return settings
@@ -63,6 +62,10 @@ client = OpenAI(
     api_key = OPENAI_KEY
 )
 
+def clean_json_string(json_string):
+    """JSON 문자열에서 ```json과 ``` 제거"""
+    cleaned_string = re.sub(r"^```json\s*|\s*```$", "", json_string, flags=re.MULTILINE)
+    return cleaned_string.strip()
 
 async def gpt_service_execution(input_msg):
     response = client.chat.completions.create(
@@ -83,6 +86,7 @@ async def gpt_service_execution(input_msg):
     print(response)
     print(response.choices[0].message.content)
     res = response.choices[0].message.content
+    res = clean_json_string(res)
     res_json = json.loads(res)
     print(res)
     return res_json
