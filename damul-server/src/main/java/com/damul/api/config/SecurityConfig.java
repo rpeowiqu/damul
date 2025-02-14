@@ -100,7 +100,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> {
                     log.info("OAuth2 로그인 설정");
                     oauth2
-                            .loginPage("/login")
+                            .loginPage(frontUrl + "/login")
                             .authorizationEndpoint(authorization ->
                                     authorization.baseUri("/oauth2/authorization")  // OAuth2 인증 요청 엔드포인트 설정
                             )
