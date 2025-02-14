@@ -80,10 +80,9 @@ async def gpt_service_execution(input_msg):
     )
 
     # print('*************************************************')
-    # print(response)
-    # print(response.choices[0].message.content)
+    print(response)
+    print(response.choices[0].message.content)
     res = response.choices[0].message.content
-    res = res[7:-3].replace('\n','').replace('\t','')
     res_json = json.loads(res)
     print(res)
     return res_json
