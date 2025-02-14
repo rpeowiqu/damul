@@ -1,8 +1,18 @@
 from fastapi import FastAPI, File, UploadFile
 from services.ocr_service import ocr_service_execution
 from services.gpt_service import gpt_service_execution
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI() # 인스턴스 생성
+print('ocr 서버 실행중...')
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 오류 방지용 엔드포인트
 # @app.get("/")
