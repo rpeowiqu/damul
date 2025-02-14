@@ -41,7 +41,6 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
     private final long refreshTokenExpire; // 생성자로 주입
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> excludedUrls = Arrays.asList(
-            "/login",
             "/api/v1/auth/consent",
             "/favicon.ico",
             "/v3/api-docs/**",
