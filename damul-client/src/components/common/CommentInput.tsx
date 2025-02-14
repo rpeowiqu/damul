@@ -1,21 +1,32 @@
 import { ChangeEvent, KeyboardEvent, Dispatch, SetStateAction } from "react";
 import { Input } from "@/components/ui/input";
 import SendIcon from "../svg/SendIcon";
+import { postRecipeComment } from "@/service/recipe";
+import { postPostComment } from "@/service/market";
+import { Comment } from "@/types/community";
 
 interface CommentInputProps {
+  id: string;
+  parentId?: number;
   placeholder?: string;
-  onButtonClick?: (_value: string) => void; // 버튼 클릭 이벤트 (입력값 전달)
   comment: string;
-  setComment: Dispatch<SetStateAction<string>>; // 상태 업데이트 함수
-  className?: string; // 추가된 스타일링 prop
+  setComment: Dispatch<SetStateAction<string>>;
+  className?: string;
+  setReplyingTo: Dispatch<SetStateAction<Comment | null>>;
+  fetchDetailData: () => void;
+  type: string;
 }
 
 const CommentInput = ({
+  id,
+  parentId,
   placeholder,
-  onButtonClick,
   comment,
   setComment,
   className = "",
+  setReplyingTo,
+  fetchDetailData,
+  type,
 }: CommentInputProps) => {
   // 입력값 변경 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -26,15 +37,39 @@ const CommentInput = ({
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && (comment || "").trim() !== "") {
       e.preventDefault();
-      onButtonClick?.(comment || ""); // 기본값 "" 설정
-      setComment("");
+      handleButtonClick();
     }
   };
 
   // 입력 버튼 클릭 핸들러
   const handleButtonClick = () => {
+    submitComment();
     console.log(comment);
-    setComment("");
+  };
+
+  const authorId = "1";
+  const submitComment = async () => {
+    try {
+      const response =
+        type === "recipe"
+          ? await postRecipeComment({
+              recipeId: id,
+              comment,
+              parentId,
+            })
+          : await postPostComment({
+              postId: id,
+              comment,
+              parentId,
+            });
+
+      console.log(response);
+      setReplyingTo(null);
+      setComment("");
+      fetchDetailData();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

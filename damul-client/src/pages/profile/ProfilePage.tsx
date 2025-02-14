@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Navigate, Outlet, useParams } from "react-router-dom";
 import DamulTab from "@/components/common/DamulTab";
 import ProfileBanner from "@/components/profile/ProfileBanner";
 import { ProfileHeader } from "@/types/profile";
 import useUserStore from "@/stores/user";
+import { getProfileHeader } from "@/service/mypage";
 
 const ProfilePage = () => {
   const { userId } = useParams();
@@ -38,30 +39,24 @@ const ProfilePage = () => {
 
   // 마운트 될 때, 동적 경로로부터 userId를 가져와서 해당 유저의 프로필을 보여준다.
   useEffect(() => {
-    const fetchData = async () => {
-      if (userId) {
-        try {
-          const response = await fetch(
-            "/mocks/profile/user-profile-header.json",
-          );
-          if (!response.ok) {
-            throw new Error("데이터를 불러오지 못했습니다.");
-          }
+    if (!userId) {
+      return;
+    }
 
-          const data = await response.json();
-          const foundUser = data.find(
-            (item: ProfileHeader) => item.userId === parseInt(userId),
-          );
-          setHeader(foundUser);
-        } catch (error) {
-          console.error(error);
-        } finally {
-          setIsLoading(false);
+    const fetchHeader = async () => {
+      try {
+        const response = await getProfileHeader(parseInt(userId));
+        if (response) {
+          setHeader(response.data);
         }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchData();
+    fetchHeader();
   }, [userId]);
 
   if (isLoading) {
@@ -74,10 +69,16 @@ const ProfilePage = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <ProfileBanner nickname={header.nickname} />
+      <ProfileBanner
+        nickname={header.nickname}
+        imageUrl={header.profileImageUrl}
+        bgImageUrl={header.profileBackgroundImageUrl}
+      />
       <DamulTab tabList={tabItems} />
       <div className="flex-1 bg-normal-50">
-        <Outlet context={{ user: header }} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Outlet context={{ user: header }} />
+        </Suspense>
       </div>
     </div>
   );

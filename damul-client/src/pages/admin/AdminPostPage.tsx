@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { Suspense } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
 const AdminPostPage = () => {
@@ -27,7 +28,9 @@ const AdminPostPage = () => {
         </NavLink>
       </div>
 
-      <Outlet />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Outlet />
+      </Suspense>
     </div>
   );
 };
