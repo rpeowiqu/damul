@@ -13,6 +13,6 @@ public class ChatMessageCreate {
 
     private MessageType messageType;  // ENUM('TEXT', 'IMAGE', 'FILE')
     private String content;
-    private MultipartFile image;
+    private String image;
 
 }
