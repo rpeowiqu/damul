@@ -1,13 +1,34 @@
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface UserState {
   myId: number;
-  setUserId: (id: number) => void;
+  setMyId: (id: number) => void;
+
+  myNickname: string;
+  setMyNickname: (nickname: string) => void;
+
+  myWarningEnabled: boolean;
+  setWarningEnabled: (warningEnable: boolean) => void;
 }
 
-const useUserStore = create<UserState>((set) => ({
-  myId: 1,
-  setUserId: (id: number) => set({ myId: id }),
-}));
+const useUserStore = create(
+  persist<UserState>(
+    (set) => ({
+      myId: 0,
+      myNickname: "",
+      myWarningEnabled: true,
+
+      setMyId: (id) => set({ myId: id }),
+      setMyNickname: (nickname) => set({ myNickname: nickname }),
+      setWarningEnabled: (warningEnabled) =>
+        set({ myWarningEnabled: warningEnabled }),
+    }),
+    {
+      name: "user",
+      storage: createJSONStorage(() => sessionStorage),
+    },
+  ),
+);
 
 export default useUserStore;

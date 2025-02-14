@@ -1,12 +1,13 @@
-import { useState, Dispatch, SetStateAction, ChangeEvent } from "react";
+import { Dispatch, SetStateAction, ChangeEvent } from "react";
 import ImageUploadIcon from "../svg/ImageUploadIcon";
 
 interface PostImageProps {
   setTempImage: Dispatch<SetStateAction<File | null>>;
+  preImage: string;
+  setPreImage: Dispatch<SetStateAction<string>>;
 }
 
-const PostImage = ({ setTempImage }: PostImageProps) => {
-  const [preImage, setPreImage] = useState("");
+const PostImage = ({ setTempImage, preImage, setPreImage }: PostImageProps) => {
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

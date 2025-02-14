@@ -1,13 +1,13 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { IngredientProps } from "@/types/community";
+import { Ingredient } from "@/types/community";
 import PostRecipeIngrediantForm from "@/components/community/PostRecipeIngrediantForm";
 import SubmitButton from "./SubmitButton";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import DamulDrawer from "@/components/common/DamulDrawer";
 
 interface PostRecipeIngrediantsProps {
-  setTempIngredients: Dispatch<SetStateAction<IngredientProps[]>>;
-  tempIngredients: IngredientProps[];
+  setTempIngredients: Dispatch<SetStateAction<Ingredient[]>>;
+  tempIngredients: Ingredient[];
 }
 
 const PostRecipeIngrediants = ({
@@ -15,7 +15,7 @@ const PostRecipeIngrediants = ({
   tempIngredients,
 }: PostRecipeIngrediantsProps) => {
   const [name, setName] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [amount, setAmount] = useState("");
   const [unit, setUnit] = useState("");
   const [isOpen, setIsOpen] = useCloseOnBack();
 
@@ -27,14 +27,14 @@ const PostRecipeIngrediants = ({
   };
 
   const handleSubmit = () => {
-    if (!name || !quantity || !unit) {
+    if (!name || !amount || !unit) {
       return;
     }
 
-    const newIngredient: IngredientProps = {
+    const newIngredient: Ingredient = {
       id: Date.now(),
       name,
-      quantity,
+      amount,
       unit,
     };
 
@@ -45,7 +45,7 @@ const PostRecipeIngrediants = ({
       if (
         updatedIngredients.length >= 2 &&
         (!updatedIngredients[0].name ||
-          !updatedIngredients[0].quantity ||
+          !updatedIngredients[0].amount ||
           !updatedIngredients[0].unit)
       ) {
         updatedIngredients = updatedIngredients.slice(1);
@@ -55,7 +55,7 @@ const PostRecipeIngrediants = ({
     });
 
     setName("");
-    setQuantity("");
+    setAmount("");
     setUnit("");
   };
 
@@ -64,7 +64,7 @@ const PostRecipeIngrediants = ({
       <table className="min-w-full">
         <thead>
           <tr>
-            <th className="pc:w-24 p-6 text-left"></th>
+            <th className="p-6 text-left"></th>
             <th className="p-2 text-left">재료</th>
             <th className="p-2 text-left">수량</th>
             <th className="p-2 text-left">단위</th>
@@ -73,14 +73,16 @@ const PostRecipeIngrediants = ({
         <tbody className="divide-y divide-neutral-300">
           {tempIngredients.map((ingredient) => (
             <tr key={ingredient.id}>
-              <td className="p-5">
-                <button
-                  type="button"
-                  onClick={() => handleRemoveIngredient(ingredient.id)}
-                  className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:negative-700 border-2 border-negative-600 text-xl font-semibold"
-                >
-                  -
-                </button>
+              <td className="p-1">
+                {ingredient.name && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveIngredient(ingredient.id)}
+                    className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:negative-700 border-2 border-negative-600 text-xl font-semibold"
+                  >
+                    -
+                  </button>
+                )}
               </td>
               <td className="p-2">
                 <input
@@ -94,7 +96,7 @@ const PostRecipeIngrediants = ({
               <td className="p-2">
                 <input
                   type="text"
-                  value={ingredient.quantity}
+                  value={ingredient.amount}
                   placeholder="수량"
                   className="w-full outline-none"
                   disabled
@@ -121,14 +123,16 @@ const PostRecipeIngrediants = ({
           }
         }}
         triggerContent={
-          <div className="text-blue-400 hover:text-blue-700 text-2xl">+</div>
+          <div className="text-blue-400 hover:text-blue-700 text-2xl mt-5">
+            +
+          </div>
         }
         headerContent={
           <PostRecipeIngrediantForm
             name={name}
             setName={setName}
-            quantity={quantity}
-            setQuantity={setQuantity}
+            amount={amount}
+            setAmount={setAmount}
             unit={unit}
             setUnit={setUnit}
           />

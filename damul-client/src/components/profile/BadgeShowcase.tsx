@@ -32,7 +32,7 @@ const BadgeShowcase = ({ list }: BadgeList) => {
           ))}
         </div>
       ) : (
-        <p className="text-center text-normal-200 text-lg">
+        <p className="text-center text-normal-200">
           보유 중인 뱃지가 없습니다.
           <br />
           식자재를 등록하고 뱃지를 획득해 보세요.

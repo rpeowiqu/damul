@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import RecipeFeedCard from "@/components/common/RecipeFeedCard";
 
 import {
   Select,
@@ -10,11 +11,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import FeedList from "@/components/common/FeedList";
+import { getMyRecipes } from "@/service/mypage";
+import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
+
+interface RecipeItem {
+  id: number;
+  title: string;
+  thumbnailUrl: string;
+  content: string;
+  createdAt: string;
+  authorId: number;
+  nickname: string;
+  bookmarked: boolean;
+  likeCnt: number;
+  liked: boolean;
+  viewCnt: number;
+}
 
 const ProfileRecipePage = () => {
   const { user } = useOutletContext();
   const [sortType, setSortType] = useState("date");
+
+  const fetchRecipes = async (pageParam: number) => {
+    try {
+      const response = await getMyRecipes(parseInt(user.userId), {
+        cursor: pageParam,
+        size: 5,
+      });
+      if (response?.status === 204) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
+
+      return response?.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2 p-5 bg-white">
@@ -49,7 +81,13 @@ const ProfileRecipePage = () => {
           </SelectContent>
         </Select>
       </div>
-      <FeedList type="profile/recipe" />
+      <DamulInfiniteScrollList
+        queryKey={["myRecipes"]}
+        fetchFn={fetchRecipes}
+        renderItems={(item: RecipeItem) => (
+          <RecipeFeedCard key={item.id} {...item} />
+        )}
+      />
     </div>
   );
 };

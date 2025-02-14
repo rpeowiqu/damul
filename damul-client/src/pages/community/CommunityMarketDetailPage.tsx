@@ -1,108 +1,100 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import CommunityDetailHeader from "@/components/community/CommunityDetailHeader";
 import AuthorInfo from "@/components/community/AuthorInfo";
 import ContentSection from "@/components/community/ContentSection";
 import CommentsSection from "@/components/community/CommentsSection";
 import FixedCommentInfo from "@/components/community/FixedCommentInfo";
-import { Comment } from "@/types/community";
+import { getPostDetail } from "@/service/market";
+import { Comment, PostDetail } from "@/types/community";
 
 const CommunityMarketDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [comment, setComment] = useState<string>("");
+  const { postId } = useParams();
 
-  const mockData = {
-    id: 1,
-    title: "토마토 공구하실 분",
-    authorId: 1,
-    authorName: "토마토러버전종우",
-    profileImageUrl: "string",
+  const initialPostDetail: PostDetail = {
+    id: "0",
+    title: "",
+    authorId: 0,
+    authorName: "",
+    profileImageUrl: "",
     status: "ACTIVE",
-    contentImageUrl: "string",
-    content:
-      "토마토 먹어요 토마토 먹어요 토마토 먹어요 토마토 먹어요 토마토 먹어요  먹어요 토마토 먹어요  먹어요 토마토 먹어요  먹어요 토마토 먹어요  먹어요 토마토 먹어요  먹어요 토마토 먹어요  먹어요 토마토 먹어요  먹어요 토마토 먹어요  먹어요 토마토 먹어요  먹어요 토마토 먹어요  먹어요 토마토 먹어요",
-    createdAt: "2024-02-02 23:22",
-    currentMemberNum: 2, // 이거
-    maxMemberSize: 13, // 이거
-    commentCnt: 122,
-    comments: [
-      {
-        id: 1,
-        userId: 1,
-        nickname: "요리사서히",
-        profileImageUrl: "string",
-        comment:
-          "우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당",
-        createdAt: "2025-01-29",
-      },
-      {
-        id: 2,
-        userId: 2,
-        nickname: "토마토러버전종우",
-        profileImageUrl: "string",
-        comment: "인정하는 부분",
-        parentId: 1,
-        createdAt: "2025-01-30",
-      },
-      {
-        id: 3,
-        userId: 1,
-        nickname: "요리사서히",
-        profileImageUrl: "string",
-        comment:
-          "우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당 우와 맛있겠당",
-        createdAt: "2025-01-29",
-      },
-      {
-        id: 4,
-        userId: 2,
-        nickname: "토마토러버전종우",
-        profileImageUrl: "string",
-        comment: "인정하는 부분",
-        parentId: 1,
-        createdAt: "2025-01-30",
-      },
-    ],
+    contentImageUrl: "",
+    content: "",
+    createdAt: "",
+    currentChatNum: 0,
+    chatSize: 0,
+    viewCnt: 0,
+    comments: [],
   };
+
+  const [data, setData] = useState<PostDetail>(initialPostDetail);
+
+  const fetchPostDetail = async () => {
+    try {
+      const response = await getPostDetail(postId);
+      setData(response?.data as PostDetail);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPostDetail();
+  }, []);
 
   const cancelReply = () => {
     setReplyingTo(null);
   };
 
   return (
-    <div className="flex">
-      <main className="relative flex flex-col justify-center w-full text-center p-5 pc:p-6 mb-12">
-        <CommunityDetailHeader
-          title={mockData.title}
-          createdAt={mockData.createdAt}
-          status={mockData.status}
-          type="market"
-        />
-        <AuthorInfo
-          profileImageUrl={mockData.profileImageUrl}
-          authorName={mockData.authorName}
-          id={mockData.id}
-          type="market"
-        />
-        <ContentSection
-          contentImageUrl={mockData.contentImageUrl}
-          content={mockData.content}
-          type="market"
-        />
-        <CommentsSection
-          comments={mockData.comments}
-          onReply={(comment) => setReplyingTo(comment)}
-          currentMemberNum={mockData.currentMemberNum}
-          maxMemberSize={mockData.maxMemberSize}
-          type="market"
-        />
-      </main>
+    <main
+      className={`relative flex flex-col justify-center w-full text-center p-6 ${
+        replyingTo ? "pc:pb-24" : "pc:pb-6"
+      } mb-8`}
+    >
+      <CommunityDetailHeader
+        title={data.title}
+        createdAt={data.createdAt}
+        status={data.status}
+        id={data.id}
+        authorId={data.authorId}
+        type="market"
+      />
+      <AuthorInfo
+        profileImageUrl={data.profileImageUrl}
+        authorName={data.authorName}
+        authorId={data.authorId}
+        viewCnt={data.viewCnt}
+        id={data.id}
+        type="market"
+      />
+      <ContentSection
+        contentImageUrl={data.contentImageUrl}
+        content={data.content}
+        type="market"
+      />
+      <CommentsSection
+        id={data.id}
+        comments={data.comments}
+        onReply={(comment) => setReplyingTo(comment)}
+        currentChatNum={data.currentChatNum}
+        chatSize={data.chatSize}
+        fetchDetailData={fetchPostDetail}
+        type="market"
+      />
       <FixedCommentInfo
+        id={postId || ""}
         replyingTo={replyingTo}
+        setReplyingTo={setReplyingTo}
         comment={comment}
         setComment={setComment}
         cancelReply={cancelReply}
+        fetchDetailData={fetchPostDetail}
+        type="market"
       />
-    </div>
+    </main>
   );
 };
 

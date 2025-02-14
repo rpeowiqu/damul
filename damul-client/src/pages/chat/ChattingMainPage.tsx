@@ -1,20 +1,34 @@
 import { useNavigate } from "react-router-dom";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import ChattingListInfo from "@/components/chat/ChattingListInfo";
-import ChattingList from "@/components/chat/ChattingList";
 import PostButton from "@/components/community/PostButton";
-import PlusIcon from "@/components/svg/PlusIcon";
+import { getChattingList } from "@/service/chatting";
+import ChattingListInfiniteScroll from "@/components/chat/ChattingListInfiniteScroll";
+import ChattingListItem from "@/components/chat/ChattingListItem";
+import { ChattingItem } from "@/types/chatting";
 
 const ChattingMainPage = () => {
   const navigate = useNavigate();
 
-  const mockData = {
-    cnt: 3,
+  const fetchItems = async (pageParam: {
+    cursor: number;
+    cursorTime?: string;
+  }) => {
+    try {
+      const response = await getChattingList({
+        cursorTime: pageParam.cursorTime ?? new Date().toISOString(),
+        cursor: pageParam.cursor ?? 0,
+        size: 10,
+      });
+      return response?.data;
+    } catch (error) {
+      console.error("Error fetching chat list:", error);
+    }
   };
 
   return (
-    <main className="h-full text-center py-6 space-y-2">
-      <div className="px-4 space-y-2">
+    <div className="h-full text-center py-6 space-y-2">
+      <div className="px-4 pc:px-6 space-y-2">
         <DamulSearchBox
           placeholder="채팅방 검색"
           onInputClick={() => {
@@ -22,11 +36,18 @@ const ChattingMainPage = () => {
           }}
           className="cursor-pointer"
         />
-        <ChattingListInfo chattingCnt={mockData.cnt} />
+        <ChattingListInfo />
+        <PostButton to="/chatting/create" icon={"+"} />
       </div>
-      <ChattingList />
-      <PostButton to="/chatting/create" icon={<PlusIcon />} />
-    </main>
+      <ChattingListInfiniteScroll
+        queryKey={["chattRooms"]}
+        fetchFn={fetchItems}
+        renderItems={(item: ChattingItem) => <ChattingListItem {...item} />}
+        skeleton={
+          <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
+        }
+      />
+    </div>
   );
 };
 

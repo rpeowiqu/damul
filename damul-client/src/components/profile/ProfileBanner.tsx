@@ -1,8 +1,12 @@
-import Image from "@/components/common/Image";
 import defaultProfile from "@/assets/profile.png";
 import defaultProfileBg from "@/assets/profile-background.jpg";
-import { useState } from "react";
 import DamulSearchBox from "../common/DamulSearchBox";
+import DamulInfiniteScrollList from "../common/DamulInfiniteScrollList";
+import { useCallback, useEffect, useState } from "react";
+import { getUser } from "@/service/user";
+import { UserSearchResult } from "@/types/profile";
+import { useNavigate } from "react-router-dom";
+import { debounce } from "@/utils/optimize";
 
 interface ProfileBannerProps {
   nickname: string;
@@ -15,52 +19,89 @@ const ProfileBanner = ({
   imageUrl,
   bgImageUrl,
 }: ProfileBannerProps) => {
-  const [searchActive, setSearchActive] = useState<boolean>();
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [debouncedSearchKeyword, setDebouncedSearchKeyword] =
+    useState<string>("");
+  const nav = useNavigate();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  // 리렌더링이 빈번하게 일어나서 추가
+  const debouncedSetSearchKeyword = useCallback(
+    debounce(
+      "setProfileSearchKeyword",
+      (keyword: string) => setDebouncedSearchKeyword(keyword),
+      200,
+    ),
+    [],
+  );
+
+  useEffect(() => {
+    debouncedSetSearchKeyword(searchKeyword);
+  }, [searchKeyword]);
+
+  const fetchUsers = async (pageParam: number) => {
+    try {
+      if (debouncedSearchKeyword.length === 0) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
+
+      const response = await getUser({
+        keyword: debouncedSearchKeyword,
+        cursor: pageParam,
+        size: 4,
+      });
+      if (response.status === 204) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div>
-      <DamulSearchBox
-        className="rounded-none bg-normal-50 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-        placeholder="유저 검색"
-      />
-      {/* <div
-        className={`flex items-center gap-1 rounded-full bg-white border border-normal-100
-transition-all duration-200 ease-in-out overflow-hidden ${searchActive ? "w-80" : "w-8"}`}
-      >
-        <button onClick={() => setSearchActive((prev) => !prev)}>
-          <SearchIcon className="size-8 fill-positive-300" />
-        </button>
-        <input
-          type="text"
-          className="text-sm flex-1 outline-none"
-          placeholder="유저 닉네임을 입력해 주세요."
+      <div className="relative z-40">
+        <DamulSearchBox
+          placeholder="찾으시는 유저의 닉네임을 입력해 주세요."
+          inputValue={searchKeyword}
+          setInputValue={setSearchKeyword}
+          className="rounded-none focus:border-positive-400"
+          onFocus={() => setIsOpen(true)}
+          onBlur={() => setTimeout(() => setIsOpen(false), 100)}
         />
-      </div> */}
+        {isOpen && (
+          <DamulInfiniteScrollList
+            queryKey={["users", debouncedSearchKeyword]}
+            fetchFn={fetchUsers}
+            renderItems={(item: UserSearchResult) => (
+              <div
+                key={item.userId}
+                className="flex items-center gap-5 px-5 py-1 bg-white hover:bg-normal-50"
+                onClick={() => nav(`/profile/${item.userId}/info`)}
+              >
+                <img
+                  src={item.profileImageUrl || defaultProfile}
+                  className="w-8 h-8 object-cover rounded-full border border-normal-100"
+                />
+                <p className="text-sm">{item.nickname}</p>
+              </div>
+            )}
+            className="flex flex-col gap-1 absolute top-full bg-white w-full h-36 max-h-32 overflow-y-auto shadow-md"
+          />
+        )}
+      </div>
 
       <div className="relative w-full h-44 select-none">
-        <Image
+        <img
           src={bgImageUrl ? bgImageUrl : defaultProfileBg}
           className="w-full h-full object-cover"
         />
-
-        {/* <div
-          className={`flex items-center gap-1 absolute top-1 left-1 rounded-full bg-white border-2 border-normal-100
-transition-all duration-200 ease-in-out overflow-hidden ${searchActive ? "w-full" : "w-8"}`}
-        >
-          <button onClick={() => setSearchActive((prev) => !prev)}>
-            <SearchIcon className="size-8 fill-normal-400" />
-          </button>
-          <input
-            type="text"
-            className="text-sm flex-1 outline-none"
-            placeholder="유저 닉네임을 입력해 주세요."
-          />
-        </div> */}
-
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border-4 border-normal-50 bg-white overflow-hidden">
-          <Image
+          <img
             src={imageUrl ? imageUrl : defaultProfile}
-            className="w-full h-full"
+            className="w-full h-full object-cover"
           />
         </div>
 

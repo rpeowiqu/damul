@@ -15,6 +15,7 @@ interface ButtonProps {
   className?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   children?: ReactNode;
+  disabled?: boolean;
 }
 
 const DamulButton = ({
@@ -23,12 +24,13 @@ const DamulButton = ({
   className,
   onClick,
   children,
+  disabled
 }: ButtonProps) => {
   return (
     <Button
       type={type}
       className={clsx(
-        "text-base font-bold rounded-lg transition-colors ease-in-out",
+        "text-sm font-bold rounded-lg transition-colors ease-in-out",
         {
           "bg-positive-300 hover:bg-positive-400 text-white":
             variant === "positive",
@@ -47,6 +49,7 @@ const DamulButton = ({
         className,
       )}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </Button>

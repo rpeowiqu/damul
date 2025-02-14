@@ -33,14 +33,14 @@ const PostRecipeSteps = ({
 
     const newOrder: OrderProps = {
       id: Date.now(),
-      description: orderDescription.trim(),
-      image: orderImage,
+      content: orderDescription.trim(),
+      imageUrl: orderImage,
     };
 
     setTempOrders((prev) => {
       let updatedOrders = [...prev, newOrder];
 
-      if (updatedOrders.length >= 2 && !updatedOrders[0].description) {
+      if (updatedOrders.length >= 2 && !updatedOrders[0].content) {
         updatedOrders = updatedOrders.slice(1);
       }
 
@@ -67,18 +67,24 @@ const PostRecipeSteps = ({
           {tempOrders.map((order, index) => (
             <tr key={order.id}>
               <td className="p-1">
-                <button
-                  type="button"
-                  onClick={() => handleRemoveStep(order.id)}
-                  className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:text-negative-700 border-2 border-negative-600 text-xl font-semibold"
-                >
-                  -
-                </button>
+                {order.content && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveStep(order.id)}
+                    className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:text-negative-700 border-2 border-negative-600 text-xl font-semibold"
+                  >
+                    -
+                  </button>
+                )}
               </td>
               <td className="p-1 text-center">
-                {order.image ? (
+                {order.imageUrl ? (
                   <Image
-                    src={URL.createObjectURL(order.image)}
+                    src={
+                      order.imageUrl instanceof File
+                        ? URL.createObjectURL(order.imageUrl)
+                        : order.imageUrl
+                    }
                     alt={`Step ${index + 1}`}
                     className="w-full h-20 object-cover rounded-sm"
                   />
@@ -93,7 +99,7 @@ const PostRecipeSteps = ({
 
               <td className="p-2">
                 <textarea
-                  value={order.description}
+                  value={order.content}
                   className="w-full min-h-20 outline-none p-2"
                   disabled
                 />
@@ -110,7 +116,9 @@ const PostRecipeSteps = ({
           }
         }}
         triggerContent={
-          <div className="text-blue-400 hover:text-blue-700 text-2xl">+</div>
+          <div className="text-blue-400 hover:text-blue-700 text-2xl mt-5">
+            +
+          </div>
         }
         headerContent={
           <PostRecipeOrderForm
