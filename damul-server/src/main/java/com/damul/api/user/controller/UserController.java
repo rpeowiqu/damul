@@ -5,6 +5,7 @@ import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.user.dto.request.CheckNicknameRequest;
 import com.damul.api.user.dto.request.FollowRequest;
 import com.damul.api.user.dto.request.SettingUpdate;
+import com.damul.api.user.dto.response.FollowList;
 import com.damul.api.user.dto.response.FollowResponse;
 import com.damul.api.user.dto.response.SettingResponse;
 import com.damul.api.user.dto.response.UserList;
@@ -19,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -62,37 +65,39 @@ public class UserController {
 
     // 팔로워 목록 조회
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<?> getFollowers(@RequestParam int cursor,
+    public ResponseEntity<?> getFollowers(@RequestParam(value = "keyword", required = false) String keyword,
+                                          @RequestParam int cursor,
                                           @RequestParam int size,
                                           @PathVariable int userId) {
         log.info("팔로워 목록 조회 요청");
-        ScrollResponse<UserList> userList = followService.getFollowers(cursor, size, userId);
+        ScrollResponse<FollowList> followList = followService.getFollowers(keyword, cursor, size, userId);
 
-        if(userList.getData().isEmpty() || userList.getData().size() == 0) {
+        if(followList.getData().isEmpty() || followList.getData().size() == 0) {
             log.info("팔로워 목록 조회 성공 - 데이터없음");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
-        log.info("팔로워 목록 조회 성공, 개수: {}", userList.getData().size());
-        return ResponseEntity.ok(userList);
+        log.info("팔로워 목록 조회 성공, 개수: {}", followList.getData().size());
+        return ResponseEntity.ok(followList);
     }
 
     
     // 팔로잉 목록 조회
     @GetMapping("/{userId}/followings")
-    public ResponseEntity<?> getFollowings(@RequestParam int cursor,
+    public ResponseEntity<?> getFollowings(@RequestParam(value = "keyword", required = false) String keyword,
+                                           @RequestParam int cursor,
                                           @RequestParam int size,
                                           @PathVariable int userId) {
         log.info("팔로잉 목록 조회 요청");
-        ScrollResponse<UserList> userList = followService.getFollowings(cursor, size, userId);
+        ScrollResponse<FollowList> followList = followService.getFollowings(keyword, cursor, size, userId);
 
-        if(userList.getData().isEmpty() || userList.getData().size() == 0) {
+        if(followList.getData().isEmpty() || followList.getData().size() == 0) {
             log.info("팔로잉 목록 조회 성공 - 데이터없음");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
-        log.info("팔로잉 목록 조회 성공, 개수: {}", userList.getData().size());
-        return ResponseEntity.ok(userList);
+        log.info("팔로잉 목록 조회 성공, 개수: {}", followList.getData().size());
+        return ResponseEntity.ok(followList);
     }
 
     // 팔로우/언팔로우
@@ -120,15 +125,17 @@ public class UserController {
 
     // 사용자 목록 검색/조회
     @GetMapping
-    public ResponseEntity<?> search(@RequestParam(required = false) String keyword) {
+    public ResponseEntity<?> search(@RequestParam(required = false) String keyword,
+                                    @RequestParam int cursor,
+                                    @RequestParam int size) {
         log.info("사용자 목록 검색/조회 요청 - keyword: {}", keyword);
-        CreateResponse createResponse = userService.getSearchUserList(keyword);
-        if(createResponse == null) {
+        ScrollResponse<UserList> scrollResponse = userService.getSearchUserList(cursor, size, keyword);
+        if(scrollResponse.getData() == null || scrollResponse.getData().isEmpty()) {
             log.info("사용자 목록 검색/조회 완료 - 데이터 없음");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
             log.info("사용자 목록 검색/조회 완료");
-            return ResponseEntity.ok(createResponse);
+            return ResponseEntity.ok(scrollResponse);
         }
     }
 }

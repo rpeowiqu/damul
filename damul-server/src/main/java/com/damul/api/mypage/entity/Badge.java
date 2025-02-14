@@ -16,12 +16,18 @@ public class Badge {
     private int id;
 
     @Column(name = "name", length = 100, nullable = false)
-    private String name;
+    private String title;
 
     @Column(name = "standard", nullable = false)
     private short standard;
 
     @Column(name = "description", length = 255, nullable = false)
     private String description;
+
+    @Column(name = "catch_phrase", length = 255)
+    private String catchPhrase;
+
+    @Column(name = "level")
+    private int level;
 
 }

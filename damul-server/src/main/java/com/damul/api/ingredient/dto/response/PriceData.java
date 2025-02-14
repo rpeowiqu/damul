@@ -1,4 +1,4 @@
-package com.damul.api.recipe.dto.response;
+package com.damul.api.ingredient.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TagDto {
-    private int id;
-    private String tagName;
+public class PriceData {
+    private int price;
+    private String date;
 }

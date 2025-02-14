@@ -4,6 +4,8 @@ import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.user.CurrentUser;
+import com.damul.api.main.dto.response.IngredientResponse;
+import com.damul.api.main.service.HomeService;
 import com.damul.api.mypage.dto.response.*;
 import com.damul.api.mypage.service.MyPageService;
 import com.damul.api.recipe.dto.response.RecipeList;
@@ -21,6 +23,7 @@ import java.util.List;
 public class MyPageController {
 
     private final MyPageService myPageService;
+    private final HomeService homeService;
 
     @GetMapping("/{userId}/header")
     public ResponseEntity<?> getProfileHeader(
@@ -98,7 +101,7 @@ public class MyPageController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{userId}/bookmark")
+    @GetMapping("/{userId}/bookmarks")
     public ResponseEntity<?> getBookmarks(
             @PathVariable int userId,
             @RequestParam(defaultValue = "0") int cursor,
@@ -121,5 +124,16 @@ public class MyPageController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{userId}/ingredients")
+    public ResponseEntity<?> getIngredients(@PathVariable int userId) {
+        log.info("다른 유저의 식자재 가져오기 시작 userId: {}", userId);
+        IngredientResponse response = homeService.getUserIngredientList(userId);
+
+        if (response.getFreezer().isEmpty() && response.getFridge().isEmpty() && response.getRoomTemp().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        log.info("다른 유저의 식자재 가져오기 성공 userId: {}", userId);
+        return ResponseEntity.ok(response);
+    }
 
 }

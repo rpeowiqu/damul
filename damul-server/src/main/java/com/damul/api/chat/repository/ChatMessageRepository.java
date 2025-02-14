@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,23 +40,20 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
     // 첫 로딩을 위한 쿼리
     @Query("SELECT cm FROM ChatMessage cm WHERE cm.room.id = :roomId " +
             "AND ((cm.id >= :lastReadId) OR " +  // 마지막 읽은 메시지부터 최신까지
-            "(cm.id < :lastReadId AND cm.id >= :lastReadId - :beforeSize)) " + // 이전 메시지 10개
+            "(cm.id < :lastReadId AND cm.id >= :lastReadId - 10)) " + // 이전 메시지 10개
             "ORDER BY cm.id DESC")
     List<ChatMessage> findInitialMessages(
             @Param("roomId") int roomId,
-            @Param("lastReadId") int lastReadId,
-            @Param("beforeSize") int beforeSize
+            @Param("lastReadId") int lastReadId
     );
 
     // 스크롤을 위한 이전 메시지 조회
     @Query("SELECT cm FROM ChatMessage cm " +
             "WHERE cm.room.id = :roomId AND cm.id < :cursorId " +
-            "ORDER BY cm.id DESC " +
-            "LIMIT :size")
+            "ORDER BY cm.id DESC ")
     List<ChatMessage> findPreviousMessages(
             @Param("roomId") int roomId,
-            @Param("cursorId") int cursorId,
-            @Param("size") int size
+            @Param("cursorId") int cursorId
     );
 
     // 안 읽은 메세지 수 전체 조회
@@ -64,5 +62,14 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
             "JOIN ChatRoomMember crm ON cm.room = crm.room " +
             "WHERE crm.user.id = :userId")
     int countAllUnreadMessages(@Param("userId") int userId);
+
+    @Query(value = """
+        SELECT created_at 
+        FROM chat_messages 
+        WHERE room_id = :roomId 
+        ORDER BY created_at DESC 
+        LIMIT 1
+        """, nativeQuery = true)
+    LocalDateTime findLastMessageTimeByRoomId(@Param("roomId") int roomId);
 
 }

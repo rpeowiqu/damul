@@ -19,13 +19,13 @@ public class UserIngredientList {
     private int ingredientQuantity;
     private int expirationDate;
     private String storage;
-    private LocalDateTime purchaseDate;
+    private LocalDate purchaseDate;
 
     public static UserIngredientList from(UserIngredient entity) {
-        LocalDate dueDate = entity.getDueDate().toLocalDate();
+        LocalDate expirationDate = entity.getExpirationDate().toLocalDate();
         LocalDate now = LocalDateTime.now().toLocalDate();
 
-        long daysBetween = ChronoUnit.DAYS.between(dueDate, now);
+        long daysBetween = ChronoUnit.DAYS.between(now, expirationDate);
 
         return new UserIngredientList(
                 entity.getUserIngredientId(),
@@ -34,7 +34,7 @@ public class UserIngredientList {
                 entity.getIngredientQuantity(),
                 (int) daysBetween,
                 convertStorage(entity.getIngredientStorage()),
-                entity.getIngredientUp()
+                entity.getIngredientUp().toLocalDate()
         );
     }
 
@@ -42,7 +42,7 @@ public class UserIngredientList {
         return switch (storage) {
             case FREEZER -> "freezer";
             case FRIDGE -> "fridge";
-            case ROOM_TEMPARATURE -> "roomTemp";
+            case ROOM_TEMPERATURE -> "roomTemp";
         };
     }
 }

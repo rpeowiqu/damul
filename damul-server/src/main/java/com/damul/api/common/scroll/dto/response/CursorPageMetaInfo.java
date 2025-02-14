@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class CursorPageMetaInfo {
 
     private int nextCursor;
-    private boolean hasNextData;
+    private boolean hasNext;
 }

@@ -4,12 +4,18 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.common.scroll.util.ScrollCursor;
+import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.config.service.S3Service;
 import com.damul.api.user.dto.request.SettingUpdate;
 import com.damul.api.user.dto.response.SettingResponse;
+import com.damul.api.user.dto.response.UserList;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -129,18 +135,22 @@ public class UserServiceImpl implements UserService {
 
     // 사용자 목록 조회 및 검색
     @Override
-    public CreateResponse getSearchUserList(String keyword) {
+    public ScrollResponse<UserList> getSearchUserList(int cursor, int size, String keyword) {
         if(keyword == null || keyword.isEmpty()) {
             log.info("검색어 없음");
             throw new BusinessException(ErrorCode.USER_NICKNAME_NOT_PROVIDED);
         }
 
+        String exactMatch = keyword; // 정확히 일치하는 경우
+        String startsWith = keyword + "%"; // 검색어로 시작하는 경우
+        String contains = "%" + keyword + "%"; // 검색어가 포함된 경우
+        Pageable pageable = PageRequest.of(0, size + 1);
 
-        log.info("검색어 있음 - 검색어: {}", keyword);
-        CreateResponse createResponse = userRepository.findUserByNickname(keyword);
+        log.info("검색어 있음 - 검색어 포함: {}, 정확히 일치: {}, 검색어 시작:{}", cursor, pageable, contains, exactMatch, startsWith);
+        List<UserList> userList = userRepository.findByNicknameContainingWithPaging(contains, exactMatch, startsWith, cursor, pageable);
 
-
-        return createResponse;
+        log.info("사용자 목록 검색 조회 성공");
+        return ScrollUtil.createScrollResponse(userList, cursor, size);
     }
 
 

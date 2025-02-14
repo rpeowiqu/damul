@@ -3,6 +3,7 @@ package com.damul.api.auth.filter;
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.auth.jwt.JwtTokenProvider;
+import com.damul.api.auth.jwt.TokenService;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
 import com.damul.api.common.user.CustomUserDetails;
@@ -20,9 +21,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,10 +35,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JwtTokenRefreshFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
-    private final AuthService authService;
+    private final TokenService tokenService;
     private final CookieUtil cookieUtil;
     private final long accessTokenExpire;  // 생성자로 주입
     private final long refreshTokenExpire; // 생성자로 주입
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final List<String> excludedUrls = Arrays.asList(
+            "/api/v1/auth/consent",
+            "/favicon.ico",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/ws/pub/**",
+            "/ws/sub/**"
+    );
 
 
     @Override
@@ -44,12 +56,43 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
 
         Optional<Cookie> accessTokenCookie = null;
         Optional<Cookie> refreshTokenCookie = null;
+        Optional<Cookie> tempTokenCookie = null;
 
         try {
             log.info("JwtTokenRefreshFilter 시작");
 
             accessTokenCookie = cookieUtil.getCookie(request, "access_token");
             refreshTokenCookie = cookieUtil.getCookie(request, "refresh_token");
+            tempTokenCookie = cookieUtil.getCookie(request, "temp_token");
+
+            if (tempTokenCookie.isPresent()) {
+                String tempToken = tempTokenCookie.get().getValue();
+
+                // 토큰 유효성 검증
+                if (jwtTokenProvider.validateToken(tempToken)) {
+                    Claims claims = jwtTokenProvider.getClaims(tempToken);
+
+                    // 최소한의 인증 정보 생성
+                    UserInfo userInfo = UserInfo.builder()
+                            .email(claims.get("email", String.class))
+                            .nickname(claims.get("nickname", String.class))
+                            .build();
+
+                    // 제한된 권한으로 인증 정보 설정
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(
+                            userInfo,
+                            null,
+                            Collections.emptyList()  // 권한 없음
+                    );
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.info("임시토큰으로 제한적 인증 처리: {}", userInfo.getEmail());
+                } else {
+                    // 토큰이 유효하지 않은 경우 로그 및 오류 처리
+                    log.warn("유효하지 않은 임시토큰 감지 - 쿠키 삭제");
+                    cookieUtil.deleteCookie(response, "temp_token");
+                }
+            }
 
             log.info("accessToken 존재: {}", accessTokenCookie.isPresent());
             log.info("refreshToken 존재: {}", refreshTokenCookie.isPresent());
@@ -87,17 +130,17 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
             log.info("1. 추출된 사용자 이메일: {}", userEmail);
 
             // 실제 Redis에 저장된 값 확인
-            String storedToken = authService.findRefreshToken(userEmail);
+            String storedToken = tokenService.findRefreshToken(userEmail);
             log.info("2. Redis에 저장된 토큰: {}", storedToken);
             log.info("3. 현재 쿠키의 토큰: {}", refreshToken);
 
             log.info("4. Redis에서 Refresh Token 검증 시작");
-            boolean isValidInRedis = authService.validateRefreshToken(userEmail, refreshToken);
+            boolean isValidInRedis = tokenService.validateRefreshToken(userEmail, refreshToken);
             log.info("5. Redis 검증 결과: {}", isValidInRedis);
 
             if (!isValidInRedis) {
                 log.error("Redis에 저장된 Refresh Token과 일치하지 않습니다.");
-                authService.removeRefreshToken(userEmail);
+                tokenService.removeRefreshToken(userEmail);
                 cookieUtil.deleteCookie(response, "refresh_token");
                 return;
             }
@@ -144,7 +187,7 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
                 log.info("User Email from refresh token: {}", userEmail);
 
 
-                if (authService.validateRefreshToken(userEmail, refreshToken)) {
+                if (tokenService.validateRefreshToken(userEmail, refreshToken)) {
                     Claims refreshTokenClaims = jwtTokenProvider.getClaims(refreshToken);
 
 
@@ -200,8 +243,17 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
 
     private void handleInvalidToken(HttpServletResponse response, String userEmail) {
         log.error("저장된 리프레시 토큰과 일치하지 않습니다.");
-        authService.removeRefreshToken(userEmail);
+        tokenService.removeRefreshToken(userEmail);
         cookieUtil.deleteCookie(response, "access_token");
         cookieUtil.deleteCookie(response, "refresh_token");
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        boolean shouldNotFilter = excludedUrls.stream()
+                .anyMatch(pattern -> pathMatcher.match(pattern, path));
+        log.debug("JWT 필터 제외 여부 확인 - URI: {}, 제외: {}", path, shouldNotFilter);
+        return shouldNotFilter;
     }
 }
