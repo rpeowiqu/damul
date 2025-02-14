@@ -8,11 +8,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { CATEGORYNAME } from "@/constants/category";
+import { CATEGORY_INFO } from "@/constants/category";
 
-const IngredientCategoryFilter = () => {
+interface IngredientCategoryFilterProps {
+  onValueChange: (value: string) => void;
+}
+
+const IngredientCategoryFilter = ({
+  onValueChange,
+}: IngredientCategoryFilterProps) => {
   return (
-    <Select>
+    <Select onValueChange={onValueChange}>
       <SelectTrigger className="w-24 text-xs bg-normal-50 text-normal-500">
         <SelectValue placeholder="정렬" />
       </SelectTrigger>
@@ -22,17 +28,17 @@ const IngredientCategoryFilter = () => {
           <SelectItem
             key="all"
             className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-            value="all"
+            value="0"
           >
             전체
           </SelectItem>
-          {Object.entries(CATEGORYNAME).map(([key, label]) => (
+          {Object.values(CATEGORY_INFO).map((category) => (
             <SelectItem
-              key={key}
+              key={`${category} ${Math.random()}`}
               className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-              value={key}
+              value={`${category.number}`}
             >
-              {label}
+              {category.name}
             </SelectItem>
           ))}
         </SelectGroup>

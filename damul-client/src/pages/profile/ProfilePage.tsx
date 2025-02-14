@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Navigate, Outlet, useParams } from "react-router-dom";
 import DamulTab from "@/components/common/DamulTab";
 import ProfileBanner from "@/components/profile/ProfileBanner";
@@ -76,7 +76,9 @@ const ProfilePage = () => {
       />
       <DamulTab tabList={tabItems} />
       <div className="flex-1 bg-normal-50">
-        <Outlet context={{ user: header }} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Outlet context={{ user: header }} />
+        </Suspense>
       </div>
     </div>
   );

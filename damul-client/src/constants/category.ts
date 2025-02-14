@@ -11,60 +11,60 @@ import {
   VegetableIcon,
 } from "@/components/svg";
 
-type CategoryKey =
-  | "grains"
-  | "vegetable"
-  | "fruit"
-  | "dairy"
-  | "meat"
-  | "egg"
-  | "fish"
-  | "oil"
-  | "seasoning"
-  | "etc";
+export const CATEGORY_INFO = {
+  grains: {
+    name: "곡물",
+    icon: GrainsIcon,
+    number: 1,
+  },
+  vegetable: {
+    name: "채소",
+    icon: VegetableIcon,
+    number: 2,
+  },
+  fruit: {
+    name: "과일",
+    icon: FruitIcon,
+    number: 3,
+  },
+  dairy: {
+    name: "유제품",
+    icon: DairyIcon,
+    number: 4,
+  },
+  meat: {
+    name: "육류",
+    icon: MeatIcon,
+    number: 5,
+  },
+  egg: {
+    name: "달걀류",
+    icon: EggIcon,
+    number: 6,
+  },
+  fish: {
+    name: "수산물",
+    icon: FishIcon,
+    number: 7,
+  },
+  oil: {
+    name: "기름",
+    icon: OilIcon,
+    number: 8,
+  },
+  seasoning: {
+    name: "양념",
+    icon: SeasoningIcon,
+    number: 9,
+  },
+  etc: {
+    name: "기타",
+    icon: EtcIcon,
+    number: 10,
+  },
+} as const;
 
-// 카테고리 이름
-export const CATEGORYNAME: Record<CategoryKey, string> = {
-  grains: "곡물",
-  vegetable: "채소",
-  fruit: "과일",
-  dairy: "유제품",
-  meat: "육류",
-  egg: "달걀류",
-  fish: "수산물",
-  oil: "기름",
-  seasoning: "양념",
-  etc: "기타",
-};
-
-// 카테고리 번호
-// 곡물, 채소, 과일, 유제품, 육류, 달걀류, 수산물, 기름, 양념, 기타
-export const CATEGORYNUMBER: Record<number, CategoryKey> = {
-  0: "grains",
-  1: "vegetable",
-  2: "fruit",
-  3: "dairy",
-  4: "meat",
-  5: "egg",
-  6: "fish",
-  7: "oil",
-  8: "seasoning",
-  9: "etc",
-};
-
-// 카테고리 아이콘
-export const CATEGORY: Record<
-  CategoryKey,
-  React.ComponentType<{ className?: string }>
-> = {
-  grains: GrainsIcon,
-  vegetable: VegetableIcon,
-  fruit: FruitIcon,
-  dairy: DairyIcon,
-  meat: MeatIcon,
-  egg: EggIcon,
-  fish: FishIcon,
-  oil: OilIcon,
-  seasoning: SeasoningIcon,
-  etc: EtcIcon,
-};
+export type CategoryKey = keyof typeof CATEGORY_INFO;
+export const CATEGORYNAME = (key: CategoryKey) => CATEGORY_INFO[key].name;
+export const CATEGORYNUMBER = (key: CategoryKey) => CATEGORY_INFO[key].number;
+export const CATEGORYICON = (key: CategoryKey) => CATEGORY_INFO[key].icon;
