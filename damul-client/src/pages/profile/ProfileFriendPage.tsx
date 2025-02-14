@@ -6,14 +6,14 @@ import clsx from "clsx";
 
 const ProfileFriendPage = () => {
   const { userId } = useParams();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchKeyword, setSetSearchKeyword] = useState<string>("");
 
   return (
     <div className="flex flex-col py-5 gap-5 h-full">
       <div className="px-5">
         <DamulSearchBox
           placeholder="친구 이름을 검색해 보세요."
-          onButtonClick={(value) => setSearchTerm(value)}
+          onButtonClick={(value) => setSetSearchKeyword(value)}
         />
       </div>
 
