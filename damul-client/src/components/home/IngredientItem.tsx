@@ -61,7 +61,10 @@ const IngredientItem = ({
             onChange={(e) => onChange(e)}
           >
             {Object.values(CATEGORY_INFO).map((category) => (
-              <option key={category.number} value={category.number}>
+              <option
+                key={`${category.number} ${Math.random()}`}
+                value={category.number}
+              >
                 {category.name}
               </option>
             ))}

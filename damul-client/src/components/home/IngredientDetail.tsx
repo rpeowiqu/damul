@@ -6,6 +6,7 @@ import { CATEGORY_INFO } from "@/constants/category";
 import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
 import { useEffect, useState } from "react";
 import useUserStore from "@/stores/user";
+import DamulButton from "../common/DamulButton";
 
 interface IngredientDetailProps {
   selectedIngredient: Ingredient;
@@ -20,26 +21,6 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
     <p className="text-positive-300">{label}</p>
     <p>{value}</p>
   </div>
-);
-
-const ActionButton = ({
-  icon: Icon,
-  text,
-  className = "",
-  onClick,
-}: {
-  icon: React.ElementType;
-  text: string;
-  className?: string;
-  onClick?: () => void;
-}) => (
-  <button
-    className={`flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-positive-300 px-7 ${className}`}
-    onClick={onClick}
-  >
-    <Icon />
-    <p className="text-xs pc:text-sm text-white">{text}</p>
-  </button>
 );
 
 const getExpirationDate = (
@@ -156,18 +137,22 @@ const IngredientDetail = ({
       </div>
 
       <div className="flex justify-between w-full gap-2">
-        <ActionButton
-          icon={DeleteIcon}
-          text="제거"
+        <DamulButton
+          variant="negative"
           className="w-full"
           onClick={handleDeleteClick}
-        />
-        <ActionButton
+        >
+          <DeleteIcon />
+          <p className="text-xs pc:text-sm text-white">제거</p>
+        </DamulButton>
+        <DamulButton
+          variant="positive"
           onClick={handleSaveClick}
-          icon={SaveIcon}
-          text="저장"
           className="w-full"
-        />
+        >
+          <SaveIcon />
+          <p className="text-xs pc:text-sm text-white">저장</p>
+        </DamulButton>
       </div>
     </div>
   );
