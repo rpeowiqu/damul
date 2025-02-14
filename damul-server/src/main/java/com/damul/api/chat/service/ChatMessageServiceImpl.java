@@ -49,6 +49,11 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND, "존재하지 않는 채팅방입니다."));
         int currentMemberCount = chatRoomMemberRepository.countMembersByRoomId(roomId);;
+
+        // ✨ 내가 속한 채팅방인지 검증
+        ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_ROOM_MEMBER, "해당 채팅방의 멤버가 아닙니다."));
+
         // ✨ 멤버십 확인 및 신규 멤버 처리 로직 추가
         if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
             if (chatRoom.getStatus() == ChatRoom.Status.INACTIVE) {
