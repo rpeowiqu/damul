@@ -1,17 +1,11 @@
+import { Link } from "react-router-dom";
 import Image from "../common/Image";
 import ChatAlarm from "../footer/ChatAlram";
-
-interface ChattingListItemProps {
-  title: string;
-  thumbnailUrl: string;
-  memberNum: number;
-  lastMessage: string;
-  lastMessageTime: string;
-  unReadNum: number;
-  keyword?: string;
-}
+import { formatDate } from "@/utils/date";
+import { ChattingListItemProps } from "@/types/chatting";
 
 const ChattingListItem = ({
+  id,
   title,
   thumbnailUrl,
   memberNum,
@@ -36,24 +30,32 @@ const ChattingListItem = ({
       ),
     );
   };
-
   return (
-    <div className="flex gap-3 border-t-1 p-3 pc:p-4 cursor-pointer hover:bg-neutral-100">
-      <Image src={thumbnailUrl} className="w-10 h-10 rounded-full" />
-      <div className="flex w-full justify-between">
-        <div className="flex flex-col text-start justify-between">
-          <div className="flex text-sm gap-1">
-            <p className="line-clamp-1">{highlightTitle(title)}</p>
-            <p>({memberNum})</p>
+    <>
+      <Link
+        to={`/chatting/${id}`}
+        className="flex gap-3 border-t-1 p-3 pc:p-4 cursor-pointer hover:bg-neutral-100"
+      >
+        <Image src={thumbnailUrl} className="w-10 h-10 rounded-full" />
+        <div className="flex w-full justify-between gap-3">
+          <div className="flex flex-1 flex-col text-start justify-between">
+            <div className="flex text-sm gap-1">
+              <p className="line-clamp-1">{highlightTitle(title)}</p>
+              <p>({memberNum})</p>
+            </div>
+            <p className="text-xs text-neutral-600 line-clamp-1">
+              {lastMessage}
+            </p>
           </div>
-          <p className="text-xs text-neutral-600 line-clamp-1">{lastMessage}</p>
+          <div className="flex flex-col justify-between items-end min-w-20">
+            <p className="text-xxs text-neutral-500">
+              {formatDate(lastMessageTime)}
+            </p>
+            {unReadNum > 0 && <ChatAlarm unReadNum={unReadNum} />}
+          </div>
         </div>
-        <div className="flex flex-col justify-between items-end min-w-16">
-          <p className="text-xs text-neutral-500">{lastMessageTime}</p>
-          {unReadNum > 0 && <ChatAlarm chatAlarmNum={unReadNum} />}
-        </div>
-      </div>
-    </div>
+      </Link>
+    </>
   );
 };
 

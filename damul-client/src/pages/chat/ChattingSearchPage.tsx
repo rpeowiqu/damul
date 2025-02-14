@@ -25,7 +25,7 @@ const ChattingSearchPage = () => {
             placeholder="채팅방 검색"
             onButtonClick={(content) => {
               handleAddSearch(content);
-              navigate(`${content}`);
+              navigate(`/chatting/search/result?keyword=${content}`);
             }}
             inputValue={inputValue}
             setInputValue={setInputValue}
@@ -37,7 +37,7 @@ const ChattingSearchPage = () => {
           onRemoveSearchAll={handleRemoveSearchAll}
           onSearch={(content) => {
             handleAddSearch(content);
-            navigate(`${content}`);
+            navigate(`/chatting/search/result?keyword=${content}`);
           }}
         />
       </div>

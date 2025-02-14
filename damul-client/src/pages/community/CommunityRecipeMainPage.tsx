@@ -14,20 +14,7 @@ import WriteIcon from "@/components/svg/WriteIcon";
 import { getRecipes } from "@/service/recipe";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import RecipeFeedCard from "@/components/common/RecipeFeedCard";
-
-interface RecipeItem {
-  id: number;
-  title: string;
-  thumbnailUrl: string;
-  content: string;
-  createdAt: string;
-  authorId: number;
-  nickname: string;
-  bookmarked: boolean;
-  likeCnt: number;
-  liked: boolean;
-  viewCnt: number;
-}
+import { RecipeItem } from "@/types/community";
 
 const CommunityRecipeMainPage = () => {
   const navigate = useNavigate();
@@ -103,22 +90,7 @@ const CommunityRecipeMainPage = () => {
       <DamulInfiniteScrollList
         queryKey={["recipes", orderType]}
         fetchFn={fetchItems}
-        renderItems={(item: RecipeItem) => (
-          <RecipeFeedCard
-            key={item.id}
-            id={item.id}
-            title={item.title}
-            thumbnailUrl={item.thumbnailUrl}
-            content={item.content}
-            createdAt={item.createdAt}
-            authorId={item.authorId}
-            nickname={item.nickname}
-            bookmarked={item.bookmarked}
-            likeCnt={item.likeCnt}
-            liked={item.liked}
-            viewCnt={item.viewCnt}
-          />
-        )}
+        renderItems={(item: RecipeItem) => <RecipeFeedCard {...item} />}
         skeleton={
           <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
         }

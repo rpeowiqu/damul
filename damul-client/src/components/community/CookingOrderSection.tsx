@@ -1,10 +1,5 @@
 import Image from "../common/Image";
-
-interface CookingOrder {
-  id: number;
-  content: string;
-  imageUrl: string;
-}
+import { CookingOrder } from "@/types/community";
 
 interface CookingOrdersSectionProps {
   cookingOrders: CookingOrder[];

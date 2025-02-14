@@ -2,16 +2,17 @@ import MenuIcon from "@/components/svg/MenuIcon";
 import { useEffect, useRef, useState } from "react";
 import Image from "../common/Image";
 import ExitIcon from "../svg/ExitIcon";
+import { getChattingMembers } from "@/service/chatting";
+import { ChattingMember } from "@/types/chatting";
 
-const mockData = [
-  { id: 1, name: "나", imageUrl: "" },
-  { id: 2, name: "사용자1", imageUrl: "" },
-  { id: 3, name: "사용자2", imageUrl: "" },
-  { id: 4, name: "사용자3", imageUrl: "" },
-];
+interface ChattingMenuButtonProps {
+  roomId: number;
+}
 
-const ChattingMenuButton = () => {
+const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [memberData, setMemberData] = useState<ChattingMember[]>();
+  const [memberCnt, setMemberCnt] = useState(0);
 
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -28,6 +29,24 @@ const ChattingMenuButton = () => {
     };
   }, []);
 
+  const fetchItems = async () => {
+    try {
+      const response = await getChattingMembers({
+        roomId: roomId,
+      });
+      console.log(response?.data);
+      setMemberData(response?.data.content);
+      setMemberCnt(response?.data.totalMembers);
+      return response?.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
   return (
     <div className="">
       <div ref={menuRef} className="relative">
@@ -42,14 +61,17 @@ const ChattingMenuButton = () => {
         <div
           className={`absolute flex-col w-64 p-4 z-50 gap-3 border-1 bg-white rounded-xl shadow-md top-4 right-4 flex ${!isOpen && "hidden"}`}
         >
-          <div className="font-semibold">참여자(4)</div>
+          <div className="font-semibold">참여자({memberCnt})</div>
 
           {/* 참여자 목록 */}
-          {mockData.map((data) => (
+          {memberData?.map((data) => (
             <div key={data.id} className="flex justify-between items-center">
               <div className="flex items-center gap-3 text-sm font-normal cursor-pointer">
-                <Image src={data.imageUrl} className="w-10 h-10 rounded-full" />
-                <div>{data.name}</div>
+                <Image
+                  src={data.profileImageUrl}
+                  className="w-10 h-10 rounded-full"
+                />
+                <div>{data.nickname}</div>
               </div>
               <div className="text-sm font-normal text-negative-600 cursor-pointer">
                 강제 퇴장

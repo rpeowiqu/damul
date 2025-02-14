@@ -8,47 +8,7 @@ import CookingOrdersSection from "@/components/community/CookingOrderSection";
 import CommentsSection from "@/components/community/CommentsSection";
 import FixedCommentInfo from "@/components/community/FixedCommentInfo";
 import { getRecipeDetail } from "@/service/recipe";
-
-interface Ingredient {
-  id: number;
-  name: string;
-  amount: string;
-  unit: string;
-}
-
-interface CookingOrder {
-  id: number;
-  content: string;
-  imageUrl: string;
-}
-
-interface Comment {
-  id: number;
-  userId: number;
-  nickname: string;
-  profileImageUrl: string;
-  comment: string;
-  createdAt: string;
-  parentId?: number;
-}
-
-interface RecipeDetail {
-  recipeId: string;
-  title: string;
-  bookmarked: boolean;
-  liked: boolean;
-  createdAt: string;
-  authorId: number;
-  authorName: string;
-  profileImageUrl: string;
-  viewCnt: number;
-  likeCnt: number;
-  content: string;
-  contentImageUrl: string;
-  ingredients: Ingredient[];
-  cookingOrders: CookingOrder[];
-  comments: Comment[];
-}
+import { RecipeDetail, Comment } from "@/types/community";
 
 const CommunityRecipeDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
