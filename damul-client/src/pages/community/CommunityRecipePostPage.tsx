@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import DamulDrawer from "@/components/common/DamulDrawer";
 import PostCard from "@/components/community/PostCard";
 import SubmitButton from "@/components/community/SubmitButton";
@@ -8,10 +9,15 @@ import PostContent from "@/components/community/PostContent";
 import PostRecipeIngrediants from "@/components/community/PostRecipeIngrediants";
 import PostRecipeOrders from "@/components/community/PostRecipeOrders";
 import DamulButton from "@/components/common/DamulButton";
-import { IngredientProps, OrderProps } from "@/types/community";
+import { Ingredient, OrderProps } from "@/types/community";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
+import { postRecipe, putRecipe, getRecipeDetail } from "@/service/recipe";
 
 const CommunityRecipePostPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { recipeId } = useParams();
+
   const [title, setTitle] = useState<string>("");
   const [tempTitle, setTempTitle] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
@@ -19,34 +25,34 @@ const CommunityRecipePostPage = () => {
   const [preImage, setPreImage] = useState("");
   const [content, setContent] = useState<string>("");
   const [tempContent, setTempContent] = useState<string>("");
-  const [ingredients, setIngredients] = useState<IngredientProps[]>([
+  const [ingredients, setIngredients] = useState<Ingredient[]>([
     {
       id: 0,
       name: "",
-      quantity: "",
+      amount: "",
       unit: "",
     },
   ]);
-  const [tempIngredients, setTempIngredients] = useState<IngredientProps[]>([
+  const [tempIngredients, setTempIngredients] = useState<Ingredient[]>([
     {
       id: 0,
       name: "",
-      quantity: "",
+      amount: "",
       unit: "",
     },
   ]);
   const [orders, setOrders] = useState<OrderProps[]>([
     {
       id: 0,
-      description: "",
-      image: null,
+      content: "",
+      imageUrl: null,
     },
   ]);
   const [tempOrders, setTempOrders] = useState<OrderProps[]>([
     {
       id: 0,
-      description: "",
-      image: null,
+      content: "",
+      imageUrl: null,
     },
   ]);
   const [currentDrawerIndex, setCurrentDrawerIndex] = useState<number>(-1);
@@ -58,8 +64,84 @@ const CommunityRecipePostPage = () => {
     }
   }, [currentDrawerIndex]);
 
+  const submitRecipe = async () => {
+    const formData = new FormData();
+
+    const recipeData = {
+      title,
+      content,
+      ingredients: ingredients.map((ingredient) => ({
+        name: ingredient.name,
+        amount: ingredient.amount,
+        unit: ingredient.unit,
+      })),
+      cookingOrders: orders.map((order, index) => ({
+        id: index + 1,
+        content: order.content,
+        imageUrl:
+          order.imageUrl instanceof File ? order.imageUrl.name : order.imageUrl, // 기존 URL 유지
+      })),
+    };
+
+    const jsonString = JSON.stringify(recipeData);
+    const recipeBlob = new Blob([jsonString], { type: "application/json" });
+    formData.append("recipeRequest", recipeBlob);
+
+    if (image) {
+      formData.append("thumbnailImage", image);
+    }
+
+    const cookingImagesArray = orders
+      .filter((order) => order.imageUrl)
+      .map((order) => order.imageUrl as File);
+
+    cookingImagesArray.forEach((file) => {
+      formData.append("cookingImages", file);
+    });
+
+    try {
+      console.log("데이터", recipeData);
+      const response = await (location.pathname.endsWith("edit")
+        ? putRecipe({ formData, recipeId })
+        : postRecipe(formData));
+
+      console.log("결과", response?.data);
+      alert("레시피가 등록되었습니다");
+      navigate("/community/recipe");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchRecipeDetail = async () => {
+    try {
+      const response = await getRecipeDetail(recipeId);
+      console.log(response.data);
+      setTitle(response.data.title);
+      setTempTitle(response.data.title);
+      setImage(response.data.contentImageUrl);
+      setTempImage(response.data.contentImageUrl);
+      setPreImage(response.data.contentImageUrl);
+      setContent(response.data.content);
+      setTempContent(response.data.content);
+      setIngredients(response.data.ingredients);
+      setTempIngredients(response.data.ingredients);
+      setOrders(response.data.cookingOrders);
+      setTempOrders(response.data.cookingOrders);
+      console.log(response.data.cookingOrders);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (location.pathname.endsWith("edit")) {
+      fetchRecipeDetail();
+    }
+  }, []);
+
   return (
-    <main className="flex flex-col px-7 py-4 pc:p-6 gap-5">
+    <div className="flex flex-col justify-between px-7 py-4 pc:p-6 gap-5">
       <div
         className="p-4 space-x-5 font-semibold cursor-pointer"
         onClick={() => window.history.back()}
@@ -88,7 +170,11 @@ const CommunityRecipePostPage = () => {
               tempTitle={tempTitle}
             />
           }
-          footerContent={<SubmitButton disabled={tempTitle.length <= 0 || tempTitle.length > 50}/>}
+          footerContent={
+            <SubmitButton
+              disabled={tempTitle.length <= 0 || tempTitle.length > 50}
+            />
+          }
           onFooterClick={() => {
             setTitle(tempTitle);
           }}
@@ -115,7 +201,7 @@ const CommunityRecipePostPage = () => {
               setPreImage={setPreImage}
             />
           }
-          footerContent={<SubmitButton disabled={!tempImage}/>}
+          footerContent={<SubmitButton disabled={!tempImage} />}
           onFooterClick={() => {
             setImage(tempImage);
           }}
@@ -141,7 +227,11 @@ const CommunityRecipePostPage = () => {
               tempContent={tempContent}
             />
           }
-          footerContent={<SubmitButton disabled={tempContent.length <= 0 || tempContent.length > 500}/>}
+          footerContent={
+            <SubmitButton
+              disabled={tempContent.length <= 0 || tempContent.length > 500}
+            />
+          }
           onFooterClick={() => {
             setContent(tempContent);
           }}
@@ -184,7 +274,7 @@ const CommunityRecipePostPage = () => {
             <PostCard
               title="조리순서"
               description="조리순서를 입력해주세요"
-              isEmpty={!orders[0].description}
+              isEmpty={!orders[0].content}
             />
           }
           headerContent={
@@ -204,18 +294,22 @@ const CommunityRecipePostPage = () => {
         image &&
         content &&
         ingredients[0].name &&
-        orders[0].description && (
-          <div className="absolute bottom-16 left-0 w-full p-6">
+        orders[0].content && (
+          <div className="w-full">
             <DamulButton
               variant="positive-outline"
               className="w-full"
-              onClick={() => {}}
+              onClick={() => {
+                submitRecipe();
+              }}
             >
-              레시피 작성하기
+              {location.pathname.endsWith("edit")
+                ? "레시피 수정하기"
+                : "레시피 작성하기기"}
             </DamulButton>
           </div>
         )}
-    </main>
+    </div>
   );
 };
 

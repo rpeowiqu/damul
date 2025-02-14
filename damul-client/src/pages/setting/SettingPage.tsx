@@ -183,6 +183,7 @@ const SettingPage = () => {
     const response = await logout();
     if (response?.status === 200) {
       alert("로그아웃 되었습니다.");
+      sessionStorage.removeItem("user");
       nav("/login", { replace: true });
     }
   };

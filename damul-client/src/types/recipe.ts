@@ -9,8 +9,3 @@ export interface SuggestedRecipe {
   thumbnailUrl: string;
   recipeTags: RecipeTag[];
 }
-
-export interface UserRecipes {
-  userId: number;
-  suggestedRecipes: SuggestedRecipe[];
-}

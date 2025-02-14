@@ -2,19 +2,23 @@ import { Ingredient } from "@/types/Ingredient";
 import DeleteIcon from "../svg/DeleteIcon";
 import SaveIcon from "../svg/SaveIcon";
 import { Slider } from "../ui/slider";
-import { CATEGORY, CATEGORYNUMBER } from "@/constants/category";
+import { CATEGORY_INFO } from "@/constants/category";
+import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
+import { useEffect, useState } from "react";
+import useUserStore from "@/stores/user";
 
 interface IngredientDetailProps {
-  ingredient: Ingredient;
-  onQuantityChange: (value: number[]) => void;
+  selectedIngredient: Ingredient;
+  updateIngredient?: (ingredient: Ingredient) => void;
+  deleteIngredient?: (deletedIngredient: Ingredient) => void;
   setIsDeleteOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex flex-col font-bold">
+  <div className="flex flex-col text-sm font-bold w-full">
     <p className="text-positive-300">{label}</p>
-    <p className="text-sm">{value}</p>
+    <p>{value}</p>
   </div>
 );
 
@@ -30,7 +34,7 @@ const ActionButton = ({
   onClick?: () => void;
 }) => (
   <button
-    className={`flex items-center justify-center gap-2 py-2 rounded-lg bg-positive-300 px-7 ${className}`}
+    className={`flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-positive-300 px-7 ${className}`}
     onClick={onClick}
   >
     <Icon />
@@ -38,38 +42,93 @@ const ActionButton = ({
   </button>
 );
 
+const getExpirationDate = (
+  purchaseDate: string,
+  expirationDate: number,
+): string => {
+  const purchase = new Date(purchaseDate);
+  purchase.setDate(purchase.getDate() + expirationDate);
+
+  return purchase.toISOString().split("T")[0];
+};
+
 const IngredientDetail = ({
-  ingredient,
-  onQuantityChange,
+  selectedIngredient,
+  updateIngredient,
+  deleteIngredient,
   setIsDeleteOpen,
   setIsOpen,
 }: IngredientDetailProps) => {
-  const IconComponent = CATEGORY[CATEGORYNUMBER[ingredient.categoryId]];
+  const IconComponent =
+    Object.values(CATEGORY_INFO)[selectedIngredient.categoryId - 1].icon;
 
-  const handleDeleteClick = () => {
-    setIsDeleteOpen(true);
-    setIsOpen(false);
+  const [ingredient, setIngredient] = useState<Ingredient>(selectedIngredient);
+
+  const myWarningEnabled = useUserStore((state) => state.myWarningEnabled);
+
+  const handleQuantityChange = (value: number[]) => {
+    setIngredient((prev) => {
+      return {
+        ...prev,
+        ingredientQuantity: value[0],
+      };
+    });
   };
 
-  const handleSaveClick = () => {
-    setIsOpen(false);
+  const handleDeleteClick = async () => {
+    if (myWarningEnabled) {
+      setIsDeleteOpen(true);
+    } else {
+      try {
+        await deleteUserIndegredient(
+          ingredient.userIngredientId,
+          myWarningEnabled ? 1 : 0,
+        );
+        deleteIngredient?.(ingredient);
+      } catch (error) {
+        console.log("식자재 정보를 삭제 하지 못했습니다.");
+      }
+    }
+    setIsOpen?.(false);
   };
+
+  const handleSaveClick = async () => {
+    try {
+      await patchUserIndegredient(ingredient.userIngredientId, {
+        ingredientQuantity: ingredient.ingredientQuantity,
+      });
+      updateIngredient?.(ingredient);
+    } catch (error: any) {
+      console.error("식자재 정보를 수정하지 못했습니다.");
+    }
+    setIsOpen?.(false);
+  };
+
+  useEffect(() => {
+    setIngredient(selectedIngredient);
+  }, [selectedIngredient]);
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <p className="w-full pb-4 text-xl font-bold text-center border-b-2 text-positive-300 border-b-normal-50">
+    <div className="flex flex-col items-center w-full gap-4 p-5">
+      <p className="w-full pb-3 text-xl font-bold text-center border-b-2 text-positive-300 border-b-normal-50">
         식자재 상세보기
       </p>
 
-      <div className="flex items-center justify-center w-full p-6 gap-4">
-        <div className="flex items-center justify-center w-full border-2 p-7 rounded-full border-normal-50">
-          <IconComponent className="w-full h-full" />
+      <div className="flex items-center justify-center w-full gap-4">
+        <div className="flex items-center justify-center w-full border-2 p-6 rounded-full border-normal-50">
+          <IconComponent className="w-full h-full max-h-40" />
         </div>
 
-        <div className="flex flex-col  w-full gap-3">
-          <InfoRow label="식자재명" value={ingredient.ingredientName} />
-          <InfoRow label="구매일" value="2025-02-04" />
-          <InfoRow label="소비기한" value="2025-03-16" />
+        <div className="flex flex-col w-full gap-3">
+          <InfoRow label="식자재명" value={selectedIngredient.ingredientName} />
+          <InfoRow label="구매일" value={selectedIngredient.purchaseDate} />
+          <InfoRow
+            label="소비기한"
+            value={getExpirationDate(
+              selectedIngredient.purchaseDate,
+              selectedIngredient.expirationDate,
+            )}
+          />
         </div>
       </div>
 
@@ -80,10 +139,11 @@ const IngredientDetail = ({
         </div>
         <div className="flex justify-center">
           <Slider
-            className="w-full px-5"
-            onValueChange={onQuantityChange}
-            defaultValue={[ingredient.ingredientQuantity]}
+            className="w-full"
+            onValueChange={handleQuantityChange}
+            defaultValue={[selectedIngredient.ingredientQuantity]}
             max={100}
+            value={[ingredient.ingredientQuantity]}
             step={1}
           />
         </div>
@@ -98,15 +158,15 @@ const IngredientDetail = ({
       <div className="flex justify-between w-full gap-2">
         <ActionButton
           icon={DeleteIcon}
-          text="즉시 제거하기"
-          className="w-1/2"
+          text="제거"
+          className="w-full"
           onClick={handleDeleteClick}
         />
         <ActionButton
           onClick={handleSaveClick}
           icon={SaveIcon}
-          text="저장하기"
-          className="w-1/2"
+          text="저장"
+          className="w-full"
         />
       </div>
     </div>
