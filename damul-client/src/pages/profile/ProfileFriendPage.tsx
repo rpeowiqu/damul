@@ -47,7 +47,7 @@ const ProfileFriendPage = () => {
           </NavLink>
         </div>
         <Suspense fallback={<div>Loading...</div>}>
-          <Outlet context={{ searchTerm }} />
+          <Outlet context={{ searchKeyword }} />
         </Suspense>
       </div>
     </div>
