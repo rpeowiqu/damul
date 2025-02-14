@@ -1,7 +1,9 @@
 package com.damul.api.user.controller;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.common.user.CurrentUser;
 import com.damul.api.user.dto.request.CheckNicknameRequest;
 import com.damul.api.user.dto.request.FollowRequest;
 import com.damul.api.user.dto.request.SettingUpdate;
@@ -32,22 +34,22 @@ public class UserController {
     private final ObjectMapper objectMapper;
 
     // 설정 조회
-    @GetMapping("/{userId}/settings")
-    public ResponseEntity<?> getSetting(@PathVariable int userId) {
-        log.info("설정 조회 요청 - userId: {}", userId);
-        SettingResponse settingResponse = userService.getSetting(userId);
-        log.info("설정 조회 완료 - userId: {}", userId);
+    @GetMapping("/settings")
+    public ResponseEntity<?> getSetting(@CurrentUser UserInfo userInfo) {
+        log.info("설정 조회 요청");
+        SettingResponse settingResponse = userService.getSetting(userInfo.getId());
+        log.info("설정 조회 완료");
         return ResponseEntity.ok(settingResponse);
     }
 
     // 설정 수정
-    @PutMapping("/{userId}/settings")
-    public ResponseEntity updateSetting(@PathVariable("userId") int userId,
+    @PutMapping("/settings")
+    public ResponseEntity updateSetting(@CurrentUser UserInfo userInfo,
                                         @RequestPart("settingUpdate") SettingUpdate setting,
                                         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
                                         @RequestPart(value = "backgroundImage", required = false) MultipartFile backgroundImage)
             throws JsonProcessingException {
-        userService.updateUserSettings(userId, setting, profileImage, backgroundImage);
+        userService.updateUserSettings(userInfo.getId(), setting, profileImage, backgroundImage);
         return ResponseEntity.ok().build();
     }
 
@@ -63,13 +65,13 @@ public class UserController {
     }
 
     // 팔로워 목록 조회
-    @GetMapping("/{userId}/followers")
+    @GetMapping("/followers")
     public ResponseEntity<?> getFollowers(@RequestParam(value = "keyword", required = false) String keyword,
                                           @RequestParam int cursor,
                                           @RequestParam int size,
-                                          @PathVariable int userId) {
+                                          @CurrentUser UserInfo userInfo) {
         log.info("팔로워 목록 조회 요청");
-        ScrollResponse<UserList> userList = followService.getFollowers(keyword, cursor, size, userId);
+        ScrollResponse<UserList> userList = followService.getFollowers(keyword, cursor, size, userInfo.getId());
 
         if(userList.getData().isEmpty() || userList.getData().size() == 0) {
             log.info("팔로워 목록 조회 성공 - 데이터없음");
@@ -82,13 +84,13 @@ public class UserController {
 
     
     // 팔로잉 목록 조회
-    @GetMapping("/{userId}/followings")
+    @GetMapping("/followings")
     public ResponseEntity<?> getFollowings(@RequestParam(value = "keyword", required = false) String keyword,
                                            @RequestParam int cursor,
                                           @RequestParam int size,
-                                          @PathVariable int userId) {
+                                          @CurrentUser UserInfo userInfo) {
         log.info("팔로잉 목록 조회 요청");
-        ScrollResponse<UserList> userList = followService.getFollowings(keyword, cursor, size, userId);
+        ScrollResponse<UserList> userList = followService.getFollowings(keyword, cursor, size, userInfo.getId());
 
         if(userList.getData().isEmpty() || userList.getData().size() == 0) {
             log.info("팔로잉 목록 조회 성공 - 데이터없음");
@@ -113,10 +115,11 @@ public class UserController {
     }
 
     // 팔로워 삭제
-    @DeleteMapping("/{userId}/followers/{followId}")
-    public ResponseEntity<?> unfollow(@PathVariable int userId, @PathVariable int followId) {
-        log.info("팔로워 강제 삭제 요청 - userId: {}, followId: {}", userId, followId);
-        followService.deleteFollower(userId, followId);
+    @DeleteMapping("/followers/{followId}")
+    public ResponseEntity<?> unfollow(@CurrentUser UserInfo userInfo,
+                                      @PathVariable int followId) {
+        log.info("팔로워 강제 삭제 요청 - userId: {}, followId: {}", userInfo.getId(), followId);
+        followService.deleteFollower(userInfo.getId(), followId);
 
         log.info("팔로워 강제 삭제 성공");
         return ResponseEntity.ok().build();
