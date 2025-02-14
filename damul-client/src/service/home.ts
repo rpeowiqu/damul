@@ -28,3 +28,13 @@ export const deleteUserIndegredient = async (
 export const postUserIndegredient = async (data: RegisterIngredientData) => {
   return apiClient.post(`/home/ingredients/register`, data);
 };
+
+export const postReceiptForOCR = async (formData: FormData) => {
+  return apiClient.post("/ocr", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    baseURL: import.meta.env.VITE_API_OCR_URL,
+    withCredentials: true,
+  });
+};
