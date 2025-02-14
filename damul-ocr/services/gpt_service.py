@@ -64,8 +64,11 @@ client = OpenAI(
 
 def clean_json_string(json_string):
     """JSON 문자열에서 ```json과 ``` 제거"""
-    cleaned_string = re.sub(r"^```json\s*|\s*```$", "", json_string, flags=re.MULTILINE)
-    return cleaned_string.strip()
+    while json_string[0] != '{':
+        json_string = json_string[1:]
+    while json_string[-1] != '}':
+        json_string = json_string[:-1]
+    return json_string
 
 async def gpt_service_execution(input_msg):
     response = client.chat.completions.create(
@@ -87,6 +90,6 @@ async def gpt_service_execution(input_msg):
     print(response.choices[0].message.content)
     res = response.choices[0].message.content
     res = clean_json_string(res)
-    res_json = json.loads(res)
     print(res)
+    res_json = json.loads(res)
     return res_json
