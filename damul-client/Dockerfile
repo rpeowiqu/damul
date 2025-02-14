@@ -2,6 +2,13 @@
 FROM node:22.12.0 AS build
 WORKDIR /app
 
+# 환경변수 선언
+ARG VITE_API_BASE_URL
+ARG VITE_WS_BASE_URL
+ARG VITE_GOOGLE_OAUTH2_LOGIN_URI
+ARG VITE_NAVER_OAUTH2_LOGIN_URI
+ARG VITE_KAKAO_OAUTH2_LOGIN_URI
+
 # 의존성 파일 복사 및 캐시 방지
 COPY package*.json ./
 RUN npm cache clean --force && rm -rf node_modules package-lock.json && npm install
