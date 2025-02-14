@@ -32,9 +32,9 @@ const Header = () => {
       <nav className="w-full h-full">
         <ul className="flex justify-between items-center w-full h-full px-5">
           <li className="flex items-center">
-            <button>
+            <Link to={"/alarm"}>
               <AlarmIcon className="w-6 stroke-normal-700" />
-            </button>
+            </Link>
           </li>
           <li className="flex items-center">
             <Link to={"/home"}>
