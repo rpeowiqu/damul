@@ -30,13 +30,13 @@ import {
   getUserSetting,
   modifyUserSetting,
 } from "@/service/user";
-import useUserStore from "@/stores/user";
 import { isValidNickname } from "@/utils/regex";
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
 import GoogleIcon from "@/components/svg/GoogleIcon";
 import KakaoIcon from "@/components/svg/KakaoIcon";
 import NaverIcon from "@/components/svg/NaverIcon";
+import useAuth from "@/hooks/useAuth";
 
 interface UserSetting {
   nickname: string;
@@ -49,7 +49,7 @@ interface UserSetting {
 }
 
 const SettingPage = () => {
-  const { myId, myNickname, setMyNickname, setWarningEnabled } = useUserStore();
+  const { data, isLoading, refetch } = useAuth();
   const [userSetting, setUserSetting] = useState<UserSetting>({
     nickname: "",
     email: "",
@@ -64,7 +64,7 @@ const SettingPage = () => {
   const [status, setStatus] = useState<
     "none" | "available" | "duplicate" | "validLength"
   >("none");
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isFetched, setIsFetched] = useState<boolean>(false);
   const nav = useNavigate();
 
   useEffect(() => {
@@ -77,7 +77,7 @@ const SettingPage = () => {
       } catch (error) {
         console.log(error);
       } finally {
-        setIsLoading(false);
+        setIsFetched(true);
       }
     };
 
@@ -101,8 +101,7 @@ const SettingPage = () => {
           backgroundFile,
         );
         if (response?.status === 200) {
-          setMyNickname(userSetting.nickname);
-          setWarningEnabled(userSetting.warningEnabled);
+          refetch();
           alert("회원정보가 변경 되었습니다.");
           return;
         }
@@ -145,7 +144,7 @@ const SettingPage = () => {
 
   const checkNickname = async () => {
     // 동일한 닉네임을 사용할 경우 사용 가능하다는 문구를 출력한다.
-    if (userSetting.nickname === myNickname) {
+    if (userSetting.nickname === data?.data.nickname) {
       return "available";
     }
 
@@ -198,6 +197,10 @@ const SettingPage = () => {
   };
 
   if (isLoading) {
+    return null;
+  }
+
+  if (!isFetched) {
     return null;
   }
 

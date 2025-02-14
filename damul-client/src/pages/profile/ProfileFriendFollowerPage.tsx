@@ -3,11 +3,11 @@ import { deleteFollower, getFollowers } from "@/service/user";
 import FriendItem, { FriendItemProps } from "@/components/profile/FriendItem";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import DamulButton from "@/components/common/DamulButton";
-import useUserStore from "@/stores/user";
 import queryClient from "@/utils/queryClient";
+import useAuth from "@/hooks/useAuth";
 
 const ProfileFriendFollowerPage = () => {
-  const myId = useUserStore((state) => state.myId);
+  const { data, isLoading } = useAuth();
   const { userId } = useParams();
   const { searchKeyword } = useOutletContext();
 
@@ -37,13 +37,17 @@ const ProfileFriendFollowerPage = () => {
     }
   };
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <DamulInfiniteScrollList
       queryKey={["follower"]}
       fetchFn={fetchFollowers}
       renderItems={(item: FriendItemProps) => (
         <FriendItem key={item.userId} {...item}>
-          {myId === parseInt(userId!) && (
+          {data?.data.id === parseInt(userId!) && (
             <>
               <DamulButton
                 variant="positive"

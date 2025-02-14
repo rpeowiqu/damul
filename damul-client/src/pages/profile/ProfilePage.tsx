@@ -3,15 +3,15 @@ import { Navigate, Outlet, useParams } from "react-router-dom";
 import DamulTab from "@/components/common/DamulTab";
 import ProfileBanner from "@/components/profile/ProfileBanner";
 import { ProfileHeader } from "@/types/profile";
-import useUserStore from "@/stores/user";
 import { getProfileHeader } from "@/service/mypage";
+import useAuth from "@/hooks/useAuth";
 
 const ProfilePage = () => {
   const { userId } = useParams();
-  const myId = useUserStore((state) => state.myId);
+  const { data, isLoading } = useAuth();
   const [header, setHeader] = useState<ProfileHeader | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const isOwn = userId && parseInt(userId) === myId;
+  const [isFetched, setIsFetched] = useState<boolean>(false);
+  const isOwn = userId && parseInt(userId) === data?.data.id;
   const tabItems = [
     {
       path: "/profile/:userId/info",
@@ -52,7 +52,7 @@ const ProfilePage = () => {
       } catch (error) {
         console.error(error);
       } finally {
-        setIsLoading(false);
+        setIsFetched(true);
       }
     };
 
@@ -60,6 +60,10 @@ const ProfilePage = () => {
   }, [userId]);
 
   if (isLoading) {
+    return;
+  }
+
+  if (!isFetched) {
     return null;
   }
 

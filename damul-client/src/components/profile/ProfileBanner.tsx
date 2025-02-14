@@ -3,7 +3,7 @@ import defaultProfileBg from "@/assets/profile-background.jpg";
 import DamulSearchBox from "../common/DamulSearchBox";
 import DamulInfiniteScrollList from "../common/DamulInfiniteScrollList";
 import { useCallback, useEffect, useState } from "react";
-import { getUser } from "@/service/user";
+import { getUsers } from "@/service/user";
 import { UserSearchResult } from "@/types/profile";
 import { useNavigate } from "react-router-dom";
 import { debounce } from "@/utils/optimize";
@@ -45,7 +45,7 @@ const ProfileBanner = ({
         return { data: [], meta: { nextCursor: null, hasNext: false } };
       }
 
-      const response = await getUser({
+      const response = await getUsers({
         keyword: debouncedSearchKeyword,
         cursor: pageParam,
         size: 4,

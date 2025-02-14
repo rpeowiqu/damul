@@ -60,7 +60,7 @@ export const deleteFollower = (followerId: number) => {
   return apiClient.delete(`/users/followers/${followerId}`);
 };
 
-export const getUser = (queryParams: {
+export const getUsers = (queryParams: {
   keyword: string;
   cursor: number;
   size: number;
