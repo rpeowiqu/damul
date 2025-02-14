@@ -89,7 +89,7 @@ public class SecurityConfig {
                     log.info("URL 접근 권한 설정");
                     auth
                             .requestMatchers("/multibranch-webhook-trigger/invoke*").permitAll()
-                            .requestMatchers("/", "/login", "/admin/login", "/api/v1/test/token").permitAll() // 누구나 접근 가능
+                            .requestMatchers("/login", "/admin/login", "/api/v1/test/token").permitAll() // 누구나 접근 가능
                             .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
                             .requestMatchers("/ws/pub/**", "/ws/sub/**").permitAll()  // WebSocket 엔드포인트 허용
                             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
@@ -100,7 +100,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> {
                     log.info("OAuth2 로그인 설정");
                     oauth2
-                            .loginPage("/login")
+                            .loginPage(frontUrl + "/login")
                             .authorizationEndpoint(authorization ->
                                     authorization.baseUri("/oauth2/authorization")  // OAuth2 인증 요청 엔드포인트 설정
                             )
