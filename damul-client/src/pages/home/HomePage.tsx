@@ -115,7 +115,7 @@ const HomePage = () => {
         </div>
         {expiringSoonItems.length !== 0 && (
           <IngredientStorageContainer
-            key={`expiringSoon ${expiringSoonItems.length}`}
+            key={`expiringSoon ${Math.random()}`}
             title="expiringSoon"
             items={expiringSoonItems}
             onEdit={isEditMode}
