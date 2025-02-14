@@ -1,5 +1,6 @@
 import DamulButton from "@/components/common/DamulButton";
 import IngredientItem from "@/components/home/IngredientItem";
+import OcrButton from "@/components/home/OcrButton";
 import PlusIcon from "@/components/svg/PlusIcon";
 import { initialIngredientRegisterData } from "@/constants/initialData";
 import { postUserIndegredient } from "@/service/home";
@@ -112,6 +113,7 @@ const HomeIngredientsRegisterPage = () => {
       navigate("/home");
     } catch (error: any) {
       console.log("식자재를 등록하지 못했습니다.");
+      alert("식자재를 등록하지 못했습니다.");
     }
   };
 
@@ -134,10 +136,8 @@ const HomeIngredientsRegisterPage = () => {
           <PlusIcon className="w-6 h-full text-normal-300 fill-normal-200 stroke-2 stroke-normal-200" />
           <p>초기화</p>
         </DamulButton>
-        <DamulButton className="flex bg-white items-center justify-end text-normal-300 text-sm gap-1">
-          <PlusIcon className="w-6 h-full text-normal-300 fill-normal-200 stroke-2 stroke-normal-200" />
-          <p>영수증으로 입력하기</p>
-        </DamulButton>
+
+        <OcrButton setIngredientRegisterData={setIngredientRegisterData} />
       </div>
 
       <div className="my-4 flex flex-col gap-3">
@@ -171,7 +171,7 @@ const HomeIngredientsRegisterPage = () => {
         <div className="flex flex-col gap-4 h-60 overflow-y-auto">
           {ingredientRegisterData.userIngredients.map((ingredient, index) => (
             <IngredientItem
-              key={`${ingredient.categoryId} ${index}`}
+              key={`${ingredient.categoryId} ${Math.random()}`}
               ingredient={ingredient}
               onChange={(e) => handleChange(e, index, e.target.name)}
               onDelete={() => removeIngredient(index)}
