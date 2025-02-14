@@ -1,5 +1,6 @@
 package com.damul.api.user.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
