@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode, SetStateAction, useEffect } from "react";
+import { ReactNode } from "react";
 import clsx from "clsx";
 
 import {
@@ -38,14 +38,21 @@ const DamulModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className={clsx(defaultContentStyle, contentStyle)}>
-        {title && (
+        {title ? (
           <DialogHeader className={clsx(defaultHeaderStyle, headerStyle)}>
             <DialogTitle className={clsx(defaultTitleStyle, titleStyle)}>
               {title}
             </DialogTitle>
           </DialogHeader>
+        ) : (
+          <DialogHeader>
+            <DialogTitle></DialogTitle>
+          </DialogHeader>
         )}
-        <DialogDescription>{children}</DialogDescription>
+
+        <DialogDescription>
+          <div>{children}</div>
+        </DialogDescription>
         {footerComponent && <DialogFooter>{footerComponent}</DialogFooter>}
       </DialogContent>
     </Dialog>

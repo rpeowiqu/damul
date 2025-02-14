@@ -15,8 +15,8 @@ const Layout = () => {
 
   const layoutConfig: RouteHandle = routeMatch?.handle || {};
 
-  const HeaderComponent = (layoutConfig.header ?? true) ? Header() : null;
-  const FooterComponent = (layoutConfig.footer ?? true) ? Footer() : null;
+  const HeaderComponent = (layoutConfig.header ?? true) ? <Header /> : null;
+  const FooterComponent = (layoutConfig.footer ?? true) ? <Footer /> : null;
 
   return (
     <QueryClientProvider client={queryClient}>
