@@ -6,32 +6,7 @@ import ContentSection from "@/components/community/ContentSection";
 import CommentsSection from "@/components/community/CommentsSection";
 import FixedCommentInfo from "@/components/community/FixedCommentInfo";
 import { getPostDetail } from "@/service/market";
-
-interface Comment {
-  id: number;
-  userId: number;
-  nickname: string;
-  profileImageUrl: string;
-  comment: string;
-  createdAt: string;
-  parentId?: number;
-}
-
-interface PostDetail {
-  id: string;
-  title: string;
-  authorId: number;
-  authorName: string;
-  profileImageUrl: string;
-  status: "ACTIVE" | "COMPLETED";
-  contentImageUrl: string;
-  content: string;
-  createdAt: string;
-  currentChatNum: number;
-  chatSize: number;
-  viewCnt: number;
-  comments: Comment[];
-}
+import { Comment, PostDetail } from "@/types/community";
 
 const CommunityMarketDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
@@ -59,7 +34,6 @@ const CommunityMarketDetailPage = () => {
   const fetchPostDetail = async () => {
     try {
       const response = await getPostDetail(postId);
-      console.log(response);
       setData(response?.data as PostDetail);
     } catch (error) {
       console.log(error);

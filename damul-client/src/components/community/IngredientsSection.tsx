@@ -1,9 +1,4 @@
-interface Ingredient {
-  id: number;
-  name: string;
-  amount: string;
-  unit: string;
-}
+import { Ingredient } from "@/types/community";
 
 interface IngredientsSectionProps {
   ingredients: Ingredient[];

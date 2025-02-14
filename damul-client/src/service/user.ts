@@ -37,7 +37,7 @@ export const checkNicknameDuplication = (nickname: string) => {
 
 export const getFollowers = (
   userId: number,
-  queryParams: { cursor: number; size: number },
+  queryParams: { keyword: string; cursor: number; size: number },
 ) => {
   const queryString = toQueryString(queryParams);
   return apiClient.get(`/users/${userId}/followers?${queryString}`);
@@ -45,7 +45,7 @@ export const getFollowers = (
 
 export const getFollowings = (
   userId: number,
-  queryParams: { cursor: number; size: number },
+  queryParams: { keyword: string; cursor: number; size: number },
 ) => {
   const queryString = toQueryString(queryParams);
   return apiClient.get(`/users/${userId}/followings?${queryString}`);

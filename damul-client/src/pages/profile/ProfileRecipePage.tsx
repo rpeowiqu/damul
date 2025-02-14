@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import RecipeFeedCard from "@/components/common/RecipeFeedCard";
 
 import {
   Select,
@@ -10,10 +11,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import FeedList from "@/components/common/FeedList";
 import { getMyRecipes } from "@/service/mypage";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
-import FeedCard from "@/components/common/FeedCard";
+
+interface RecipeItem {
+  id: number;
+  title: string;
+  thumbnailUrl: string;
+  content: string;
+  createdAt: string;
+  authorId: number;
+  nickname: string;
+  bookmarked: boolean;
+  likeCnt: number;
+  liked: boolean;
+  viewCnt: number;
+}
 
 const ProfileRecipePage = () => {
   const { user } = useOutletContext();
@@ -68,15 +81,13 @@ const ProfileRecipePage = () => {
           </SelectContent>
         </Select>
       </div>
-      <FeedList type="profile/recipe" />
-
-      {/* <DamulInfiniteScrollList
+      <DamulInfiniteScrollList
         queryKey={["myRecipes"]}
         fetchFn={fetchRecipes}
-        renderItems={(item: FeedCardProps) => (
-          <FeedCard key={item.id} {...item} />
+        renderItems={(item: RecipeItem) => (
+          <RecipeFeedCard key={item.id} {...item} />
         )}
-      /> */}
+      />
     </div>
   );
 };
