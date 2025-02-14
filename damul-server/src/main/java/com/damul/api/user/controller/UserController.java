@@ -104,9 +104,10 @@ public class UserController {
 
     // 팔로우/언팔로우
     @PostMapping("/follows")
-    public ResponseEntity<?> follow(@RequestBody FollowRequest followRequest) {
-        log.info("팔로우/언팔로우 요청 - userId: {}, targetId: {}", followRequest.getUserId(), followRequest.getTargetId());
-        FollowResponse followResponse = followService.toggleFollow(followRequest.getUserId(), followRequest.getTargetId());
+    public ResponseEntity<?> follow(@RequestBody FollowRequest followRequest,
+                                    @CurrentUser UserInfo userInfo) {
+        log.info("팔로우/언팔로우 요청 - userId: {}, targetId: {}", userInfo.getId(), followRequest.getTargetId());
+        FollowResponse followResponse = followService.toggleFollow(userInfo.getId(), followRequest.getTargetId());
         if(followResponse == null) {
             log.info("팔로우/언팔로우 실패");
             throw new IllegalArgumentException("팔로우/언팔로우에 실패하였습니다.");

@@ -43,9 +43,15 @@ public class FollowServiceImpl implements FollowService {
         }
 
         User currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
+                .orElseThrow(() -> {
+                    log.error("현재 유저의 ID가 존재하지 않습니다 - userId: {}", userId);
+                    throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+                });
         User targetUser = userRepository.findById(targetId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
+                .orElseThrow(() -> {
+                    log.error("팔로우 할 유저의 ID가 존재하지 않습니다 - targetId: {}", targetId);
+                    throw new BusinessException(ErrorCode.USER_FORBIDDEN);
+                });
 
         try {
             Optional<Follow> existingFollow = followRepository.findByFollowerAndFollowing(currentUser, targetUser);
