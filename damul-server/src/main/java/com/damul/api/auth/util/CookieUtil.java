@@ -19,15 +19,15 @@ public class CookieUtil {
 
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .path("/")
-                .domain("localhost")
+                .domain("i12a306.p.ssafy.io")
                 .sameSite("Lax")
                 .httpOnly(true)
-                .secure(false)        // 개발 환경에서는 false, 운영에서는 true
+                .secure(true)        // 개발 환경에서는 false, 운영에서는 true
                 .maxAge(maxAge)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        log.debug("쿠키 생성 완료 - 설정: path=/, domain=localhost, sameSite=Lax, httpOnly=true, secure=false");
+        log.debug("쿠키 생성 완료 - 설정: path=/, domain=i12a306.p.ssafy.io, sameSite=Lax, httpOnly=true, secure=true");
 
     }
 
@@ -40,10 +40,10 @@ public class CookieUtil {
 
         ResponseCookie cookie = ResponseCookie.from(name, "")
                 .path("/")
-                .domain("")
+                .domain("i12a306.p.ssafy.io")
                 .sameSite("Lax")
                 .httpOnly(true)
-                .secure(false)    // 개발 환경에서는 false, 운영에서는 true
+                .secure(true)    // 개발 환경에서는 false, 운영에서는 true
                 .maxAge(0)        // 즉시 만료
                 .build();
 
