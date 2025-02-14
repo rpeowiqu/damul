@@ -100,6 +100,10 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> {
                     log.info("OAuth2 로그인 설정");
                     oauth2
+                            .loginPage("/login")
+                            .authorizationEndpoint(authorization ->
+                                    authorization.baseUri("/oauth2/authorization")  // OAuth2 인증 요청 엔드포인트 설정
+                            )
                             .userInfoEndpoint(userInfo -> {
                                 log.info("OAuth2 사용자 정보 엔드포인트 설정");
                                 userInfo.userService(customOAuth2UserService); // OAuth2 인증 후 사용자 정보를 처리하는 서비스
