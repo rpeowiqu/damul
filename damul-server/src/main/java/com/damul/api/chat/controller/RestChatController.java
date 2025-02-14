@@ -5,7 +5,6 @@ import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.ChatRoomLimitUpdate;
 import com.damul.api.chat.dto.request.MultiChatRoomCreate;
 import com.damul.api.chat.dto.response.*;
-import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.service.ChatMessageService;
 import com.damul.api.chat.service.ChatRoomService;
 import com.damul.api.common.dto.response.CreateResponse;

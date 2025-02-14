@@ -64,6 +64,7 @@ public enum ErrorCode {
     CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방입니다."),
     CHATROOM_INACTIVE(HttpStatus.BAD_REQUEST, "비활성화된 채팅방입니다."),
     CHATROOM_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방 멤버가 아닙니다."),
+    NOT_ROOM_MEMBER(HttpStatus.FORBIDDEN, "채팅방 멤버가 아닙니다."),
     CHATROOM_ACCESS_DENIED(HttpStatus.FORBIDDEN, "채팅방 접근 권한이 없습니다."),
     CHATROOM_FULL(HttpStatus.BAD_REQUEST, "채팅방 인원이 가득 찼습니다."),
     CHATROOM_ALREADY_MEMBER(HttpStatus.CONFLICT, "이미 채팅방에 참여중입니다."),
