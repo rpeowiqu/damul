@@ -13,7 +13,7 @@ const ProfileFriendFollowerPage = () => {
 
   const fetchFollowers = async (pageParam: number) => {
     try {
-      const response = await getFollowers(parseInt(userId!), {
+      const response = await getFollowers({
         keyword: searchKeyword,
         cursor: pageParam,
         size: 10,
@@ -30,7 +30,7 @@ const ProfileFriendFollowerPage = () => {
 
   const handleDeleteFriend = async (userId: number) => {
     try {
-      await deleteFollower(myId, userId!);
+      await deleteFollower(userId);
       queryClient.invalidateQueries({ queryKey: ["follower"] });
     } catch (error) {
       console.error(error);

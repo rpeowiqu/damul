@@ -70,7 +70,7 @@ const SettingPage = () => {
   useEffect(() => {
     const fetchUserSetting = async () => {
       try {
-        const response = await getUserSetting(myId);
+        const response = await getUserSetting();
         if (response) {
           setUserSetting(response.data);
         }
@@ -91,7 +91,6 @@ const SettingPage = () => {
       const newStatus = await checkNickname();
       if (newStatus === "available") {
         const response = await modifyUserSetting(
-          myId,
           {
             nickname: userSetting.nickname,
             selfIntroduction: userSetting.selfIntroduction,

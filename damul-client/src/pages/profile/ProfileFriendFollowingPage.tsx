@@ -14,7 +14,7 @@ const ProfileFriendFollowingPage = () => {
 
   const fetchFollowings = async (pageParam: number) => {
     try {
-      const response = await getFollowings(parseInt(userId!), {
+      const response = await getFollowings({
         keyword: searchKeyword,
         cursor: pageParam,
         size: 10,
@@ -32,7 +32,6 @@ const ProfileFriendFollowingPage = () => {
   const handleFollowState = async (userId: number) => {
     try {
       await toggleFollow({
-        userId: myId,
         targetId: userId,
       });
 
