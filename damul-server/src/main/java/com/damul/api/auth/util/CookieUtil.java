@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -13,22 +14,37 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class CookieUtil {
+
+    @Value("${spring.config.profiles.active}")
+    private String activeProfile;
+
     public void addCookie(HttpServletResponse response, String name,  String value, long maxAge) {
         log.debug("쿠키 생성 시작 - 이름: {}, 만료시간: {}초", name, maxAge);
 
 
-        ResponseCookie cookie = ResponseCookie.from(name, value)
+        ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from(name, value)
                 .path("/")
-                .domain("i12a306.p.ssafy.io")
                 .sameSite("Lax")
                 .httpOnly(true)
-                .secure(true)        // 개발 환경에서는 false, 운영에서는 true
-                .maxAge(maxAge)
-                .build();
+                .maxAge(maxAge);
 
+
+        // 환경에 따른 설정 분기
+        if ("local".equals(activeProfile)) {
+            cookieBuilder
+                    .domain("localhost")
+                    .secure(false);
+            log.debug("로컬 환경 쿠키 설정 적용");
+        } else {
+            cookieBuilder
+                    .domain("i12a306.p.ssafy.io")
+                    .secure(true);
+            log.debug("운영 환경 쿠키 설정 적용");
+        }
+
+        ResponseCookie cookie = cookieBuilder.build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        log.debug("쿠키 생성 완료 - 설정: path=/, domain=i12a306.p.ssafy.io, sameSite=Lax, httpOnly=true, secure=true");
-
+        log.debug("쿠키 생성 완료 - 환경: {}, 설정: {}", activeProfile, cookie);
     }
 
     /**
@@ -38,17 +54,26 @@ public class CookieUtil {
     public void deleteCookie(HttpServletResponse response, String name) {
         log.debug("쿠키 삭제 시작 - 이름: {}", name);
 
-        ResponseCookie cookie = ResponseCookie.from(name, "")
+        ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from(name, "")
                 .path("/")
-                .domain("i12a306.p.ssafy.io")
                 .sameSite("Lax")
                 .httpOnly(true)
-                .secure(true)    // 개발 환경에서는 false, 운영에서는 true
-                .maxAge(0)        // 즉시 만료
-                .build();
+                .maxAge(0);        // 즉시 만료
 
+        // 환경에 따른 설정 분기
+        if ("local".equals(activeProfile)) {
+            cookieBuilder
+                    .domain("localhost")
+                    .secure(false);
+        } else {
+            cookieBuilder
+                    .domain("i12a306.p.ssafy.io")
+                    .secure(true);
+        }
+
+        ResponseCookie cookie = cookieBuilder.build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        log.debug("쿠키 삭제 완료 - 이름: {}", name);
+        log.debug("쿠키 삭제 완료 - 이름: {}, 환경: {}", name, activeProfile);
     }
 
     /**

@@ -116,7 +116,7 @@ public class UserReceiptServiceImpl implements UserReceiptService {
     }
 
     @Override
-    public ReceiptCalendarResponse getMonthlyReceipt(UserInfo userInfo, int year, int month) {
+    public ReceiptCalendarResponse getMonthlyReceipt(int userId, int year, int month) {
         log.info("월별 영수증 조회 서비스 시작");
 
         // 유효성 검증
@@ -125,26 +125,39 @@ public class UserReceiptServiceImpl implements UserReceiptService {
             throw new BusinessException(ErrorCode.INVALID_MONTH);
         }
 
-        int userId = userInfo.getId();
-
-        // 월별 총액 조회 (null일 경우 0으로 처리)
+        // 이번달 총액 조회 (null일 경우 0으로 처리)
         int monthlyTotal = Optional.ofNullable(
                         userReceiptRepository.calculateMonthlyTotal(userId, year, month))
                 .orElse(0);
 
+        // 이전달 년/월 계산
+        int previousMonth = month - 1;
+        int previousYear = year;
+        if(previousMonth == 0) {
+            previousMonth = 12;
+            previousYear = year - 1;
+        }
+
+        // 이전달 총액 조회
+        int previousMonthTotal = Optional.ofNullable(
+                userReceiptRepository.calculateMonthlyTotal(userId, previousYear, previousMonth))
+                .orElse(0);
+
+
         List<DailyReceiptInfo> dailyReceipts = userReceiptRepository.findDailyReceipts(userId, year, month);
 
 
-        log.info("월별 영수증 조회 완료 - 총액: {}, 일수: {}", monthlyTotal, dailyReceipts.size());
+        log.info("월별 영수증 조회 완료 - 총액: {}, 전월: {}, 일수: {}", monthlyTotal, previousMonthTotal, dailyReceipts.size());
 
         return ReceiptCalendarResponse.builder()
                 .monthlyTotalAmount(monthlyTotal)
+                .comparedPreviousMonth(monthlyTotal - previousMonthTotal)
                 .dailyReceiptInfoList(dailyReceipts)
                 .build();
     }
 
     @Override
-    public ReceiptDetailResponse getReceiptDetail(UserInfo userInfo, int receiptId) {
+    public ReceiptDetailResponse getReceiptDetail(int userId, int receiptId) {
         log.info("영수증 상세보기 시작");
 
         log.info("영수증 상세 내용 조회 시작");

@@ -1,8 +1,9 @@
 package com.damul.api.config;
 
-import com.damul.api.auth.jwt.JwtTokenProvider;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class JwtConfig {

@@ -9,8 +9,8 @@ public interface UserReceiptService {
 
     void registerIngredients(int userId, UserIngredientPost request);
 
-    ReceiptCalendarResponse getMonthlyReceipt(UserInfo userInfo, int year, int month);
+    ReceiptCalendarResponse getMonthlyReceipt(int userId, int year, int month);
 
-    ReceiptDetailResponse getReceiptDetail(UserInfo userInfo, int receiptId);
+    ReceiptDetailResponse getReceiptDetail(int userId, int receiptId);
 
 }

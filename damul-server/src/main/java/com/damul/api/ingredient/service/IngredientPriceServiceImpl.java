@@ -3,10 +3,9 @@ package com.damul.api.ingredient.service;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.ingredient.dto.response.IngredientPriceResponse;
-import com.damul.api.ingredient.dto.response.IngredientsCategoryList;
 import com.damul.api.ingredient.dto.response.IngredientsCategoryResponse;
-import com.damul.api.receipt.entity.FoodCategories;
-import com.damul.api.receipt.repository.FoodCategoriesRepository;
+import com.damul.api.mypage.entity.FoodCategory;
+import com.damul.api.mypage.repository.FoodCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class IngredientPriceServiceImpl implements IngredientPriceService {
     private final KamisApiService kamisApiService;
-    private final FoodCategoriesRepository foodCategoriesRepository;
+    private final FoodCategoryRepository foodCategoriesRepository;
 
     @Override
     public IngredientPriceResponse getIngredientPrice(String period, String productNo) {
@@ -57,7 +56,7 @@ public class IngredientPriceServiceImpl implements IngredientPriceService {
     @Override
     public IngredientsCategoryResponse getIngredientsCategory() {
         log.info("식자재 대분류 조회 시작");
-        List<FoodCategories> foodCategories = foodCategoriesRepository.findAll();
+        List<FoodCategory> foodCategories = foodCategoriesRepository.findAll();
         log.info("식자재 대분류 조회 완료");
         return IngredientsCategoryResponse.builder()
                 .categories(foodCategories)
