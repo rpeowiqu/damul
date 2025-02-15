@@ -14,7 +14,7 @@ const ProfileFriendFollowingPage = () => {
 
   const fetchFollowings = async (pageParam: number) => {
     try {
-      const response = await getFollowings({
+      const response = await getFollowings(parseInt(userId!), {
         keyword: searchKeyword,
         cursor: pageParam,
         size: 10,
@@ -55,7 +55,7 @@ const ProfileFriendFollowingPage = () => {
 
   return (
     <DamulInfiniteScrollList
-      queryKey={["following"]}
+      queryKey={["following", userId, searchKeyword]}
       fetchFn={fetchFollowings}
       renderItems={(item: FriendItemProps) => (
         <FriendItem key={item.userId} {...item}>

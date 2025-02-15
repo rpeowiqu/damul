@@ -8,6 +8,7 @@ interface DamulInfiniteScrollListProps<T> {
     data: T[];
     meta: { nextCursor: number; hasNext: boolean };
   }>;
+  staleTime?: number;
   initPage?: number;
   renderItems: (item: T, index: number) => ReactNode;
   skeleton?: ReactNode;
@@ -17,6 +18,7 @@ interface DamulInfiniteScrollListProps<T> {
 const DamulInfiniteScrollList = <T,>({
   queryKey,
   fetchFn,
+  staleTime = 0,
   initPage = 0,
   renderItems,
   skeleton,
@@ -31,6 +33,7 @@ const DamulInfiniteScrollList = <T,>({
     useInfiniteQuery({
       queryKey,
       queryFn: ({ pageParam = 0 }) => fetchFn(pageParam),
+      staleTime,
       initialPageParam: initPage,
       getNextPageParam: (lastPage) =>
         lastPage.meta.hasNext ? lastPage.meta.nextCursor : undefined,

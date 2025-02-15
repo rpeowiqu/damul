@@ -69,7 +69,7 @@ const ProfileBanner = ({
           setInputValue={setSearchKeyword}
           className="rounded-none focus:border-positive-400"
           onFocus={() => setIsOpen(true)}
-          onBlur={() => setTimeout(() => setIsOpen(false), 100)}
+          onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         />
         {isOpen && (
           <DamulInfiniteScrollList
@@ -88,7 +88,7 @@ const ProfileBanner = ({
                 <p className="text-sm">{item.nickname}</p>
               </div>
             )}
-            className="flex flex-col gap-1 absolute top-full bg-white w-full h-36 max-h-32 overflow-y-auto shadow-md"
+            className="flex flex-col gap-1 absolute top-full bg-white w-full h-fit max-h-32 overflow-y-auto shadow-md"
           />
         )}
       </div>

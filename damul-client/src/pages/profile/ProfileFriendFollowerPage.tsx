@@ -13,7 +13,7 @@ const ProfileFriendFollowerPage = () => {
 
   const fetchFollowers = async (pageParam: number) => {
     try {
-      const response = await getFollowers({
+      const response = await getFollowers(parseInt(userId!), {
         keyword: searchKeyword,
         cursor: pageParam,
         size: 10,
@@ -31,7 +31,7 @@ const ProfileFriendFollowerPage = () => {
   const handleDeleteFriend = async (userId: number) => {
     try {
       await deleteFollower(userId);
-      queryClient.invalidateQueries({ queryKey: ["follower"] });
+      queryClient.invalidateQueries({ queryKey: ["follower", searchKeyword] });
     } catch (error) {
       console.error(error);
     }
@@ -43,7 +43,7 @@ const ProfileFriendFollowerPage = () => {
 
   return (
     <DamulInfiniteScrollList
-      queryKey={["follower"]}
+      queryKey={["follower", userId, searchKeyword]}
       fetchFn={fetchFollowers}
       renderItems={(item: FriendItemProps) => (
         <FriendItem key={item.userId} {...item}>
