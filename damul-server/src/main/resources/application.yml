@@ -123,16 +123,9 @@ jwt:
 
 logging:
   level:
-    root: INFO                     # 기본 로그 레벨
-    org.hibernate.SQL: DEBUG       # 실행되는 쿼리문 확인
-    org.hibernate.orm.jdbc.bind: TRACE  # 쿼리 파라미터 값 확인 (최신 하이버네이트 6.x 버전)
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.security: INFO   # 시큐리티는 필요할 때만 DEBUG로
-    com.damul.api: DEBUG          # 우리 애플리케이션 로그
-    org.springframework.data.repository.config: WARN  # 또는 ERROR
-    org.springframework.boot.context.config: DEBUG    # 환경변수 로딩 확인
-    org.springframework.security.oauth2.jwt: DEBUG    # JWT 관련 로그
-
+    root: INFO
+    com.damul.api: INFO
+    org.springframework.data.repository.config: WARN
 
 redirect:
   frontUrl: ${FRONT_URL}

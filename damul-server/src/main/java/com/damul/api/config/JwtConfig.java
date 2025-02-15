@@ -21,11 +21,6 @@ public class JwtConfig {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @PostConstruct
-    public void init() {
-        log.info("JWT Secret loaded: {}", jwtSecret != null ? "secret exists" : "secret is null");
-    }
-
     @Bean
     public SecretKey jwtSecretKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
