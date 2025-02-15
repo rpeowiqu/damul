@@ -147,11 +147,11 @@ public class UserReceiptServiceImpl implements UserReceiptService {
         List<DailyReceiptInfo> dailyReceipts = userReceiptRepository.findDailyReceipts(userId, year, month);
 
 
-        log.info("월별 영수증 조회 완료 - 총액: {}, 일수: {}", monthlyTotal, dailyReceipts.size());
+        log.info("월별 영수증 조회 완료 - 총액: {}, 전월: {}, 일수: {}", monthlyTotal, previousMonthTotal, dailyReceipts.size());
 
         return ReceiptCalendarResponse.builder()
                 .monthlyTotalAmount(monthlyTotal)
-                .previousMonthTotalAmount(previousMonthTotal)
+                .comparedPreviousMonth(monthlyTotal - previousMonthTotal)
                 .dailyReceiptInfoList(dailyReceipts)
                 .build();
     }

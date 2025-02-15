@@ -34,7 +34,7 @@ public class ReceiptController {
 
     // 나의 영수증 보기(상세조회)
     @GetMapping("{receiptId}")
-    public ResponseEntity<?> getReceiptById(UserInfo userInfo,
+    public ResponseEntity<?> getReceiptById(@CurrentUser UserInfo userInfo,
                                             @PathVariable("receiptId") int receiptId) {
         log.info("영수증 상세 조회 요청 - receiptId: {}", receiptId);
         ReceiptDetailResponse receiptDetailResponse = userReceiptService.getReceiptDetail(userInfo.getId(), receiptId);
