@@ -4,7 +4,7 @@ import ReportButton from "../common/ReportButton";
 import { formatDate } from "@/utils/date";
 import { deleteRecipeComment } from "@/service/recipe";
 import { deletePostComment } from "@/service/market";
-import useUserStore from "@/stores/user";
+import useAuth from "@/hooks/useAuth";
 
 interface ReplyItemProps {
   id: string;
@@ -22,8 +22,7 @@ const ReplyItem = ({
   fetchDetailData,
   type,
 }: ReplyItemProps) => {
-  const myId = useUserStore((state) => state.myId);
-
+  const { data, isLoading } = useAuth();
   const deleteComment = async (commentId: number) => {
     const isConfirmed = window.confirm("정말로 댓글을 삭제하시겠습니까?");
 
@@ -43,6 +42,10 @@ const ReplyItem = ({
       console.error(error);
     }
   };
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <div className="ml-6 mt-2 bg-neutral-100 p-2 rounded-md">
@@ -66,7 +69,7 @@ const ReplyItem = ({
         >
           <p className="text-xs">답글</p>
         </div>
-        {reply.userId === myId && (
+        {data?.data.id === reply.userId && (
           <div
             className="flex items-center gap-1"
             onClick={() => deleteComment(reply.id)}

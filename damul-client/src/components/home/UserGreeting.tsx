@@ -1,12 +1,17 @@
-import useUserStore from "@/stores/user";
+import useAuth from "@/hooks/useAuth";
 
 const UserGreeting = () => {
-  const { myNickname } = useUserStore();
+  const { data, isLoading } = useAuth();
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
-    <div className="flex items-center p-5">
-      <div className="mr-2 text-xl font-bold">{myNickname}님</div> 반갑습니다.
-    </div>
+    <h1 className="p-5">
+      <span className="text-lg font-bold">{data?.data.nickname}</span>님
+      반갑습니다.
+    </h1>
   );
 };
 

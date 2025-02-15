@@ -10,7 +10,7 @@ import { postRecipeLike } from "@/service/recipe";
 import { useState, useEffect } from "react";
 import { deleteRecipe } from "@/service/recipe";
 import { deletePost } from "@/service/market";
-import useUserStore from "@/stores/user";
+import useAuth from "@/hooks/useAuth";
 
 interface AuthorInfoProps {
   profileImageUrl: string;
@@ -33,8 +33,7 @@ const AuthorInfo = ({
   type,
   id,
 }: AuthorInfoProps) => {
-  const myId = useUserStore((state) => state.myId);
-
+  const { data, isLoading } = useAuth();
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(liked);
   const [likesCount, setLikesCount] = useState(likeCnt);
@@ -77,6 +76,10 @@ const AuthorInfo = ({
     }
   };
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col h-auto p-2">
       <div className="flex justify-between items-center">
@@ -117,7 +120,7 @@ const AuthorInfo = ({
             <p className="text-xs pc:text-sm">신고하기</p>
           </ReportButton>
         </div>
-        {authorId === myId && (
+        {data?.data.id === authorId && (
           <>
             <div
               className="flex items-center gap-0.5 cursor-pointer mr-1"

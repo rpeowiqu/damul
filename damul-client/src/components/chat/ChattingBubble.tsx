@@ -1,14 +1,18 @@
 import Image from "../common/Image";
 import { ChatMessage } from "@/types/chatting";
-import useUserStore from "../../stores/user";
+import useAuth from "@/hooks/useAuth";
 
 interface ChattingBubbleProps {
   msg: ChatMessage;
 }
 
 const ChattingBubble = ({ msg }: ChattingBubbleProps) => {
-  const myId = useUserStore((state) => state.myId);
-  const isMyMessage = msg.senderId === myId;
+  const { data, isLoading } = useAuth();
+  const isMyMessage = data?.data.id === msg.senderId;
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <div

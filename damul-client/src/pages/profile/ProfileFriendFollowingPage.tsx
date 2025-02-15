@@ -3,18 +3,18 @@ import { getFollowings, toggleFollow } from "@/service/user";
 import FriendItem, { FriendItemProps } from "@/components/profile/FriendItem";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import DamulButton from "@/components/common/DamulButton";
-import useUserStore from "@/stores/user";
 import { useState } from "react";
+import useAuth from "@/hooks/useAuth";
 
 const ProfileFriendFollowingPage = () => {
-  const myId = useUserStore((state) => state.myId);
+  const { data, isLoading } = useAuth();
   const { userId } = useParams();
   const { searchKeyword } = useOutletContext();
   const [checkSet, setCheckSet] = useState<Set<number>>(new Set());
 
   const fetchFollowings = async (pageParam: number) => {
     try {
-      const response = await getFollowings(parseInt(userId!), {
+      const response = await getFollowings({
         keyword: searchKeyword,
         cursor: pageParam,
         size: 10,
@@ -32,7 +32,6 @@ const ProfileFriendFollowingPage = () => {
   const handleFollowState = async (userId: number) => {
     try {
       await toggleFollow({
-        userId: myId,
         targetId: userId,
       });
 
@@ -50,13 +49,17 @@ const ProfileFriendFollowingPage = () => {
     }
   };
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <DamulInfiniteScrollList
       queryKey={["following"]}
       fetchFn={fetchFollowings}
       renderItems={(item: FriendItemProps) => (
         <FriendItem key={item.userId} {...item}>
-          {myId === parseInt(userId!) && (
+          {data?.data.id === parseInt(userId!) && (
             <>
               <DamulButton
                 variant="positive"
