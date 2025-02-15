@@ -16,6 +16,7 @@ import com.damul.api.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.lettuce.core.dynamic.annotation.Param;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -66,13 +67,13 @@ public class UserController {
     }
 
     // 팔로워 목록 조회
-    @GetMapping("/followers")
+    @GetMapping("/{userId}/followers")
     public ResponseEntity<?> getFollowers(@RequestParam(value = "keyword", required = false) String keyword,
                                           @RequestParam int cursor,
                                           @RequestParam int size,
-                                          @CurrentUser UserInfo userInfo) {
+                                          @PathVariable int userId) {
         log.info("팔로워 목록 조회 요청");
-        ScrollResponse<FollowList> followList = followService.getFollowers(keyword, cursor, size, userInfo.getId());
+        ScrollResponse<FollowList> followList = followService.getFollowers(keyword, cursor, size, userId);
 
         if(followList.getData().isEmpty() || followList.getData().size() == 0) {
             log.info("팔로워 목록 조회 성공 - 데이터없음");
@@ -85,13 +86,13 @@ public class UserController {
 
     
     // 팔로잉 목록 조회
-    @GetMapping("/followings")
+    @GetMapping("/{userId}/followings")
     public ResponseEntity<?> getFollowings(@RequestParam(value = "keyword", required = false) String keyword,
                                            @RequestParam int cursor,
                                           @RequestParam int size,
-                                          @CurrentUser UserInfo userInfo) {
+                                          @PathVariable int userId) {
         log.info("팔로잉 목록 조회 요청");
-        ScrollResponse<FollowList> followList = followService.getFollowings(keyword, cursor, size, userInfo.getId());
+        ScrollResponse<FollowList> followList = followService.getFollowings(keyword, cursor, size, userId);
 
         if(followList.getData().isEmpty() || followList.getData().size() == 0) {
             log.info("팔로잉 목록 조회 성공 - 데이터없음");
