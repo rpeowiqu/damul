@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import Skeleton from "react-loading-skeleton";
 import Image from "../common/Image";
 import ViewIcon from "../svg/ViewIcon";
@@ -8,8 +9,7 @@ import ReportIcon from "../svg/ReportIcon";
 import WriteIcon from "../svg/WriteIcon";
 import DeleteIcon from "../svg/DeleteIcon";
 import ReportButton from "../common/ReportButton";
-import { postRecipeLike } from "@/service/recipe";
-import { deleteRecipe } from "@/service/recipe";
+import { postRecipeLike, deleteRecipe } from "@/service/recipe";
 import { deletePost } from "@/service/market";
 import useAuth from "@/hooks/useAuth";
 
@@ -118,12 +118,17 @@ const AuthorInfo = ({
                 onClick={likeRecipe}
                 className="flex items-center gap-1 cursor-pointer"
               >
-                {isLiked ? (
-                  <LikesIcon className="w-5 h-5 pc:w-6 pc:h-6 fill-positive-300 stroke-neutral-500" />
-                ) : (
-                  <LikesIcon className="w-5 h-5 pc:w-6 pc:h-6 stroke-neutral-700" />
-                )}
-                <p className="text-xs pc:text-sm text-neutral-700">
+                <motion.div
+                  animate={{ scale: isLiked ? [1, 1.3, 1] : 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {isLiked ? (
+                    <LikesIcon className="w-5 h-5 pc:w-6 pc:h-6 fill-negative-200 stroke-negative-300" />
+                  ) : (
+                    <LikesIcon className="w-5 h-5 pc:w-6 pc:h-6 stroke-negative-300" />
+                  )}
+                </motion.div>
+                <p className="text-xs pc:text-sm font-semibold text-negative-300">
                   {likesCount?.toLocaleString()}
                 </p>
               </div>
@@ -132,13 +137,7 @@ const AuthorInfo = ({
         </div>
       </div>
       <div className="flex justify-end">
-        <div className="flex items-center gap-0.5 cursor-pointer">
-          <ReportButton className="flex items-center gap-0.5 cursor-pointer">
-            <ReportIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5" />
-            <p className="text-xs pc:text-sm">신고하기</p>
-          </ReportButton>
-        </div>
-        {data?.data.id === authorId && (
+        {data?.data.id === authorId ? (
           <>
             <div
               className="flex items-center gap-0.5 cursor-pointer pl-3"
@@ -157,6 +156,13 @@ const AuthorInfo = ({
               <p className="text-xs pc:text-sm">삭제하기</p>
             </div>
           </>
+        ) : (
+          <div className="flex items-center gap-0.5 cursor-pointer">
+            <ReportButton className="flex items-center gap-0.5 cursor-pointer">
+              <ReportIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5 fill-neutral-700" />
+              <p className="text-xs pc:text-sm">신고하기</p>
+            </ReportButton>
+          </div>
         )}
       </div>
     </div>

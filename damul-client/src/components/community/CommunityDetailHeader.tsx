@@ -50,6 +50,11 @@ const CommunityDetailHeader = ({
   };
 
   const changeStatus = async () => {
+    const isConfirmed = window.confirm("공구/나눔 모집을 완료하시겠습니까?");
+
+    if (!isConfirmed) {
+      return;
+    }
     try {
       const response = await putPostStatusChange({ postId: id });
       console.log(response?.data);
@@ -60,7 +65,7 @@ const CommunityDetailHeader = ({
   };
 
   const StatusMarker = () => {
-    return status === "COMPLETED" ? (
+    return status === "COMPLETED" || isStatusActive === "COMPLETED" ? (
       <div className="flex content-center bg-neutral-300 text-xs py-0.5 px-2 rounded-full">
         모집완료
       </div>
