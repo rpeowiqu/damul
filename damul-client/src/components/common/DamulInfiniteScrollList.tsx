@@ -6,7 +6,7 @@ interface DamulInfiniteScrollListProps<T> {
   queryKey: string[];
   fetchFn: (pageParam: number) => Promise<{
     data: T[];
-    meta: { nextCursor: number; hasNext: boolean };
+    meta: { nextCursor: number | null; hasNext: boolean };
   }>;
   initPage?: number;
   renderItems: (item: T, index: number) => ReactNode;
@@ -37,19 +37,23 @@ const DamulInfiniteScrollList = <T,>({
     });
 
   useEffect(() => {
+    console.log(isFetchingNextPage);
     if (inView && hasNextPage) {
       fetchNextPage();
     }
-  }, [inView]);
-
+  }, [inView, hasNextPage, isFetchingNextPage]);
   return (
     <div className={className}>
       {data?.pages.map((page, pageIndex) =>
-        page.data.map((item, index) =>
+        page.data?.map((item, index) =>
           renderItems(item, index + pageIndex * page.data.length),
         ),
       )}
-      {isFetchingNextPage ? skeleton : <div ref={ref}></div>}
+      {isFetchingNextPage ? (
+        skeleton
+      ) : (
+        <div ref={ref} className="bg-red-300"></div>
+      )}
     </div>
   );
 };

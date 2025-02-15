@@ -4,11 +4,24 @@ export interface Ingredient {
   ingredientName: string;
   ingredientQuantity: number;
   expirationDate: number;
+  storage: string;
+  purchaseDate: string;
 }
 
 export interface IngredientData {
   freezer: Ingredient[];
   fridge: Ingredient[];
   roomTemp: Ingredient[];
-  expiringSoon?: Ingredient[];
+}
+
+export interface RegisterIngredientData {
+  purchaseAt: string;
+  storeName: string;
+  userIngredients: {
+    ingredientName: string;
+    categoryId: number;
+    productPrice: number;
+    expirationDate: string;
+    ingredientStorage: "FREEZER" | "FRIDGE" | "ROOM_TEMPERATURE";
+  }[];
 }

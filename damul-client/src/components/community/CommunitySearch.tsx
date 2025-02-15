@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useManageRecentSearches from "@/hooks/useManageRecentSearches";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
@@ -16,11 +16,10 @@ import {
 
 interface CommunitySearch {
   placeholder: string;
-  title: string;
-  postTo: string;
+  type: string;
 }
 
-const CommunitySearch = ({ placeholder, title }: CommunitySearch) => {
+const CommunitySearch = ({ placeholder, type }: CommunitySearch) => {
   const {
     recentSearches,
     handleAddSearch,
@@ -30,25 +29,31 @@ const CommunitySearch = ({ placeholder, title }: CommunitySearch) => {
   const navigate = useNavigate();
 
   const [inputValue, setInputValue] = useState("");
-  const [sortType, setSortType] = useState("title");
+  const [searchType, setSearchType] = useState("content");
+
+  useEffect(() => {
+    console.log(searchType);
+  }, [searchType]);
 
   return (
     <>
       <div className="flex justify-between gap-2">
         <div className="flex w-full justify-between gap-1">
           <Select
-            value={sortType}
-            onValueChange={(value) => setSortType(value)}
+            value={searchType}
+            onValueChange={(value) => setSearchType(value)}
           >
             <SelectTrigger className="w-24 pc:w-28 text-xs pc:text-sm">
-              <SelectValue placeholder="정렬 방식" />
+              <SelectValue placeholder="검색 조건" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel className="text-xs pc:text-sm">검색 조건</SelectLabel>
+                <SelectLabel className="text-xs pc:text-sm">
+                  검색 조건
+                </SelectLabel>
                 <SelectItem
                   className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500 text-xs pc:text-sm"
-                  value="title"
+                  value="content"
                 >
                   제목+내용
                 </SelectItem>
@@ -66,7 +71,8 @@ const CommunitySearch = ({ placeholder, title }: CommunitySearch) => {
               placeholder={placeholder}
               onButtonClick={(content) => {
                 handleAddSearch(content);
-                navigate(`${content}`);
+                navigate(`/community/${type}/search/result?keyword=${encodeURIComponent(content)}&searchType=${searchType}`);
+
               }}
               inputValue={inputValue}
               setInputValue={setInputValue}
@@ -78,12 +84,13 @@ const CommunitySearch = ({ placeholder, title }: CommunitySearch) => {
         recentSearches={recentSearches}
         onRemoveSearch={handleRemoveSearch}
         onRemoveSearchAll={handleRemoveSearchAll}
-        onSearch={(content) => {
-          handleAddSearch(content);
-          navigate(`${content}`);
+        onSearch={(keyword) => {
+          handleAddSearch(keyword);
+          navigate(
+            `/community/${type}/search/result?keyword=${encodeURIComponent(keyword)}&searchType=${searchType}`,
+          );
         }}
       />
-      <h3 className="px-2 font-semibold text-md">{title}</h3>
     </>
   );
 };

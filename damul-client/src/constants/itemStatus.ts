@@ -7,3 +7,5 @@ export const ITEM_STATUS: Record<"expiringSoon", string> = {
 export const ITEM_STATUS_ICON = {
   expiringSoon: AlertTriangleIcon,
 } as const;
+
+export const EXPIRINGSOON_DAY = 7;

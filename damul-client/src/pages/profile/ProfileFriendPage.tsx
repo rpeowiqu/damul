@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { NavLink, Outlet, useParams } from "react-router-dom";
 
 import DamulSearchBox from "@/components/common/DamulSearchBox";
@@ -46,8 +46,9 @@ const ProfileFriendPage = () => {
             팔로잉
           </NavLink>
         </div>
-
-        <Outlet context={{ searchKeyword }} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Outlet context={{ searchTerm }} />
+        </Suspense>
       </div>
     </div>
   );
