@@ -11,6 +11,7 @@ import { Comment, PostDetail } from "@/types/community";
 const CommunityMarketDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [comment, setComment] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
   const { postId } = useParams();
 
   const initialPostDetail: PostDetail = {
@@ -33,10 +34,14 @@ const CommunityMarketDetailPage = () => {
 
   const fetchPostDetail = async () => {
     try {
+      setIsLoading(true);
       const response = await getPostDetail(postId);
       setData(response?.data as PostDetail);
+      console.log(response?.data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,6 +65,7 @@ const CommunityMarketDetailPage = () => {
         status={data.status}
         id={data.id}
         authorId={data.authorId}
+        isLoading={isLoading}
         type="market"
       />
       <AuthorInfo
@@ -68,11 +74,13 @@ const CommunityMarketDetailPage = () => {
         authorId={data.authorId}
         viewCnt={data.viewCnt}
         id={data.id}
+        isLoading={isLoading}
         type="market"
       />
       <ContentSection
         contentImageUrl={data.contentImageUrl}
         content={data.content}
+        isLoading={isLoading}
         type="market"
       />
       <CommentsSection

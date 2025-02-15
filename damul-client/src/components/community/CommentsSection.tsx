@@ -38,10 +38,12 @@ const CommentsSection = ({
   return (
     <div className="py-3 text-start">
       <div className="flex flex-row p-3 border-b border-neutral-300 justify-between">
-        <h3 className="text-lg font-semibold">댓글({comments.length})</h3>
+        <h3 className="text-md pc:text-lg font-semibold">
+          댓글({comments.length})
+        </h3>
         {type === "market" && <StatusMarker />}
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col">
         {topLevelComments.map((comment) => {
           const replies = comments.filter((c) => c.parentId === comment.id);
           return (

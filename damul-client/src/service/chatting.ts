@@ -1,6 +1,6 @@
 import apiClient from "./http";
 
-// 레시피 상세조회
+// 모든 채팅 목록 조회
 export const getChattingList = async ({
   cursorTime,
   cursor = 0,

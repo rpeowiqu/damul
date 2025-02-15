@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
 import BookMarkIcon from "../svg/BookMarkIcon";
 import { postRecipeBookMark } from "@/service/recipe";
 import { formatDate } from "@/utils/date";
@@ -13,6 +15,7 @@ interface RecipeHeaderProps {
   bookmarked?: boolean;
   id?: string;
   authorId?: number;
+  isLoading?: boolean;
 }
 const CommunityDetailHeader = ({
   title,
@@ -22,10 +25,11 @@ const CommunityDetailHeader = ({
   bookmarked,
   id,
   authorId,
+  isLoading,
 }: RecipeHeaderProps) => {
   const [isBookmarked, setIsBookmarked] = useState(bookmarked);
   const [isStatusActive, setIsStatusActive] = useState(status);
-  const { data, isLoading } = useAuth();
+  const { data, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
     setIsBookmarked(bookmarked);
@@ -55,8 +59,8 @@ const CommunityDetailHeader = ({
     }
   };
 
-  const StatusMarker = () =>
-    status === "COMPLETED" ? (
+  const StatusMarker = () => {
+    return status === "COMPLETED" ? (
       <div className="flex content-center bg-neutral-300 text-xs py-0.5 px-2 rounded-full">
         모집완료
       </div>
@@ -72,40 +76,62 @@ const CommunityDetailHeader = ({
         모집중
       </div>
     );
+  };
 
-  if (isLoading) {
-    return null;
+  if (isLoading || authLoading) {
+    return (
+      <div className="flex justify-between p-2 border-b border-neutral-300">
+        <div className="text-start">
+          <Skeleton width={100} height={14} />
+          <Skeleton width={200} height={20} />
+        </div>
+        <div className="flex flex-col justify-between items-end">
+          <Skeleton width={30} height={20} />
+          <Skeleton width={100} height={20} />
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="flex justify-between p-2 border-b border-neutral-300">
       <div className="text-start">
         {type === "recipe" ? (
-          <p className="text-sm text-neutral-600">레시피 게시판</p>
+          <Link to="/community/recipe">
+            <p className="text-sm text-neutral-600">레시피 게시판</p>
+          </Link>
         ) : (
-          <p className="text-sm text-neutral-600">공구/나눔 게시판</p>
+          <Link to="/community/market">
+            <p className="text-sm text-neutral-600">공구/나눔 게시판</p>
+          </Link>
         )}
         <h3 className="text-lg font-semibold">{title}</h3>
       </div>
       {type === "recipe" ? (
         <div
           onClick={bookmarkRecipe}
-          className="flex flex-col w-1/3 justify-between items-end py-0.5 cursor-pointer"
+          className="flex flex-col max-w-1/3 justify-between items-end py-0.5 cursor-pointer"
         >
           {isBookmarked ? (
             <BookMarkIcon className="w-5 h-5 fill-positive-300 stroke-positive-300" />
           ) : (
             <BookMarkIcon className="w-5 h-5 stroke-positive-300" />
           )}
-          {createdAt && (
+          {createdAt ? (
             <p className="text-xs text-neutral-500">{formatDate(createdAt)}</p>
+          ) : (
+            <Skeleton width={80} height={14} />
           )}
         </div>
       ) : (
         <div className="flex flex-col justify-between items-end">
           <StatusMarker />
           <p className="text-xs text-neutral-500">
-            {createdAt.split("T")[0] + " " + createdAt.split("T")[1]}
+            {createdAt ? (
+              createdAt.split("T")[0] + " " + createdAt.split("T")[1]
+            ) : (
+              <Skeleton width={100} height={14} />
+            )}
           </p>
         </div>
       )}

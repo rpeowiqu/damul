@@ -22,9 +22,9 @@ const Layout = () => {
         {HeaderComponent}
 
         <main className="flex flex-col flex-1 pt-14 pb-16">
-          <Suspense fallback={<div>Loading...</div>}>
-            <Outlet />
-          </Suspense>
+          {/* <Suspense fallback={<div>Loading...</div>}> */}
+          <Outlet />
+          {/* </Suspense> */}
         </main>
 
         {FooterComponent}
