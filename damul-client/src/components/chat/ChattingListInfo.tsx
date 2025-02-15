@@ -9,16 +9,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface ChattingListInfoProps {
-  chattingCnt: number;
-}
-
-const ChattingListInfo = ({ chattingCnt }: ChattingListInfoProps) => {
+const ChattingListInfo = () => {
   const [sortType, setSortType] = useState("all");
 
   return (
-    <div className="flex justify-between">
-      <div className="flex items-center text-sm">채팅 ({chattingCnt}개)</div>
+    <div className="flex justify-end">
       <div>
         <Select value={sortType} onValueChange={(value) => setSortType(value)}>
           <SelectTrigger className="w-40 h-8 text-xs pc:text-sm">
@@ -39,13 +34,13 @@ const ChattingListInfo = ({ chattingCnt }: ChattingListInfoProps) => {
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500 text-xs pc:text-sm"
                 value="normal"
               >
-                일반 채팅 보기
+                일반 채팅
               </SelectItem>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500 text-xs pc:text-sm"
                 value="market"
               >
-                공동구매/나눔 채팅 보기
+                공동구매/나눔 채팅
               </SelectItem>
             </SelectGroup>
           </SelectContent>

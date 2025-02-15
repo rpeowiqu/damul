@@ -19,6 +19,7 @@ export const consent = () => {
   return apiClient.get("/auth/consent");
 };
 
-export const getInfo = () => {
+export const getAuth = () => {
+  console.log("재요청 발생함");
   return apiClient.get("/auth/users");
 };

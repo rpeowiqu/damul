@@ -5,7 +5,7 @@ import { Comment } from "@/types/community";
 import { formatDate } from "@/utils/date";
 import { deleteRecipeComment } from "@/service/recipe";
 import { deletePostComment } from "@/service/market";
-import useUserStore from "@/stores/user";
+import useAuth from "@/hooks/useAuth";
 
 interface CommentItemProps {
   id: string;
@@ -23,7 +23,7 @@ const CommentItem = ({
   fetchDetailData,
   type,
 }: CommentItemProps) => {
-  const myId = useUserStore((state) => state.myId);
+  const { data, isLoading } = useAuth();
 
   const deleteComment = async (commentId: number) => {
     const isConfirmed = window.confirm("정말로 댓글을 삭제하시겠습니까?");
@@ -46,6 +46,10 @@ const CommentItem = ({
       console.error(error);
     }
   };
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <div className="py-3">
@@ -72,7 +76,7 @@ const CommentItem = ({
         >
           <p className="text-xs">답글</p>
         </div>
-        {comment.userId === myId && (
+        {data?.data.id === comment.userId && (
           <div
             className="flex items-center gap-1"
             onClick={() => {

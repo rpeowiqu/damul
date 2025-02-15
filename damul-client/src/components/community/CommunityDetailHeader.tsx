@@ -3,7 +3,7 @@ import BookMarkIcon from "../svg/BookMarkIcon";
 import { postRecipeBookMark } from "@/service/recipe";
 import { formatDate } from "@/utils/date";
 import { putPostStatusChange } from "@/service/market";
-import useUserStore from "@/stores/user";
+import useAuth from "@/hooks/useAuth";
 
 interface RecipeHeaderProps {
   title: string;
@@ -25,8 +25,7 @@ const CommunityDetailHeader = ({
 }: RecipeHeaderProps) => {
   const [isBookmarked, setIsBookmarked] = useState(bookmarked);
   const [isStatusActive, setIsStatusActive] = useState(status);
-
-  const myId = useUserStore((state) => state.myId);
+  const { data, isLoading } = useAuth();
 
   useEffect(() => {
     setIsBookmarked(bookmarked);
@@ -45,6 +44,7 @@ const CommunityDetailHeader = ({
       console.error(error);
     }
   };
+
   const changeStatus = async () => {
     try {
       const response = await putPostStatusChange({ postId: id });
@@ -60,7 +60,7 @@ const CommunityDetailHeader = ({
       <div className="flex content-center bg-neutral-300 text-xs py-0.5 px-2 rounded-full">
         모집완료
       </div>
-    ) : myId === authorId ? (
+    ) : data?.data.id === authorId ? (
       <div
         className="flex content-center bg-negative-200 text-xs py-0.5 px-2 rounded-full cursor-pointer"
         onClick={changeStatus}
@@ -72,6 +72,10 @@ const CommunityDetailHeader = ({
         모집중
       </div>
     );
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <div className="flex justify-between p-2 border-b border-neutral-300">

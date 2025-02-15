@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { Outlet, useMatches } from "react-router-dom";
-import Header from "./Header";
-import Footer from "./Footer";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "@/utils/queryClient";
+import Header from "./Header";
+import Footer from "./Footer";
 
 interface RouteHandle {
   header?: boolean;
@@ -12,11 +12,9 @@ interface RouteHandle {
 
 const Layout = () => {
   const routeMatch = useMatches().find((match) => match.handle);
-
   const layoutConfig: RouteHandle = routeMatch?.handle || {};
-
-  const HeaderComponent = (layoutConfig.header ?? true) ? Header() : null;
-  const FooterComponent = (layoutConfig.footer ?? true) ? Footer() : null;
+  const HeaderComponent = (layoutConfig.header ?? true) ? <Header /> : null;
+  const FooterComponent = (layoutConfig.footer ?? true) ? <Footer /> : null;
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -16,18 +16,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import WriteIcon from "@/components/svg/WriteIcon";
 import { getPosts } from "@/service/market";
-
-interface PostItem {
-  id: number;
-  title: string;
-  thumbnailUrl: string;
-  content: string;
-  createdAt: string;
-  authorId: number;
-  authorName: string;
-  status: string;
-  viewCnt: number;
-}
+import { PostItem } from "@/types/community";
 
 const CommunityMarketMainPage = () => {
   const [filterActive, setFlterActive] = useState(false);
@@ -126,20 +115,7 @@ const CommunityMarketMainPage = () => {
       <DamulInfiniteScrollList
         queryKey={["posts", orderType, statusType]}
         fetchFn={fetchItems}
-        renderItems={(item: PostItem) => (
-          <PostFeedCard
-            key={item.id}
-            id={item.id}
-            title={item.title}
-            thumbnailUrl={item.thumbnailUrl}
-            content={item.content}
-            createdAt={item.createdAt}
-            authorId={item.authorId}
-            authorName={item.authorName}
-            viewCnt={item.viewCnt}
-            status={item.status}
-          />
-        )}
+        renderItems={(item: PostItem) => <PostFeedCard {...item} />}
         skeleton={
           <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
         }
