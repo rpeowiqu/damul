@@ -29,6 +29,9 @@ public class UserBadge {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "rank")
+    private Double rank;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
