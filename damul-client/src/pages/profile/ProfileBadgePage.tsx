@@ -1,5 +1,6 @@
 import DamulHoverCard from "@/components/common/DamulHoverCard";
 import BadgeShowcase from "@/components/profile/BadgeShowcase";
+import { getBadges } from "@/service/profile";
 import { BadgeList } from "@/types/profile";
 import { AlertCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -10,31 +11,25 @@ const ProfileBadgePage = () => {
   const [badgeList, setBadgeList] = useState<BadgeList>({
     list: [],
   });
-  const [isLoading, setIsLoading] = useState<boolean>();
+  const [isFetched, setIsFetched] = useState<boolean>();
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         `/mocks/profile/user-profile-badge_${user.userId}.json`,
-  //       );
-  //       if (!response.ok) {
-  //         throw new Error("데이터를 불러오지 못했습니다.");
-  //       }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getBadges(parseInt(user.userId));
+        console.log(response);
+        // setBadgeList(response.data.list);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsFetched(true);
+      }
+    };
 
-  //       const data = await response.json();
-  //       setBadgeList(data);
-  //     } catch (error) {
-  //       console.error(error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
+    fetchData();
+  }, [user]);
 
-  //   fetchData();
-  // }, [user]);
-
-  if (isLoading) {
+  if (!isFetched) {
     return null;
   }
 

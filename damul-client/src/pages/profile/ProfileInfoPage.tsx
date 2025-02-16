@@ -9,7 +9,7 @@ import { Link, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ProfileInfo } from "@/types/profile";
 import DamulButton from "@/components/common/DamulButton";
-import { getProfileDetail } from "@/service/mypage";
+import { getProfileDetail } from "@/service/profile";
 import { toggleFollow } from "@/service/user";
 import useAuth from "@/hooks/useAuth";
 

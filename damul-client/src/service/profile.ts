@@ -9,11 +9,11 @@ export const getProfileDetail = (userId: number) => {
   return apiClient.get(`/mypages/${userId}/profiles`);
 };
 
-export const getProfileBadges = (userId: number) => {
+export const getBadges = (userId: number) => {
   return apiClient.get(`/mypages/${userId}/badges`);
 };
 
-export const getProfileBadge = (userId: number, badgeId: number) => {
+export const getBadge = (userId: number, badgeId: number) => {
   return apiClient.get(`/mypages/${userId}/badges/${badgeId}`);
 };
 

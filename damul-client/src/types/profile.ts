@@ -26,13 +26,21 @@ export interface ProfileInfo {
 }
 
 export interface Badge {
-  badgeId: number;
-  badgeName: string;
-  badgeLevel: number;
-  condition: string;
-  description: string;
+  id: number;
+  title: string;
+  level: number;
 }
 
 export interface BadgeList {
   list: Badge[];
+}
+
+export interface BadgeDetail {
+  id: number;
+  title: string;
+  level: number;
+  description: string;
+  createdAt: string;
+  rank: number;
+  achieveCond: string;
 }
