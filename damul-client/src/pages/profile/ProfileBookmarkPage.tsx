@@ -91,6 +91,13 @@ const ProfileBookmarkPage = () => {
         renderItems={(item: RecipeItem) => (
           <RecipeFeedCard key={item.id} {...item} />
         )}
+        noContent={
+          <p className="text-center text-normal-200">
+            등록한 북마크가 없습니다.
+            <br />
+            커뮤니티에서 맘에 드는 레시피를 살펴보고 등록해 보세요.
+          </p>
+        }
       />
     </div>
   );
