@@ -26,6 +26,7 @@ public enum ErrorCode {
 
     // API 요청 관련
     EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API 요청에 실패하였습니다"),
+    DATA_ANALYSIS_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "최근 데이터 분석에 실패하였습니다"),
 
     // 데이터베이스 관련 에러
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다"),

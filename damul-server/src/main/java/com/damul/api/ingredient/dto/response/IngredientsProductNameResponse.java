@@ -5,11 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PriceData {
-    private String period;
-    private int price;
+public class IngredientsProductNameResponse {
+    private List<IngredientsProductNameList> ingredientsProductNameLists;
 }

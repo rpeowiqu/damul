@@ -2,6 +2,7 @@ package com.damul.api.ingredient.controller;
 
 import com.damul.api.ingredient.dto.response.IngredientPriceResponse;
 import com.damul.api.ingredient.dto.response.IngredientsCategoryResponse;
+import com.damul.api.ingredient.dto.response.IngredientsProductNameResponse;
 import com.damul.api.ingredient.service.IngredientPriceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +24,14 @@ public class IngredientPriceController {
     @GetMapping("/prices")
     public ResponseEntity<?> getIngredientPrice(
             @RequestParam String period,
-            @RequestParam String productNo) {
-        log.info("식자재 가격 동향 조회 요청 - period: {}, productNo: {}", period, productNo);
+            @RequestParam(required = false) String itemCode,
+            @RequestParam(required = false) String itemCategoryCode) {
+        log.info("식자재 가격 동향 조회 요청 - period: {}, itemCode: {},  itemCategoryCode: {}", period, itemCode, itemCategoryCode);
 
-        IngredientPriceResponse response = ingredientPriceService.getIngredientPrice(period, productNo);
+        IngredientPriceResponse response = ingredientPriceService.getIngredientPrice(period, itemCode, itemCategoryCode);
 
         if (response == null) {
-            log.info("식자재 가격 동향 조회 실패 - 데이터 없음");
+            log.info("식자재 가격 동향 조회 성공 - 데이터 없음");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
@@ -46,6 +48,19 @@ public class IngredientPriceController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         log.info("식자재 대분류 조회 완료");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/categories/items")
+    public ResponseEntity<?> getIngredientCategoriesItems() {
+        log.info("식자재 품목 검색 요청");
+        IngredientsProductNameResponse response = ingredientPriceService.getIngredientsProductName();
+        if(response.getIngredientsProductNameLists() == null || response.getIngredientsProductNameLists().isEmpty()) {
+            log.info("식자재 품목 검색 성공 - 데이터 없음");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        log.info("식자재 품목 검색 완료");
         return ResponseEntity.ok(response);
     }
 }
