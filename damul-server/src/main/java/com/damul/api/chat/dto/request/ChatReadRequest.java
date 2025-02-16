@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatReadRequest {
 
+    private int userId;
     private int roomId;
     private int messageId;
 
