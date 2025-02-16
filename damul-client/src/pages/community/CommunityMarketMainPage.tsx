@@ -55,7 +55,7 @@ const CommunityMarketMainPage = () => {
     try {
       const response = await getPosts({
         cursor: pageParam,
-        size: 5,
+        size: 10,
         orderBy: orderType,
         status: statusType,
       });
