@@ -21,6 +21,7 @@ import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.dto.response.SearchResponse;
+import com.damul.api.notification.service.NotificationService;
 import com.damul.api.post.entity.Post;
 import com.damul.api.post.repository.PostRepository;
 import com.damul.api.user.repository.UserRepository;
@@ -48,6 +49,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -296,6 +298,9 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
         log.info("서비스: 1:1 채팅방 생성 완료 - roomId: {}", savedRoom.getId());
 
+        List<ChatRoomMember> members = List.of(currentMember, targetMember);
+        notificationService.notifyNewChatRoom(savedRoom, members);
+
         return new CreateResponse(savedRoom.getId());
     }
 
@@ -369,6 +374,10 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         createSystemMessage(savedRoom, systemMessage);
 
         log.info("서비스: 단체 채팅방 생성 완료 - roomId: {}", savedRoom.getId());
+
+        List<ChatRoomMember> allMembers = chatRoomMemberRepository
+                .findAllByRoomId(savedRoom.getId());
+        notificationService.notifyNewChatRoom(savedRoom, allMembers);
 
         return new CreateResponse(savedRoom.getId());
     }

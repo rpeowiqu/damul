@@ -164,7 +164,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void handleTyping(ChatTypingMessage typingRequest) {
-        ChatRoomMember member = validateRoomAndMember(typingRequest.getRoomId(), typingRequest.getUserId());
+        ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(typingRequest.getRoomId(), typingRequest.getUserId()).get();
 
         TypingStatus status = new TypingStatus(
                 typingRequest.getRoomId(),
@@ -179,7 +179,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     @Transactional
     public void handleMessageRead(ChatReadRequest readRequest) {
-        ChatRoomMember member = validateRoomAndMember(readRequest.getRoomId(), readRequest.getUserId());
+        ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(readRequest.getRoomId(), readRequest.getUserId()).get();
 
         member.updateLastReadMessageId(readRequest.getMessageId());
         chatRoomMemberRepository.save(member);
@@ -209,7 +209,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         }
     }
 
-    private ChatRoomMember validateRoomAndMember(int roomId, int userId) {
+    private void validateRoomAndMember(int roomId, int userId) {
         log.info("validateRoomAndMember roomId={}, userId={}", roomId, userId);
         ChatRoom room = getChatRoom(roomId);
         log.info("채팅방 존재: {}", room != null);
@@ -218,8 +218,8 @@ public class WebSocketServiceImpl implements WebSocketService {
             throw new BusinessException(ErrorCode.CHATROOM_INACTIVE, "비활성화된 채팅방입니다.");
         }
 
-        return chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "채팅방 멤버가 아닙니다."));
+        if(!chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
+                .isEmpty()) throw new BusinessException(ErrorCode.CHATROOM_ALREADY_MEMBER, "이미 입장한 채팅방입니다.");
     }
 
     private String getExtensionFromContentType(String contentType) {
