@@ -2,6 +2,7 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.MemberRole;
 import com.damul.api.chat.dto.MessageType;
 import com.damul.api.chat.dto.ReadStatus;
 import com.damul.api.chat.dto.TypingStatus;
@@ -121,6 +122,17 @@ public class WebSocketServiceImpl implements WebSocketService {
         ChatRoom room = getChatRoom(roomId);
         validateRoomAndMember(roomId, userId);
         User user = userRepository.findById(userId).get();
+
+        if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
+            int currentMemberCount = chatRoomMemberRepository.countByRoomId(roomId);
+            if (currentMemberCount >= room.getMemberLimit()) {
+                throw new IllegalStateException("채팅방 최대 인원을 초과했습니다.");
+            }
+
+            String nickname = user.getNickname();
+            ChatRoomMember member = ChatRoomMember.create(room, user, nickname, MemberRole.MEMBER, 0);
+            chatRoomMemberRepository.save(member);
+        }
 
         ChatMessage enterMessage = ChatMessage.createEnterMessage(room, user);
         chatMessageRepository.save(enterMessage);
