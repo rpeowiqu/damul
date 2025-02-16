@@ -8,6 +8,7 @@ import com.damul.api.chat.dto.TypingStatus;
 import com.damul.api.chat.dto.request.ChatMessageCreate;
 import com.damul.api.chat.dto.request.ChatReadRequest;
 import com.damul.api.chat.dto.request.ChatTypingMessage;
+import com.damul.api.chat.dto.response.ChatMessageResponse;
 import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.entity.ChatRoomMember;
@@ -78,7 +79,8 @@ public class WebSocketServiceImpl implements WebSocketService {
         }
 
         chatMessageRepository.save(message);
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, message);
+        int unReadCount = chatMessageRepository.countUnreadMessages(roomId, message.getId());
+        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, ChatMessageResponse.from(message, unReadCount));
         updateUnreadCount(message);
 
     }
@@ -108,7 +110,8 @@ public class WebSocketServiceImpl implements WebSocketService {
         ChatMessage message = ChatMessage.createFileMessage(room, currentUser, imageRequest.getContent(), imagePath);
 
         chatMessageRepository.save(message);
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, message);
+        int unReadCount = chatMessageRepository.countUnreadMessages(roomId, message.getId());
+        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, ChatMessageResponse.from(message, unReadCount));
         updateUnreadCount(message);
     }
 
@@ -121,7 +124,8 @@ public class WebSocketServiceImpl implements WebSocketService {
 
         ChatMessage enterMessage = ChatMessage.createEnterMessage(room, user);
         chatMessageRepository.save(enterMessage);
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, enterMessage);
+        int unReadCount = chatMessageRepository.countUnreadMessages(roomId, enterMessage.getId());
+        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, ChatMessageResponse.from(enterMessage, unReadCount));
     }
 
     @Override
@@ -133,7 +137,8 @@ public class WebSocketServiceImpl implements WebSocketService {
 
         ChatMessage leaveMessage = ChatMessage.createLeaveMessage(room, user);
         chatMessageRepository.save(leaveMessage);
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, leaveMessage);
+        int unReadCount = chatMessageRepository.countUnreadMessages(roomId, leaveMessage.getId());
+        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, ChatMessageResponse.from(leaveMessage, unReadCount));
     }
 
     @Override
