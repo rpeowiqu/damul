@@ -2,6 +2,7 @@ import { useState, ChangeEvent, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import SearchIcon from "@/components/svg/SearchIcon";
 import Image from "@/components/common/Image";
+import { getFollowings } from "@/service/user";
 
 const ChattingStartPage = () => {
   const [inputValue, setInputValue] = useState<string>("");
@@ -27,6 +28,24 @@ const ChattingStartPage = () => {
       { id: 8, image: "sds", nickname: "수다쟁이" },
     ],
   };
+
+  const fetchFollowings = async (pageParam: number) => {
+    try {
+      const response = await getFollowings({
+        cursor: pageParam,
+        size: 10,
+      });
+      if (response?.status === 204) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
+
+      return response?.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchFollowings(0);
 
   const toggleSelection = (id: number) => {
     setSelectedFriends((prev) =>
@@ -58,7 +77,6 @@ const ChattingStartPage = () => {
           채팅 시작
         </button>
       </div>
-
       {selectedFriends.length > 0 && (
         <div className="flex gap-2 py-3 whitespace-nowrap overflow-x-scroll">
           {selectedFriends.map((id) => {

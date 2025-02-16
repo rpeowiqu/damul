@@ -68,7 +68,7 @@ export const deleteMemberFromRoom = async ({
   roomId,
   memberId,
 }: {
-  roomId: number;
+  roomId: string | undefined;
   memberId: number;
 }) => {
   return apiClient.delete(`chats/rooms/${roomId}/members/${memberId}`);

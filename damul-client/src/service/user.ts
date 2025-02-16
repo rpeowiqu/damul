@@ -44,7 +44,7 @@ export const getFollowers = (queryParams: {
 };
 
 export const getFollowings = (queryParams: {
-  keyword: string;
+  keyword?: string;
   cursor: number;
   size: number;
 }) => {
