@@ -6,6 +6,7 @@ import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.entity.ChatRoomMember;
 import com.damul.api.notification.dto.ChatRoomCreatedEvent;
 import com.damul.api.notification.dto.NotificationType;
+import com.damul.api.notification.dto.response.NotificationList;
 import com.damul.api.notification.dto.response.NotificationResponse;
 import com.damul.api.notification.entity.Notification;
 import com.damul.api.notification.repository.NotificationRepository;
@@ -25,7 +26,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<NotificationResponse> getNotifications(Integer userId, boolean unreadOnly) {
+    public NotificationList getNotifications(Integer userId, boolean unreadOnly) {
         List<Notification> notifications;
         if (unreadOnly) {
             notifications = notificationRepository.findByReceiverIdAndIsReadFalseOrderByCreatedAtDesc(userId);
@@ -33,9 +34,11 @@ public class NotificationServiceImpl implements NotificationService {
             notifications = notificationRepository.findByReceiverIdOrderByCreatedAtDesc(userId);
         }
 
-        return notifications.stream()
+        List<NotificationResponse> responseList = notifications.stream()
                 .map(NotificationResponse::from)
                 .collect(Collectors.toList());
+
+        return new NotificationList(responseList);
     }
 
     @Override
