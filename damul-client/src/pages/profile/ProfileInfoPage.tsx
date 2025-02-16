@@ -5,13 +5,14 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Link, useOutletContext } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ProfileInfo } from "@/types/profile";
 import DamulButton from "@/components/common/DamulButton";
-import { getProfileDetail } from "@/service/mypage";
+import { getProfileDetail } from "@/service/profile";
 import { toggleFollow } from "@/service/user";
 import useAuth from "@/hooks/useAuth";
+import { postIntoPrivateRoom } from "@/service/chatting";
 
 const chartConfig = {
   categoryPreference: {
@@ -43,6 +44,7 @@ const ProfileInfoPage = () => {
     foodPreference: [],
   });
   const [isFetched, setIsFetched] = useState<boolean>(false);
+  const nav = useNavigate();
 
   useEffect(() => {
     const fetchProfileDetail = async () => {
@@ -60,6 +62,18 @@ const ProfileInfoPage = () => {
 
     fetchProfileDetail();
   }, [user.userId]);
+
+  const enterPrivateChat = async (userId: number) => {
+    try {
+      const response = await postIntoPrivateRoom({ userId });
+      if (response) {
+        const chatId = response.data.id;
+        nav(`/chatting/${chatId}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleFollowState = async () => {
     try {
@@ -142,7 +156,7 @@ const ProfileInfoPage = () => {
             <DamulButton
               variant="positive"
               className="w-20 sm:w-24 h-7 text-sm"
-              onClick={() => {}}
+              onClick={() => enterPrivateChat(user.userId)}
             >
               채팅 시작
             </DamulButton>

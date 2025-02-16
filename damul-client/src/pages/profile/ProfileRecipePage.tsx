@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getMyRecipes } from "@/service/mypage";
+import { getMyRecipes } from "@/service/profile";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 
 interface RecipeItem {
@@ -30,7 +30,7 @@ interface RecipeItem {
 
 const ProfileRecipePage = () => {
   const { user } = useOutletContext();
-  const [sortType, setSortType] = useState("date");
+  const [sortType, setSortType] = useState<"date" | "title">("date");
 
   const fetchRecipes = async (pageParam: number) => {
     try {
@@ -58,7 +58,10 @@ const ProfileRecipePage = () => {
       </div>
 
       <div className="flex justify-end">
-        <Select value={sortType} onValueChange={(value) => setSortType(value)}>
+        <Select
+          value={sortType}
+          onValueChange={(value: "date" | "title") => setSortType(value)}
+        >
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
           </SelectTrigger>
@@ -87,6 +90,13 @@ const ProfileRecipePage = () => {
         renderItems={(item: RecipeItem) => (
           <RecipeFeedCard key={item.id} {...item} />
         )}
+        noContent={
+          <p className="text-center text-normal-200">
+            작성한 레피시가 없습니다.
+            <br />
+            자신만의 노하우가 담긴 레시피를 작성하고 공유해보세요!
+          </p>
+        }
       />
     </div>
   );

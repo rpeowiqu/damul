@@ -25,14 +25,18 @@ export interface ProfileInfo {
   foodPreference: FoodPreference[];
 }
 
-export interface Badge {
+export interface BadgeBasic {
   badgeId: number;
   badgeName: string;
   badgeLevel: number;
-  condition: string;
-  description: string;
 }
 
-export interface BadgeList {
-  list: Badge[];
+export interface BadgeDetail {
+  id: number;
+  title: string;
+  level: number;
+  createdAt: string;
+  description: string;
+  rank: number;
+  catchPhrase: string;
 }

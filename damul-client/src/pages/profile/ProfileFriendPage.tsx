@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { NavLink, Outlet, useParams } from "react-router-dom";
 
 import DamulSearchBox from "@/components/common/DamulSearchBox";
@@ -7,13 +7,17 @@ import clsx from "clsx";
 const ProfileFriendPage = () => {
   const { userId } = useParams();
   const [searchKeyword, setSetSearchKeyword] = useState<string>("");
+  const [submitSearchKeyword, setSubmitSearchKeyword] = useState<string>("");
 
   return (
     <div className="flex flex-col py-5 gap-5 h-full">
       <div className="px-5">
         <DamulSearchBox
+          inputValue={searchKeyword}
+          setInputValue={setSetSearchKeyword}
           placeholder="친구 이름을 검색해 보세요."
-          onButtonClick={(value) => setSetSearchKeyword(value)}
+          onButtonClick={() => setSubmitSearchKeyword(searchKeyword)}
+          resetAfter={false}
         />
       </div>
 
@@ -47,7 +51,7 @@ const ProfileFriendPage = () => {
           </NavLink>
         </div>
         <Suspense fallback={<div>Loading...</div>}>
-          <Outlet context={{ searchKeyword }} />
+          <Outlet context={{ searchKeyword: submitSearchKeyword }} />
         </Suspense>
       </div>
     </div>

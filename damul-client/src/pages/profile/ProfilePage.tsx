@@ -3,7 +3,7 @@ import { Navigate, Outlet, useParams } from "react-router-dom";
 import DamulTab from "@/components/common/DamulTab";
 import ProfileBanner from "@/components/profile/ProfileBanner";
 import { ProfileHeader } from "@/types/profile";
-import { getProfileHeader } from "@/service/mypage";
+import { getProfileHeader } from "@/service/profile";
 import useAuth from "@/hooks/useAuth";
 
 const ProfilePage = () => {
