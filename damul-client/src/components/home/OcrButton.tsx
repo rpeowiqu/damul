@@ -99,7 +99,7 @@ const OcrButton = ({
       />
       <DamulButton
         onClick={handleClick}
-        className="bg-white items-center justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50"
+        className="bg-white items-center justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50 shadow-md transition ease-in-out duration-150 active:scale-75"
       >
         <ReceiptIcon className="w-6 h-full text-normal-300 fill-normal-200 stroke-2 stroke-normal-200" />
         <p>영수증으로 입력하기</p>

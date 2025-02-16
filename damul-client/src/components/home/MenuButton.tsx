@@ -33,7 +33,7 @@ const MenuButton = ({ onClick }: MenuButtonProps) => {
                 setIsOpen((preState) => !preState);
                 clearSelectedIngredients();
               }}
-              className="w-full h-full"
+              className="w-full h-full transition ease-in-out duration-150 active:scale-75"
             >
               <MenuIcon className="scale-150" />
             </DamulButton>

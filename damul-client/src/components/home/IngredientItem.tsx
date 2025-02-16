@@ -8,6 +8,7 @@ interface IngredientItemProps {
   ingredient: RegisterIngredient;
   purchaseAt: string;
   onComplete: (data: {
+    id: number;
     ingredientName: string;
     productPrice: number;
     categoryId: number;
@@ -76,7 +77,7 @@ const IngredientItem = ({
         <button
           type="button"
           onClick={onDelete}
-          className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:negative-700 border-2 border-negative-600 text-xl font-semibold"
+          className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:negative-700 border-2 border-negative-600 text-xl font-semibold shadow-md transition ease-in-out duration-150 active:scale-75 active:bg-negative-200"
         >
           -
         </button>
@@ -94,7 +95,7 @@ const IngredientItem = ({
             id="ingredientName"
             name="ingredientName"
             maxLength={30}
-            className="border-1 h-8 w-full min-w-0 cursor-pointer text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+            className="shadow-md border h-8 w-full min-w-0 cursor-pointer text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             value={ingredientData.ingredientName}
             onChange={handleChange}
           />
@@ -109,7 +110,7 @@ const IngredientItem = ({
           <select
             id="categoryId"
             name="categoryId"
-            className="border-1 w-full min-w-0 cursor-pointer text-right focus:outline-positive-300 p-1"
+            className="shadow-md border rounded-md w-full min-w-0 cursor-pointer text-right focus:outline-positive-300 p-1"
             value={ingredientData.categoryId}
             onChange={handleChange}
           >
@@ -134,7 +135,7 @@ const IngredientItem = ({
             type="text"
             id="productPrice"
             name="productPrice"
-            className="border-1 w-full h-8 min-w-0 cursor-pointer text-negative-500 font-bold text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1 pr-6 "
+            className="shadow-md border w-full h-8 min-w-0 cursor-pointer text-negative-500 font-bold text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1 pr-6 "
             onChange={(e) => {
               let value = e.target.value;
               if (value === "" || parseInt(value) < 0) {
@@ -163,7 +164,7 @@ const IngredientItem = ({
             type="date"
             id="expirationDate"
             name="expirationDate"
-            className="border-1 flex justify-end text-right h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+            className="shadow-md border flex justify-end text-right h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             onChange={handleChange}
             value={ingredientData.expirationDate}
           />
@@ -175,10 +176,11 @@ const IngredientItem = ({
           >
             보관장소
           </label>
+
           <select
             id="ingredientStorage"
             name="ingredientStorage"
-            className="border-1 w-full min-w-0 cursor-pointer text-right focus:outline-positive-300 p-1"
+            className="shadow-md border rounded-md w-full min-w-0 cursor-pointer text-right focus:outline-positive-300 p-1"
             value={ingredientData.ingredientStorage}
             onChange={handleChange}
           >
