@@ -10,24 +10,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getBadges } from "@/service/profile";
-import { BadgeList } from "@/types/profile";
+import { BadgeBasic } from "@/types/profile";
 import { AlertCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 const ProfileBadgePage = () => {
   const { user } = useOutletContext();
-  const [badgeList, setBadgeList] = useState<BadgeList>({
-    list: [],
-  });
+  const [badgeList, setBadgeList] = useState<BadgeBasic[]>([]);
   const [isFetched, setIsFetched] = useState<boolean>();
+  const [sortType, setSortType] = useState<"level" | "title">("level");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getBadges(parseInt(user.userId));
         if (response.status == 200) {
-          setBadgeList({ list: response.data.list });
+          setBadgeList(response.data.list);
         }
       } catch (error) {
         console.error(error);
@@ -55,13 +54,16 @@ const ProfileBadgePage = () => {
       <div className="flex justify-end items-center gap-4">
         <DamulHoverCard
           hoverCardTrigger={
-            <AlertCircleIcon className="size-4 stroke-normal-300" />
+            <AlertCircleIcon className="size-4 stroke-normal-200" />
           }
         >
           <p className="text-sm">뱃지는 매일 오전 12시에 갱신 됩니다.</p>
         </DamulHoverCard>
 
-        <Select>
+        <Select
+          value={sortType}
+          onValueChange={(value: "level" | "title") => setSortType(value)}
+        >
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
           </SelectTrigger>
@@ -70,28 +72,22 @@ const ProfileBadgePage = () => {
               <SelectLabel>정렬 방식</SelectLabel>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="date"
+                value="level"
+              >
+                등급순
+              </SelectItem>
+              <SelectItem
+                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                value="title"
               >
                 제목순
-              </SelectItem>
-              <SelectItem
-                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="title"
-              >
-                획득일순
-              </SelectItem>
-              <SelectItem
-                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="title"
-              >
-                랭크순
               </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
       </div>
 
-      <BadgeShowcase list={badgeList.list} />
+      <BadgeShowcase list={badgeList} sortType={sortType} />
     </div>
   );
 };

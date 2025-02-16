@@ -30,7 +30,7 @@ interface RecipeItem {
 
 const ProfileBookmarkPage = () => {
   const { user } = useOutletContext();
-  const [sortType, setSortType] = useState("date");
+  const [sortType, setSortType] = useState<"date" | "title">("date");
 
   const fetchBookmarks = async (pageParam: number) => {
     try {
@@ -61,7 +61,10 @@ const ProfileBookmarkPage = () => {
       </div>
 
       <div className="flex justify-end">
-        <Select value={sortType} onValueChange={(value) => setSortType(value)}>
+        <Select
+          value={sortType}
+          onValueChange={(value: "date" | "title") => setSortType(value)}
+        >
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
           </SelectTrigger>

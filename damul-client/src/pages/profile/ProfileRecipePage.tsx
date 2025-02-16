@@ -30,7 +30,7 @@ interface RecipeItem {
 
 const ProfileRecipePage = () => {
   const { user } = useOutletContext();
-  const [sortType, setSortType] = useState("date");
+  const [sortType, setSortType] = useState<"date" | "title">("date");
 
   const fetchRecipes = async (pageParam: number) => {
     try {
@@ -58,7 +58,10 @@ const ProfileRecipePage = () => {
       </div>
 
       <div className="flex justify-end">
-        <Select value={sortType} onValueChange={(value) => setSortType(value)}>
+        <Select
+          value={sortType}
+          onValueChange={(value: "date" | "title") => setSortType(value)}
+        >
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
           </SelectTrigger>

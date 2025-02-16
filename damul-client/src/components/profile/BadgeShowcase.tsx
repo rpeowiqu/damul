@@ -1,14 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import Badge from "./Badge";
 import DamulModal from "../common/DamulModal";
-import { BadgeDetail, BadgeList } from "@/types/profile";
+import { BadgeBasic, BadgeDetail } from "@/types/profile";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getBadge } from "@/service/profile";
 
-const BadgeShowcase = ({ list }: BadgeList) => {
+interface BadgeShowcaseProps {
+  list: BadgeBasic[];
+  sortType: "level" | "title";
+}
+
+const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
   const { userId } = useParams();
   const [currentBadgeIndex, setCurrentBadgeIndex] = useState(-1);
   const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentBadgeIndex(-1));
@@ -38,13 +43,23 @@ const BadgeShowcase = ({ list }: BadgeList) => {
     setIsOpen(currentBadgeIndex > -1 ? true : false);
   }, [currentBadgeIndex]);
 
+  const sortedList = useMemo(() => {
+    return [...list].sort((a, b) => {
+      if (sortType === "title") {
+        return a.badgeName.localeCompare(b.badgeName);
+      }
+
+      return a.badgeLevel > b.badgeLevel ? -1 : 1;
+    });
+  }, [list, sortType]);
+
   return (
     <div className="flex flex-col gap-3 p-3 border border-normal-100 rounded-xl">
-      <p className="text-end text-sm">보유 뱃지 수 : {list.length || 0}개</p>
+      <p className="text-end text-sm">보유 뱃지 수 : {list.length}개</p>
 
-      {list.length > 0 ? (
+      {sortedList.length > 0 ? (
         <div className="grid grid-cols-3 sm:grid-cols-5 place-items-center gap-4">
-          {list.map((badge, index) => (
+          {sortedList.map((badge, index) => (
             <Badge
               key={index}
               {...badge}
