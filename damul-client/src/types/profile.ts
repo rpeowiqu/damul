@@ -26,9 +26,9 @@ export interface ProfileInfo {
 }
 
 export interface Badge {
-  id: number;
-  title: string;
-  level: number;
+  badgeId: number;
+  badgeName: string;
+  badgeLevel: number;
 }
 
 export interface BadgeList {
@@ -39,8 +39,8 @@ export interface BadgeDetail {
   id: number;
   title: string;
   level: number;
-  description: string;
   createdAt: string;
+  description: string;
   rank: number;
-  achieveCond: string;
+  catchPhrase: string;
 }

@@ -15,20 +15,20 @@ const BadgeShowcase = ({ list }: BadgeList) => {
   const { data, isLoading } = useQuery<BadgeDetail>({
     queryKey: ["badge", userId, currentBadgeIndex],
     queryFn: async () => {
-      const reponse = await getBadge(
+      const response = await getBadge(
         parseInt(userId!),
-        list[currentBadgeIndex].id,
+        list[currentBadgeIndex].badgeId,
       );
-      return reponse.data;
+      return response.data;
     },
     initialData: {
       id: 0,
       title: "",
       level: 0,
-      description: "",
       createdAt: "",
+      description: "",
       rank: 0,
-      achieveCond: "",
+      catchPhrase: "",
     },
     refetchOnWindowFocus: false,
     enabled: currentBadgeIndex > -1,
@@ -40,10 +40,10 @@ const BadgeShowcase = ({ list }: BadgeList) => {
 
   return (
     <div className="flex flex-col gap-3 p-3 border border-normal-100 rounded-xl">
-      <p className="text-end text-sm">보유 뱃지 수 : {list.length}개</p>
+      <p className="text-end text-sm">보유 뱃지 수 : {list.length || 0}개</p>
 
       {list.length > 0 ? (
-        <div className="grid grid-cols-5 pc:grid-cols-6 place-items-center gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-5 place-items-center gap-4">
           {list.map((badge, index) => (
             <Badge
               key={index}
@@ -76,32 +76,33 @@ const BadgeShowcase = ({ list }: BadgeList) => {
           <div className="flex flex-col justify-center gap-5 px-3">
             <div className="flex items-center gap-3">
               <div className="flex justify-center items-center w-20 h-20 pt-2 rounded-full border-2 border-normal-100">
-                <Badge {...list[currentBadgeIndex]} />
+                <Badge badgeLevel={list[currentBadgeIndex].badgeLevel} />
               </div>
 
               <div className="flex flex-col gap-2 flex-1">
                 <div>
                   <p className="text-xs text-positive-400">뱃지명</p>
-                  <div className="flex gap-1 text-sm">
-                    <p className="font-bold">{data.title}</p>
-                    <p className="font-black">(Lv.{data.level})</p>
-                  </div>
+                  <p className="font-bold">
+                    {data.title} (Lv.{data.level})
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-positive-400">획득일</p>
-                  <p className="font-bold text-sm">{data.createdAt}</p>
+                  <p className="font-bold">
+                    {new Date(data.createdAt).toLocaleDateString("ko-KR")}
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="text-center">
-              <p className="text-base font-black">{data.achieveCond}</p>
-              <p className="text-positive-400 text-sm">
+              <p className="text-base font-black">{data.description}</p>
+              <p className="text-positive-400">
                 상위 {data.rank}%가 이 뱃지를 획득했어요.
               </p>
             </div>
 
-            <p className="text-center text-normal-300">{data.description}</p>
+            <p className="text-center text-normal-300">“{data.catchPhrase}”</p>
           </div>
         </DamulModal>
       )}
