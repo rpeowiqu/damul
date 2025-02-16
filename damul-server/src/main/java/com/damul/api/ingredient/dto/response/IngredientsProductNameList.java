@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PriceData {
-    private String period;
-    private int price;
+public class IngredientsProductNameList {
+    private int categoryId;
+    private String ingredientName;
+    private String itemCode;
+    private String kindCode;
 }
