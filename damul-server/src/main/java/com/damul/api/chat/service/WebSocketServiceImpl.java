@@ -48,7 +48,6 @@ public class WebSocketServiceImpl implements WebSocketService {
     public void handleMessage(int roomId, ChatMessageCreate messageRequest) {
         ChatRoom room = getChatRoom(roomId);
         User user = userRepository.findById(messageRequest.getUserId()).get();
-        validateRoomAndMember(roomId, user.getId());
         ChatMessage message;
 
         // 이미지가 포함된 메시지인 경우
@@ -91,7 +90,6 @@ public class WebSocketServiceImpl implements WebSocketService {
     public void handleImageMessage(int roomId, ChatMessageCreate imageRequest) {
         ChatRoom room = getChatRoom(roomId);
         User user = userRepository.findById(imageRequest.getUserId()).get();
-        validateRoomAndMember(roomId, user.getId());
 
         // Base64 디코딩 및 MultipartFile 변환
         String[] parts = imageRequest.getImage().split(",");

@@ -1,5 +1,8 @@
 package com.damul.api.notification.controller;
 
+import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.common.user.CurrentUser;
+import com.damul.api.notification.dto.response.NotificationList;
 import com.damul.api.notification.dto.response.NotificationResponse;
 import com.damul.api.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +29,12 @@ public class NotificationController {
         notificationService.markAsRead(notificationId);
     }
 
-    @GetMapping("/api/v1/notifications/{userId}")
-    public ResponseEntity<List<NotificationResponse>> getNotifications(
-            @PathVariable Integer userId,
+    @GetMapping("/api/v1/notifications")
+    public ResponseEntity<?> getNotifications(
+            @CurrentUser UserInfo user,
             @RequestParam(required = false, defaultValue = "false") Boolean unreadOnly) {
-        log.info("Get notifications request: userId={}, unreadOnly={}", userId, unreadOnly);
-        List<NotificationResponse> notifications = notificationService.getNotifications(userId, unreadOnly);
+        log.info("Get notifications request: userId={}, unreadOnly={}", user.getId(), unreadOnly);
+        NotificationList notifications = notificationService.getNotifications(user.getId(), unreadOnly);
         return ResponseEntity.ok(notifications);
     }
 

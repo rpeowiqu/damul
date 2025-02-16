@@ -3,13 +3,14 @@ package com.damul.api.notification.service;
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.entity.ChatRoomMember;
+import com.damul.api.notification.dto.response.NotificationList;
 import com.damul.api.notification.dto.response.NotificationResponse;
 
 import java.util.List;
 
 public interface NotificationService {
 
-    List<NotificationResponse> getNotifications(Integer userId, boolean unreadOnly);
+    NotificationList getNotifications(Integer userId, boolean unreadOnly);
 
     Integer getUnreadCount(Integer userId);
 
