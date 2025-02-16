@@ -6,6 +6,7 @@ import { getChattingList } from "@/service/chatting";
 import ChattingListInfiniteScroll from "@/components/chat/ChattingListInfiniteScroll";
 import ChattingListItem from "@/components/chat/ChattingListItem";
 import { ChattingItem } from "@/types/chatting";
+import { getKSTISOString } from "@/utils/date";
 
 const ChattingMainPage = () => {
   const navigate = useNavigate();
@@ -16,9 +17,9 @@ const ChattingMainPage = () => {
   }) => {
     try {
       const response = await getChattingList({
-        cursorTime: pageParam.cursorTime ?? new Date().toISOString(),
+        cursorTime: pageParam.cursorTime ?? getKSTISOString(),
         cursor: pageParam.cursor ?? 0,
-        size: 10,
+        size: 15,
       });
       return response?.data;
     } catch (error) {

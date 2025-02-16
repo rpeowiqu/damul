@@ -19,7 +19,7 @@ const ChattingBubble = ({ msg }: ChattingBubbleProps) => {
       key={msg.id}
       className={`flex ${isMyMessage ? "justify-end" : "justify-start"}`}
     >
-      <div className="flex items-start space-x-3 pb-2">
+      <div className="flex items-start space-x-3 mb-5">
         {!isMyMessage && (
           <Image
             src={msg.profileImageUrl}
@@ -43,7 +43,7 @@ const ChattingBubble = ({ msg }: ChattingBubbleProps) => {
               </div>
             )}
             <div
-              className={`rounded-md text-start text-sm flex-1 ${
+              className={`rounded-md text-start text-sm flex-1 whitespace-pre-wrap ${
                 msg.messageType === "IMAGE"
                   ? "bg-transparent"
                   : isMyMessage

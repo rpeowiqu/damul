@@ -21,7 +21,8 @@ const ChattingRoomPage = () => {
   const { data, isLoading: authLoading } = useAuth();
 
   const [message, setMessage] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<Uint8Array | null>(null);
+  const [prevImage, setPrevImage] = useState<string | null>(null);
   const [chatData, setChatData] = useState<ChatData>({
     messages: [],
     memberNum: 0,
@@ -52,6 +53,7 @@ const ChattingRoomPage = () => {
     textarea.style.height = `${textarea.scrollHeight}px`;
   };
 
+  // 엔터키 클릭 이벤트
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -59,19 +61,28 @@ const ChattingRoomPage = () => {
     }
   };
 
+  // 이미지 업로드하기
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0];
     if (file) {
+      const prevReader = new FileReader();
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
+      reader.readAsArrayBuffer(file);
+      prevReader.onloadend = () => {
+        setPrevImage(prevReader.result as string);
+
+        if (reader.result instanceof ArrayBuffer) {
+          const byteArray = new Uint8Array(reader.result);
+          setImage(byteArray);
+        }
       };
-      reader.readAsDataURL(file);
+      prevReader.readAsDataURL(file);
     }
   };
 
+  // 미리보기 이미지 제거
   const handleImageRemove = () => {
-    setImage(null);
+    setPrevImage(null);
   };
 
   // 채팅 내역 가져오기
@@ -83,6 +94,7 @@ const ChattingRoomPage = () => {
         size: 5,
       });
 
+      console.log(response?.data);
       if (response?.data && typeof response.data === "object") {
         setChatData({
           messages: response.data.data || [],
@@ -100,6 +112,7 @@ const ChattingRoomPage = () => {
     }
   };
 
+  // 가장 하단부터 보여주기
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "instant" });
@@ -115,13 +128,13 @@ const ChattingRoomPage = () => {
         content: message,
       });
       setMessage("");
-    } else if (image) {
+    } else if (prevImage) {
       sendMessage({
         userId: data?.data.id,
         messageType: "IMAGE",
-        fileUrl: image,
+        image: image ?? undefined,
       });
-      setImage(null);
+      setPrevImage(null);
     }
   };
 
@@ -162,11 +175,11 @@ const ChattingRoomPage = () => {
           accept="image/*"
           onChange={handleImageUpload}
         />
-        {image ? (
+        {prevImage ? (
           <div className="flex-1 border-1 p-3 rounded-lg relative">
             <div className="relative h-24 w-24">
               <img
-                src={image}
+                src={prevImage}
                 alt="Preview"
                 className="h-24 object-cover rounded-lg"
               />

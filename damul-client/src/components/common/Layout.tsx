@@ -3,7 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "@/utils/queryClient";
 import Header from "./Header";
 import Footer from "./Footer";
-// import { useStompSubscription } from "@/hooks/useStompSubscription";
+import { useStompSubscription } from "@/hooks/useStompSubscription";
 
 interface RouteHandle {
   header?: boolean;
@@ -11,7 +11,7 @@ interface RouteHandle {
 }
 
 const Layout = () => {
-  // useStompSubscription(); // ✅ WebSocket 연결 & 알림 구독
+  useStompSubscription(); // ✅ WebSocket 연결 & 알림 구독
 
   const routeMatch = useMatches().find((match) => match.handle);
   const layoutConfig: RouteHandle = routeMatch?.handle || {};

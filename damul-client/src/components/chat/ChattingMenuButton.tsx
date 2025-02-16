@@ -1,8 +1,13 @@
-import MenuIcon from "@/components/svg/MenuIcon";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Image from "../common/Image";
+import MenuIcon from "@/components/svg/MenuIcon";
 import ExitIcon from "../svg/ExitIcon";
-import { getChattingMembers } from "@/service/chatting";
+import {
+  getChattingMembers,
+  deleteFromRoom,
+  deleteMemberFromRoom,
+} from "@/service/chatting";
 import { ChattingMember } from "@/types/chatting";
 
 interface ChattingMenuButtonProps {
@@ -15,6 +20,8 @@ const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
   const [memberCnt, setMemberCnt] = useState(0);
 
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -47,6 +54,28 @@ const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
     fetchItems();
   }, []);
 
+  const handleExitRoom = async () => {
+    try {
+      const response = await deleteFromRoom({ roomId: roomId });
+      console.log(response);
+      navigate("/chatting");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleRemoveMember = async (memberId: number) => {
+    try {
+      const response = await deleteMemberFromRoom({
+        roomId: roomId,
+        memberId: memberId,
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="">
       <div ref={menuRef} className="relative">
@@ -73,7 +102,10 @@ const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
                 />
                 <div>{data.nickname}</div>
               </div>
-              <div className="text-sm font-normal text-negative-600 cursor-pointer">
+              <div
+                className="text-sm font-normal text-negative-600 cursor-pointer"
+                onClick={() => handleRemoveMember(data.id)}
+              >
                 강제 퇴장
               </div>
             </div>
@@ -82,7 +114,9 @@ const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
             <span className="font-normal w-32 p-1 text-center text-xs border-2 border-positive-300 rounded-lg cursor-pointer">
               원본 게시글 바로가기
             </span>
-            <ExitIcon className="w-5 h-5 stroke-neutral-500 cursor-pointer" />
+            <div onClick={handleExitRoom}>
+              <ExitIcon className="w-5 h-5 stroke-neutral-500 cursor-pointer" />
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { getKSTISOString } from "@/utils/date";
 
 interface ChattingListInfiniteScrollProps<T> {
   queryKey: string[];
@@ -21,7 +22,7 @@ interface ChattingListInfiniteScrollProps<T> {
 const ChattingListInfiniteScroll = <T,>({
   queryKey,
   fetchFn,
-  initPage = { cursor: 0, cursorTime: new Date().toISOString() },
+  initPage = { cursor: 0, cursorTime: getKSTISOString() }, // KST 적용
   renderItems,
   skeleton,
   className,
@@ -42,7 +43,6 @@ const ChattingListInfiniteScroll = <T,>({
       },
       initialPageParam: initPage,
       getNextPageParam: (lastPage) => {
-        console.log("lastPage:", lastPage);
         if (lastPage.meta?.hasNext) {
           return {
             cursor: lastPage.meta.nextCursor ?? 0,

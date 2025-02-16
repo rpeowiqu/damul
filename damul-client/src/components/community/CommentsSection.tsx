@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import CommentItem from "./CommentItem";
 import { Comment } from "@/types/community";
 import useAuth from "@/hooks/useAuth";
@@ -32,16 +33,17 @@ const CommentsSection = ({
   const { data, isLoading: authLoading } = useAuth();
   const { sendEnterRoom } = useStompClient({ roomId: chatRoomId ?? 0 });
 
+  const navigate = useNavigate();
+
   const handleEnterRoom = () => {
-    if (!data?.data.id) {
-      alert("로그인이 필요합니다.");
+    if (currentChatNum === chatSize) {
+      alert("정원이 다 찼어요!");
       return;
     }
     if (chatRoomId) {
       sendEnterRoom(chatRoomId, data?.data.id);
-    } else {
-      console.warn("🚨 채팅방 ID가 없습니다.");
     }
+    navigate(`/chatting/${chatRoomId}`);
   };
 
   const StatusMarker = () => {

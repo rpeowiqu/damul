@@ -7,15 +7,8 @@ interface ExtendedOptions extends SockJS.Options {
 }
 
 interface SendChattingProps {
-  roomId: string | undefined;
-  onMessageReceived: (message: any) => void; // 메시지 수신 핸들러 추가
-}
-
-interface SendMessage {
-  userId: string;
-  messageType: string;
-  content?: string;
-  fileUrl?: string;
+  roomId?: string | number | undefined;
+  onMessageReceived?: (message: any) => void;
 }
 
 export const useStompClient = ({
@@ -37,7 +30,9 @@ export const useStompClient = ({
         stompClient.subscribe(`/sub/chat/room/${roomId}`, (message) => {
           const receivedMessage = JSON.parse(message.body);
           console.log("📩 메시지 수신:", receivedMessage);
-          onMessageReceived(receivedMessage); // ✅ 수신한 메시지를 상위 컴포넌트에 전달
+          if (onMessageReceived) {
+            onMessageReceived(receivedMessage);
+          }
         });
       },
       onStompError: (frame) => {
@@ -65,8 +60,13 @@ export const useStompClient = ({
     userId,
     messageType,
     content,
-    fileUrl,
-  }: SendMessage) => {
+    image,
+  }: {
+    userId: string;
+    messageType: string;
+    content?: string;
+    image?: Uint8Array;
+  }) => {
     if (!stompClientRef.current || !stompClientRef.current.connected) {
       console.warn("🚨 STOMP 클라이언트가 연결되지 않음");
       return;
@@ -76,7 +76,7 @@ export const useStompClient = ({
       userId,
       messageType,
       content,
-      fileUrl,
+      image,
       room: { id: roomId },
     };
 

@@ -55,16 +55,16 @@ export const getChattingMembers = async ({
 };
 
 // 채팅방 나가기
-export const deleteFromChattingRoom = async ({
+export const deleteFromRoom = async ({
   roomId,
 }: {
-  roomId: number;
+  roomId: string | undefined;
 }) => {
   return apiClient.delete(`chats/rooms/${roomId}`);
 };
 
 // 채팅방 멤버 추방
-export const deleteMember = async ({
+export const deleteMemberFromRoom = async ({
   roomId,
   memberId,
 }: {
