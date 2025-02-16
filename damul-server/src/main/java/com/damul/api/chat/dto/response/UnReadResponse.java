@@ -11,4 +11,8 @@ public class UnReadResponse {
 
     private int unReadMessageNum;
 
+    public void count(Integer count) {
+        this.unReadMessageNum = count;
+    }
+
 }
