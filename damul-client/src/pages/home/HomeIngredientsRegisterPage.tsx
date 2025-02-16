@@ -51,12 +51,13 @@ const HomeIngredientsRegisterPage = () => {
     setPurchaseAt(e.target.value);
   };
 
-  const handleIngredientComplete = (index: number, data: any) => {
-    setIngredientRegisterData((prev) => {
-      const updatedIngredients = [...prev];
-      updatedIngredients[index] = { ...data };
-      return updatedIngredients;
-    });
+  const handleIngredientComplete = (
+    index: number,
+    data: RegisterIngredient,
+  ) => {
+    setIngredientRegisterData((prev) =>
+      prev.map((item, i) => (i === index ? { ...data } : item)),
+    );
   };
 
   const addIngredient = () => {
@@ -67,7 +68,7 @@ const HomeIngredientsRegisterPage = () => {
           id: Math.floor(Math.random() * 1000000),
           ingredientName: "",
           productPrice: 0,
-          categoryId: 0,
+          categoryId: 1,
           expirationDate: "",
           ingredientStorage: "FRIDGE",
         },
@@ -127,19 +128,20 @@ const HomeIngredientsRegisterPage = () => {
           </div>
         </div>
       )}
+
       <div className="flex w-full gap-6 items-center text-xl font-bold">
         <button type="button" onClick={() => navigate("/home")}>
           {"<"}
         </button>
         <p>식자재 등록하기</p>
       </div>
-      <p className="text-positive-300 font-bold p-1">
+      <p className="text-positive-300 font-bold p-1 mb-2">
         오늘은 이런 품목을 구매하셨네요!
       </p>
       <div className="flex justify-between">
         <DamulButton
           onClick={handleResetData}
-          className="flex bg-white items-center justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50"
+          className="flex bg-white items-center justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50 shadow-md transition ease-in-out duration-150 active:scale-75"
         >
           <ResetIcon className="stroke-2 stroke-normal-200" />
           <p>초기화</p>
@@ -205,7 +207,7 @@ const HomeIngredientsRegisterPage = () => {
 
       <div className="flex justify-center p-2">
         <DamulButton
-          className="bg-normal-200 hover:bg-normal-300"
+          className="bg-normal-200 hover:bg-normal-300 shadow-md transition ease-in-out duration-150 active:scale-90"
           onClick={addIngredient}
         >
           +
@@ -214,7 +216,7 @@ const HomeIngredientsRegisterPage = () => {
 
       <DamulButton
         onClick={handleRegisterIngredients}
-        className="bg-positive-300 hover:bg-positive-300/60"
+        className="bg-positive-300 w-full hover:bg-positive-300/60 px-4 py-2 text-white font-semibold rounded-lg shadow-md transition ease-in-out duration-150 active:scale-90"
       >
         등록
       </DamulButton>
