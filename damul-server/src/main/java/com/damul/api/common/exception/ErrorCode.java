@@ -51,6 +51,7 @@ public enum ErrorCode {
     USER_NICKNAME_NOT_PROVIDED(HttpStatus.BAD_REQUEST, "검색할 닉네임이 존재하지 않습니다."),
     USER_FORBIDDEN(HttpStatus.FORBIDDEN, "해당 유저 ID가 존재하지 않습니다"),
     ADMIN_FORBIDDEN(HttpStatus.FORBIDDEN, "관리자 계정이 존재하지 않습니다"),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "해당 컨텐츠의 수정 권한이 없습니다"),
 
 
     // 파일 관련 에러
