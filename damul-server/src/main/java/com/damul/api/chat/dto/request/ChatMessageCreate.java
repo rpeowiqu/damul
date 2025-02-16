@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class ChatMessageCreate {
 
+    private int userId;
     private MessageType messageType;  // ENUM('TEXT', 'IMAGE', 'FILE')
     private String content;
     private String image;

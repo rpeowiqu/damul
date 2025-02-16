@@ -219,6 +219,7 @@ public class PostServiceImpl implements PostService {
                 .contentImageUrl(post.getThumbnailUrl())
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
+                .chatRoomId(chatRoom.getId())
                 .viewCnt(post.getViewCnt())
                 .currentChatNum(currentChatNum)
                 .entered(entered)

@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @Slf4j
@@ -56,7 +57,7 @@ public class CookieUtil {
 
         ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from(name, "")
                 .path("/")
-                .sameSite("Lax")
+                .sameSite("None")
                 .httpOnly(true)
                 .maxAge(0);        // 즉시 만료
 
@@ -81,6 +82,7 @@ public class CookieUtil {
      */
     public Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
+        log.debug("Received cookies: {}", Arrays.toString(cookies));
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
