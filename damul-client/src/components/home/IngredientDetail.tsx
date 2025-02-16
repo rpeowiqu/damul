@@ -18,8 +18,8 @@ interface IngredientDetailProps {
 
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col text-sm font-bold w-full">
-    <p className="text-positive-300">{label}</p>
-    <p>{value}</p>
+    <div className="text-positive-300">{label}</div>
+    <div>{value}</div>
   </div>
 );
 
