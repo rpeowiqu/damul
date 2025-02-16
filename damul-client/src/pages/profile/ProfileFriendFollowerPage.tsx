@@ -42,10 +42,12 @@ const ProfileFriendFollowerPage = () => {
     }
   };
 
-  const handleDeleteFriend = async (userId: number) => {
+  const handleDeleteFriend = async (targetId: number) => {
     try {
-      await deleteFollower(userId);
-      queryClient.invalidateQueries({ queryKey: ["follower", searchKeyword] });
+      await deleteFollower(targetId);
+      queryClient.refetchQueries({
+        queryKey: ["follower", userId, searchKeyword],
+      });
     } catch (error) {
       console.error(error);
     }
