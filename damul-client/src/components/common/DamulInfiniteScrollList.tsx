@@ -33,7 +33,7 @@ const DamulInfiniteScrollList = <T,>({
       queryFn: ({ pageParam = 0 }) => fetchFn(pageParam),
       initialPageParam: initPage,
       getNextPageParam: (lastPage) =>
-        lastPage.meta.hasNext ? lastPage.meta.nextCursor : undefined,
+        lastPage.meta?.hasNext ? lastPage.meta.nextCursor : undefined,
     });
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const DamulInfiniteScrollList = <T,>({
   return (
     <div className={className}>
       {data?.pages.map((page, pageIndex) =>
-        page.data.map((item, index) =>
+        page.data?.map((item, index) =>
           renderItems(item, index + pageIndex * page.data.length),
         ),
       )}

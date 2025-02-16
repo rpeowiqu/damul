@@ -25,7 +25,9 @@ const CommunityMarketDetailPage = () => {
     content: "",
     createdAt: "",
     currentChatNum: 0,
+    chatRoomId: 0,
     chatSize: 0,
+    entered: false,
     viewCnt: 0,
     comments: [],
   };
@@ -90,6 +92,9 @@ const CommunityMarketDetailPage = () => {
         currentChatNum={data.currentChatNum}
         chatSize={data.chatSize}
         fetchDetailData={fetchPostDetail}
+        entered={data.entered}
+        chatRoomId={data.chatRoomId}
+        status={data.status}
         type="market"
       />
       <FixedCommentInfo

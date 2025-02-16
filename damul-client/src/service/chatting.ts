@@ -81,11 +81,6 @@ export const getUnreads = async () => {
   return apiClient.get(`chats/unreads`);
 };
 
-// 공구나눔 채팅방 입장하기
-export const postIntoMarketRoom = async ({ roomId }: { roomId: number }) => {
-  return apiClient.post(`chats/rooms/${roomId}`);
-};
-
 // 일대일 채팅 입장
 export const postIntoPrivateRoom = async ({ userId }: { userId: number }) => {
   return apiClient.post(`chats/direct/${userId}`);
