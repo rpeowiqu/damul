@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatTypingMessage {
 
+    private int userId;
     private int roomId;
     private boolean isTyping;
 
