@@ -2,6 +2,7 @@ package com.damul.api.notification.service;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MemberRole;
+import com.damul.api.chat.dto.response.UnReadResponse;
 import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.entity.ChatRoomMember;
 import com.damul.api.notification.dto.ChatRoomCreatedEvent;
@@ -43,8 +44,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
-    public Integer getUnreadCount(Integer userId) {
-        return notificationRepository.countByReceiverIdAndIsReadFalse(userId);
+    public UnReadResponse getUnreadCount(Integer userId) {
+        UnReadResponse response = new UnReadResponse();
+        response.count(notificationRepository.countByReceiverIdAndIsReadFalse(userId));
+        return response;
     }
 
     @Override

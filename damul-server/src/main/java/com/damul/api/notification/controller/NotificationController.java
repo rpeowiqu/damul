@@ -1,6 +1,7 @@
 package com.damul.api.notification.controller;
 
 import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.chat.dto.response.UnReadResponse;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.notification.dto.response.NotificationList;
 import com.damul.api.notification.dto.response.NotificationResponse;
@@ -38,10 +39,10 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    @GetMapping("/api/v1/notifications/{userId}/count")
-    public ResponseEntity<Integer> getUnreadCount(@PathVariable Integer userId) {
-        log.info("Get unread count request: userId={}", userId);
-        Integer count = notificationService.getUnreadCount(userId);
+    @GetMapping("/api/v1/notifications/count")
+    public ResponseEntity<?> getUnreadCount(@CurrentUser UserInfo user) {
+        log.info("Get unread count request: userId={}", user.getId());
+        UnReadResponse count = notificationService.getUnreadCount(user.getId());
         return ResponseEntity.ok(count);
     }
 }

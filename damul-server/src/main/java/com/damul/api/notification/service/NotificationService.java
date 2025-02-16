@@ -1,6 +1,7 @@
 package com.damul.api.notification.service;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.response.UnReadResponse;
 import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.entity.ChatRoomMember;
 import com.damul.api.notification.dto.response.NotificationList;
@@ -12,7 +13,7 @@ public interface NotificationService {
 
     NotificationList getNotifications(Integer userId, boolean unreadOnly);
 
-    Integer getUnreadCount(Integer userId);
+    UnReadResponse getUnreadCount(Integer userId);
 
     void createBadgeNotification(User receiver, String badgeName);
 
