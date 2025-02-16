@@ -1,83 +1,77 @@
 import DamulButton from "@/components/common/DamulButton";
 import IngredientItem from "@/components/home/IngredientItem";
 import OcrButton from "@/components/home/OcrButton";
-import PlusIcon from "@/components/svg/PlusIcon";
-import { initialIngredientRegisterData } from "@/constants/initialData";
+import ResetIcon from "@/components/svg/ResetIcon";
+import { Input } from "@/components/ui/input";
+import { initialRegisterIngredient } from "@/constants/initialData";
 import { postUserIndegredient } from "@/service/home";
-import { RegisterIngredientData } from "@/types/Ingredient";
-import { useState } from "react";
+import { RegisterIngredient } from "@/types/Ingredient";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const LIMIT_ADD_COUNT = 50;
 
 const HomeIngredientsRegisterPage = () => {
-  const [ingredientRegisterData, setIngredientRegisterData] =
-    useState<RegisterIngredientData>(initialIngredientRegisterData);
+  const [ingredientRegisterData, setIngredientRegisterData] = useState<
+    RegisterIngredient[]
+  >([initialRegisterIngredient]);
+
+  const [storeName, setStoreName] = useState("");
+  const [purchaseAt, setPurchaseAt] = useState("");
+
+  const [totalAmount, setTotalAmount] = useState(0);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleResetData = () => {
-    setIngredientRegisterData(initialIngredientRegisterData);
+    setStoreName("");
+    setPurchaseAt("");
+
+    setIngredientRegisterData([
+      { ...initialRegisterIngredient, id: Math.floor(Math.random() * 100000) },
+    ]);
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index?: number,
-    field?: string,
-  ) => {
-    const { name, value } = e.target;
-    const parsedValue = ["productPrice", "categoryId"].includes(field ?? name)
-      ? Number(value)
-      : value;
+  const handleStoreNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStoreName(e.target.value);
+  };
+  const handlePurchaseAtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedDate = new Date(e.target.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
 
-    setIngredientRegisterData((prevData) => {
-      if (name === "storeName" || name === "purchaseAt") {
-        return {
-          ...prevData,
-          [name]: value,
-        };
-      }
+    if (selectedDate > today) {
+      alert("오늘 날짜를 포함한 이전 날짜만 선택 가능합니다.");
+      return;
+    }
 
-      if (
-        name === "ingredientName" ||
-        name === "productPrice" ||
-        name === "categoryId" ||
-        name === "expirationDate" ||
-        name === "ingredientStorage"
-      ) {
-        const updatedIngredients = [...prevData.userIngredients];
-        if (index !== undefined && field !== undefined) {
-          updatedIngredients[index] = {
-            ...updatedIngredients[index],
-            [field]: parsedValue,
-          };
-        }
+    setPurchaseAt(e.target.value);
+  };
 
-        return {
-          ...prevData,
-          userIngredients: updatedIngredients,
-        };
-      }
-
-      return prevData;
+  const handleIngredientComplete = (index: number, data: any) => {
+    setIngredientRegisterData((prev) => {
+      const updatedIngredients = [...prev];
+      updatedIngredients[index] = { ...data };
+      return updatedIngredients;
     });
   };
 
   const addIngredient = () => {
-    if (ingredientRegisterData.userIngredients.length <= LIMIT_ADD_COUNT) {
-      setIngredientRegisterData((prev) => ({
+    if (ingredientRegisterData.length <= LIMIT_ADD_COUNT) {
+      setIngredientRegisterData((prev) => [
         ...prev,
-        userIngredients: [
-          ...prev.userIngredients,
-          {
-            ingredientName: "",
-            productPrice: 0,
-            categoryId: 0,
-            expirationDate: "",
-            ingredientStorage: "FRIDGE",
-          },
-        ],
-      }));
+        {
+          id: Math.floor(Math.random() * 1000000),
+          ingredientName: "",
+          productPrice: 0,
+          categoryId: 0,
+          expirationDate: "",
+          ingredientStorage: "FRIDGE",
+        },
+      ]);
     } else {
       alert(
         "효과적인 식자재 등록을 위해 식자재 등록 후 이용해주시길 바랍니다.",
@@ -87,38 +81,52 @@ const HomeIngredientsRegisterPage = () => {
 
   const removeIngredient = (index: number) => {
     setIngredientRegisterData((prev) => {
-      const updatedIngredients = prev.userIngredients.filter(
-        (_, i) => i !== index,
-      );
+      const updatedIngredients = prev.filter((_, idx) => idx !== index);
 
-      if (prev.userIngredients.length === 1) {
-        return {
-          ...prev,
-          userIngredients: [...ingredientRegisterData.userIngredients],
-        };
+      if (prev.length === 1) {
+        return ingredientRegisterData;
       }
 
-      return { ...prev, userIngredients: updatedIngredients };
+      return updatedIngredients;
     });
   };
 
-  const totalAmount = ingredientRegisterData.userIngredients.reduce(
-    (sum, item) => sum + (Number(item.productPrice) || 0),
-    0,
-  );
+  useEffect(() => {
+    const newTotal = ingredientRegisterData.reduce(
+      (sum, item) => sum + (Number(item.productPrice) || 0),
+      0,
+    );
+    setTotalAmount(newTotal);
+  }, [ingredientRegisterData]);
 
   const handleRegisterIngredients = async () => {
+    setIsLoading(true);
+    const data = {
+      storeName,
+      purchaseAt,
+      userIngredients: ingredientRegisterData.map(({ id, ...rest }) => rest),
+    };
+
     try {
-      await postUserIndegredient(ingredientRegisterData);
+      await postUserIndegredient(data);
       navigate("/home");
     } catch (error: any) {
       console.log("식자재를 등록하지 못했습니다.");
       alert("식자재를 등록하지 못했습니다.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col p-5">
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[9999999999]">
+          <div className="bg-white p-5 rounded-lg shadow-lg">
+            <p className="text-xl font-bold">처리 중...</p>
+          </div>
+        </div>
+      )}
       <div className="flex w-full gap-6 items-center text-xl font-bold">
         <button type="button" onClick={() => navigate("/home")}>
           {"<"}
@@ -131,66 +139,79 @@ const HomeIngredientsRegisterPage = () => {
       <div className="flex justify-between">
         <DamulButton
           onClick={handleResetData}
-          className="flex bg-white items-center justify-end text-normal-300 text-sm gap-1"
+          className="flex bg-white items-center justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50"
         >
-          <PlusIcon className="w-6 h-full text-normal-300 fill-normal-200 stroke-2 stroke-normal-200" />
+          <ResetIcon className="stroke-2 stroke-normal-200" />
           <p>초기화</p>
         </DamulButton>
 
-        <OcrButton setIngredientRegisterData={setIngredientRegisterData} />
+        <OcrButton
+          setStoreName={setStoreName}
+          setPurchaseAt={setPurchaseAt}
+          setIngredientRegisterData={setIngredientRegisterData}
+          setIsLoading={setIsLoading}
+        />
       </div>
 
-      <div className="my-4 flex flex-col gap-3">
+      <div className="my-4 flex flex-col gap-3 justify-center">
         <div className="flex w-full gap-2">
           <div className="w-full flex flex-col gap-2">
-            <label className="cursor-pointer" htmlFor="storeName">
+            <label className="cursor-pointer font-bold" htmlFor="storeName">
               매장명
             </label>
-            <input
+            <Input
               name="storeName"
               id="storeName"
               type="text"
-              value={ingredientRegisterData.storeName}
-              onChange={handleChange}
-              className="border-1 w-full focus:outline-positive-300"
+              maxLength={20}
+              value={storeName}
+              onChange={handleStoreNameChange}
+              className="border-1 h-8 w-full min-w-0 cursor-pointer text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             />
           </div>
           <div className="w-full flex flex-col gap-2">
-            <label className="cursor-pointer" htmlFor="purchaseAt">
+            <label className="cursor-pointer font-bold" htmlFor="purchaseAt">
               날짜
             </label>
-            <input
+            <Input
               name="purchaseAt"
               type="date"
-              value={ingredientRegisterData.purchaseAt}
-              onChange={handleChange}
-              className="border-1 focus:outline-positive-300"
+              value={purchaseAt}
+              onChange={handlePurchaseAtChange}
+              className="border-1 flex justify-end h-8 w-full min-w-0 cursor-pointer text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             />
           </div>
         </div>
         <div className="flex flex-col gap-4 h-60 overflow-y-auto">
-          {ingredientRegisterData.userIngredients.map((ingredient, index) => (
+          {ingredientRegisterData.map((ingredient, index) => (
             <IngredientItem
-              key={`${ingredient.categoryId} ${Math.random()}`}
+              key={ingredient.id}
               ingredient={ingredient}
-              onChange={(e) => handleChange(e, index, e.target.name)}
+              purchaseAt={purchaseAt}
+              onComplete={(data) => handleIngredientComplete(index, data)}
               onDelete={() => removeIngredient(index)}
             />
           ))}
         </div>
       </div>
-      <div className="flex justify-end gap-2 font-bold">
+
+      <div className="flex justify-end items-center gap-2 font-bold">
         총 구매 금액:
-        <span className="text-positive-300">
+        <span className="text-negative-500">
           {totalAmount.toLocaleString()}
         </span>
         원
       </div>
+
       <div className="flex justify-center p-2">
-        <DamulButton className="bg-normal-200" onClick={addIngredient}>
+        <DamulButton
+          className="bg-normal-200 hover:bg-normal-300"
+          onClick={addIngredient}
+        >
           +
         </DamulButton>
       </div>
+
       <DamulButton
         onClick={handleRegisterIngredients}
         className="bg-positive-300 hover:bg-positive-300/60"

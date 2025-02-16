@@ -1,13 +1,16 @@
 import { ChangeEvent, useRef } from "react";
 import DamulButton from "../common/DamulButton";
-import PlusIcon from "../svg/PlusIcon";
 import { postReceiptForOCR } from "@/service/home";
-import { RegisterIngredientData } from "@/types/Ingredient";
+import { RegisterIngredient } from "@/types/Ingredient";
 import { CATEGORY_INFO_KR } from "@/constants/category";
+import ReceiptIcon from "../svg/ReceiptIcon";
 
 interface OcrButtonProps {
+  setStoreName: React.Dispatch<React.SetStateAction<string>>;
+  setPurchaseAt: React.Dispatch<React.SetStateAction<string>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setIngredientRegisterData: React.Dispatch<
-    React.SetStateAction<RegisterIngredientData>
+    React.SetStateAction<RegisterIngredient[]>
   >;
 }
 
@@ -19,7 +22,12 @@ interface responseData {
   ingredientStorage: "FREEZER" | "FRIDGE" | "ROOMTEMP";
 }
 
-const OcrButton = ({ setIngredientRegisterData }: OcrButtonProps) => {
+const OcrButton = ({
+  setStoreName,
+  setPurchaseAt,
+  setIsLoading,
+  setIngredientRegisterData,
+}: OcrButtonProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleClick = () => {
@@ -29,15 +37,17 @@ const OcrButton = ({ setIngredientRegisterData }: OcrButtonProps) => {
   };
 
   const fetchData = async (formData: FormData) => {
+    setIsLoading(true);
     try {
       const response = await postReceiptForOCR(formData);
 
       if (response.data.userIngredients.length > 0) {
         setIngredientRegisterData((prevData) => {
-          const newIngredientRegisterData = { ...prevData };
+          const newIngredientRegisterData = [...prevData];
 
           response.data.userIngredients.map((ingredient: responseData) => {
-            newIngredientRegisterData.userIngredients.push({
+            newIngredientRegisterData.push({
+              id: Math.floor(Math.random() * 10000),
               ingredientName: ingredient.ingredientName,
               categoryId: CATEGORY_INFO_KR[ingredient.category]
                 ? CATEGORY_INFO_KR[ingredient.category].number
@@ -51,8 +61,8 @@ const OcrButton = ({ setIngredientRegisterData }: OcrButtonProps) => {
             });
           });
 
-          newIngredientRegisterData.purchaseAt = response.data.purchaseAt;
-          newIngredientRegisterData.storeName = response.data.storeName;
+          setPurchaseAt(response.data.purchaseAt);
+          setStoreName(response.data.storeName);
 
           return newIngredientRegisterData;
         });
@@ -60,6 +70,8 @@ const OcrButton = ({ setIngredientRegisterData }: OcrButtonProps) => {
     } catch (error: any) {
       console.log("영수증 입력이 실패하였습니다.");
       alert("영수증 등록에 실패하였습니다.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,9 +99,9 @@ const OcrButton = ({ setIngredientRegisterData }: OcrButtonProps) => {
       />
       <DamulButton
         onClick={handleClick}
-        className="bg-white items-center justify-end text-normal-300 text-sm gap-1"
+        className="bg-white items-center justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50"
       >
-        <PlusIcon className="w-6 h-full text-normal-300 fill-normal-200 stroke-2 stroke-normal-200" />
+        <ReceiptIcon className="w-6 h-full text-normal-300 fill-normal-200 stroke-2 stroke-normal-200" />
         <p>영수증으로 입력하기</p>
       </DamulButton>
     </>

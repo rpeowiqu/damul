@@ -25,3 +25,12 @@ export interface RegisterIngredientData {
     ingredientStorage: "FREEZER" | "FRIDGE" | "ROOM_TEMPERATURE";
   }[];
 }
+
+export interface RegisterIngredient {
+  id: number;
+  ingredientName: string;
+  categoryId: number;
+  productPrice: number;
+  expirationDate: string;
+  ingredientStorage: "FREEZER" | "FRIDGE" | "ROOM_TEMPERATURE";
+}
