@@ -31,6 +31,10 @@ const ChattingRoomPage = () => {
 
   // 메시지 수신 핸들러
   const handleMessageReceived = (newMessage: ChatMessage) => {
+    if (newMessage.id === data?.data.id) {
+      return;
+    }
+
     setChatData((prevChatData) => {
       const updatedMessages = [...prevChatData.messages, newMessage];
       return {
@@ -122,19 +126,53 @@ const ChattingRoomPage = () => {
   // 메시지 전송
   const handleSendMessage = () => {
     if (message.trim()) {
+      const newTextMessage: ChatMessage = {
+        id: Date.now(),
+        roomId: Number(roomId),
+        senderId: data?.data.id,
+        messageType: "TEXT",
+        content: message,
+        createdAt: new Date().toISOString(),
+      };
+
+      setChatData((prevChatData) => ({
+        ...prevChatData,
+        messages: [...prevChatData.messages, newTextMessage],
+      }));
+
       sendMessage({
         userId: data?.data.id,
         messageType: "TEXT",
         content: message,
       });
+
       setMessage("");
-    } else if (prevImage) {
+    } else if (prevImage && image) {
+      const imageBlob = new Blob([image]);
+      const previewUrl = URL.createObjectURL(imageBlob);
+
+      const newImageMessage: ChatMessage = {
+        id: Date.now(),
+        roomId: Number(roomId),
+        senderId: data?.data.id,
+        messageType: "IMAGE",
+        fileUrl: previewUrl,
+        createdAt: new Date().toISOString(),
+      };
+
+      setChatData((prevChatData) => ({
+        ...prevChatData,
+        messages: [...prevChatData.messages, newImageMessage],
+      }));
+
       sendMessage({
         userId: data?.data.id,
         messageType: "IMAGE",
-        image: image ?? undefined,
+        image: image,
       });
+
       setPrevImage(null);
+      setImage(null);
     }
   };
 

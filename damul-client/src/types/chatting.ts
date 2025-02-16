@@ -21,15 +21,15 @@ export interface ChattingListItemProps {
 
 export interface ChatMessage {
   id: number;
-  roomId: number;
+  roomId?: number;
   senderId: number;
-  profileImageUrl: string;
-  nickname: string;
+  profileImageUrl?: string;
+  nickname?: string;
   messageType: "TEXT" | "IMAGE";
-  content: string;
+  content?: string;
   fileUrl?: string;
   createdAt: string;
-  unReadCount: number;
+  unReadCount?: number;
 }
 
 export interface ChatResponse {
