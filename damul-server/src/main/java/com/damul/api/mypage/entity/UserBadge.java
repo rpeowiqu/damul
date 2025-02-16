@@ -19,11 +19,11 @@ public class UserBadge {
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "badgeId", referencedColumnName = "id")
+    @JoinColumn(name = "badge_id", referencedColumnName = "id")
     private Badge badge;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @Column(name = "created_at", nullable = false, updatable = false)
