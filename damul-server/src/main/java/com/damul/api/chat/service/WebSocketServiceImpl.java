@@ -2,6 +2,7 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.MemberRole;
 import com.damul.api.chat.dto.MessageType;
 import com.damul.api.chat.dto.ReadStatus;
 import com.damul.api.chat.dto.TypingStatus;
@@ -122,6 +123,17 @@ public class WebSocketServiceImpl implements WebSocketService {
         validateRoomAndMember(roomId, userId);
         User user = userRepository.findById(userId).get();
 
+        if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
+            int currentMemberCount = chatRoomMemberRepository.countByRoomId(roomId);
+            if (currentMemberCount >= room.getMemberLimit()) {
+                throw new IllegalStateException("채팅방 최대 인원을 초과했습니다.");
+            }
+
+            String nickname = user.getNickname();
+            ChatRoomMember member = ChatRoomMember.create(room, user, nickname, MemberRole.MEMBER, 0);
+            chatRoomMemberRepository.save(member);
+        }
+
         ChatMessage enterMessage = ChatMessage.createEnterMessage(room, user);
         chatMessageRepository.save(enterMessage);
         int unReadCount = chatMessageRepository.countUnreadMessages(roomId, enterMessage.getId());
@@ -134,6 +146,15 @@ public class WebSocketServiceImpl implements WebSocketService {
         ChatRoom room = getChatRoom(roomId);
         validateRoomAndMember(roomId, userId);
         User user = userRepository.findById(userId).get();
+
+        ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
+                .orElseThrow(() -> new IllegalStateException("채팅방 멤버를 찾을 수 없습니다."));
+
+        if (member.getRole() == MemberRole.ADMIN) {
+            throw new IllegalStateException("방장은 채팅방을 나갈 수 없습니다.");
+        }
+
+        chatRoomMemberRepository.delete(member);
 
         ChatMessage leaveMessage = ChatMessage.createLeaveMessage(room, user);
         chatMessageRepository.save(leaveMessage);
