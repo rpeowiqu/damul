@@ -1,65 +1,84 @@
-import { useState, ChangeEvent, useEffect } from "react";
+import { useState, ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import SearchIcon from "@/components/svg/SearchIcon";
 import Image from "@/components/common/Image";
 import { getFollowings } from "@/service/user";
+import useAuth from "@/hooks/useAuth";
+import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
+import { FriendItemProps } from "@/components/profile/FriendItem";
+import { postIntoPrivateRoom, postIntoGroupRoom } from "@/service/chatting";
+
+interface Friend {
+  id: number;
+  nickname: string;
+}
 
 const ChattingStartPage = () => {
-  const [inputValue, setInputValue] = useState<string>("");
-  const [selectedFriends, setSelectedFriends] = useState<number[]>([]);
+  const [inputValue, setInputValue] = useState("");
+  const [selectedFriends, setSelectedFriends] = useState<Friend[]>([]);
+  const { data, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
-  useEffect(() => {
-    console.log(inputValue);
-  }, [inputValue]);
-
-  const mockData = {
-    data: [
-      { id: 1, image: "sds", nickname: "토마토러버전종우" },
-      { id: 2, image: "sds", nickname: "채팅왕김채팅" },
-      { id: 3, image: "sds", nickname: "하이퍼토마토" },
-      { id: 4, image: "sds", nickname: "뭘봐?" },
-      { id: 5, image: "sds", nickname: "깜찍이채팅" },
-      { id: 6, image: "sds", nickname: "신속배달챗봇" },
-      { id: 7, image: "sds", nickname: "그냥김철수" },
-      { id: 8, image: "sds", nickname: "수다쟁이" },
-    ],
-  };
-
   const fetchFollowings = async (pageParam: number) => {
     try {
-      const response = await getFollowings({
+      const response = await getFollowings(parseInt(data?.data.id), {
         cursor: pageParam,
         size: 10,
       });
-      if (response?.status === 204) {
-        return { data: [], meta: { nextCursor: null, hasNext: false } };
-      }
-
-      return response?.data;
+      console.log(response?.data);
+      return response?.status === 204
+        ? { data: [], meta: { nextCursor: null, hasNext: false } }
+        : response?.data;
     } catch (error) {
-      console.error(error);
+      console.error("Failed to fetch followings:", error);
+      return { data: [], meta: { nextCursor: null, hasNext: false } };
     }
   };
 
-  fetchFollowings(0);
-
-  const toggleSelection = (id: number) => {
+  const toggleSelection = (id: number, nickname: string) => {
     setSelectedFriends((prev) =>
-      prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id],
+      prev.some((friend) => friend.id === id)
+        ? prev.filter((friend) => friend.id !== id)
+        : [...prev, { id, nickname }],
     );
   };
 
   const removeSelectedFriend = (event: React.MouseEvent, id: number) => {
     event.stopPropagation();
-    setSelectedFriends((prev) => prev.filter((fid) => fid !== id));
+    setSelectedFriends((prev) => prev.filter((friend) => friend.id !== id));
   };
 
-  const startChat = () => {
-    console.log("선택된 친구들과 채팅 시작:", selectedFriends);
+  const handleStartPrivateChat = async (userId: number) => {
+    try {
+      const response = await postIntoPrivateRoom({ userId });
+      console.log(response.data);
+      const chatRoomId = response.data.id;
+      navigate(`/chatting/${chatRoomId}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleStartMultiChat = async (users: number[]) => {
+    try {
+      const response = await postIntoGroupRoom({ users });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onClickStartChat = () => {
+    if (selectedFriends.length === 1) {
+      handleStartPrivateChat(selectedFriends[0].id);
+    } else if (selectedFriends.length > 1) {
+      handleStartMultiChat(selectedFriends.map((friend) => friend.id));
+    }
   };
 
   return (
@@ -67,7 +86,7 @@ const ChattingStartPage = () => {
       <div className="flex justify-between items-center px-2">
         <div>{selectedFriends.length}명 선택</div>
         <button
-          onClick={startChat}
+          onClick={onClickStartChat}
           className={`w-auto h-auto rounded-lg px-3 py-0.5 border-2 transition ${
             selectedFriends.length > 0
               ? "border-positive-300 bg-white text-positive-500"
@@ -78,24 +97,21 @@ const ChattingStartPage = () => {
         </button>
       </div>
       {selectedFriends.length > 0 && (
-        <div className="flex gap-2 py-3 whitespace-nowrap overflow-x-scroll">
-          {selectedFriends.map((id) => {
-            const friend = mockData.data.find((user) => user.id === id);
-            return (
-              <div
-                key={id}
-                className="flex items-center bg-primary-200 text-primary-700 px-3 py-0.5 rounded-full text-xs bg-neutral-200"
+        <div className="flex gap-2 py-3 whitespace-nowrap">
+          {selectedFriends.map((friend) => (
+            <div
+              key={friend.id}
+              className="flex items-center bg-primary-200 text-primary-700 px-3 py-0.5 rounded-full text-xs bg-neutral-200"
+            >
+              {friend.nickname}
+              <button
+                onClick={(event) => removeSelectedFriend(event, friend.id)}
+                className="ml-1 p-1 rounded-full hover:bg-primary-300"
               >
-                {friend?.nickname}
-                <button
-                  onClick={(event) => removeSelectedFriend(event, id)}
-                  className="ml-1 p-1 rounded-full hover:bg-primary-300"
-                >
-                  X
-                </button>
-              </div>
-            );
-          })}
+                X
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
@@ -112,24 +128,33 @@ const ChattingStartPage = () => {
       </div>
 
       <div className="space-y-2 mt-8">
-        {mockData.data.map((user) => (
-          <div
-            key={user.id}
-            className="flex items-center justify-between p-2 pc:p-3 rounded-lg cursor-pointer hover:bg-neutral-100"
-            onClick={() => toggleSelection(user.id)}
-          >
-            <div className="flex items-center gap-3">
-              <Image src={user.image} className="w-12 h-12 rounded-full" />
-              <p className="text-normal-700">{user.nickname}</p>
+        <DamulInfiniteScrollList
+          queryKey={["following"]}
+          fetchFn={fetchFollowings}
+          renderItems={(item: FriendItemProps) => (
+            <div
+              key={item.userId}
+              className="flex items-center justify-between p-2 pc:p-3 rounded-lg cursor-pointer hover:bg-neutral-100"
+              onClick={() => toggleSelection(item.userId, item.nickname)}
+            >
+              <div className="flex items-center gap-3">
+                <Image
+                  src={item.profileImageUrl}
+                  className="w-12 h-12 rounded-full"
+                />
+                <p className="text-normal-700">{item.nickname}</p>
+              </div>
+              <input
+                type="radio"
+                readOnly
+                checked={selectedFriends.some(
+                  (friend) => friend.id === item.userId,
+                )}
+                className="w-4 h-4 pc:w-5 pc:h-5 text-primary-500 cursor-pointer"
+              />
             </div>
-            <input
-              type="radio"
-              readOnly
-              checked={selectedFriends.includes(user.id)}
-              className="w-4 h-4 pc:w-5 pc:h-5 text-primary-500 cursor-pointer"
-            />
-          </div>
-        ))}
+          )}
+        />
       </div>
     </main>
   );
