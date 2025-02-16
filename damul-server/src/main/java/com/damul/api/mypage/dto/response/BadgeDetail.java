@@ -18,6 +18,6 @@ public class BadgeDetail {
     private String description;
     private LocalDateTime createdAt;
     private double rank;
-    private String achieveCond;
+    private String catchPhrase;
 
 }

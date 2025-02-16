@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -115,16 +116,16 @@ public class MyPageServiceImpl implements MyPageService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_BADGE_NOT_FOUND, "획득하지 않은 뱃지입니다."));
 
         Badge badge = userBadge.getBadge();
-        double rankPercentage = calculateRankPercentage(badgeId, userBadge.getBadge().getLevel());
-        String achieveCondition = generateAchieveCondition(badge);
+        double rankValue = Optional.ofNullable(userBadge.getRank())
+                .orElse(0.0);
 
         return BadgeDetail.builder()
                 .id(badge.getId())
                 .title(badge.getTitle())
                 .description(badge.getDescription())
                 .createdAt(userBadge.getCreatedAt())
-                .rank(rankPercentage)
-                .achieveCond(achieveCondition)
+                .rank(rankValue)
+                .catchPhrase(badge.getCatchPhrase())
                 .build();
     }
 
