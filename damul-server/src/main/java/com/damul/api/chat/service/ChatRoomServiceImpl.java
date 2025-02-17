@@ -301,7 +301,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         // 채팅방 생성
         ChatRoom newRoom = ChatRoom.createDirectRoom(
                 currentUser,
-                String.format("%s,%s의 대화방", currentUser.getNickname(), targetUser.getNickname())
+                String.format("%s,%s", currentUser.getNickname(), targetUser.getNickname())
         );
 
         ChatRoom savedRoom = chatRoomRepository.save(newRoom);
