@@ -109,13 +109,13 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
               <div className="flex flex-col gap-2 flex-1">
                 <div>
                   <p className="text-xs text-positive-400">뱃지명</p>
-                  <p className="font-bold">
+                  <p className="text-sm text-normal-600 font-bold">
                     {selectedBadge.title} (Lv.{selectedBadge.level})
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-positive-400">획득일</p>
-                  <p className="font-bold">
+                  <p className="text-sm text-normal-600 font-bold">
                     {new Date(selectedBadge.createdAt).toLocaleDateString(
                       "ko-KR",
                     )}
@@ -125,15 +125,15 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
             </div>
 
             <div className="text-center">
-              <p className="text-base font-black">
+              <p className="text-base text-normal-600 font-black">
                 {selectedBadge.description}
               </p>
-              <p className="text-positive-400">
+              <p className="text-sm text-positive-400">
                 상위 {selectedBadge.rank}%가 이 뱃지를 획득했어요.
               </p>
             </div>
 
-            <p className="text-center text-normal-300">
+            <p className="text-center text-sm text-normal-300">
               “{selectedBadge.catchPhrase}”
             </p>
           </div>
