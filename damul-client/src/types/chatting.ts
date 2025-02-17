@@ -45,3 +45,8 @@ export interface ChattingMember {
   nickname: string;
   profileImageUrl: string;
 }
+
+export interface Friend {
+  id: number;
+  nickname: string;
+}

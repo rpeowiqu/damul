@@ -3,7 +3,7 @@ import noImage from "@/assets/noImage.jpeg";
 
 interface ImageProps {
   src: string | undefined;
-  alt: string | undefined;
+  alt?: string | undefined;
   className?: string;
 }
 

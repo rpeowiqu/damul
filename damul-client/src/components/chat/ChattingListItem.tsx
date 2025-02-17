@@ -17,7 +17,7 @@ const ChattingListItem = ({
   const highlightTitle = (title: string) => {
     if (!keyword) return title;
 
-    const regex = new RegExp(`(${keyword})`, "gi"); // 대소문자 구분 없이 keyword에 맞는 부분 찾기
+    const regex = new RegExp(`(${keyword})`, "gi");
     const parts = title.split(regex);
 
     return parts.map((part, index) =>

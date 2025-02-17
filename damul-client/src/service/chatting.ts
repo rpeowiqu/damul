@@ -1,4 +1,5 @@
 import apiClient from "./http";
+import { Friend } from "@/types/chatting";
 
 // 모든 채팅 목록 조회
 export const getChattingList = async ({
@@ -87,6 +88,6 @@ export const postIntoPrivateRoom = async ({ userId }: { userId: number }) => {
 };
 
 // 단체 채팅 생성
-export const postIntoGroupRoom = async ({ users }: { users: number[] }) => {
+export const postIntoGroupRoom = async ({ users }: { users: Friend[] }) => {
   return apiClient.post(`chats/rooms`, { users });
 };

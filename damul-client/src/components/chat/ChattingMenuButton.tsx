@@ -109,7 +109,7 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
                 />
                 <div>{member.nickname}</div>
               </div>
-              {data?.data.id === adminId && (
+              {data?.data.id === adminId && data?.data.id !== member.id && (
                 <div
                   className="text-sm font-normal text-negative-600 cursor-pointer"
                   onClick={() => handleRemoveMember(member.id)}

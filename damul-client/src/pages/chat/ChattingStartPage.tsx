@@ -8,11 +8,8 @@ import useAuth from "@/hooks/useAuth";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import { FriendItemProps } from "@/components/profile/FriendItem";
 import { postIntoPrivateRoom, postIntoGroupRoom } from "@/service/chatting";
-
-interface Friend {
-  id: number;
-  nickname: string;
-}
+import DamulButton from "@/components/common/DamulButton";
+import { Friend } from "@/types/chatting";
 
 const ChattingStartPage = () => {
   const [inputValue, setInputValue] = useState("");
@@ -56,7 +53,6 @@ const ChattingStartPage = () => {
   const handleStartPrivateChat = async (userId: number) => {
     try {
       const response = await postIntoPrivateRoom({ userId });
-      console.log(response.data);
       const chatRoomId = response.data.id;
       navigate(`/chatting/${chatRoomId}`);
     } catch (error) {
@@ -64,10 +60,11 @@ const ChattingStartPage = () => {
     }
   };
 
-  const handleStartMultiChat = async (users: number[]) => {
+  const handleStartMultiChat = async (users: Friend[]) => {
     try {
       const response = await postIntoGroupRoom({ users });
-      console.log(response.data);
+      const chatRoomId = response.data.id;
+      navigate(`/chatting/${chatRoomId}`);
     } catch (error) {
       console.log(error);
     }
@@ -77,7 +74,12 @@ const ChattingStartPage = () => {
     if (selectedFriends.length === 1) {
       handleStartPrivateChat(selectedFriends[0].id);
     } else if (selectedFriends.length > 1) {
-      handleStartMultiChat(selectedFriends.map((friend) => friend.id));
+      handleStartMultiChat(
+        selectedFriends.map((friend) => ({
+          id: friend.id,
+          nickname: friend.nickname,
+        })),
+      );
     }
   };
 
@@ -85,16 +87,14 @@ const ChattingStartPage = () => {
     <main className="h-full px-4 py-6 pc:px-6 space-y-2">
       <div className="flex justify-between items-center px-2">
         <div>{selectedFriends.length}명 선택</div>
-        <button
+        <DamulButton
           onClick={onClickStartChat}
-          className={`w-auto h-auto rounded-lg px-3 py-0.5 border-2 transition ${
-            selectedFriends.length > 0
-              ? "border-positive-300 bg-white text-positive-500"
-              : "border-gray-300 bg-white text-gray-500"
-          }`}
+          variant={`${selectedFriends.length > 0 ? "positive" : "normal"}`}
+          disabled={selectedFriends.length === 0}
+          className="h-8"
         >
           채팅 시작
-        </button>
+        </DamulButton>
       </div>
       {selectedFriends.length > 0 && (
         <div className="flex gap-2 py-3 whitespace-nowrap">
