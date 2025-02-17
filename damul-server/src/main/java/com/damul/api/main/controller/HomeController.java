@@ -31,7 +31,7 @@ public class HomeController {
     public ResponseEntity<?> getUserIngredients(@CurrentUser UserInfo user) {
         log.info("컨트롤러: 유저 식자재 목록 조회 시작 - userId: {}", user.getId());
 
-        IngredientResponse response = homeService.getUserIngredientList(user.getId());
+        IngredientResponse response = homeService.getUserIngredientList(user.getId(), user.getId());
 
         if (response.getFreezer().isEmpty() && response.getFridge().isEmpty() && response.getRoomTemp().isEmpty()) {
             return ResponseEntity.noContent().build();

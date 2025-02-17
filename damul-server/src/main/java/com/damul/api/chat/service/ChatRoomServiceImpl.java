@@ -126,11 +126,13 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                     .build();
         }
 
-        int adminId = members.stream()
-                .filter(member -> member.getRole() == MemberRole.ADMIN)
-                .findFirst()
-                .map(member -> member.getUser().getId())
-                .orElse(0);
+        int adminId = 0;
+        for (ChatRoomMember member : members) {
+            if (member.getRole() == MemberRole.ADMIN) {
+                adminId = member.getUser().getId();
+                break;
+            }
+        }
 
         // 멤버 정보 변환
         List<ChatMember> chatMembers = members.stream()
@@ -175,11 +177,13 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
             chatRoomMemberRepository.delete(member);
         }
 
-        List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(roomId);
-        String roomName = members.stream()
-                        .map(ChatRoomMember::getNickname)
-                        .collect(Collectors.joining(", "));
-        chatRoom.updateRoomName(roomName);
+        if(chatRoom.getPost() == null) {
+            List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(roomId);
+            String roomName = members.stream()
+                    .map(ChatRoomMember::getNickname)
+                    .collect(Collectors.joining(", "));
+            chatRoom.updateRoomName(roomName);
+        }
 
         log.info("서비스: 채팅방 삭제 완료 - roomId: {}", roomId);
     }

@@ -39,10 +39,11 @@ public class HomeServiceImpl implements HomeService {
     private final UserRepository userRepository;
 
     @Override
-    public IngredientResponse getUserIngredientList(int userId) {
+    public IngredientResponse getUserIngredientList(int targetId, int userId) {
         log.info("사용자 식자재 전체 가져오기 시작 - userId: {}", userId);
 
         validateUserId(userId);
+        validateUserAccessRange(userId);
         List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(userId);
 
         return new IngredientResponse(
@@ -216,6 +217,10 @@ public class HomeServiceImpl implements HomeService {
 
     private int calculateDaysUntilExpiration(LocalDateTime expirationDate) {
         return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), expirationDate);
+    }
+
+    private void validateUserAccessRange(int userId) {
+
     }
 
     private IngredientResponse categorizeIngredients(List<UserIngredientList> ingredients) {

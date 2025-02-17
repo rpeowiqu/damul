@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface HomeService {
 
-    IngredientResponse getUserIngredientList(int userId);
+    IngredientResponse getUserIngredientList(int targetId, int userId);
 
     IngredientResponse getSearchUserIngredientList(int userId, String keyword, String orderByDir, String orderBy);
 
