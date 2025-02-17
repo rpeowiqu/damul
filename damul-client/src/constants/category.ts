@@ -117,7 +117,38 @@ export const CATEGORY_INFO_KR = {
   },
 } as const;
 
-export type CategoryKey = keyof typeof CATEGORY_INFO;
-export const CATEGORYNAME = (key: CategoryKey) => CATEGORY_INFO[key].name;
-export const CATEGORYNUMBER = (key: CategoryKey) => CATEGORY_INFO[key].number;
-export const CATEGORYICON = (key: CategoryKey) => CATEGORY_INFO[key].icon;
+export const CATEGORY_NAME_MAPPER = new Map();
+CATEGORY_NAME_MAPPER.set(1, "곡물");
+CATEGORY_NAME_MAPPER.set(2, "채소");
+CATEGORY_NAME_MAPPER.set(3, "과일");
+CATEGORY_NAME_MAPPER.set(4, "유제품");
+CATEGORY_NAME_MAPPER.set(5, "육류");
+CATEGORY_NAME_MAPPER.set(6, "달걀류");
+CATEGORY_NAME_MAPPER.set(7, "수산물");
+CATEGORY_NAME_MAPPER.set(8, "기름");
+CATEGORY_NAME_MAPPER.set(9, "양념");
+CATEGORY_NAME_MAPPER.set(10, "기타");
+
+export const CATEGORY_NUMBER_MAPPER = new Map();
+CATEGORY_NAME_MAPPER.set("곡물", 1);
+CATEGORY_NAME_MAPPER.set("채소", 2);
+CATEGORY_NAME_MAPPER.set("과일", 3);
+CATEGORY_NAME_MAPPER.set("유제품", 4);
+CATEGORY_NAME_MAPPER.set("육류", 5);
+CATEGORY_NAME_MAPPER.set("달걀류", 6);
+CATEGORY_NAME_MAPPER.set("수산물", 7);
+CATEGORY_NAME_MAPPER.set("기름", 8);
+CATEGORY_NAME_MAPPER.set("양념", 9);
+CATEGORY_NAME_MAPPER.set("기타", 10);
+
+export const CATEGORY_COLOR_MAPPER = new Map();
+CATEGORY_COLOR_MAPPER.set("곡물", "#f28b82");
+CATEGORY_COLOR_MAPPER.set("채소", "#fbbc04");
+CATEGORY_COLOR_MAPPER.set("과일", "#fdd663");
+CATEGORY_COLOR_MAPPER.set("유제품", "#97d174");
+CATEGORY_COLOR_MAPPER.set("육류", "#6fcf97");
+CATEGORY_COLOR_MAPPER.set("달걀류", "#76d7ea");
+CATEGORY_COLOR_MAPPER.set("수산물", "#4a90e2");
+CATEGORY_COLOR_MAPPER.set("기름", "#ab7fd0");
+CATEGORY_COLOR_MAPPER.set("양념", "#f4a9c0");
+CATEGORY_COLOR_MAPPER.set("기타", "#cfd8dc");
