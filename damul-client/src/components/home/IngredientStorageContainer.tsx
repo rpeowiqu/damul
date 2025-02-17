@@ -166,12 +166,13 @@ const IngredientStorageContainer = ({
       ) : (
         <>
           <div
-            className={`grid grid-cols-2 gap-2 p-2 mt-2 mb-3 pc:grid-cols-5 sm:grid-cols-4 xs:grid-cols-3 ${!isExpanded && "overflow-y-hidden h-[70px]"}`}
+            className={`grid grid-cols-2 gap-2 p-2 mt-2 pc:grid-cols-5 sm:grid-cols-4 xs:grid-cols-3 ${!isExpanded && "overflow-y-hidden h-[70px]"}`}
           >
             {ingredients.map((ingredient, idx) => {
               return (
                 <IngredientButton
                   key={idx}
+                  title={title}
                   variant={ingredient.categoryId}
                   name={ingredient.ingredientName}
                   quantity={ingredient.ingredientQuantity}
@@ -183,6 +184,7 @@ const IngredientStorageContainer = ({
               );
             })}
           </div>
+
           <button
             onClick={handleOnClick}
             className={`${isOverColumnLimit ? "block" : "hidden"}

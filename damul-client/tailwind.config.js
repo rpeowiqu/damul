@@ -10,6 +10,18 @@ module.exports = {
       xs: "360px",
     },
     extend: {
+      keyframes: {
+        shiver: {
+          "0%, 100%": { transform: "translate(0, 0)" },
+          "20%": { transform: "translate(-1px, 2px)" },
+          "40%": { transform: "translate(2px, -2px)" },
+          "60%": { transform: "translate(-2px, 1px)" },
+          "80%": { transform: "translate(1px, -1px)" },
+        },
+      },
+      animation: {
+        shiver: "shiver 0.2s infinite",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
