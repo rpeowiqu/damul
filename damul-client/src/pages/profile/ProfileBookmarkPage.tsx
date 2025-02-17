@@ -33,7 +33,7 @@ const ProfileBookmarkPage = () => {
   const { user } = useOutletContext();
   const { data, isLoading } = useAuth();
   const [sortType, setSortType] = useState<
-    "created_at" | "view_cnt" | "like_cnt"
+    "created_at" | "like_cnt" | "view_cnt"
   >("created_at");
 
   const fetchBookmarks = async (pageParam: number) => {
@@ -76,7 +76,7 @@ const ProfileBookmarkPage = () => {
       <div className="flex justify-end">
         <Select
           value={sortType}
-          onValueChange={(value: "created_at" | "view_cnt" | "like_cnt") =>
+          onValueChange={(value: "created_at" | "like_cnt" | "view_cnt") =>
             setSortType(value)
           }
         >
@@ -94,13 +94,13 @@ const ProfileBookmarkPage = () => {
               </SelectItem>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="view_cnt"
+                value="like_cnt"
               >
                 추천순
               </SelectItem>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="like_cnt"
+                value="view_cnt"
               >
                 조회수순
               </SelectItem>

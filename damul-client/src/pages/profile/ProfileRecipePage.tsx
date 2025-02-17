@@ -31,7 +31,7 @@ interface RecipeItem {
 const ProfileRecipePage = () => {
   const { user } = useOutletContext();
   const [sortType, setSortType] = useState<
-    "created_at" | "view_cnt" | "like_cnt"
+    "created_at" | "like_cnt" | "view_cnt"
   >("created_at");
 
   const fetchRecipes = async (pageParam: number) => {
@@ -63,7 +63,7 @@ const ProfileRecipePage = () => {
       <div className="flex justify-end">
         <Select
           value={sortType}
-          onValueChange={(value: "created_at" | "view_cnt" | "like_cnt") =>
+          onValueChange={(value: "created_at" | "like_cnt" | "view_cnt") =>
             setSortType(value)
           }
         >
@@ -81,13 +81,13 @@ const ProfileRecipePage = () => {
               </SelectItem>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="view_cnt"
+                value="like_cnt"
               >
                 추천순
               </SelectItem>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="like_cnt"
+                value="view_cnt"
               >
                 조회수순
               </SelectItem>
