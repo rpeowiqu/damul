@@ -13,6 +13,7 @@ import com.damul.api.config.service.S3Service;
 import com.damul.api.main.dto.response.HomeSuggestedResponse;
 import com.damul.api.main.dto.response.RecipeTagList;
 import com.damul.api.main.dto.response.SuggestedRecipeList;
+import com.damul.api.notification.service.NotificationService;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.*;
 import com.damul.api.recipe.entity.*;
@@ -57,6 +58,7 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeLikeRepository recipeLikeRepository;
     private final RecipeBookmarkRepository recipeBookmarkRepository;
     private final TimeZoneConverter timeZoneConverter;
+    private final NotificationService notificationService;
 
     // 레시피 전체 조회 및 검색
     @Override
@@ -511,6 +513,7 @@ public class RecipeServiceImpl implements RecipeService {
     public boolean toggleRecipeLike(int recipeId, UserInfo userInfo) {
         log.info("레시피 좋아요 시작");
         int userId = checkUserInfo(userInfo);
+        User currentUser = userRepository.findById(userId).get();
 
         log.info("레시피 존재 유무 확인");
         Recipe recipe = recipeRepository.findById(recipeId)
@@ -537,6 +540,7 @@ public class RecipeServiceImpl implements RecipeService {
             recipeLikeRepository.save(newLike);
             recipe.incrementLikeCnt();  // likeCnt 증가
             recipeRepository.save(recipe);  // 변경사항 저장
+            notificationService.createLikeNotification(recipe.getUser(), currentUser, recipeId);
             return true;
         }
     }
@@ -573,6 +577,7 @@ public class RecipeServiceImpl implements RecipeService {
         comment.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         RecipeComment savedComment = recipeCommentRepository.save(comment);
+        notificationService.createCommentNotification(recipe.getUser(), user, comment.getId());
         return new CreateResponse(savedComment.getId());
     }
 
