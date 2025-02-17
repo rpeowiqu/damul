@@ -533,6 +533,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipe(recipe)
                     .user(userRepository.getReferenceById(userId))  // 실제 조회 없이 참조만 가져옴
                     .build();
+            newLike.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
             recipeLikeRepository.save(newLike);
             recipe.incrementLikeCnt();  // likeCnt 증가
             recipeRepository.save(recipe);  // 변경사항 저장

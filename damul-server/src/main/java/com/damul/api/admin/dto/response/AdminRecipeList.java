@@ -1,4 +1,4 @@
-package com.damul.api.ingredient.dto.response;
+package com.damul.api.admin.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PriceData {
-    private String period;
-    private String price;
+public class AdminRecipeList {
+    private int id;
+    private String nickname;
+    private String title;
 }

@@ -20,9 +20,6 @@ public class FoodItem {
     @Column(name = "item_name", length = 100)
     private String itemName;
 
-    @Column(name = "kind_name", length = 100)
-    private String kindName;
-
     @Column(name = "item_code", length = 10)
     private String itemCode;
 

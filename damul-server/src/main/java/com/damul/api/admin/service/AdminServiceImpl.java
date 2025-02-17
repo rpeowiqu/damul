@@ -1,5 +1,8 @@
 package com.damul.api.admin.service;
 
+import com.damul.api.admin.dto.response.AdminUserDetail;
+import com.damul.api.admin.dto.response.AdminUserList;
+import com.damul.api.admin.dto.response.ReportDetail;
 import com.damul.api.admin.dto.response.ReportList;
 import com.damul.api.common.page.PageResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,26 @@ import org.springframework.stereotype.Service;
 public class AdminServiceImpl implements AdminService {
     @Override
     public PageResponse<ReportList> getReportList(int currentPage, int pageSize, String searchType, String keyword) {
+        return null;
+    }
+
+    @Override
+    public ReportDetail getReportDetail(int reportId) {
+        return null;
+    }
+
+    @Override
+    public void updateReportStatus(String status, int targetId) {
+
+    }
+
+    @Override
+    public PageResponse<AdminUserList> getUsers(int currentPage, int pageSize, String searchType, String keyword) {
+        return null;
+    }
+
+    @Override
+    public AdminUserDetail getUserDetail(int userId) {
         return null;
     }
 }

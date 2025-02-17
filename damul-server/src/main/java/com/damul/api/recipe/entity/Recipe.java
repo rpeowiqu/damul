@@ -44,7 +44,6 @@ public class Recipe {
     private int likeCnt;
 
     @Column(name = "created_at", nullable = false)
-    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
