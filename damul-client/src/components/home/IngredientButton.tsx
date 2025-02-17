@@ -11,7 +11,7 @@ interface IngredientButtonProps {
   quantity: number;
   expirationDate: number;
   onClick: MouseEventHandler<HTMLButtonElement>;
-  onEdit: boolean;
+  onEdit?: boolean;
 }
 
 const IngredientButton = ({

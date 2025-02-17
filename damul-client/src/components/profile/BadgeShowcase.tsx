@@ -17,31 +17,6 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
   const { userId } = useParams();
   const [currentBadgeIndex, setCurrentBadgeIndex] = useState(-1);
   const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentBadgeIndex(-1));
-  const { data, isLoading } = useQuery<BadgeDetail>({
-    queryKey: ["badge", userId, currentBadgeIndex],
-    queryFn: async () => {
-      const response = await getBadge(
-        parseInt(userId!),
-        list[currentBadgeIndex].badgeId,
-      );
-      return response.data;
-    },
-    initialData: {
-      id: 0,
-      title: "",
-      level: 0,
-      createdAt: "",
-      description: "",
-      rank: 0,
-      catchPhrase: "",
-    },
-    refetchOnWindowFocus: false,
-    enabled: currentBadgeIndex > -1,
-  });
-
-  useEffect(() => {
-    setIsOpen(currentBadgeIndex > -1 ? true : false);
-  }, [currentBadgeIndex]);
 
   const sortedList = useMemo(() => {
     return [...list].sort((a, b) => {
@@ -52,6 +27,43 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
       return a.badgeLevel > b.badgeLevel ? -1 : 1;
     });
   }, [list, sortType]);
+  const originalIndex = useMemo(() => {
+    if (currentBadgeIndex === -1) {
+      return -1;
+    }
+
+    const badge = sortedList[currentBadgeIndex];
+    return list.findIndex((b) => b.badgeId === badge.badgeId);
+  }, [currentBadgeIndex, sortedList, list]);
+
+  const badgeId = originalIndex > -1 ? list[originalIndex].badgeId : null;
+  const { data, isLoading } = useQuery<BadgeDetail>({
+    queryKey: ["badge", userId, badgeId],
+    queryFn: async () => {
+      const response = await getBadge(
+        parseInt(userId!),
+        sortedList[currentBadgeIndex].badgeId,
+      );
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 3,
+    refetchOnWindowFocus: false,
+    enabled: !!badgeId,
+  });
+
+  useEffect(() => {
+    setIsOpen(currentBadgeIndex > -1 ? true : false);
+  }, [currentBadgeIndex]);
+
+  const selectedBadge = data ?? {
+    id: 0,
+    title: "",
+    level: 0,
+    createdAt: "",
+    description: "",
+    rank: 0,
+    catchPhrase: "",
+  };
 
   return (
     <div className="flex flex-col gap-3 p-3 border border-normal-100 rounded-xl">
@@ -91,33 +103,39 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
           <div className="flex flex-col justify-center gap-5 px-3">
             <div className="flex items-center gap-3">
               <div className="flex justify-center items-center w-20 h-20 pt-2 rounded-full border-2 border-normal-100">
-                <Badge badgeLevel={list[currentBadgeIndex].badgeLevel} />
+                <Badge badgeLevel={selectedBadge.level} />
               </div>
 
               <div className="flex flex-col gap-2 flex-1">
                 <div>
                   <p className="text-xs text-positive-400">뱃지명</p>
                   <p className="font-bold">
-                    {data.title} (Lv.{data.level})
+                    {selectedBadge.title} (Lv.{selectedBadge.level})
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-positive-400">획득일</p>
                   <p className="font-bold">
-                    {new Date(data.createdAt).toLocaleDateString("ko-KR")}
+                    {new Date(selectedBadge.createdAt).toLocaleDateString(
+                      "ko-KR",
+                    )}
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="text-center">
-              <p className="text-base font-black">{data.description}</p>
+              <p className="text-base font-black">
+                {selectedBadge.description}
+              </p>
               <p className="text-positive-400">
-                상위 {data.rank}%가 이 뱃지를 획득했어요.
+                상위 {selectedBadge.rank}%가 이 뱃지를 획득했어요.
               </p>
             </div>
 
-            <p className="text-center text-normal-300">“{data.catchPhrase}”</p>
+            <p className="text-center text-normal-300">
+              “{selectedBadge.catchPhrase}”
+            </p>
           </div>
         </DamulModal>
       )}
