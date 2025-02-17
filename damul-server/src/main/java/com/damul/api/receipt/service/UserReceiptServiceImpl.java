@@ -79,6 +79,7 @@ public class UserReceiptServiceImpl implements UserReceiptService {
                             .userReciept(savedReceipt)
                             .categoryId(item.getCategoryId())
                             .ingredientQuantity(100)
+                            .ingredientUp(request.getPurchaseAt().atStartOfDay())
                             .ingredientName(item.getIngredientName())
                             .expirationDate(item.getExpirationDate().atStartOfDay())
                             .ingredientStorage(item.getIngredientStorage())
