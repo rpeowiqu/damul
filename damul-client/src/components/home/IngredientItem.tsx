@@ -124,35 +124,7 @@ const IngredientItem = ({
             ))}
           </select>
         </div>
-        <div className="flex relative gap-2 w-full justify-between items-center">
-          <label
-            className="w-20 cursor-pointer font-bold max-xs:text-sm"
-            htmlFor="productPrice"
-          >
-            가격
-          </label>
-          <Input
-            type="text"
-            id="productPrice"
-            name="productPrice"
-            className="border w-full h-8 min-w-0 cursor-pointer text-negative-500 font-bold text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1 pr-6 "
-            onChange={(e) => {
-              let value = e.target.value;
-              if (value === "" || parseInt(value) < 0) {
-                value = "0";
-              }
-              if (
-                /^\d*\.?\d{0,0}$/.test(value) &&
-                parseInt(value) <= MAX_PRODUCT_PRICE
-              ) {
-                handleChange(e);
-              }
-            }}
-            value={ingredientData.productPrice}
-            onFocus={(e) => e.target.select()}
-          />
-          <p className="absolute right-2 font-bold">원</p>
-        </div>
+
         <div className="flex gap-2 w-full justify-between items-center">
           <label
             className="w-20 cursor-pointer font-bold max-xs:text-sm"
@@ -190,6 +162,35 @@ const IngredientItem = ({
               </option>
             ))}
           </select>
+        </div>
+        <div className="flex relative gap-2 w-full justify-between items-center">
+          <label
+            className="w-20 cursor-pointer font-bold max-xs:text-sm"
+            htmlFor="productPrice"
+          >
+            가격
+          </label>
+          <Input
+            type="text"
+            id="productPrice"
+            name="productPrice"
+            className="border w-full h-8 min-w-0 cursor-pointer text-negative-500 font-bold text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1 pr-6 "
+            onChange={(e) => {
+              let value = e.target.value;
+              if (value === "" || parseInt(value) < 0) {
+                value = "0";
+              }
+              if (
+                /^\d*\.?\d{0,0}$/.test(value) &&
+                parseInt(value) <= MAX_PRODUCT_PRICE
+              ) {
+                handleChange(e);
+              }
+            }}
+            value={ingredientData.productPrice}
+            onFocus={(e) => e.target.select()}
+          />
+          <p className="absolute right-2 font-bold">원</p>
         </div>
       </div>
     </div>
