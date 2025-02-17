@@ -1,21 +1,26 @@
-import { useState } from "react";
-import fallbackSrc from "@/assets/noImage.jpeg";
+import { useEffect, useState } from "react";
+import noImage from "@/assets/noImage.jpeg";
 
 interface ImageProps {
-  src?: string;
-  alt?: string;
+  src: string;
+  alt: string;
   className?: string;
 }
 
-const Image = ({ src, alt = "이미지", className = "" }: ImageProps) => {
-  const [imageSrc, setImageSrc] = useState(src || fallbackSrc);
+const Image = ({ src, alt, className }: ImageProps) => {
+  const [imageSrc, setImageSrc] = useState(src);
 
-  const handleError = () => {
-    setImageSrc(fallbackSrc);
-  };
+  useEffect(() => {
+    setImageSrc(src);
+  }, [src]);
 
   return (
-    <img src={imageSrc} alt={alt} className={className} onError={handleError} />
+    <img
+      src={imageSrc || noImage}
+      alt={alt}
+      className={className}
+      onError={() => setImageSrc(noImage)}
+    />
   );
 };
 
