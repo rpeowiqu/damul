@@ -330,8 +330,8 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
         log.info("서비스: 1:1 채팅방 생성 완료 - roomId: {}", savedRoom.getId());
 
-        List<ChatRoomMember> members = List.of(currentMember, targetMember);
-        notificationService.notifyNewChatRoom(savedRoom, members);
+//        List<ChatRoomMember> members = List.of(currentMember, targetMember);
+//        notificationService.notifyNewChatRoom(savedRoom, members);
 
         return new CreateResponse(savedRoom.getId());
     }
@@ -407,9 +407,9 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
         log.info("서비스: 단체 채팅방 생성 완료 - roomId: {}", savedRoom.getId());
 
-        List<ChatRoomMember> allMembers = chatRoomMemberRepository
-                .findAllByRoomId(savedRoom.getId());
-        notificationService.notifyNewChatRoom(savedRoom, allMembers);
+//        List<ChatRoomMember> allMembers = chatRoomMemberRepository
+//                .findAllByRoomId(savedRoom.getId());
+//        notificationService.notifyNewChatRoom(savedRoom, allMembers);
 
         return new CreateResponse(savedRoom.getId());
     }

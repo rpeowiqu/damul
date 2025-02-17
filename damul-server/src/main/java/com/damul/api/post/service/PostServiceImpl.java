@@ -16,6 +16,7 @@ import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.config.service.S3Service;
+import com.damul.api.notification.service.NotificationService;
 import com.damul.api.post.dto.PostStatus;
 import com.damul.api.post.dto.request.PostRequest;
 import com.damul.api.post.dto.response.CommentList;
@@ -62,6 +63,7 @@ public class PostServiceImpl implements PostService {
 
     private final S3Service s3Service;
     private final TimeZoneConverter timeZoneConverter;
+    private final NotificationService notificationService;
 
 
     // 게시글 전체 조회/검색
@@ -377,6 +379,7 @@ public class PostServiceImpl implements PostService {
         comment.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         PostComment savedComment = postCommentRepository.save(comment);
+        notificationService.createCommentNotification(post.getUser(), user, postId);
         return new CreateResponse(savedComment.getPostCommentId());
     }
 

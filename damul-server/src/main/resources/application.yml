@@ -4,7 +4,7 @@ spring:
       - optional:classpath:.env[.properties]
       - optional:file:.env[.properties]
     profiles:
-      active: local
+      active: prod
       # on-profile: local
 
   application:

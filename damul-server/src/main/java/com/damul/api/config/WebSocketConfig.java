@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .addInterceptors(handshakeInterceptor)
-                .setAllowedOriginPatterns("http://localhost:5173") // 실제 운영 환경에서는 구체적인 도메인 지정 필요
+                .setAllowedOriginPatterns("https://i12a306.p.ssafy.io") // 실제 운영 환경에서는 구체적인 도메인 지정 필요
                 .withSockJS()
                 .setStreamBytesLimit(512 * 1024) // 512KB
                 .setHttpMessageCacheSize(1000)
@@ -53,6 +54,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(new AuthenticationPrincipalArgumentResolver());
+    }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+        registry.setMessageSizeLimit(1024 * 1024)    // 1MB
+                .setSendBufferSizeLimit(1024 * 1024) // 1MB
+                .setSendTimeLimit(20000);            // 20초
     }
 
 }

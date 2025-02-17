@@ -6,6 +6,7 @@ import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.util.ScrollUtil;
+import com.damul.api.notification.service.NotificationService;
 import com.damul.api.user.dto.response.FollowList;
 import com.damul.api.user.dto.response.FollowResponse;
 import com.damul.api.user.dto.response.UserList;
@@ -32,6 +33,7 @@ public class FollowServiceImpl implements FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final TimeZoneConverter timeZoneConverter;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -71,6 +73,7 @@ public class FollowServiceImpl implements FollowService {
                         .build();
                 newFollow.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
                 followRepository.save(newFollow);
+                notificationService.createFollowNotification(currentUser, targetUser);
                 return new FollowResponse(true);
             }
         } catch (DataIntegrityViolationException e) {
