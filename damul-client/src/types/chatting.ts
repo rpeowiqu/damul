@@ -23,9 +23,9 @@ export interface ChatMessage {
   id: number;
   roomId?: number;
   senderId: number;
-  profileImageUrl?: string;
+  profileImageUrl?: string | undefined;
   nickname?: string;
-  messageType: "TEXT" | "IMAGE";
+  messageType: "TEXT" | "IMAGE" | "SYSTEM";
   content?: string;
   fileUrl?: string;
   createdAt: string;

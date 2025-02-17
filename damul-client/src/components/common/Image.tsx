@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import noImage from "@/assets/noImage.jpeg";
 
 interface ImageProps {
-  src: string;
-  alt: string;
+  src: string | undefined;
+  alt: string | undefined;
   className?: string;
 }
 
