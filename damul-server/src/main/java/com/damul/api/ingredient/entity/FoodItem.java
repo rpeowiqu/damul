@@ -17,9 +17,6 @@ public class FoodItem {
     @Column(name = "category_id")
     private int categoryId;
 
-    @Column(length = 50)
-    private String origin;
-
     @Column(name = "item_name", length = 100)
     private String itemName;
 
@@ -31,4 +28,10 @@ public class FoodItem {
 
     @Column(name = "kind_code", length = 10)
     private String kindCode;
+
+    @Column(name = "unit")
+    private String unit;
+
+    @Column(name = "eco_flag")
+    private boolean ecoFlag;
 }

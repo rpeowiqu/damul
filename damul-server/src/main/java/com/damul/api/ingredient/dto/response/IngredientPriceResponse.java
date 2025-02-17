@@ -12,6 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IngredientPriceResponse {
-    private String productName;
-    private List<PriceData> prices;
+    private List<PriceData> priceDataList;
 }
