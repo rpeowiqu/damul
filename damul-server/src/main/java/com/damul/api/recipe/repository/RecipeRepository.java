@@ -161,13 +161,27 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
         WHERE r.user.id = :userId
         AND r.deleted = false
         AND (:cursor = 0 OR r.id < :cursor)
-        ORDER BY r.id DESC
+        ORDER BY 
+        CASE :sortType 
+            WHEN 'created_at' THEN r.createdAt
+            ELSE NULL
+        END DESC,
+        CASE :sortType
+            WHEN 'view_cnt' THEN r.viewCnt
+            ELSE 0
+        END DESC,
+        CASE :sortType
+            WHEN 'like_cnt' THEN r.likeCnt
+            ELSE 0
+        END DESC,
+        r.id DESC
         LIMIT :size
     """)
     List<RecipeList> findMyRecipes(
             @Param("userId") int userId,
             @Param("cursor") int cursor,
-            @Param("size") int size
+            @Param("size") int size,
+            @Param("sortType") String sortType
     );
 
     @Query("""

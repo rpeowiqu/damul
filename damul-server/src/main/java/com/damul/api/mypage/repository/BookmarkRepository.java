@@ -12,31 +12,45 @@ import java.util.List;
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark, Integer> {
     @Query("""
-    SELECT new com.damul.api.recipe.dto.response.RecipeList(
-        b.recipe.id,
-        b.recipe.title,
-        b.recipe.thumbnailUrl,
-        b.recipe.content,
-        b.recipe.createdAt,
-        b.recipe.user.id,
-        b.recipe.user.nickname,
-        b.recipe.viewCnt,
-        b.recipe.likeCnt,
-        true,
-        CASE WHEN l.id IS NOT NULL THEN true ELSE false END
-    )
-    FROM Bookmark b
-    LEFT JOIN RecipeLike l ON l.recipe.id = b.recipe.id AND l.user.id = :userId
-    WHERE b.user.id = :userId
-    AND b.recipe.deleted = false
-    AND (:cursor = 0 OR b.id < :cursor)
-    ORDER BY b.id DESC
-    LIMIT :size
+        SELECT new com.damul.api.recipe.dto.response.RecipeList(
+            b.recipe.id,
+            b.recipe.title,
+            b.recipe.thumbnailUrl,
+            b.recipe.content,
+            b.recipe.createdAt,
+            b.recipe.user.id,
+            b.recipe.user.nickname,
+            b.recipe.viewCnt,
+            b.recipe.likeCnt,
+            true,
+            CASE WHEN l.id IS NOT NULL THEN true ELSE false END
+        )
+        FROM Bookmark b
+        LEFT JOIN RecipeLike l ON l.recipe.id = b.recipe.id AND l.user.id = :userId
+        WHERE b.user.id = :userId
+        AND b.recipe.deleted = false
+        AND (:cursor = 0 OR b.id < :cursor)
+        ORDER BY 
+        CASE :sortType 
+            WHEN 'created_at' THEN b.recipe.createdAt
+            ELSE NULL
+        END DESC,
+        CASE :sortType
+            WHEN 'view_cnt' THEN b.recipe.viewCnt
+            ELSE 0
+        END DESC,
+        CASE :sortType
+            WHEN 'like_cnt' THEN b.recipe.likeCnt
+            ELSE 0
+        END DESC,
+        b.id DESC
+        LIMIT :size
     """)
     List<RecipeList> findBookmarkedRecipes(
             @Param("userId") int userId,
             @Param("cursor") int cursor,
-            @Param("size") int size
+            @Param("size") int size,
+            @Param("sortType") String sortType
     );
 
     boolean existsByUserIdAndIdLessThan(int userId, int id);
