@@ -40,8 +40,7 @@ const ProfileBookmarkPage = () => {
     try {
       const response = await getBookmarks(parseInt(user.userId), {
         cursor: pageParam,
-        size: 5,
-        sortType,
+        size: 10,
       });
       if (response?.status === 204) {
         return { data: [], meta: { nextCursor: null, hasNext: false } };

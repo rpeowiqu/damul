@@ -38,7 +38,7 @@ const DamulInfiniteScrollList = <T,>({
       enabled,
       initialPageParam: initPage,
       getNextPageParam: (lastPage) =>
-        lastPage.meta.hasNext ? lastPage.meta.nextCursor : undefined,
+        lastPage.meta?.hasNext ? lastPage.meta.nextCursor : undefined,
     });
 
   useEffect(() => {

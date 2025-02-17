@@ -49,10 +49,8 @@ const DamulModal = ({
             <DialogTitle></DialogTitle>
           </DialogHeader>
         )}
-
-        <DialogDescription>
-          <div>{children}</div>
-        </DialogDescription>
+        <DialogDescription className="hidden"></DialogDescription>
+        {children}
         {footerComponent && <DialogFooter>{footerComponent}</DialogFooter>}
       </DialogContent>
     </Dialog>

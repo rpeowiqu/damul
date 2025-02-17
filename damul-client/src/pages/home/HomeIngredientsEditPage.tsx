@@ -55,7 +55,7 @@ const HomeIngredientsEditPage = () => {
           return (
             <>
               <div
-                key={`${ingredient} ${Math.random()}`}
+                key={ingredient.userIngredientId}
                 className="border-4 w-full max-w-96 rounded-3xl border-positive-300"
               >
                 <IngredientDetail

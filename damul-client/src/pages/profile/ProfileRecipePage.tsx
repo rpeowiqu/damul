@@ -38,9 +38,9 @@ const ProfileRecipePage = () => {
     try {
       const response = await getMyRecipes(parseInt(user.userId), {
         cursor: pageParam,
-        size: 5,
-        sortType,
+        size: 10,
       });
+      console.log(response.data);
       if (response?.status === 204) {
         return { data: [], meta: { nextCursor: null, hasNext: false } };
       }
