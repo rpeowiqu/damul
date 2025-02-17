@@ -14,6 +14,8 @@ import reactor.netty.http.client.HttpClient;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 @Slf4j
 @Service
@@ -32,6 +34,7 @@ public class KamisApiService {
     private static final String CONVERT_KG_YN = "Y";
 
     public String getPrice(String itemCode, String itemCategoryCode) {
+
         log.info("Kamis API 호출 시작 - itemCode: {}, itemCategoryCode: {}", itemCode, itemCategoryCode);
 
         log.info("KAMIS_RETURN_TYPE : {}", KAMIS_RETURN_TYPE);
