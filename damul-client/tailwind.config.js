@@ -18,9 +18,25 @@ module.exports = {
           "60%": { transform: "translate(-2px, 1px)" },
           "80%": { transform: "translate(1px, -1px)" },
         },
+        wind: {
+          "0%, 100%": { transform: "translate(0px, 0px)" },
+          "25%": { transform: "translate(5px, -2px)" },
+          "50%": { transform: "translate(-5px, 2px)" },
+          "75%": { transform: "translate(3px, -1px)" },
+        },
+
+        wave: {
+          "0%": { transform: "rotate(0deg)" },
+          "25%": { transform: "rotate(2deg)" },
+          "50%": { transform: "rotate(-2deg)" },
+          "75%": { transform: "rotate(2deg)" },
+          "100%": { transform: "rotate(0deg)" },
+        },
       },
       animation: {
         shiver: "shiver 0.2s infinite",
+        wind: "wind 3s infinite",
+        wave: "wave 0.5s infinite ease-in-out",
       },
       borderRadius: {
         lg: "var(--radius)",

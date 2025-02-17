@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import DamulCarousel from "@/components/common/DamulCarousel";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import UserGreeting from "@/components/home/UserGreeting";
@@ -15,6 +14,7 @@ import {
   initialIngrdientItems,
 } from "@/constants/initialData";
 import { EXPIRINGSOON_DAY } from "@/constants/itemStatus";
+import RefrigeratorDoor from "@/components/home/RefrigeratorDoor";
 
 const HomePage = () => {
   const [ingredientData, setIngredientData] =
@@ -128,16 +128,20 @@ const HomePage = () => {
           if (storage === "expiringSoon") return null;
 
           return (
-            <IngredientStorageContainer
-              key={`${storage}${Math.random()}`}
-              title={storage as keyof IngredientData}
-              items={
-                filteredIngredientData[storage as keyof IngredientData] || []
-              }
-              onEdit={isEditMode}
-              setExpiringSoonItems={setExpiringSoonItems}
-              setIngredientData={setIngredientData}
-            />
+            <div className="relative" key={`${storage}${Math.random()}`}>
+              {(storage === "freezer" || storage === "fridge") && (
+                <RefrigeratorDoor />
+              )}
+              <IngredientStorageContainer
+                title={storage as keyof IngredientData}
+                items={
+                  filteredIngredientData[storage as keyof IngredientData] || []
+                }
+                onEdit={isEditMode}
+                setExpiringSoonItems={setExpiringSoonItems}
+                setIngredientData={setIngredientData}
+              />
+            </div>
           );
         })}
       </div>
