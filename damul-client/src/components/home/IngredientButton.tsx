@@ -34,7 +34,7 @@ const IngredientButton = ({
   return (
     <DamulButton
       onClick={onClick}
-      className={`${expirationDate < 0 && "opacity-40"} bg-white h-full text-black flex items-center justify-center py-2 shadow-md border-1 border-normal-100 rounded-xl hover:bg-normal-100 focus:outline-none ${onEdit && "border-2 border-positive-300"}`}
+      className={`${expirationDate < 0 && "opacity-40"} bg-white h-full text-black flex items-center justify-center py-2 shadow-md border-1 border-normal-100 rounded-xl hover:bg-normal-100 focus:outline-none ${onEdit && "border-2 border-positive-300"} transition ease-in-out duration-150 active:scale-75`}
     >
       <div className="relative">
         {expirationDate <= 7 && expirationDate > 0 && (

@@ -1,4 +1,8 @@
-import { IngredientData, RegisterIngredientData } from "@/types/Ingredient";
+import {
+  IngredientData,
+  RegisterIngredient,
+  RegisterIngredientData,
+} from "@/types/Ingredient";
 
 export const initialIngrdientData: IngredientData = {
   freezer: [
@@ -76,4 +80,13 @@ export const initialIngredientRegisterData: RegisterIngredientData = {
       ingredientStorage: "FRIDGE",
     },
   ],
+};
+
+export const initialRegisterIngredient: RegisterIngredient = {
+  id: Math.floor(Math.random() * 100000),
+  ingredientName: "",
+  productPrice: 0,
+  categoryId: 1,
+  expirationDate: "",
+  ingredientStorage: "FREEZER",
 };
