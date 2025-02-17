@@ -1,27 +1,37 @@
 import IngredientStorageContainer from "@/components/home/IngredientStorageContainer";
-import { ITEM_STATUS } from "@/constants/itemStatus";
-import { STORAGE_TYPE } from "@/constants/storage";
+import useAuth from "@/hooks/useAuth";
 import { getIngredients } from "@/service/profile";
 import { IngredientData } from "@/types/Ingredient";
 import { useQuery } from "@tanstack/react-query";
-import { useOutletContext } from "react-router-dom";
+import { Navigate, useOutletContext } from "react-router-dom";
 
 const ProfileIngredientsPage = () => {
   const { user } = useOutletContext();
-  const { data, isLoading } = useQuery<IngredientData>({
-    queryKey: ["ingredients", user.userId],
-    queryFn: async () => {
-      const response = await getIngredients(user.userId);
-      if (response.status === 204) {
-        return { freezer: [], fridge: [], roomTemp: [] };
-      }
-      return response.data;
-    },
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
-  });
+  const { data: authData, isLoading: isLoadingAuth } = useAuth();
+  const { data: ingredientData, isLoading: isLoadingIngredient } =
+    useQuery<IngredientData>({
+      queryKey: ["ingredients", user.userId],
+      queryFn: async () => {
+        const response = await getIngredients(user.userId);
+        if (response.status === 204) {
+          return { freezer: [], fridge: [], roomTemp: [] };
+        }
+        return response.data;
+      },
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+    });
 
-  if (isLoading) {
+  // URL 입력으로 나의 보유 식자재 탭으로 이동하는 경우
+  if (authData?.data.id === user.userId) {
+    return <Navigate to={"/404"} />;
+  }
+
+  if (isLoadingAuth) {
+    return null;
+  }
+
+  if (isLoadingIngredient) {
     return null;
   }
 
@@ -33,12 +43,12 @@ const ProfileIngredientsPage = () => {
         </h1>
         <p className="text-normal-600">어떤 식자재가 있는지 살펴보세요.</p>
       </div>
-      {data &&
-        Object.keys(data).map((item, index) => (
+      {ingredientData &&
+        Object.keys(ingredientData).map((item, index) => (
           <IngredientStorageContainer
             key={index}
             title={item as "freezer" | "fridge" | "roomTemp"}
-            items={data[item as "freezer" | "fridge" | "roomTemp"]}
+            items={ingredientData[item as "freezer" | "fridge" | "roomTemp"]}
           />
         ))}
     </div>

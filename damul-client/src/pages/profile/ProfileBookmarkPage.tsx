@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { Navigate, useOutletContext } from "react-router-dom";
 import RecipeFeedCard from "@/components/common/RecipeFeedCard";
 
 import {
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { getBookmarks } from "@/service/profile";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
+import useAuth from "@/hooks/useAuth";
 
 interface RecipeItem {
   id: number;
@@ -30,24 +31,36 @@ interface RecipeItem {
 
 const ProfileBookmarkPage = () => {
   const { user } = useOutletContext();
-  const [sortType, setSortType] = useState<"date" | "title">("date");
+  const { data, isLoading } = useAuth();
+  const [sortType, setSortType] = useState<
+    "created_at" | "view_cnt" | "like_cnt"
+  >("created_at");
 
   const fetchBookmarks = async (pageParam: number) => {
     try {
       const response = await getBookmarks(parseInt(user.userId), {
         cursor: pageParam,
         size: 5,
+        sortType,
       });
       if (response?.status === 204) {
         return { data: [], meta: { nextCursor: null, hasNext: false } };
       }
 
-      console.log(response?.data);
       return response?.data;
     } catch (error) {
       console.error(error);
     }
   };
+
+  if (isLoading) {
+    return null;
+  }
+
+  // URL 입력으로 다른 유저의 북마크 탭으로 이동하는 경우
+  if (data?.data.id !== user.userId) {
+    return <Navigate to={"/404"} />;
+  }
 
   return (
     <div className="flex flex-col gap-2 p-5 bg-white">
@@ -63,7 +76,9 @@ const ProfileBookmarkPage = () => {
       <div className="flex justify-end">
         <Select
           value={sortType}
-          onValueChange={(value: "date" | "title") => setSortType(value)}
+          onValueChange={(value: "created_at" | "view_cnt" | "like_cnt") =>
+            setSortType(value)
+          }
         >
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
@@ -73,15 +88,21 @@ const ProfileBookmarkPage = () => {
               <SelectLabel>정렬 방식</SelectLabel>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="date"
+                value="created_at"
               >
                 최신순
               </SelectItem>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="title"
+                value="view_cnt"
               >
-                제목순
+                추천순
+              </SelectItem>
+              <SelectItem
+                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                value="like_cnt"
+              >
+                조회수순
               </SelectItem>
             </SelectGroup>
           </SelectContent>
@@ -89,7 +110,7 @@ const ProfileBookmarkPage = () => {
       </div>
 
       <DamulInfiniteScrollList
-        queryKey={["bookMarks"]}
+        queryKey={["bookMarks", sortType]}
         fetchFn={fetchBookmarks}
         renderItems={(item: RecipeItem) => (
           <RecipeFeedCard key={item.id} {...item} />
