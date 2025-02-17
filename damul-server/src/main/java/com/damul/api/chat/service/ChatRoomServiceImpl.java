@@ -150,6 +150,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         return ChatMembersResponse.builder()
                 .content(chatMembers)
                 .totalMembers(chatMembers.size())
+                .adminId(adminId)
                 .build();
     }
 
