@@ -133,5 +133,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
             @Param("roomId") int roomId
     );
 
-    List<ChatRoom> findChatRoomsByUserId(int userId);
+    @Query("SELECT crm.room FROM ChatRoomMember crm WHERE crm.user.id = :userId AND crm.room.status = 'ACTIVE'")
+    List<ChatRoom> findChatRoomsByUserId(@Param("userId") int userId);
 }
