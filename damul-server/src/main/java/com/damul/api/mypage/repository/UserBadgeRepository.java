@@ -1,6 +1,8 @@
 package com.damul.api.mypage.repository;
 
+import com.damul.api.auth.entity.User;
 import com.damul.api.mypage.dto.response.BadgeList;
+import com.damul.api.mypage.entity.Badge;
 import com.damul.api.mypage.entity.UserBadge;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,5 +34,11 @@ public interface UserBadgeRepository extends JpaRepository<UserBadge, Integer> {
             AND ub.badge.level > :userLevel
             """)
     int countUsersWithHigherLevel(@Param("badgeId") int badgeId, @Param("userLevel") int userLevel);
+
+    Optional<UserBadge> findTopByUserAndBadge_TitleOrderByBadge_LevelDesc(User user, String badgeTitle);
+
+    boolean existsByUserAndBadge(User user, Badge badge);
+
+    List<UserBadge> findByUser(User user);
 }
 

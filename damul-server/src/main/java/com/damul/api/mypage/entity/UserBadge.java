@@ -3,6 +3,7 @@ package com.damul.api.mypage.entity;
 import com.damul.api.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,5 +38,16 @@ public class UserBadge {
         createdAt = LocalDateTime.now();
     }
 
+    public void updateBadge(Badge newBadge) {
+        this.badge = newBadge;
+        // 뱃지 업데이트 시점 기록
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @Builder
+    public UserBadge(Badge badge, User user) {
+        this.badge = badge;
+        this.user = user;
+    }
 
 }
