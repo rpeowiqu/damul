@@ -1,6 +1,7 @@
 package com.damul.api.user.service;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
@@ -30,6 +31,7 @@ import java.util.Optional;
 public class FollowServiceImpl implements FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final TimeZoneConverter timeZoneConverter;
 
     @Override
     @Transactional
@@ -67,6 +69,7 @@ public class FollowServiceImpl implements FollowService {
                         .following(targetUser)
                         .createdAt(LocalDateTime.now())
                         .build();
+                newFollow.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
                 followRepository.save(newFollow);
                 return new FollowResponse(true);
             }

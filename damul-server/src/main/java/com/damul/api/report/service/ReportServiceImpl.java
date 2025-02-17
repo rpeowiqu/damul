@@ -1,6 +1,7 @@
 package com.damul.api.report.service;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -25,6 +27,7 @@ public class ReportServiceImpl implements ReportService {
     private final ReportCategoryRepository reportCategoryRepository;
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
+    private final TimeZoneConverter timeZoneConverter;
 
     @Override
     public ReportCategoryResponse getReportCategory() {
@@ -69,6 +72,7 @@ public class ReportServiceImpl implements ReportService {
                 .reportType(ReportType.valueOf(reportCreate.getReportType().name()))
                 .description(reportCreate.getDescription())
                 .build();
+        report.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         Report savedReport = reportRepository.save(report);  // 저장된 엔티티를 받아옴
 

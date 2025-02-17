@@ -5,6 +5,7 @@ import com.damul.api.chat.dto.MemberRole;
 import com.damul.api.chat.dto.response.UnReadResponse;
 import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.entity.ChatRoomMember;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.notification.dto.ChatRoomCreatedEvent;
 import com.damul.api.notification.dto.NotificationType;
 import com.damul.api.notification.dto.response.NotificationList;
@@ -16,6 +17,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final SimpMessageSendingOperations messagingTemplate;
+    private final TimeZoneConverter timeZoneConverter;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,6 +63,7 @@ public class NotificationServiceImpl implements NotificationService {
                 String.format("새로운 뱃지를 획득했습니다: %s", badgeName),
                 "/profile/badges"
         );
+        notification.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         notificationRepository.save(notification);
         sendNotification(receiver.getId(), NotificationResponse.from(notification));
     }
@@ -74,6 +78,7 @@ public class NotificationServiceImpl implements NotificationService {
                 String.format("%s님이 회원님의 게시글에 댓글을 달았습니다.", sender.getNickname()),
                 "/posts/" + postId
         );
+        notification.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         notificationRepository.save(notification);
         sendNotification(receiver.getId(), NotificationResponse.from(notification));
     }
@@ -88,6 +93,7 @@ public class NotificationServiceImpl implements NotificationService {
                 String.format("%s님이 회원님을 팔로우했습니다.", follower.getNickname()),
                 "/profile/" + follower.getId()
         );
+        notification.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         notificationRepository.save(notification);
         sendNotification(receiver.getId(), NotificationResponse.from(notification));
     }
@@ -102,6 +108,7 @@ public class NotificationServiceImpl implements NotificationService {
                 String.format("%s님이 회원님의 게시글을 좋아합니다.", sender.getNickname()),
                 "/posts/" + postId
         );
+        notification.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         notificationRepository.save(notification);
         sendNotification(receiver.getId(), NotificationResponse.from(notification));
     }

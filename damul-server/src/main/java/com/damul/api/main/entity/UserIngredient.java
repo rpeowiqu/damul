@@ -30,7 +30,7 @@ public class UserIngredient {
     private int ingredientQuantity = 100;
 
     @Column(name = "ingredient_up")
-    private LocalDateTime ingredientUp = LocalDateTime.now();;
+    private LocalDateTime ingredientUp = LocalDateTime.now();
 
     @Column(name = "ingredient_name", length = 100)
     private String ingredientName;
@@ -74,5 +74,8 @@ public class UserIngredient {
         this.ingredientQuantity = quantity;
     }
 
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.ingredientUp = createdAt;
+    }
 
 }

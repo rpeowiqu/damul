@@ -41,12 +41,14 @@ public class ChatMessage {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
         if (messageType == null) {
             messageType = MessageType.TEXT;
         }
+    }
+
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public static ChatMessage createSystemMessage(ChatRoom room, String content) {
@@ -54,6 +56,7 @@ public class ChatMessage {
         message.room = room;
         message.messageType = MessageType.SYSTEM;
         message.content = content;
+        message.createdAt = LocalDateTime.now();
         return message;
     }
 
@@ -63,6 +66,7 @@ public class ChatMessage {
         message.sender = sender;
         message.content = content;
         message.messageType = messageType;
+        message.createdAt = LocalDateTime.now();
         return message;
     }
 
@@ -73,6 +77,7 @@ public class ChatMessage {
         message.content = content;
         message.fileUrl = fileUrl;
         message.messageType = MessageType.FILE;
+        message.createdAt = LocalDateTime.now();
         return message;
     }
 
@@ -82,6 +87,7 @@ public class ChatMessage {
         message.room = room;
         message.messageType = MessageType.SYSTEM;
         message.content = sender.getNickname() + "님이 입장하셨습니다.";
+        message.createdAt = LocalDateTime.now();
         return message;
     }
 
@@ -90,6 +96,7 @@ public class ChatMessage {
         message.room = room;
         message.messageType = MessageType.SYSTEM;
         message.content = sender.getNickname() + "님이 퇴장하셨습니다.";
+        message.createdAt = LocalDateTime.now();
         return message;
     }
 

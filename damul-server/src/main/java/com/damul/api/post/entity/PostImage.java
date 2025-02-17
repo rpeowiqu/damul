@@ -28,4 +28,8 @@ public class PostImage {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

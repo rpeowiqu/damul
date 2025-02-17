@@ -8,6 +8,7 @@ import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.chat.service.ChatRoomService;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,6 +61,7 @@ public class PostServiceImpl implements PostService {
     private final ChatRoomService chatRoomService;
 
     private final S3Service s3Service;
+    private final TimeZoneConverter timeZoneConverter;
 
 
     // 게시글 전체 조회/검색
@@ -255,6 +258,7 @@ public class PostServiceImpl implements PostService {
                 .content(postRequest.getContent())
                 .thumbnailUrl(thumbnailUrl)
                 .build();
+        post.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         Post savedPost = postRepository.save(post);
         log.info("게시글 작성 완료 - ID: {}", savedPost.getPostId());
@@ -370,6 +374,7 @@ public class PostServiceImpl implements PostService {
                 .parentPostComment(parent)
                 .comment(commentCreate.getComment())
                 .build();
+        comment.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         PostComment savedComment = postCommentRepository.save(comment);
         return new CreateResponse(savedComment.getPostCommentId());

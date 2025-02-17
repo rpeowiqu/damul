@@ -49,7 +49,6 @@ public class ChatRoom {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
         status = Status.ACTIVE;
     }
 
@@ -67,6 +66,10 @@ public class ChatRoom {
 
     public void activate() {
         this.status = Status.ACTIVE;
+    }
+
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public void updateMemberLimit(int newLimit) {
