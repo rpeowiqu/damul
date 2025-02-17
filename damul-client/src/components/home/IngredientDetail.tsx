@@ -5,8 +5,7 @@ import { Slider } from "../ui/slider";
 import { CATEGORY_INFO } from "@/constants/category";
 import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
 import { useEffect, useState } from "react";
-import useUserStore from "@/stores/user";
-import DamulButton from "../common/DamulButton";
+import useAuth from "@/hooks/useAuth";
 
 interface IngredientDetailProps {
   selectedIngredient: Ingredient;
@@ -42,10 +41,12 @@ const IngredientDetail = ({
 }: IngredientDetailProps) => {
   const IconComponent =
     Object.values(CATEGORY_INFO)[selectedIngredient.categoryId - 1].icon;
-
   const [ingredient, setIngredient] = useState<Ingredient>(selectedIngredient);
+  const { data, isLoading, refetch } = useAuth();
 
-  const myWarningEnabled = useUserStore((state) => state.myWarningEnabled);
+  if (isLoading) {
+    return null;
+  }
 
   const handleQuantityChange = (value: number[]) => {
     setIngredient((prev) => {
@@ -57,14 +58,15 @@ const IngredientDetail = ({
   };
 
   const handleDeleteClick = async () => {
-    if (myWarningEnabled) {
+    if (data?.data.warningEnabled) {
       setIsDeleteOpen(true);
     } else {
       try {
         await deleteUserIndegredient(
           ingredient.userIngredientId,
-          myWarningEnabled ? 1 : 0,
+          data?.data.warningEnabled ? 1 : 0,
         );
+        refetch(); // 삭제 재확인 정보를 새로 불러옴
         deleteIngredient?.(ingredient);
       } catch (error) {
         console.log("식자재 정보를 삭제 하지 못했습니다.");

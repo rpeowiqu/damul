@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getBookmarks } from "@/service/mypage";
+import { getBookmarks } from "@/service/profile";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 
 interface RecipeItem {
@@ -30,13 +30,13 @@ interface RecipeItem {
 
 const ProfileBookmarkPage = () => {
   const { user } = useOutletContext();
-  const [sortType, setSortType] = useState("date");
+  const [sortType, setSortType] = useState<"date" | "title">("date");
 
   const fetchBookmarks = async (pageParam: number) => {
     try {
       const response = await getBookmarks(parseInt(user.userId), {
         cursor: pageParam,
-        size: 5,
+        size: 10,
       });
       if (response?.status === 204) {
         return { data: [], meta: { nextCursor: null, hasNext: false } };
@@ -61,7 +61,10 @@ const ProfileBookmarkPage = () => {
       </div>
 
       <div className="flex justify-end">
-        <Select value={sortType} onValueChange={(value) => setSortType(value)}>
+        <Select
+          value={sortType}
+          onValueChange={(value: "date" | "title") => setSortType(value)}
+        >
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
           </SelectTrigger>
@@ -91,6 +94,13 @@ const ProfileBookmarkPage = () => {
         renderItems={(item: RecipeItem) => (
           <RecipeFeedCard key={item.id} {...item} />
         )}
+        noContent={
+          <p className="text-center text-normal-200">
+            등록한 북마크가 없습니다.
+            <br />
+            커뮤니티에서 맘에 드는 레시피를 살펴보고 등록해 보세요.
+          </p>
+        }
       />
     </div>
   );

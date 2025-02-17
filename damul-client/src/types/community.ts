@@ -32,7 +32,9 @@ export interface PostDetail {
   content: string;
   createdAt: string;
   currentChatNum: number;
+  chatRoomId: number;
   chatSize: number;
+  entered: boolean;
   viewCnt: number;
   comments: Comment[];
 }

@@ -1,7 +1,8 @@
 import { Ingredient } from "@/types/Ingredient";
 import DeleteIcon from "../svg/DeleteIcon";
 import { deleteUserIndegredient } from "@/service/home";
-import useUserStore from "@/stores/user";
+import useAuth from "@/hooks/useAuth";
+import { useState } from "react";
 
 interface ConfirmDeleteModalProps {
   setIsDeleteOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,13 +17,14 @@ const ConfirmDeleteModal = ({
   setIsDeleteOpen,
   deleteIngredient,
 }: ConfirmDeleteModalProps) => {
-  const myWarningEnabled = useUserStore((state) => state.myWarningEnabled);
-  const setWarningEnabled = useUserStore((state) => state.setWarningEnabled);
+  const { data, isLoading } = useAuth();
+  const [warningEnabled, setWarningEnabled] = useState<boolean>(false);
+
   const handleOnDelete = async () => {
     try {
       await deleteUserIndegredient(
         ingredient.userIngredientId,
-        myWarningEnabled ? 1 : 0,
+        warningEnabled ? 1 : 0,
       );
       deleteIngredient(ingredient);
     } catch (error) {
@@ -36,8 +38,12 @@ const ConfirmDeleteModal = ({
   };
 
   const handleDeleteCheck = () => {
-    setWarningEnabled(!myWarningEnabled);
+    setWarningEnabled(!warningEnabled);
   };
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col items-center gap-5 rounded-xl">

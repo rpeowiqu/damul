@@ -1,16 +1,30 @@
-import { useOutletContext, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { getFollowings, toggleFollow } from "@/service/user";
 import FriendItem, { FriendItemProps } from "@/components/profile/FriendItem";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import DamulButton from "@/components/common/DamulButton";
-import useUserStore from "@/stores/user";
 import { useState } from "react";
+import useAuth from "@/hooks/useAuth";
+import { postIntoPrivateRoom } from "@/service/chatting";
 
 const ProfileFriendFollowingPage = () => {
-  const myId = useUserStore((state) => state.myId);
+  const { data, isLoading } = useAuth();
   const { userId } = useParams();
   const { searchKeyword } = useOutletContext();
   const [checkSet, setCheckSet] = useState<Set<number>>(new Set());
+  const nav = useNavigate();
+
+  const enterPrivateChat = async (userId: number) => {
+    try {
+      const response = await postIntoPrivateRoom({ userId });
+      if (response) {
+        const chatId = response.data.id;
+        nav(`/chatting/${chatId}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchFollowings = async (pageParam: number) => {
     try {
@@ -32,7 +46,6 @@ const ProfileFriendFollowingPage = () => {
   const handleFollowState = async (userId: number) => {
     try {
       await toggleFollow({
-        userId: myId,
         targetId: userId,
       });
 
@@ -50,18 +63,22 @@ const ProfileFriendFollowingPage = () => {
     }
   };
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <DamulInfiniteScrollList
-      queryKey={["following"]}
+      queryKey={["following", userId, searchKeyword]}
       fetchFn={fetchFollowings}
       renderItems={(item: FriendItemProps) => (
         <FriendItem key={item.userId} {...item}>
-          {myId === parseInt(userId!) && (
+          {data?.data.id === parseInt(userId!) && (
             <>
               <DamulButton
                 variant="positive"
                 className="sm:w-20 h-7 sm:h-10 text-xs sm:text-sm"
-                onClick={() => {}}
+                onClick={() => enterPrivateChat(item.userId)}
               >
                 채팅 시작
               </DamulButton>

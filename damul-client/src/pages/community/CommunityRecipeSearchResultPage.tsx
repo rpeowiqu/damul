@@ -47,6 +47,10 @@ const CommunityRecipeSearchResultPage = () => {
         searchType: searchType,
         keyword: keyword,
       });
+      if (response?.status === 204) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
+
       return response?.data;
     } catch (error) {
       console.log(error);
@@ -98,6 +102,9 @@ const CommunityRecipeSearchResultPage = () => {
         renderItems={(item: RecipeItem) => <RecipeFeedCard {...item} />}
         skeleton={
           <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
+        }
+        noContent={
+          <p className="text-center text-normal-200">검색 결과가 없습니다.</p>
         }
       />
     </main>

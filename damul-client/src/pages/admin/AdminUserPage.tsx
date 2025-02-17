@@ -50,6 +50,7 @@ const AdminUserPage = () => {
   if (isLoading) {
     return null;
   }
+
   return (
     <div className="flex flex-col gap-6 w-full h-full p-6">
       <div className="flex items-center gap-3">

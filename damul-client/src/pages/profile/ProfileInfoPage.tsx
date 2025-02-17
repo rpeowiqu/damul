@@ -5,13 +5,14 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Link, useOutletContext } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ProfileInfo } from "@/types/profile";
 import DamulButton from "@/components/common/DamulButton";
-import useUserStore from "@/stores/user";
-import { getProfileDetail } from "@/service/mypage";
+import { getProfileDetail } from "@/service/profile";
 import { toggleFollow } from "@/service/user";
+import useAuth from "@/hooks/useAuth";
+import { postIntoPrivateRoom } from "@/service/chatting";
 
 const chartConfig = {
   categoryPreference: {
@@ -34,7 +35,7 @@ const colorList = [
 
 const ProfileInfoPage = () => {
   const { user } = useOutletContext();
-  const myId = useUserStore((state) => state.myId);
+  const { data, isLoading } = useAuth();
   const [profileInfo, setProfileInfo] = useState<ProfileInfo>({
     followed: false,
     followerCount: 0,
@@ -42,7 +43,8 @@ const ProfileInfoPage = () => {
     selfIntroduction: "",
     foodPreference: [],
   });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isFetched, setIsFetched] = useState<boolean>(false);
+  const nav = useNavigate();
 
   useEffect(() => {
     const fetchProfileDetail = async () => {
@@ -54,17 +56,28 @@ const ProfileInfoPage = () => {
       } catch (error) {
         console.error(error);
       } finally {
-        setIsLoading(false);
+        setIsFetched(true);
       }
     };
 
     fetchProfileDetail();
   }, [user.userId]);
 
+  const enterPrivateChat = async (userId: number) => {
+    try {
+      const response = await postIntoPrivateRoom({ userId });
+      if (response) {
+        const chatId = response.data.id;
+        nav(`/chatting/${chatId}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleFollowState = async () => {
     try {
       const response = await toggleFollow({
-        userId: myId,
         targetId: user.userId,
       });
       if (response) {
@@ -81,10 +94,6 @@ const ProfileInfoPage = () => {
       console.error(error);
     }
   };
-
-  if (isLoading) {
-    return null;
-  }
 
   const getFavoriteFoodText = () => {
     const favoriteFood = profileInfo.foodPreference.reduce(
@@ -113,6 +122,14 @@ const ProfileInfoPage = () => {
     );
   };
 
+  if (isLoading) {
+    return null;
+  }
+
+  if (!isFetched) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-3 h-full">
       <div className="flex items-center min-h-24 bg-white">
@@ -134,12 +151,12 @@ const ProfileInfoPage = () => {
             {profileInfo.followingCount.toLocaleString()}
           </p>
         </Link>
-        {myId !== user.userId && (
+        {data?.data.id !== user.userId && (
           <div className="flex flex-col flex-1 justify-center items-center gap-2">
             <DamulButton
               variant="positive"
               className="w-20 sm:w-24 h-7 text-sm"
-              onClick={() => {}}
+              onClick={() => enterPrivateChat(user.userId)}
             >
               채팅 시작
             </DamulButton>

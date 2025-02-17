@@ -7,16 +7,14 @@ interface ExtendedOptions extends SockJS.Options {
 }
 
 interface SendChattingProps {
-  roomId: number;
+  roomId?: string | number | undefined;
+  onMessageReceived?: (message: any) => void;
 }
 
-interface sendMessage {
-  messageType: string;
-  content?: string;
-  fileUrl?: string;
-}
-
-export const useStompClient = ({ roomId }: SendChattingProps) => {
+export const useStompClient = ({
+  roomId,
+  onMessageReceived,
+}: SendChattingProps) => {
   const wsUrl = import.meta.env.VITE_WS_BASE_URL;
   const stompClientRef = useRef<Client | null>(null);
 
@@ -31,15 +29,17 @@ export const useStompClient = ({ roomId }: SendChattingProps) => {
         console.log("Connected: " + frame);
         stompClient.subscribe(`/sub/chat/room/${roomId}`, (message) => {
           const receivedMessage = JSON.parse(message.body);
-          console.log("Received:", receivedMessage);
+          console.log("📩 메시지 수신:", receivedMessage);
+          if (onMessageReceived) {
+            onMessageReceived(receivedMessage);
+          }
         });
       },
       onStompError: (frame) => {
-        console.error("Broker reported error: " + frame.headers["message"]);
-        console.error("Additional details:", frame.body);
+        console.error("🚨 STOMP 에러:", frame.headers["message"], frame.body);
       },
       onWebSocketError: (event) => {
-        console.error("WebSocket error:", event);
+        console.error("⚠️ WebSocket 에러:", event);
       },
     });
 
@@ -49,36 +49,58 @@ export const useStompClient = ({ roomId }: SendChattingProps) => {
 
   useEffect(() => {
     initializeStompClient();
-
     return () => {
-      if (stompClientRef.current) {
-        stompClientRef.current.deactivate().then(() => {
-          console.log("🔌 STOMP 연결 종료");
-        });
-      }
+      stompClientRef.current
+        ?.deactivate()
+        .then(() => console.log("🔌 STOMP 연결 종료"));
     };
   }, [roomId]);
 
-  const sendMessage = ({ messageType, content, fileUrl }: sendMessage) => {
+  const sendMessage = ({
+    userId,
+    messageType,
+    content,
+    image,
+  }: {
+    userId: string;
+    messageType: string;
+    content?: string;
+    image?: Uint8Array;
+  }) => {
     if (!stompClientRef.current || !stompClientRef.current.connected) {
       console.warn("🚨 STOMP 클라이언트가 연결되지 않음");
       return;
     }
 
     const message = {
+      userId,
       messageType,
       content,
-      fileUrl,
+      image,
       room: { id: roomId },
     };
 
+    console.log("📤 메시지 전송:", message);
     stompClientRef.current.publish({
       destination: `/pub/chat/room/${roomId}/message`,
       body: JSON.stringify(message),
     });
-
-    console.log("📤 메시지 전송:", message);
   };
 
-  return { sendMessage };
+  const sendEnterRoom = (roomId: number, userId: string) => {
+    if (!stompClientRef.current || !stompClientRef.current.connected) {
+      console.warn("🚨 STOMP 클라이언트가 연결되지 않음");
+      return;
+    }
+
+    const enterMessage = { userId, roomId };
+    console.log("🚪 채팅방 입장 요청:", enterMessage);
+
+    stompClientRef.current.publish({
+      destination: `/pub/chat/room/${roomId}/enter/${userId}`,
+      body: JSON.stringify(enterMessage),
+    });
+  };
+
+  return { sendMessage, sendEnterRoom };
 };
