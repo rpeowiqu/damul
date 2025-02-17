@@ -131,15 +131,16 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<RecipeList> getMyRecipes(int userId, int cursor, int size, UserInfo currentUser) {
+    public ScrollResponse<RecipeList> getMyRecipes(int userId, int cursor, int size, String sortType, UserInfo currentUser) {
         log.info("서비스: 마이페이지 레시피 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         validateAccessPermission(targetUser, currentUser);
+        validateSortType(sortType);
 
-        List<RecipeList> recipes = recipeRepository.findMyRecipes(userId, cursor, size);
+        List<RecipeList> recipes = recipeRepository.findMyRecipes(userId, cursor, size, sortType);
 
         if (recipes.isEmpty()) {
             return new ScrollResponse<>(
@@ -159,15 +160,16 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<RecipeList> getBookmarkedRecipes(int userId, int cursor, int size, UserInfo currentUser) {
+    public ScrollResponse<RecipeList> getBookmarkedRecipes(int userId, int cursor, int size, String sortType, UserInfo currentUser) {
         log.info("서비스: 마이페이지 북마크 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         validateAccessPermission(targetUser, currentUser);
+        validateSortType(sortType);
 
-        List<RecipeList> bookmarks = bookmarkRepository.findBookmarkedRecipes(userId, cursor, size);
+        List<RecipeList> bookmarks = bookmarkRepository.findBookmarkedRecipes(userId, cursor, size, sortType);
 
         if (bookmarks.isEmpty()) {
             return new ScrollResponse<>(
@@ -199,6 +201,16 @@ public class MyPageServiceImpl implements MyPageService {
     private void validateAccessPermission(User targetUser, UserInfo currentUser) {
         if (!targetUser.isActive()) {
             throw new BusinessException(ErrorCode.USER_INACTIVE, "비활성화된 사용자입니다.");
+        }
+    }
+
+    private void validateSortType(String sortType) {
+        boolean isValid = switch (sortType) {
+            case "created_at", "view_cnt", "like_cnt" -> true;
+            default -> false;
+        };
+        if(!isValid) {
+            throw new BusinessException(ErrorCode.INVALID_SEARCH_TYPE, "존재하지 않는 정렬 타입입니다.");
         }
     }
 }

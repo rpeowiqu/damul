@@ -83,6 +83,7 @@ public class MyPageController {
             @PathVariable int userId,
             @RequestParam(defaultValue = "0") int cursor,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "created_at") String sortType,
             @CurrentUser UserInfo currentUser) {
         log.info("컨트롤러: 마이페이지 레시피 조회 시작 - userId: {}, cursor: {}, size: {}",
                 userId, cursor, size);
@@ -91,6 +92,7 @@ public class MyPageController {
                 userId,
                 cursor,
                 size,
+                sortType,
                 currentUser
         );
 
@@ -106,6 +108,7 @@ public class MyPageController {
             @PathVariable int userId,
             @RequestParam(defaultValue = "0") int cursor,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "created_at") String sortType,
             @CurrentUser UserInfo currentUser) {
         log.info("컨트롤러: 마이페이지 북마크 조회 시작 - userId: {}, cursor: {}, size: {}",
                 userId, cursor, size);
@@ -114,6 +117,7 @@ public class MyPageController {
                 userId,
                 cursor,
                 size,
+                sortType,
                 currentUser
         );
 
