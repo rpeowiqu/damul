@@ -87,7 +87,7 @@ public class MyPageController {
         log.info("컨트롤러: 마이페이지 레시피 조회 시작 - userId: {}, cursor: {}, size: {}",
                 userId, cursor, size);
 
-        ScrollResponse<MyRecipeList> response = myPageService.getMyRecipes(
+        ScrollResponse<RecipeList> response = myPageService.getMyRecipes(
                 userId,
                 cursor,
                 size,

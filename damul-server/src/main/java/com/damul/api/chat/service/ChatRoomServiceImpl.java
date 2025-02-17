@@ -119,8 +119,18 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(roomId);
 
         if (members.isEmpty()) {
-            return new ChatMembersResponse(Collections.emptyList(), 0);
+            return ChatMembersResponse.builder()
+                    .content(Collections.emptyList())
+                    .adminId(0)
+                    .totalMembers(0)
+                    .build();
         }
+
+        int adminId = members.stream()
+                .filter(member -> member.getRole() == MemberRole.ADMIN)
+                .findFirst()
+                .map(member -> member.getUser().getId())
+                .orElse(0);
 
         // 멤버 정보 변환
         List<ChatMember> chatMembers = members.stream()

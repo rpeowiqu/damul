@@ -21,7 +21,7 @@ public interface MyPageService {
 
     BadgeDetail getBadgeDetail(int userId, int badgeId, UserInfo currentUser);
 
-    ScrollResponse<MyRecipeList> getMyRecipes(int userId, int cursor, int size, UserInfo currentUser);
+    ScrollResponse<RecipeList> getMyRecipes(int userId, int cursor, int size, UserInfo currentUser);
 
     ScrollResponse<RecipeList> getBookmarkedRecipes(int userId, int cursor, int size, UserInfo currentUser);
 
