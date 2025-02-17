@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 @Component
 public class TimeZoneConverter {
 
-    public LocalDateTime convertSeoulToUTC(T entity, LocalDateTime seoulDateTime) {
+    public LocalDateTime convertSeoulToUTC(LocalDateTime seoulDateTime) {
         ZoneId seoulZone = ZoneId.of("Asia/Seoul");
         ZonedDateTime seoulZoned = seoulDateTime.atZone(seoulZone);
         return seoulZoned.withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime();
