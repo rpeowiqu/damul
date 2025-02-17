@@ -17,7 +17,7 @@ const ChattingListItem = ({
   const highlightTitle = (title: string) => {
     if (!keyword) return title;
 
-    const regex = new RegExp(`(${keyword})`, "gi"); // 대소문자 구분 없이 keyword에 맞는 부분 찾기
+    const regex = new RegExp(`(${keyword})`, "gi");
     const parts = title.split(regex);
 
     return parts.map((part, index) =>
@@ -34,7 +34,7 @@ const ChattingListItem = ({
     <>
       <Link
         to={`/chatting/${id}`}
-        className="flex gap-3 border-t-1 p-3 pc:p-4 cursor-pointer hover:bg-neutral-100"
+        className="flex gap-3 border-t-1 px-3 py-4 pc:p-5 cursor-pointer hover:bg-neutral-100"
       >
         <Image src={thumbnailUrl} className="w-10 h-10 rounded-full" />
         <div className="flex w-full justify-between gap-3">

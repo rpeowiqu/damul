@@ -7,14 +7,50 @@ import { getChattingContents } from "@/service/chatting";
 import { ChatMessage } from "@/types/chatting";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import { useStompClient } from "@/hooks/useStompClient";
+import useAuth from "@/hooks/useAuth";
+
+interface ChatData {
+  messages: ChatMessage[];
+  memberNum: number;
+  roomName: string;
+  postId: number;
+}
 
 const ChattingRoomPage = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { roomId } = useParams();
-  const { sendMessage } = useStompClient({ roomId: Number(roomId) });
+  const { data, isLoading: authLoading } = useAuth();
 
   const [message, setMessage] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<Uint8Array | null>(null);
+  const [prevImage, setPrevImage] = useState<string | null>(null);
+  const [chatData, setChatData] = useState<ChatData>({
+    messages: [],
+    memberNum: 0,
+    roomName: "",
+    postId: 0,
+  });
+
+  // 메시지 수신 핸들러
+  const handleMessageReceived = (newMessage: ChatMessage) => {
+    if (newMessage.id === data?.data.id) {
+      return;
+    }
+
+    setChatData((prevChatData) => {
+      const updatedMessages = [...prevChatData.messages, newMessage];
+      return {
+        ...prevChatData,
+        messages: updatedMessages,
+      };
+    });
+  };
+
+  // STOMP 클라이언트 초기화
+  const { sendMessage } = useStompClient({
+    roomId: roomId,
+    onMessageReceived: handleMessageReceived,
+  });
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     setMessage(e.target.value);
@@ -23,32 +59,39 @@ const ChattingRoomPage = () => {
     textarea.style.height = `${textarea.scrollHeight}px`;
   };
 
+  // 엔터키 클릭 이벤트
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // 기본 엔터 동작 방지
+      e.preventDefault();
       handleSendMessage();
     }
   };
 
+  // 이미지 업로드하기
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0];
     if (file) {
+      const prevReader = new FileReader();
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
+      reader.readAsArrayBuffer(file);
+      prevReader.onloadend = () => {
+        setPrevImage(prevReader.result as string);
+
+        if (reader.result instanceof ArrayBuffer) {
+          const byteArray = new Uint8Array(reader.result);
+          setImage(byteArray);
+        }
       };
-      reader.readAsDataURL(file);
+      prevReader.readAsDataURL(file);
     }
   };
 
+  // 미리보기 이미지 제거
   const handleImageRemove = () => {
-    setImage(null);
+    setPrevImage(null);
   };
 
-  const [chatData, setChatData] = useState<ChatMessage[]>([]);
-  const [memberNum, setMemberNum] = useState(0);
-  const [roomName, setRoomName] = useState("");
-
+  // 채팅 내역 가져오기
   const fetchItems = async (pageParam: number) => {
     try {
       const response = await getChattingContents({
@@ -56,32 +99,83 @@ const ChattingRoomPage = () => {
         cursor: pageParam,
         size: 5,
       });
-      if (response?.data) {
-        setChatData(response.data);
-        setMemberNum(response.data.memberNum);
-        setRoomName(response.data.roomName);
+
+      console.log(response?.data);
+      if (response?.data && typeof response.data === "object") {
+        setChatData({
+          messages: response.data.data || [],
+          memberNum: response.data.memberNum || 0,
+          roomName: response.data.roomName || "",
+          postId: response.data.postId || 0,
+        });
+      } else {
+        console.warn("예상과 다른 데이터 구조:", response?.data);
+        setChatData({ messages: [], memberNum: 0, roomName: "", postId: 0 });
       }
+
       return response?.data;
     } catch (error) {
-      console.log(error);
+      console.error("채팅 데이터 불러오기 실패:", error);
     }
   };
 
+  // 가장 하단부터 보여주기
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "instant" });
     }
-  }, [chatData]);
+  }, [chatData.messages]);
 
+  // 메시지 전송
   const handleSendMessage = () => {
     if (message.trim()) {
-      sendMessage({ messageType: "TEXT", content: message });
+      const newTextMessage: ChatMessage = {
+        id: Date.now(),
+        roomId: Number(roomId),
+        senderId: data?.data.id,
+        messageType: "TEXT",
+        content: message,
+        createdAt: new Date().toISOString(),
+      };
+
+      setChatData((prevChatData) => ({
+        ...prevChatData,
+        messages: [...prevChatData.messages, newTextMessage],
+      }));
+
+      sendMessage({
+        userId: data?.data.id,
+        messageType: "TEXT",
+        content: message,
+      });
+
       setMessage("");
-    } else if (image) {
-      sendMessage({ messageType: "IMAGE", fileUrl: image });
+    } else if (prevImage && image) {
+      const imageBlob = new Blob([image]);
+      const previewUrl = URL.createObjectURL(imageBlob);
+
+      const newImageMessage: ChatMessage = {
+        id: Date.now(),
+        roomId: Number(roomId),
+        senderId: data?.data.id,
+        messageType: "IMAGE",
+        fileUrl: previewUrl,
+        createdAt: new Date().toISOString(),
+      };
+
+      setChatData((prevChatData) => ({
+        ...prevChatData,
+        messages: [...prevChatData.messages, newImageMessage],
+      }));
+
+      sendMessage({
+        userId: data?.data.id,
+        messageType: "IMAGE",
+        image: image,
+      });
+
+      setPrevImage(null);
       setImage(null);
-    } else {
-      return;
     }
   };
 
@@ -89,12 +183,13 @@ const ChattingRoomPage = () => {
     <main className="h-full text-center py-6 space-y-2">
       <div className="fixed flex top-14 p-5 items-center justify-between border-b-1 border-neutral-200 bg-white font-semibold text-start h-12 pc:h-16 w-full pc:w-[598px]">
         <p>
-          {roomName}({memberNum})
+          {chatData.roomName}({chatData.memberNum})
         </p>
-        <ChattingMenuButton roomId={5} />
+        <ChattingMenuButton roomId={roomId} postId={chatData.postId} />
       </div>
       <div className="flex-1 justify-end overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
         <DamulInfiniteScrollList
+          key={chatData.messages.length} // 새로운 메시지가 추가될 때마다 key 변경
           queryKey={["chats"]}
           fetchFn={fetchItems}
           renderItems={(msg: ChatMessage) => <ChattingBubble msg={msg} />}
@@ -102,6 +197,7 @@ const ChattingRoomPage = () => {
             <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
           }
         />
+
         <div ref={messagesEndRef} />
       </div>
       <div className="fixed w-full pc:w-[598px] bottom-16 p-2 pc:p-4 border-t bg-white flex items-end">
@@ -120,11 +216,11 @@ const ChattingRoomPage = () => {
           accept="image/*"
           onChange={handleImageUpload}
         />
-        {image ? (
+        {prevImage ? (
           <div className="flex-1 border-1 p-3 rounded-lg relative">
             <div className="relative h-24 w-24">
               <img
-                src={image}
+                src={prevImage}
                 alt="Preview"
                 className="h-24 object-cover rounded-lg"
               />

@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getMyRecipes } from "@/service/mypage";
+import { getMyRecipes } from "@/service/profile";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 
 interface RecipeItem {
@@ -30,14 +30,17 @@ interface RecipeItem {
 
 const ProfileRecipePage = () => {
   const { user } = useOutletContext();
-  const [sortType, setSortType] = useState("date");
+  const [sortType, setSortType] = useState<
+    "created_at" | "like_cnt" | "view_cnt"
+  >("created_at");
 
   const fetchRecipes = async (pageParam: number) => {
     try {
       const response = await getMyRecipes(parseInt(user.userId), {
         cursor: pageParam,
-        size: 5,
+        size: 10,
       });
+      console.log(response.data);
       if (response?.status === 204) {
         return { data: [], meta: { nextCursor: null, hasNext: false } };
       }
@@ -58,7 +61,12 @@ const ProfileRecipePage = () => {
       </div>
 
       <div className="flex justify-end">
-        <Select value={sortType} onValueChange={(value) => setSortType(value)}>
+        <Select
+          value={sortType}
+          onValueChange={(value: "created_at" | "like_cnt" | "view_cnt") =>
+            setSortType(value)
+          }
+        >
           <SelectTrigger className="w-28">
             <SelectValue placeholder="정렬 방식" />
           </SelectTrigger>
@@ -67,26 +75,39 @@ const ProfileRecipePage = () => {
               <SelectLabel>정렬 방식</SelectLabel>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="date"
+                value="created_at"
               >
                 최신순
               </SelectItem>
               <SelectItem
                 className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="title"
+                value="like_cnt"
               >
-                제목순
+                추천순
+              </SelectItem>
+              <SelectItem
+                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                value="view_cnt"
+              >
+                조회수순
               </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
       </div>
       <DamulInfiniteScrollList
-        queryKey={["myRecipes"]}
+        queryKey={["myRecipes", sortType]}
         fetchFn={fetchRecipes}
         renderItems={(item: RecipeItem) => (
           <RecipeFeedCard key={item.id} {...item} />
         )}
+        noContent={
+          <p className="text-center text-normal-200">
+            작성한 레피시가 없습니다.
+            <br />
+            자신만의 노하우가 담긴 레시피를 작성하고 공유해보세요!
+          </p>
+        }
       />
     </div>
   );

@@ -34,22 +34,28 @@ export const checkNicknameDuplication = (nickname: string) => {
   return apiClient.post("/users/check-nickname", { nickname });
 };
 
-export const getFollowers = (queryParams: {
-  keyword: string;
-  cursor: number;
-  size: number;
-}) => {
+export const getFollowers = (
+  userId: number,
+  queryParams: {
+    keyword: string;
+    cursor: number;
+    size: number;
+  },
+) => {
   const queryString = toQueryString(queryParams);
-  return apiClient.get(`/users/followers?${queryString}`);
+  return apiClient.get(`/users/${userId}/followers?${queryString}`);
 };
 
-export const getFollowings = (queryParams: {
-  keyword: string;
-  cursor: number;
-  size: number;
-}) => {
+export const getFollowings = (
+  userId: number,
+  queryParams: {
+    keyword?: string;
+    cursor: number;
+    size: number;
+  },
+) => {
   const queryString = toQueryString(queryParams);
-  return apiClient.get(`/users/followings?${queryString}`);
+  return apiClient.get(`/users/${userId}/followings?${queryString}`);
 };
 
 export const toggleFollow = (followRequest: { targetId: number }) => {

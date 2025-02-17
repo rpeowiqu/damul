@@ -18,13 +18,13 @@ const LoginPage = () => {
 
   return (
     <div className="flex flex-col justify-center flex-1 gap-36 px-6 sm:px-10">
-      <p className="text-3xl sm:text-4xl">
+      <div className="text-3xl sm:text-4xl">
         효율적인 식자재 관리
         <br />
         오직
         <div className="inline-block m-2 font-bold animate-bounce">다믈랭</div>
         에서
-      </p>
+      </div>
 
       <div className="flex flex-col gap-5">
         <div className="flex items-center">

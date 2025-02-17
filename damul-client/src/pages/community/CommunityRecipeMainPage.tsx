@@ -38,10 +38,12 @@ const CommunityRecipeMainPage = () => {
     try {
       const response = await getRecipes({
         cursor: pageParam,
-        size: 5,
+        size: 10,
         orderBy: orderType,
       });
-      console.log(response?.data);
+      if (response?.status === 204) {
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
+      }
       return response?.data;
     } catch (error) {
       console.log(error);
@@ -93,6 +95,13 @@ const CommunityRecipeMainPage = () => {
         renderItems={(item: RecipeItem) => <RecipeFeedCard {...item} />}
         skeleton={
           <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
+        }
+        noContent={
+          <p className="text-center text-normal-200">
+            등록된 레시피가 없습니다.
+            <br />
+            자신만의 노하우가 담긴 레시피를 작성하고 공유해보세요!
+          </p>
         }
       />
       <PostButton to="/community/recipe/post" icon={<WriteIcon />} />

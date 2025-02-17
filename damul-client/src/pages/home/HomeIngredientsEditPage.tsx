@@ -51,11 +51,11 @@ const HomeIngredientsEditPage = () => {
             </DamulButton>
           </div>
         )}
-        {ingredients.map((ingredient, idx) => {
+        {ingredients.map((ingredient) => {
           return (
             <>
               <div
-                key={`${ingredient} ${idx}`}
+                key={ingredient.userIngredientId}
                 className="border-4 w-full max-w-96 rounded-3xl border-positive-300"
               >
                 <IngredientDetail
