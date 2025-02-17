@@ -228,5 +228,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     """)
     List<RecipeList> findPopularRecipes();
 
+    int countByUser_IdAndDeletedFalse(Integer authorId);
+
 }
 
