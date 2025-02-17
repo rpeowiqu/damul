@@ -39,6 +39,7 @@ const ProfileRecipePage = () => {
       const response = await getMyRecipes(parseInt(user.userId), {
         cursor: pageParam,
         size: 10,
+        sortType,
       });
       console.log(response.data);
       if (response?.status === 204) {

@@ -6,6 +6,7 @@ import { CATEGORY_INFO } from "@/constants/category";
 import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
 import { useEffect, useState } from "react";
 import useAuth from "@/hooks/useAuth";
+import DamulButton from "../common/DamulButton";
 
 interface IngredientDetailProps {
   selectedIngredient: Ingredient;
