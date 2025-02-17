@@ -41,7 +41,7 @@ public class BadgeService {
     private final FollowRepository followRepository;
     private final TimeZoneConverter timeZoneConverter;
 
-    @Scheduled(cron = "0 0 0 * * *") // 매일 자정 실행
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul") // 매일 자정 실행
     public void checkAndAwardBadges() {
         List<User> users = userRepository.findAll();
 
