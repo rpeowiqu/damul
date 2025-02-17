@@ -1,20 +1,33 @@
-import MenuIcon from "@/components/svg/MenuIcon";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Image from "../common/Image";
+import MenuIcon from "@/components/svg/MenuIcon";
 import ExitIcon from "../svg/ExitIcon";
-import { getChattingMembers } from "@/service/chatting";
+import {
+  getChattingMembers,
+  deleteFromRoom,
+  deleteMemberFromRoom,
+} from "@/service/chatting";
 import { ChattingMember } from "@/types/chatting";
+import useAuth from "@/hooks/useAuth";
+import DamulButton from "../common/DamulButton";
 
 interface ChattingMenuButtonProps {
   roomId: string | undefined;
+  postId: number;
 }
 
-const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
+const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [memberData, setMemberData] = useState<ChattingMember[]>();
   const [memberCnt, setMemberCnt] = useState(0);
+  const [adminId, setAdminId] = useState(0);
+
+  const { data, isLoading } = useAuth();
 
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -37,6 +50,7 @@ const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
       console.log("ㅇㅇ", response?.data);
       setMemberData(response?.data.content);
       setMemberCnt(response?.data.totalMembers);
+      setAdminId(response?.data.adminId);
       return response?.data;
     } catch (error) {
       console.log(error);
@@ -46,6 +60,28 @@ const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
   useEffect(() => {
     fetchItems();
   }, []);
+
+  const handleExitRoom = async () => {
+    try {
+      const response = await deleteFromRoom({ roomId: roomId });
+      console.log(response);
+      navigate("/chatting");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleRemoveMember = async (memberId: number) => {
+    try {
+      const response = await deleteMemberFromRoom({
+        roomId: roomId,
+        memberId: memberId,
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="">
@@ -64,26 +100,41 @@ const ChattingMenuButton = ({ roomId }: ChattingMenuButtonProps) => {
           <div className="font-semibold">참여자({memberCnt})</div>
 
           {/* 참여자 목록 */}
-          {memberData?.map((data) => (
-            <div key={data.id} className="flex justify-between items-center">
+          {memberData?.map((member) => (
+            <div key={member.id} className="flex justify-between items-center">
               <div className="flex items-center gap-3 text-sm font-normal cursor-pointer">
                 <Image
-                  src={data.profileImageUrl}
+                  src={member.profileImageUrl}
                   className="w-10 h-10 rounded-full"
                 />
-                <div>{data.nickname}</div>
+                <div>{member.nickname}</div>
               </div>
-              <div className="text-sm font-normal text-negative-600 cursor-pointer">
-                강제 퇴장
-              </div>
+              {data?.data.id === adminId && data?.data.id !== member.id && (
+                <div
+                  className="text-sm font-normal text-negative-600 cursor-pointer"
+                  onClick={() => handleRemoveMember(member.id)}
+                >
+                  강제 퇴장
+                </div>
+              )}
             </div>
           ))}
-          <div className="flex justify-between items-center">
-            <span className="font-normal w-32 p-1 text-center text-xs border-2 border-positive-300 rounded-lg cursor-pointer">
-              원본 게시글 바로가기
-            </span>
-            <ExitIcon className="w-5 h-5 stroke-neutral-500 cursor-pointer" />
-          </div>
+          {postId !== 0 ? (
+            <div className="flex justify-between items-center">
+              <Link to={`/community/market/${postId}`}>
+                <DamulButton variant="positive" className="w-32 h-7 text-xs">
+                  원본 게시글 바로가기
+                </DamulButton>
+              </Link>
+              <div onClick={handleExitRoom}>
+                <ExitIcon className="w-5 h-5 stroke-neutral-500 cursor-pointer" />
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-end" onClick={handleExitRoom}>
+              <ExitIcon className="w-5 h-5 stroke-neutral-500 cursor-pointer" />
+            </div>
+          )}
         </div>
       </div>
     </div>

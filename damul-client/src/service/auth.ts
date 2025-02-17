@@ -19,6 +19,6 @@ export const consent = () => {
   return apiClient.get("/auth/consent");
 };
 
-export const getInfo = () => {
+export const getAuth = () => {
   return apiClient.get("/auth/users");
 };

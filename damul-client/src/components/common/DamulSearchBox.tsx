@@ -18,6 +18,7 @@ interface SearchBoxProps {
   className?: string; // 추가된 스타일링 prop
   onFocus?: FocusEventHandler<HTMLInputElement>;
   onBlur?: FocusEventHandler<HTMLInputElement>;
+  resetAfter?: boolean;
 }
 
 const DamulSearchBox = ({
@@ -29,6 +30,7 @@ const DamulSearchBox = ({
   className,
   onFocus,
   onBlur,
+  resetAfter = true,
 }: SearchBoxProps) => {
   // 입력값 변경 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -37,17 +39,21 @@ const DamulSearchBox = ({
 
   // 엔터 키 입력 핸들러
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && (inputValue || "").trim() !== "") {
+    if (e.key === "Enter") {
       e.preventDefault();
-      onButtonClick?.(inputValue || ""); // 기본값 "" 설정
-      setInputValue?.("");
+      onButtonClick?.(inputValue || "");
+
+      if (resetAfter) {
+        setInputValue?.("");
+      }
     }
   };
 
   // 검색 버튼 클릭 핸들러
   const handleButtonClick = () => {
-    if ((inputValue || "").trim() !== "") {
-      onButtonClick?.(inputValue || ""); // 기본값 "" 설정
+    onButtonClick?.(inputValue || "");
+
+    if (resetAfter) {
       setInputValue?.("");
     }
   };

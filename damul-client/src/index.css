@@ -65,6 +65,24 @@
   }
 }
 
+@keyframes shine {
+  0% {
+    transform: translate(150%, -20%) rotate(150deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(55%, 5%) rotate(150deg);
+    opacity: 0;
+  }
+}
+
+.animate-shine {
+  animation: shine 3s ease-in-out infinite;
+}
+
 @font-face {
   font-family: "SUITE-Regular";
   src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/SUITE-Light.woff2")

@@ -1,15 +1,29 @@
-import { useOutletContext, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { deleteFollower, getFollowers } from "@/service/user";
 import FriendItem, { FriendItemProps } from "@/components/profile/FriendItem";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import DamulButton from "@/components/common/DamulButton";
-import useUserStore from "@/stores/user";
 import queryClient from "@/utils/queryClient";
+import useAuth from "@/hooks/useAuth";
+import { postIntoPrivateRoom } from "@/service/chatting";
 
 const ProfileFriendFollowerPage = () => {
-  const myId = useUserStore((state) => state.myId);
+  const { data, isLoading } = useAuth();
   const { userId } = useParams();
   const { searchKeyword } = useOutletContext();
+  const nav = useNavigate();
+
+  const enterPrivateChat = async (userId: number) => {
+    try {
+      const response = await postIntoPrivateRoom({ userId });
+      if (response) {
+        const chatId = response.data.id;
+        nav(`/chatting/${chatId}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchFollowers = async (pageParam: number) => {
     try {
@@ -28,27 +42,33 @@ const ProfileFriendFollowerPage = () => {
     }
   };
 
-  const handleDeleteFriend = async (userId: number) => {
+  const handleDeleteFriend = async (targetId: number) => {
     try {
-      await deleteFollower(myId, userId!);
-      queryClient.invalidateQueries({ queryKey: ["follower"] });
+      await deleteFollower(targetId);
+      queryClient.refetchQueries({
+        queryKey: ["follower", userId, searchKeyword],
+      });
     } catch (error) {
       console.error(error);
     }
   };
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <DamulInfiniteScrollList
-      queryKey={["follower"]}
+      queryKey={["follower", userId, searchKeyword]}
       fetchFn={fetchFollowers}
       renderItems={(item: FriendItemProps) => (
         <FriendItem key={item.userId} {...item}>
-          {myId === parseInt(userId!) && (
+          {data?.data.id === parseInt(userId!) && (
             <>
               <DamulButton
                 variant="positive"
                 className="h-7 sm:h-10 text-xs xs:text-sm"
-                onClick={() => {}}
+                onClick={() => enterPrivateChat(item.userId)}
               >
                 채팅 시작
               </DamulButton>

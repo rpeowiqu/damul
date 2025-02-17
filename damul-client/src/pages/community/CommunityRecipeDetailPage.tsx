@@ -13,6 +13,7 @@ import { RecipeDetail, Comment } from "@/types/community";
 const CommunityRecipeDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [comment, setComment] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
   const { recipeId } = useParams();
 
   const initialRecipeDetail: RecipeDetail = {
@@ -37,11 +38,14 @@ const CommunityRecipeDetailPage = () => {
 
   const fetchRecipeDetail = async () => {
     try {
+      setIsLoading(true);
       const response = await getRecipeDetail(recipeId);
       console.log(response);
       setData(response?.data as RecipeDetail);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,6 +69,7 @@ const CommunityRecipeDetailPage = () => {
           createdAt={data.createdAt}
           bookmarked={data.bookmarked}
           id={data.recipeId}
+          isLoading={isLoading}
           type="recipe"
         />
         <AuthorInfo
@@ -75,15 +80,23 @@ const CommunityRecipeDetailPage = () => {
           likeCnt={data.likeCnt}
           liked={data.liked}
           id={data.recipeId}
+          isLoading={isLoading}
           type="recipe"
         />
         <ContentSection
           contentImageUrl={data.contentImageUrl}
           content={data.content}
           type="recipe"
+          isLoading={isLoading}
         />
-        <IngredientsSection ingredients={data.ingredients} />
-        <CookingOrdersSection cookingOrders={data.cookingOrders} />
+        <IngredientsSection
+          ingredients={data.ingredients}
+          isLoading={isLoading}
+        />
+        <CookingOrdersSection
+          cookingOrders={data.cookingOrders}
+          isLoading={isLoading}
+        />
         <CommentsSection
           id={data.recipeId}
           comments={data.comments}

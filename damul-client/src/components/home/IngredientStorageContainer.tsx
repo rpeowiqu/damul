@@ -16,9 +16,9 @@ import { initialIngrdientItem } from "@/constants/initialData";
 interface IngredientStorageContainerProps {
   title: keyof typeof STORAGE_TYPE | keyof typeof ITEM_STATUS;
   items: Ingredient[];
-  onEdit: boolean;
-  setExpiringSoonItems: React.Dispatch<React.SetStateAction<Ingredient[]>>;
-  setIngredientData: React.Dispatch<React.SetStateAction<IngredientData>>;
+  onEdit?: boolean;
+  setExpiringSoonItems?: React.Dispatch<React.SetStateAction<Ingredient[]>>;
+  setIngredientData?: React.Dispatch<React.SetStateAction<IngredientData>>;
 }
 
 const COLUMN_SIZE = {
