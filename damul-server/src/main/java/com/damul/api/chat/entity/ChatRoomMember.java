@@ -41,9 +41,8 @@ public class ChatRoomMember {
     @Column(name = "last_read_message_id", nullable = false)
     private Integer lastReadMessageId;
 
-    @PrePersist
-    protected void onCreate() {
-        joinedAt = LocalDateTime.now();
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.joinedAt = createdAt;
     }
 
     public void updateLastReadMessageId(int messageId) {

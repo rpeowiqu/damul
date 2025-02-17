@@ -1,6 +1,7 @@
 package com.damul.api.mypage.service;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.main.repository.UserIngredientRepository;
 import com.damul.api.mypage.entity.Badge;
 import com.damul.api.mypage.entity.UserBadge;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,7 @@ public class BadgeService {
     private final PostRepository postRepository;
     private final RecipeRepository recipeRepository;
     private final FollowRepository followRepository;
+    private final TimeZoneConverter timeZoneConverter;
 
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정 실행
     public void checkAndAwardBadges() {
@@ -79,6 +82,7 @@ public class BadgeService {
                     .user(user)
                     .badge(newBadge.get())
                     .build();
+            userBadge.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
             userBadgeRepository.save(userBadge);
             log.info("Awarded new badge {} level {} to user {}",
                     badgeTitle, newBadge.get().getLevel(), user.getId());

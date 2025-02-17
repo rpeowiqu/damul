@@ -16,6 +16,7 @@ import com.damul.api.chat.entity.ChatRoomMember;
 import com.damul.api.chat.repository.ChatMessageRepository;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.socket.Base64MultipartFile;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 
@@ -42,6 +44,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     private final SimpMessageSendingOperations messagingTemplate;
     private final S3Service s3Service;
     private final UserRepository userRepository;
+    private final TimeZoneConverter timeZoneConverter;
 
     @Override
     @Transactional
@@ -77,6 +80,7 @@ public class WebSocketServiceImpl implements WebSocketService {
                     messageRequest.getMessageType() != null ? messageRequest.getMessageType() : MessageType.TEXT
             );
         }
+        message.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         chatMessageRepository.save(message);
         int unReadCount = chatMessageRepository.countUnreadMessages(roomId, message.getId());
@@ -107,6 +111,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
         String imagePath = s3Service.uploadFile(multipartFile);
         ChatMessage message = ChatMessage.createFileMessage(room, currentUser, imageRequest.getContent(), imagePath);
+        message.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         chatMessageRepository.save(message);
         int unReadCount = chatMessageRepository.countUnreadMessages(roomId, message.getId());
@@ -129,10 +134,12 @@ public class WebSocketServiceImpl implements WebSocketService {
 
             String nickname = user.getNickname();
             ChatRoomMember member = ChatRoomMember.create(room, user, nickname, MemberRole.MEMBER, 0);
+            member.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
             chatRoomMemberRepository.save(member);
         }
 
         ChatMessage enterMessage = ChatMessage.createEnterMessage(room, user);
+        enterMessage.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         chatMessageRepository.save(enterMessage);
         int unReadCount = chatMessageRepository.countUnreadMessages(roomId, enterMessage.getId());
         messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, ChatMessageResponse.from(enterMessage, unReadCount));
@@ -155,6 +162,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         chatRoomMemberRepository.delete(member);
 
         ChatMessage leaveMessage = ChatMessage.createLeaveMessage(room, user);
+        leaveMessage.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         chatMessageRepository.save(leaveMessage);
         int unReadCount = chatMessageRepository.countUnreadMessages(roomId, leaveMessage.getId());
         messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, ChatMessageResponse.from(leaveMessage, unReadCount));

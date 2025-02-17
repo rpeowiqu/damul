@@ -51,8 +51,7 @@ public class Report {
     @Column(name = "resolved_at")
     private LocalDateTime resolvedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

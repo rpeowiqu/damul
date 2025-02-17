@@ -54,9 +54,8 @@ public class Recipe {
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public void incrementLikeCnt() {

@@ -45,9 +45,8 @@ public class RecipeComment {
     @OneToMany(mappedBy = "parent")
     private List<RecipeComment> children;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     @Builder

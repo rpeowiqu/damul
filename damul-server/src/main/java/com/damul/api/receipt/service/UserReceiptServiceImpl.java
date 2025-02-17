@@ -2,6 +2,7 @@ package com.damul.api.receipt.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.main.entity.UserIngredient;
@@ -41,6 +42,7 @@ public class UserReceiptServiceImpl implements UserReceiptService {
     private final UserRepository userRepository;
     private final FoodPreferenceRepository foodPreferenceRepository;
     private final FoodCategoryRepository foodCategoryRepository;
+    private final TimeZoneConverter timeZoneConverter;
 
     @Override
     @Transactional
@@ -59,7 +61,7 @@ public class UserReceiptServiceImpl implements UserReceiptService {
         UserReceipt receipt = UserReceipt.builder()
                 .user(user)
                 .storeName(request.getStoreName())
-                .purchaseAt(request.getPurchaseAt().atStartOfDay())
+                .purchaseAt(timeZoneConverter.convertUtcToSeoul(request.getPurchaseAt().atStartOfDay()))
                 .totalAmount(totalAmount)  // 총액 추가
                 .build();
 
@@ -79,7 +81,7 @@ public class UserReceiptServiceImpl implements UserReceiptService {
                             .userReciept(savedReceipt)
                             .categoryId(item.getCategoryId())
                             .ingredientQuantity(100)
-                            .ingredientUp(request.getPurchaseAt().atStartOfDay())
+                            .ingredientUp(timeZoneConverter.convertUtcToSeoul(request.getPurchaseAt().atStartOfDay()))
                             .ingredientName(item.getIngredientName())
                             .expirationDate(item.getExpirationDate().atStartOfDay())
                             .ingredientStorage(item.getIngredientStorage())
