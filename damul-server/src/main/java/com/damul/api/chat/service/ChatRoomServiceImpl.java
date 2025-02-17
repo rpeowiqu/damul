@@ -15,6 +15,7 @@ import com.damul.api.chat.entity.ChatRoomMember;
 import com.damul.api.chat.repository.ChatMessageRepository;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
@@ -50,6 +51,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final NotificationService notificationService;
+    private final TimeZoneConverter timeZoneConverter;
 
     @Override
     @Transactional(readOnly = true)
@@ -308,12 +310,15 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 currentUser,
                 String.format("%s,%s", currentUser.getNickname(), targetUser.getNickname())
         );
+        newRoom.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         ChatRoom savedRoom = chatRoomRepository.save(newRoom);
 
         // 채팅방 멤버 추가
         ChatRoomMember currentMember = ChatRoomMember.create(savedRoom, currentUser, currentUser.getNickname(), MemberRole.MEMBER, 0);
         ChatRoomMember targetMember = ChatRoomMember.create(savedRoom, targetUser, targetUser.getNickname(), MemberRole.MEMBER, 0);
+        currentMember.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
+        targetMember.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         chatRoomMemberRepository.save(currentMember);
         chatRoomMemberRepository.save(targetMember);
@@ -360,6 +365,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 roomName,
                 request.getUsers().size() + 1
         );
+        newRoom.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         ChatRoom savedRoom = chatRoomRepository.save(newRoom);
 
@@ -371,6 +377,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 MemberRole.ADMIN,
                 0
         );
+        creatorMember.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         chatRoomMemberRepository.save(creatorMember);
 
         // 초대된 멤버들 추가
@@ -386,6 +393,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                     MemberRole.MEMBER,
                     0
             );
+            newMember.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
             chatRoomMemberRepository.save(newMember);
         }
 
@@ -449,6 +457,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 postName,
                 chatSize
         );
+        newRoom.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         ChatRoom savedRoom = chatRoomRepository.save(newRoom);
 
@@ -460,6 +469,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 MemberRole.ADMIN,
                 0
         );
+        creatorMember.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         chatRoomMemberRepository.save(creatorMember);
 
         // 시스템 메시지 생성
@@ -505,6 +515,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
     private void createSystemMessage(ChatRoom chatRoom, String content) {
         ChatMessage systemMessage = ChatMessage.createSystemMessage(chatRoom, content);
+        systemMessage.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         chatMessageRepository.save(systemMessage);
     }
 
@@ -580,19 +591,6 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 .lastMessageTime(lastMessage != null ? lastMessage.getCreatedAt().toString() : "")
                 .unReadNum(unreadCount)
                 .build();
-    }
-
-    private LocalDateTime convertSeoulToUTC(LocalDateTime seoulDateTime) {
-        ZoneId seoulZone = ZoneId.of("Asia/Seoul");
-        ZonedDateTime seoulZoned = seoulDateTime.atZone(seoulZone);
-        return seoulZoned.withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime();
-    }
-
-    private LocalDateTime convertUtcToSeoul(LocalDateTime utcTime) {
-        return utcTime
-                .atZone(ZoneId.of("UTC"))
-                .withZoneSameInstant(ZoneId.of("Asia/Seoul"))
-                .toLocalDateTime();
     }
 
 }

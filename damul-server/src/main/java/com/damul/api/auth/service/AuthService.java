@@ -13,6 +13,7 @@ import com.damul.api.auth.jwt.TokenService;
 import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.user.repository.UserRepository;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+    private final TimeZoneConverter timeZoneConverter;
     @Value("${spring.security.admin.password}")
     private String hashedAdminPassword;
 
@@ -128,6 +131,7 @@ public class AuthService {
             User user = objectMapper.readValue(jsonString, User.class);
             user.setNickname(signupRequest.getNickname());
             user.setSelfIntroduction(signupRequest.getSelfIntroduction());
+            user.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
             User savedUser = authRepository.save(user);
 

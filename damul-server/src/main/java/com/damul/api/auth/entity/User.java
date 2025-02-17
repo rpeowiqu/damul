@@ -65,11 +65,6 @@ public class User {
     @Builder.Default
     private boolean warningEnabled = true;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-
     public void updateSettings(SettingUpdate settingUpdate) {
         this.nickname = settingUpdate.getNickname();
         this.selfIntroduction = settingUpdate.getSelfIntroduction();
@@ -81,6 +76,10 @@ public class User {
         }
         this.accessRange = settingUpdate.getAccessRange();
         this.warningEnabled = settingUpdate.isWarningEnabled();
+    }
+
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public void updateWarningEnabled(boolean warningEnabled) {

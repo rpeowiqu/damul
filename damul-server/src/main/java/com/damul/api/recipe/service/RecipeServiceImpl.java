@@ -2,6 +2,7 @@ package com.damul.api.recipe.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.comment.CommentCreate;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
@@ -55,6 +56,8 @@ public class RecipeServiceImpl implements RecipeService {
     private final UserRepository userRepository;
     private final RecipeLikeRepository recipeLikeRepository;
     private final RecipeBookmarkRepository recipeBookmarkRepository;
+    private final TimeZoneConverter timeZoneConverter;
+
     // 레시피 전체 조회 및 검색
     @Override
     public ScrollResponse getRecipes(UserInfo userInfo, int cursor, int size, String searchType, String keyword, String orderBy) {
@@ -331,6 +334,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .user(user)
                     .thumbnailUrl(thumbnailImageUrl)
                     .build();
+            recipe.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
             recipeRepository.save(recipe);
             log.info("레시피 기본 정보 저장 완료 - recipeId: {}", recipe.getId());
 
@@ -559,13 +563,13 @@ public class RecipeServiceImpl implements RecipeService {
                     .orElseThrow(() -> new BusinessException(ErrorCode.PARENT_ID_NOT_FOUND));
         }
 
-
         RecipeComment comment = RecipeComment.builder()
                 .recipe(recipe)
                 .user(user)
                 .parent(parent)
                 .comment(commentCreate.getComment())
                 .build();
+        comment.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         RecipeComment savedComment = recipeCommentRepository.save(comment);
         return new CreateResponse(savedComment.getId());

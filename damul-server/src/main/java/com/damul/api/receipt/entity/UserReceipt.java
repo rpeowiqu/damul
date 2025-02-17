@@ -35,9 +35,8 @@ public class UserReceipt {
     @Column(name = "total_amount")
     private int totalAmount;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     @Builder

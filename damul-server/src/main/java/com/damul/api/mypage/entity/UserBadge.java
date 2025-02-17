@@ -33,9 +33,8 @@ public class UserBadge {
     @Column(name = "rank")
     private Double rank;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public void updateBadge(Badge newBadge) {
