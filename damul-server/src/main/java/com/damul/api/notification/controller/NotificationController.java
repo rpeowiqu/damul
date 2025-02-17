@@ -36,6 +36,7 @@ public class NotificationController {
             @RequestParam(required = false, defaultValue = "false") Boolean unreadOnly) {
         log.info("Get notifications request: userId={}, unreadOnly={}", user.getId(), unreadOnly);
         NotificationList notifications = notificationService.getNotifications(user.getId(), unreadOnly);
+        if(notifications.getNotifications().isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(notifications);
     }
 
