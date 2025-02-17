@@ -1,5 +1,5 @@
 import AlarmItem from "@/components/alarm/AlarmItem";
-import { getAlarms } from "@/service/alarm";
+import { getAlarms, getUnreadAlarmCnt } from "@/service/alarm";
 import { useEffect, useState } from "react";
 
 const AlarmPage = () => {
@@ -17,8 +17,18 @@ const AlarmPage = () => {
     }
   };
 
+  const fetchUnreadAlarmCnt = async () => {
+    try {
+      const response = await getUnreadAlarmCnt();
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    fetchAlarms();
+    // fetchAlarms();
+    fetchUnreadAlarmCnt();
   }, []);
   return (
     <main className="h-full text-centerspace-y-2">
