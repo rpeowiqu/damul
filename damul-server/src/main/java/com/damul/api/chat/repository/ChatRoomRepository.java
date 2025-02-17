@@ -132,4 +132,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
             @Param("lastMessageTime") LocalDateTime lastMessageTime,
             @Param("roomId") int roomId
     );
+
+    List<ChatRoom> findChatRoomsByUserId(int userId);
 }
