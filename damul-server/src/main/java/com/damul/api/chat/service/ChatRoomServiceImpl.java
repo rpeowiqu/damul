@@ -53,8 +53,8 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<ChatRoomList> getChatRooms(LocalDateTime cursorTime, int cursorId, int size, int userId) {
-        List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursor(userId, cursorTime, cursorId);
+    public ScrollResponse<ChatRoomList> getChatRooms(LocalDateTime cursorTime, int cursorId, int size, String filter, int userId) {
+        List<ChatRoom> rooms = chatRoomRepository.findRoomsWithCursor(userId, cursorTime, cursorId, filter);
 
         if (rooms.isEmpty()) {
             return new ScrollResponse<>(
@@ -87,7 +87,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
     @Override
     @Transactional(readOnly = true)
-    public SearchResponse<ChatRoomList> searchChatRooms(String keyword, LocalDateTime cursorTime, int cursorId, int size, int userId) {
+    public SearchResponse<ChatRoomList> searchChatRooms(String keyword, LocalDateTime cursorTime, int cursorId, int size, String filter, int userId) {
         log.info("서비스: 채팅방 검색 시작 - keyword: {}", keyword);
 
         validateUserId(userId);
@@ -97,7 +97,8 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 userId,
                 cursorTime,
                 cursorId,
-                keyword
+                keyword,
+                filter
         );
 
         ScrollResponse<ChatRoomList> results = processRoomResults(rooms, size, userId);
@@ -211,7 +212,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         ChatRoomMember admin = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, adminId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "채팅방 멤버가 아닙니다."));
 
-        if (!admin.getRole().equals("ADMIN")) {
+        if (!admin.getRole().equals(MemberRole.ADMIN)) {
             throw new BusinessException(ErrorCode.CHATROOM_MEMBER_KICK_DENIED, "방장만 멤버를 추방할 수 있습니다.");
         }
 
@@ -220,7 +221,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "추방할 멤버가 존재하지 않습니다."));
 
         // 방장은 추방할 수 없음
-        if (memberToKick.getRole().equals("ADMIN")) {
+        if (memberToKick.getRole().equals(MemberRole.ADMIN)) {
             throw new BusinessException(ErrorCode.CHATROOM_MEMBER_KICK_DENIED, "방장은 추방할 수 없습니다.");
         }
 

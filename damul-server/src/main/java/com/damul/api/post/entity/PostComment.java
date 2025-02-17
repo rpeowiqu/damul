@@ -43,6 +43,11 @@ public class PostComment {
     @Column(nullable = false)
     private boolean isDeleted = false;  // 삭제 상태 필드 추가
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
     // 논리적 삭제를 위한 메서드
     public void delete() {
         this.isDeleted = true;

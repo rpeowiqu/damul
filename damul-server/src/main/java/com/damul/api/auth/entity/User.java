@@ -39,7 +39,6 @@ public class User {
     private Role role;         // ENUM
 
     @Column(name = "created_at", updatable = false, columnDefinition = "DATETIME")
-    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", columnDefinition = "DATETIME")
@@ -65,6 +64,11 @@ public class User {
     @Column(name = "warning_enabled")
     @Builder.Default
     private boolean warningEnabled = true;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
     public void updateSettings(SettingUpdate settingUpdate) {
         this.nickname = settingUpdate.getNickname();

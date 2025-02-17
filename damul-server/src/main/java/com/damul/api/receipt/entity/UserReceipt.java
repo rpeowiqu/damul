@@ -35,6 +35,11 @@ public class UserReceipt {
     @Column(name = "total_amount")
     private int totalAmount;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
     @Builder
     public UserReceipt(User user, String storeName, LocalDateTime purchaseAt, int totalAmount) {
         this.user = user;

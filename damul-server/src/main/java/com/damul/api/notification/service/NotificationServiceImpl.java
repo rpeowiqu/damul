@@ -30,7 +30,7 @@ public class NotificationServiceImpl implements NotificationService {
     public NotificationList getNotifications(Integer userId, boolean unreadOnly) {
         List<Notification> notifications;
         if (unreadOnly) {
-            notifications = notificationRepository.findByReceiverIdAndIsReadFalseOrderByCreatedAtDesc(userId);
+            notifications = notificationRepository.findByReceiverIdAndReadFalseOrderByCreatedAtDesc(userId);
         } else {
             notifications = notificationRepository.findByReceiverIdOrderByCreatedAtDesc(userId);
         }
@@ -46,7 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional(readOnly = true)
     public UnReadResponse getUnreadCount(Integer userId) {
         UnReadResponse response = new UnReadResponse();
-        response.count(notificationRepository.countByReceiverIdAndIsReadFalse(userId));
+        response.count(notificationRepository.countByReceiverIdAndReadFalse(userId));
         return response;
     }
 
