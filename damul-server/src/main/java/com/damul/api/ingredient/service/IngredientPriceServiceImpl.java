@@ -3,18 +3,15 @@ package com.damul.api.ingredient.service;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.ingredient.dto.response.IngredientPriceResponse;
-import com.damul.api.ingredient.dto.response.IngredientsCategoryResponse;
 import com.damul.api.ingredient.dto.response.IngredientsProductNameList;
 import com.damul.api.ingredient.dto.response.IngredientsProductNameResponse;
 import com.damul.api.ingredient.repository.FoodItemRepository;
-import com.damul.api.mypage.entity.FoodCategory;
 import com.damul.api.mypage.repository.FoodCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -30,8 +27,8 @@ public class IngredientPriceServiceImpl implements IngredientPriceService {
     private final FoodItemRepository foodItemRepository;
 
     @Override
-    public IngredientPriceResponse getIngredientPrice(String period, String itemCode, String itemCategoryCode) {
-        log.info("식자재 가격 동향 조회 시작 - period: {}, itemCode: {}, itemCategoryCode: {}", period, itemCode, itemCategoryCode);
+    public IngredientPriceResponse getIngredientPrice(String period, String itemCode, String kindCode, boolean ecoFlag) {
+        log.info("식자재 가격 동향 조회 시작 - period: {}, itemCode: {}, itemCategoryCode: {}, ecoFlag: {}", period, itemCode, kindCode, ecoFlag);
 
         try {
             if (!period.equals("monthly") && !period.equals("recent")) {
@@ -45,7 +42,7 @@ public class IngredientPriceServiceImpl implements IngredientPriceService {
                 log.info("랜덤 선택된 itemCode: {}", itemCode);
             }
             // PriceAnalysisService를 통해 데이터 분석
-            IngredientPriceResponse response = priceAnalysisService.analyzePrices(itemCode, period, LocalDate.now(), itemCategoryCode);
+            IngredientPriceResponse response = priceAnalysisService.analyzePrices(itemCode, period, LocalDate.now(), kindCode, ecoFlag);
             log.info("식자재 가격 동향 조회 완료");
             return response;
 
@@ -53,16 +50,6 @@ public class IngredientPriceServiceImpl implements IngredientPriceService {
             log.error("식자재 가격 동향 조회 실패: {}", e.getMessage());
             throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR);
         }
-    }
-
-    @Override
-    public IngredientsCategoryResponse getIngredientsCategory() {
-        log.info("식자재 대분류 조회 시작");
-        List<FoodCategory> foodCategories = foodCategoriesRepository.findAll();
-        log.info("식자재 대분류 조회 완료");
-        return IngredientsCategoryResponse.builder()
-                .categories(foodCategories)
-                .build();
     }
 
     @Override

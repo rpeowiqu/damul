@@ -1,4 +1,4 @@
-package com.damul.api.ingredient.dto.response;
+package com.damul.api.common.page;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IngredientsCategoryList {
-    private int id;
-    private String name;
+public class PageInfo {
+    private int totalElements;
+    private int totalPages;
 }

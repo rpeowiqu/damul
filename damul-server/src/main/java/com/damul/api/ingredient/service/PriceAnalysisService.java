@@ -37,9 +37,9 @@ public class PriceAnalysisService {
     private static final Duration CACHE_TTL = Duration.ofHours(24); // 기본 24시간
 
 
-    public IngredientPriceResponse  analyzePrices(String itemCode, String period, LocalDate currentDate, String itemCategoryCode) {
+    public IngredientPriceResponse  analyzePrices(String itemCode, String period, LocalDate currentDate, String kindCode, boolean ecoFlag) {
         // Redis 키 생성
-        String redisKey = String.format(REDIS_KEY_PATTERN, period, itemCode, itemCategoryCode,
+        String redisKey = String.format(REDIS_KEY_PATTERN, period, itemCode, kindCode, ecoFlag,
                 currentDate.format(DateTimeFormatter.BASIC_ISO_DATE));
 
         // Redis에서 조회
@@ -54,7 +54,7 @@ public class PriceAnalysisService {
 
         // 캐시 미스시 API 호출
         LocalDate startDate = currentDate.minusYears(1);
-        String response = kamisApiService.getPrice(itemCode, itemCategoryCode);
+        String response = kamisApiService.getPrice(itemCode, kindCode, ecoFlag);
 
 
         IngredientPriceResponse result = analyzePriceData(response, period, itemCode);
@@ -74,49 +74,16 @@ public class PriceAnalysisService {
             JsonNode rootNode = objectMapper.readTree(jsonResponse);
             JsonNode dataNode = rootNode.path("data");
 
-
-            String name = extractItemName(dataNode);
-
             List<PriceData> prices = calculatePrices(dataNode, period);
 
             return IngredientPriceResponse.builder()
-                    .productName(name)
-                    .prices(prices)
+                    .priceDataList(prices)
                     .build();
 
         } catch (Exception e) {
             log.error("데이터 분석 실패", e);
             throw new BusinessException(ErrorCode.DATA_ANALYSIS_ERROR);
         }
-    }
-
-    private String extractItemName(JsonNode dataNode) {
-        for (JsonNode item : dataNode.path("item")) {
-            JsonNode kindNameNode = item.path("kindname");
-            JsonNode itemNameNode = item.path("itemname");
-
-
-            // 첫 번째로 발견된 유효한 값을 반환
-            if ((!itemNameNode.isMissingNode() && !itemNameNode.isNull() && !itemNameNode.asText().isEmpty()) ||
-                    (!kindNameNode.isMissingNode() && !kindNameNode.isNull() && !kindNameNode.asText().isEmpty())) {
-
-                String itemName = itemNameNode.isNull() ? "" : itemNameNode.asText();
-                String kindName = kindNameNode.isNull() ? "" : kindNameNode.asText();
-
-                // 둘 중 하나라도 있으면 조합
-                if (!itemName.isEmpty() || !kindName.isEmpty()) {
-                    String result = (itemName + " " + kindName).trim();
-
-                    log.info("추출된 itemName: {}", itemName);
-                    log.info("추출된 kindName: {}", kindName);
-
-                    return result.isEmpty() ? "알 수 없는 종류" : result;
-                }
-            }
-        }
-
-        log.warn("itemName을 찾지 못했습니다.");
-        return "알 수 없는 종류";
     }
 
     private List<PriceData> calculatePrices(JsonNode dataNode, String period) {

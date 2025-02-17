@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IngredientsProductNameList {
     private int categoryId;
-    private String ingredientName;
+    private String itemName;
     private String itemCode;
     private String kindCode;
+    private String unit;
+    private boolean ecoFlag;
 }

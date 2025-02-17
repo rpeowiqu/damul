@@ -14,6 +14,8 @@ import reactor.netty.http.client.HttpClient;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 @Slf4j
 @Service
@@ -26,15 +28,18 @@ public class KamisApiService {
 
 
     private static final String KAMIS_BASE_URL = "http://www.kamis.or.kr/service/price/xml.do";
-    private static final String KAMIS_ACTION = "periodRetailProductList";
     private static final String KAMIS_API_ID = "5234";
     private static final String KAMIS_RETURN_TYPE = "json";
-    private static final String CONVERT_KG_YN = "Y";
+    private static final String CONVERT_KG_YN = "N";
+    private static final String ECO_ACTION = "periodEcoPriceList";
+    private static final String RETAIL_ACTION = "periodRetailProductList";
 
-    public String getPrice(String itemCode, String itemCategoryCode) {
-        log.info("Kamis API 호출 시작 - itemCode: {}, itemCategoryCode: {}", itemCode, itemCategoryCode);
 
-        log.info("KAMIS_RETURN_TYPE : {}", KAMIS_RETURN_TYPE);
+    public String getPrice(String itemCode, String kindCode, boolean ecoFlag) {
+        String kamisAction = ecoFlag ? ECO_ACTION : RETAIL_ACTION;
+        log.info("Kamis API 호출 시작 - itemCode: {}, kindCode: {}, ecoFlag: {}", itemCode, kindCode, ecoFlag);
+
+
         // 날짜 계산
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusMonths(6)
@@ -43,14 +48,14 @@ public class KamisApiService {
 
         try {
             URI fullUri = UriComponentsBuilder.fromUriString(KAMIS_BASE_URL)
-                    .queryParam("action", KAMIS_ACTION)
+                    .queryParam("action", kamisAction)
                     .queryParam("p_cert_key", apiKey)
                     .queryParam("p_cert_id", KAMIS_API_ID)
                     .queryParam("p_returntype", KAMIS_RETURN_TYPE)
                     .queryParam("p_startday", startDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
                     .queryParam("p_endday", endDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
                     .queryParam("p_itemcode", itemCode)
-                    .queryParam("p_itemcategorycode", itemCategoryCode)
+                    .queryParam("p_itemcategorycode", kindCode)
                     .queryParam("p_convert_kg_yn", CONVERT_KG_YN)
                     .build()
                     .toUri();
@@ -72,14 +77,14 @@ public class KamisApiService {
                     .build()
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .queryParam("action", KAMIS_ACTION)
+                            .queryParam("action", kamisAction)
                             .queryParam("p_cert_key", apiKey)
                             .queryParam("p_cert_id", KAMIS_API_ID)
                             .queryParam("p_returntype", KAMIS_RETURN_TYPE)
                             .queryParam("p_startday", startDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
                             .queryParam("p_endday", endDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
                             .queryParam("p_itemcode", itemCode)
-                            .queryParam("p_itemcategorycode", itemCategoryCode)
+                            .queryParam("p_itemcategorycode", kindCode)
                             .queryParam("p_convert_kg_yn", CONVERT_KG_YN)
                             .build())
                     .retrieve()
