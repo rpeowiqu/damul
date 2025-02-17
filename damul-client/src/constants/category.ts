@@ -10,6 +10,8 @@ import {
   DairyIcon,
   VegetableIcon,
 } from "@/components/svg";
+import { SVGProps } from "@/types/svg";
+import { ReactNode } from "react";
 
 export const CATEGORY_INFO = {
   grains: {
@@ -117,38 +119,79 @@ export const CATEGORY_INFO_KR = {
   },
 } as const;
 
-export const CATEGORY_NAME_MAPPER = new Map();
-CATEGORY_NAME_MAPPER.set(1, "곡물");
-CATEGORY_NAME_MAPPER.set(2, "채소");
-CATEGORY_NAME_MAPPER.set(3, "과일");
-CATEGORY_NAME_MAPPER.set(4, "유제품");
-CATEGORY_NAME_MAPPER.set(5, "육류");
-CATEGORY_NAME_MAPPER.set(6, "달걀류");
-CATEGORY_NAME_MAPPER.set(7, "수산물");
-CATEGORY_NAME_MAPPER.set(8, "기름");
-CATEGORY_NAME_MAPPER.set(9, "양념");
-CATEGORY_NAME_MAPPER.set(10, "기타");
+export const CATEGORY_NAME_MAPPER: Record<number, string> = {
+  1: "곡물",
+  2: "과일",
+  3: "기름",
+  4: "달걀류",
+  5: "수산물",
+  6: "양념",
+  7: "유제품",
+  8: "육류",
+  9: "채소",
+  10: "기타",
+};
 
-export const CATEGORY_NUMBER_MAPPER = new Map();
-CATEGORY_NAME_MAPPER.set("곡물", 1);
-CATEGORY_NAME_MAPPER.set("채소", 2);
-CATEGORY_NAME_MAPPER.set("과일", 3);
-CATEGORY_NAME_MAPPER.set("유제품", 4);
-CATEGORY_NAME_MAPPER.set("육류", 5);
-CATEGORY_NAME_MAPPER.set("달걀류", 6);
-CATEGORY_NAME_MAPPER.set("수산물", 7);
-CATEGORY_NAME_MAPPER.set("기름", 8);
-CATEGORY_NAME_MAPPER.set("양념", 9);
-CATEGORY_NAME_MAPPER.set("기타", 10);
+export const CATEGORY_ID_MAPPER: Record<string | number, number> = {
+  곡물: 1,
+  과일: 2,
+  기름: 3,
+  달걀류: 4,
+  수산물: 5,
+  양념: 6,
+  유제품: 7,
+  육류: 8,
+  채소: 9,
+  기타: 10,
+};
 
-export const CATEGORY_COLOR_MAPPER = new Map();
-CATEGORY_COLOR_MAPPER.set("곡물", "#f28b82");
-CATEGORY_COLOR_MAPPER.set("채소", "#fbbc04");
-CATEGORY_COLOR_MAPPER.set("과일", "#fdd663");
-CATEGORY_COLOR_MAPPER.set("유제품", "#97d174");
-CATEGORY_COLOR_MAPPER.set("육류", "#6fcf97");
-CATEGORY_COLOR_MAPPER.set("달걀류", "#76d7ea");
-CATEGORY_COLOR_MAPPER.set("수산물", "#4a90e2");
-CATEGORY_COLOR_MAPPER.set("기름", "#ab7fd0");
-CATEGORY_COLOR_MAPPER.set("양념", "#f4a9c0");
-CATEGORY_COLOR_MAPPER.set("기타", "#cfd8dc");
+export const CATEGORY_COLOR_MAPPER: Record<string, string> = {
+  곡물: "#f28b82",
+  과일: "#fbbc04",
+  기름: "#fdd663",
+  달걀류: "#97d174",
+  수산물: "#6fcf97",
+  양념: "#76d7ea",
+  유제품: "#4a90e2",
+  육류: "#ab7fd0",
+  채소: "#f4a9c0",
+  기타: "#cfd8dc",
+
+  1: "#f28b82",
+  2: "#fbbc04",
+  3: "#fdd663",
+  4: "#97d174",
+  5: "#6fcf97",
+  6: "#76d7ea",
+  7: "#4a90e2",
+  8: "#ab7fd0",
+  9: "#f4a9c0",
+  10: "#cfd8dc",
+};
+
+export const CATEGORY_ICON_MAPPER: Record<
+  string,
+  ({ className }: SVGProps) => ReactNode
+> = {
+  곡물: GrainsIcon,
+  과일: FruitIcon,
+  기름: OilIcon,
+  달걀류: EggIcon,
+  수산물: FishIcon,
+  양념: SeasoningIcon,
+  유제품: DairyIcon,
+  육류: MeatIcon,
+  채소: VegetableIcon,
+  기타: EtcIcon,
+
+  1: GrainsIcon,
+  2: FruitIcon,
+  3: OilIcon,
+  4: EggIcon,
+  5: FishIcon,
+  6: SeasoningIcon,
+  7: DairyIcon,
+  8: MeatIcon,
+  9: VegetableIcon,
+  10: EtcIcon,
+};

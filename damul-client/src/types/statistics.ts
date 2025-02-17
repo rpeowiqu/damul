@@ -8,7 +8,7 @@ export interface KamisIngredient {
 }
 
 export interface KamisChartData {
-  date: string;
+  period: string;
   price: number;
 }
 

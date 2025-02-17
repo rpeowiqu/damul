@@ -102,7 +102,7 @@ const ProfileInfoPage = () => {
         <span
           className={"font-bold ml-0.5"}
           style={{
-            color: CATEGORY_COLOR_MAPPER.get(favoriteFood.item.categoryName),
+            color: CATEGORY_COLOR_MAPPER[favoriteFood.item.categoryName],
           }}
         >
           {favoriteFood.item.categoryName}
@@ -184,8 +184,11 @@ const ProfileInfoPage = () => {
             <YAxis className="text-sm" type="category" dataKey="categoryName" />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar dataKey="categoryPreference">
-              {profileInfo.foodPreference.map((item, index) => (
-                <Cell key={item.categoryId} fill={colorList[index]} />
+              {profileInfo.foodPreference.map((item) => (
+                <Cell
+                  key={item.categoryId}
+                  fill={CATEGORY_COLOR_MAPPER[item.categoryName]}
+                />
               ))}
             </Bar>
           </BarChart>
