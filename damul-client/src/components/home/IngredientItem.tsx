@@ -124,6 +124,45 @@ const IngredientItem = ({
             ))}
           </select>
         </div>
+
+        <div className="flex gap-2 w-full justify-between items-center">
+          <label
+            className="w-20 cursor-pointer font-bold max-xs:text-sm"
+            htmlFor="ingredientStorage"
+          >
+            보관장소
+          </label>
+
+          <select
+            id="ingredientStorage"
+            name="ingredientStorage"
+            className="border rounded-md w-full min-w-0 cursor-pointer focus:outline-positive-300 p-1"
+            value={ingredientData.ingredientStorage}
+            onChange={handleChange}
+          >
+            {Object.keys(STORAGE_TYPE_CONST).map((key) => (
+              <option key={key} value={key}>
+                {STORAGE_TYPE_CONST[key as keyof typeof STORAGE_TYPE_CONST]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex gap-2 w-full justify-between items-center">
+          <label
+            className="w-20 cursor-pointer font-bold max-xs:text-sm"
+            htmlFor="expirationDate"
+          >
+            소비기한
+          </label>
+          <Input
+            type="date"
+            id="expirationDate"
+            name="expirationDate"
+            className="border justify-end text-right h-8 min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+            onChange={handleChange}
+            value={ingredientData.expirationDate}
+          />
+        </div>
         <div className="flex relative gap-2 w-full justify-between items-center">
           <label
             className="w-20 cursor-pointer font-bold max-xs:text-sm"
@@ -152,44 +191,6 @@ const IngredientItem = ({
             onFocus={(e) => e.target.select()}
           />
           <p className="absolute right-2 font-bold">원</p>
-        </div>
-        <div className="flex gap-2 w-full justify-between items-center">
-          <label
-            className="w-20 cursor-pointer font-bold max-xs:text-sm"
-            htmlFor="expirationDate"
-          >
-            소비기한
-          </label>
-          <Input
-            type="date"
-            id="expirationDate"
-            name="expirationDate"
-            className="border h-8 min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
-            onChange={handleChange}
-            value={ingredientData.expirationDate}
-          />
-        </div>
-        <div className="flex gap-2 w-full justify-between items-center">
-          <label
-            className="w-20 cursor-pointer font-bold max-xs:text-sm"
-            htmlFor="ingredientStorage"
-          >
-            보관장소
-          </label>
-
-          <select
-            id="ingredientStorage"
-            name="ingredientStorage"
-            className="border rounded-md w-full min-w-0 cursor-pointer focus:outline-positive-300 p-1"
-            value={ingredientData.ingredientStorage}
-            onChange={handleChange}
-          >
-            {Object.keys(STORAGE_TYPE_CONST).map((key) => (
-              <option key={key} value={key}>
-                {STORAGE_TYPE_CONST[key as keyof typeof STORAGE_TYPE_CONST]}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
     </div>

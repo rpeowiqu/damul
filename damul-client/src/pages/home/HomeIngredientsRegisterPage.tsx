@@ -180,7 +180,7 @@ const HomeIngredientsRegisterPage = () => {
               type="date"
               value={purchaseAt}
               onChange={handlePurchaseAtChange}
-              className="border-1 h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+              className="border-1 h-8 w-full min-w-0 justify-end text-right cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             />
           </div>
         </div>

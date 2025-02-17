@@ -24,6 +24,9 @@ const ChattingMainPage = () => {
         cursor: pageParam.cursor ?? 0,
         size: 15,
       });
+      if (response.status === 204) {
+        return { data: [], meta: { nextCursor: 0, hasNext: 0 } };
+      }
       return response?.data;
     } catch (error) {
       console.error("Error fetching chat list:", error);
