@@ -30,6 +30,10 @@ public class RecipeLike {
     private User user;
 
     @Column(name = "created_at", nullable = false)
-    @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

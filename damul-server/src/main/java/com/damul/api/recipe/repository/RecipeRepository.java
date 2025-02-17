@@ -142,23 +142,46 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     void updateViewCount(@Param("recipeId") int recipeId, @Param("viewCount") int viewCount);
 
     @Query("""
-            SELECT new com.damul.api.mypage.dto.response.MyRecipeList(
-                r.id,
-                r.title,
-                r.content,
-                r.thumbnailUrl,
-                r.createdAt
-            )
-            FROM Recipe r
-            WHERE r.user.id = :userId
-            AND r.deleted = false
-            AND (:cursor = 0 OR r.id < :cursor)
-            ORDER BY r.id DESC
-            """)
-    List<MyRecipeList> findMyRecipes(
+        SELECT new com.damul.api.recipe.dto.response.RecipeList(
+            r.id,
+            r.title,
+            r.thumbnailUrl,
+            r.content,
+            r.createdAt,
+            r.user.id,
+            r.user.nickname,
+            r.viewCnt,
+            r.likeCnt,
+            CASE WHEN b.id IS NOT NULL THEN true ELSE false END,
+            CASE WHEN l.id IS NOT NULL THEN true ELSE false END
+        )
+        FROM Recipe r
+        LEFT JOIN Bookmark b ON b.recipe.id = r.id AND b.user.id = :userId
+        LEFT JOIN RecipeLike l ON l.recipe.id = r.id AND l.user.id = :userId
+        WHERE r.user.id = :userId
+        AND r.deleted = false
+        AND (:cursor = 0 OR r.id < :cursor)
+        ORDER BY 
+        CASE :sortType 
+            WHEN 'created_at' THEN r.createdAt
+            ELSE NULL
+        END DESC,
+        CASE :sortType
+            WHEN 'view_cnt' THEN r.viewCnt
+            ELSE 0
+        END DESC,
+        CASE :sortType
+            WHEN 'like_cnt' THEN r.likeCnt
+            ELSE 0
+        END DESC,
+        r.id DESC
+        LIMIT :size
+    """)
+    List<RecipeList> findMyRecipes(
             @Param("userId") int userId,
             @Param("cursor") int cursor,
-            @Param("size") int size
+            @Param("size") int size,
+            @Param("sortType") String sortType
     );
 
     @Query("""
@@ -227,6 +250,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     ORDER BY r.likeCnt DESC, r.viewCnt DESC
     """)
     List<RecipeList> findPopularRecipes();
+
+    int countByUser_IdAndDeletedFalse(Integer authorId);
 
 }
 

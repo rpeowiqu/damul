@@ -28,12 +28,12 @@ public class ChatRoomMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "nickname", length = 50, nullable = false)
+    @Column(name = "nickname", length = 50)
     private String nickname;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private MemberRole role;
+    private MemberRole role = MemberRole.MEMBER;
 
     @Column(name = "joined_at", nullable = false, updatable = false)
     private LocalDateTime joinedAt;
@@ -44,8 +44,6 @@ public class ChatRoomMember {
     @PrePersist
     protected void onCreate() {
         joinedAt = LocalDateTime.now();
-        role = MemberRole.MEMBER;
-        lastReadMessageId = 0;
     }
 
     public void updateLastReadMessageId(int messageId) {

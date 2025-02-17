@@ -1,6 +1,6 @@
-package com.damul.api.ingredient.dto.response;
+package com.damul.api.report.dto.response;
 
-import com.damul.api.receipt.entity.FoodCategories;
+import com.damul.api.report.entity.ReportCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +12,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IngredientsCategoryResponse {
-    private List<FoodCategories> categories;
+public class ReportCategoryResponse {
+    private List<ReportCategory> content;
 }

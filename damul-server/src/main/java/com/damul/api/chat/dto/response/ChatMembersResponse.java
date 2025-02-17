@@ -14,6 +14,7 @@ import java.util.List;
 public class ChatMembersResponse {
 
     private List<ChatMember> content;
+    private int adminId;
     private int totalMembers;
 
 }

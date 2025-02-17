@@ -2,6 +2,11 @@ package com.damul.api.user.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
+import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
+import com.damul.api.chat.entity.ChatRoom;
+import com.damul.api.chat.entity.ChatRoomMember;
+import com.damul.api.chat.repository.ChatRoomMemberRepository;
+import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
@@ -24,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,6 +37,8 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
 
 
     // 닉네임 중복 확인
@@ -120,8 +128,21 @@ public class UserServiceImpl implements UserService {
             setting.setBackgroundImageUrl(backgroundImageUrl);
         }
 
+        String nickname = user.getNickname();
         // 사용자 설정 업데이트
         user.updateSettings(setting);
+        if(!nickname.equals(user.getNickname())) {
+            List<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsByUserId(userId);
+            chatRooms.stream().forEach(chatRoom -> {
+                if(chatRoom.getPost() == null) {
+                    List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(chatRoom.getId());
+                    String roomName = members.stream()
+                            .map(ChatRoomMember::getNickname)
+                            .collect(Collectors.joining(", "));
+                    chatRoom.updateRoomName(roomName);
+                }
+            });
+        }
         log.info("설정 수정 성공");
     }
 

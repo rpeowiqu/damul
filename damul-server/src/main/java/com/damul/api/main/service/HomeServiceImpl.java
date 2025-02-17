@@ -1,6 +1,7 @@
 package com.damul.api.main.service;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.main.dto.IngredientStorage;
@@ -13,6 +14,7 @@ import com.damul.api.recipe.entity.Recipe;
 import com.damul.api.recipe.entity.RecipeTag;
 import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.recipe.repository.RecipeTagRepository;
+import com.damul.api.user.repository.FollowRepository;
 import com.damul.api.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -37,12 +39,17 @@ public class HomeServiceImpl implements HomeService {
     private final RecipeRepository recipeRepository;
     private final RecipeTagRepository recipeTagRepository;
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
     @Override
-    public IngredientResponse getUserIngredientList(int userId) {
+    public IngredientResponse getUserIngredientList(int targetId, int userId) {
         log.info("사용자 식자재 전체 가져오기 시작 - userId: {}", userId);
 
-        validateUserId(userId);
+        validateUserId(targetId);
+        if(targetId != userId) {
+            validateUserAccessRange(targetId, userId);
+        }
+
         List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(userId);
 
         return new IngredientResponse(
@@ -216,6 +223,24 @@ public class HomeServiceImpl implements HomeService {
 
     private int calculateDaysUntilExpiration(LocalDateTime expirationDate) {
         return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), expirationDate);
+    }
+
+    private void validateUserAccessRange(int targetId, int userId) {
+        AccessRange range = userRepository.findAccessRangeById(targetId);
+        switch (range) {
+            case PUBLIC -> {
+                return;
+            }
+            case PRIVATE -> throw new BusinessException(ErrorCode.ACCESS_DENIED, "비공개된 사용자입니다.");
+            case FRIENDS -> {
+                if(followRepository.existsByFollowerIdAndFollowingId(userId, targetId)
+                        && followRepository.existsByFollowerIdAndFollowingId(targetId, userId)) {
+                    return;
+                }
+
+                throw new BusinessException(ErrorCode.ACCESS_DENIED, "비공개된 사용자입니다.");
+            }
+        }
     }
 
     private IngredientResponse categorizeIngredients(List<UserIngredientList> ingredients) {

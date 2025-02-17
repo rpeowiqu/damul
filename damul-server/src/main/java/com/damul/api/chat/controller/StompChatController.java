@@ -1,17 +1,23 @@
 package com.damul.api.chat.controller;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.request.*;
 import com.damul.api.chat.service.WebSocketService;
 import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.user.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
 
 @Slf4j
 @Controller
@@ -23,36 +29,37 @@ public class StompChatController {
 
     @MessageMapping("/chat/room/{roomId}/message")
     public void message(@DestinationVariable int roomId,
-                        ChatMessageCreate messageRequest, // 이미지를 bitcode로 받는 방식 혹은 http 통신으로 이미지만 받는 방식
-                        @AuthenticationPrincipal User sender) {
-        webSocketService.handleMessage(roomId, messageRequest, sender);
+                        ChatMessageCreate messageRequest // 이미지를 bitcode로 받는 방식 혹은 http 통신으로 이미지만 받는 방식
+                        ) {
+        log.info("메세지 보내기, roomId={}, senderId={}", roomId, messageRequest.getUserId());
+        webSocketService.handleMessage(roomId, messageRequest);
     }
 
 //    @MessageMapping("/chat/room/{roomId}/image")
 //    public void handleImageMessage(@DestinationVariable int roomId,
 //                                   ChatMessageCreate imageRequest,
-//                                   @AuthenticationPrincipal User user) {
+//                                   @CurrentUser UserInfo user) {
 //        webSocketService.handleImageMessage(roomId, imageRequest, user);
 //    }
 
-    @MessageMapping("/chat/room/{roomId}/enter")
-    public void enter(@DestinationVariable int roomId, @AuthenticationPrincipal User user) {
-        webSocketService.handleEnter(roomId, user);
+    @MessageMapping("/chat/room/{roomId}/enter/{userId}")
+    public void enter(@DestinationVariable int roomId, @DestinationVariable int userId) {
+        webSocketService.handleEnter(roomId, userId);
     }
 
-    @MessageMapping("/chat/room/{roomId}/leave")
-    public void leave(@DestinationVariable int roomId, @AuthenticationPrincipal User user) {
-        webSocketService.handleLeave(roomId, user);
+    @MessageMapping("/chat/room/{roomId}/leave/{userId}")
+    public void leave(@DestinationVariable int roomId, @DestinationVariable int userId) {
+        webSocketService.handleLeave(roomId, userId);
     }
 
     @MessageMapping("/chat/typing")
-    public void typing(ChatTypingMessage typingRequest, @AuthenticationPrincipal User user) {
-        webSocketService.handleTyping(typingRequest.getRoomId(), user, typingRequest.isTyping());
+    public void typing(ChatTypingMessage typingRequest) {
+        webSocketService.handleTyping(typingRequest);
     }
 
     @MessageMapping("/chat/read")
-    public void messageRead(ChatReadRequest readRequest, @AuthenticationPrincipal User user) {
-        webSocketService.handleMessageRead(readRequest.getRoomId(), user, readRequest.getMessageId());
+    public void messageRead(ChatReadRequest readRequest) {
+        webSocketService.handleMessageRead(readRequest);
     }
 
     @MessageExceptionHandler

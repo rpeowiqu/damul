@@ -13,11 +13,13 @@ public class ChatScrollResponse<T> extends ScrollResponse<T> {
 
     private String roomName;
     private int memberNum;
+    private Integer postId;
 
-    public ChatScrollResponse(List<T> data, CursorPageMetaInfo meta, String roomName, int memberNum) {
+    public ChatScrollResponse(List<T> data, CursorPageMetaInfo meta, String roomName, int memberNum, int postId) {
         super(data, meta);
         this.roomName = roomName;
         this.memberNum = memberNum;
+        this.postId = postId;
     }
 
 }

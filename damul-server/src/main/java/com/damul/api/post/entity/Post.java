@@ -53,6 +53,11 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
     // 논리적 삭제를 위한 메서드
     public void changeStatus(PostStatus newStatus) {
         if (this.status == newStatus) {

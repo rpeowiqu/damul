@@ -73,12 +73,23 @@ public class ChatRoom {
         this.memberLimit = newLimit;
     }
 
+    public void updateRoomName(String newRoomName) { this.roomName = newRoomName; }
+
     public static ChatRoom createDirectRoom(User creator, String roomName) {
         ChatRoom room = new ChatRoom();
         room.creator = creator;
         room.roomName = roomName;
         room.roomType = RoomType.PRIVATE;
         room.memberLimit = 2;
+        return room;
+    }
+
+    public static ChatRoom createMultiRoom(User creator, String roomName, int memberLimit) {
+        ChatRoom room = new ChatRoom();
+        room.creator = creator;
+        room.roomName = roomName;
+        room.roomType = RoomType.GROUP;
+        room.memberLimit = memberLimit;
         return room;
     }
 

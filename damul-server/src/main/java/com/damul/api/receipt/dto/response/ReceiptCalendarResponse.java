@@ -13,5 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ReceiptCalendarResponse {
     private int monthlyTotalAmount;
+    private int comparedPreviousMonth;
     private List<DailyReceiptInfo> dailyReceiptInfoList;
 }

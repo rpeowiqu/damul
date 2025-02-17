@@ -23,6 +23,7 @@ public class PostDetail {
     private String contentImageUrl;
     private String content;
     private LocalDateTime createdAt;
+    private int chatRoomId;
     private int viewCnt;
     private int currentChatNum;
     private int chatSize;

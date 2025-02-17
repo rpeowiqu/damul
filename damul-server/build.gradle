@@ -54,7 +54,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
+	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
 //	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
@@ -64,6 +64,10 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'com.h2database:h2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation 'org.springframework.boot:spring-boot-starter-batch'
+	implementation 'org.springframework.batch:spring-batch-core'
+	testImplementation 'org.springframework.batch:spring-batch-test'
 }
 
 tasks.named('test') {

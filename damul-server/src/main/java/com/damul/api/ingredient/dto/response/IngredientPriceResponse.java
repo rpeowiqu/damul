@@ -12,7 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IngredientPriceResponse {
-    private String productName;
-    private String unit;
-    private List<PriceData> prices;
+    private List<PriceData> priceDataList;
 }

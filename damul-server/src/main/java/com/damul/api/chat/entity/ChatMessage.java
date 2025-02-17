@@ -80,8 +80,7 @@ public class ChatMessage {
     public static ChatMessage createEnterMessage(ChatRoom room, User sender) {
         ChatMessage message = new ChatMessage();
         message.room = room;
-        message.sender = sender;
-        message.messageType = MessageType.ENTER;
+        message.messageType = MessageType.SYSTEM;
         message.content = sender.getNickname() + "님이 입장하셨습니다.";
         return message;
     }
@@ -89,8 +88,7 @@ public class ChatMessage {
     public static ChatMessage createLeaveMessage(ChatRoom room, User sender) {
         ChatMessage message = new ChatMessage();
         message.room = room;
-        message.sender = sender;
-        message.messageType = MessageType.LEAVE;
+        message.messageType = MessageType.SYSTEM;
         message.content = sender.getNickname() + "님이 퇴장하셨습니다.";
         return message;
     }

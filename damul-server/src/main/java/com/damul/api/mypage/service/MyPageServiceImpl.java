@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -115,30 +116,32 @@ public class MyPageServiceImpl implements MyPageService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_BADGE_NOT_FOUND, "획득하지 않은 뱃지입니다."));
 
         Badge badge = userBadge.getBadge();
-        double rankPercentage = calculateRankPercentage(badgeId, userBadge.getBadge().getLevel());
-        String achieveCondition = generateAchieveCondition(badge);
+        double rankValue = Optional.ofNullable(userBadge.getRank())
+                .orElse(0.0);
 
         return BadgeDetail.builder()
                 .id(badge.getId())
                 .title(badge.getTitle())
                 .description(badge.getDescription())
                 .createdAt(userBadge.getCreatedAt())
-                .rank(rankPercentage)
-                .achieveCond(achieveCondition)
+                .level(badge.getLevel())
+                .rank(rankValue)
+                .catchPhrase(badge.getCatchPhrase())
                 .build();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<MyRecipeList> getMyRecipes(int userId, int cursor, int size, UserInfo currentUser) {
+    public ScrollResponse<RecipeList> getMyRecipes(int userId, int cursor, int size, String sortType, UserInfo currentUser) {
         log.info("서비스: 마이페이지 레시피 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         validateAccessPermission(targetUser, currentUser);
+        validateSortType(sortType);
 
-        List<MyRecipeList> recipes = recipeRepository.findMyRecipes(userId, cursor, size);
+        List<RecipeList> recipes = recipeRepository.findMyRecipes(userId, cursor, size, sortType);
 
         if (recipes.isEmpty()) {
             return new ScrollResponse<>(
@@ -158,15 +161,16 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<RecipeList> getBookmarkedRecipes(int userId, int cursor, int size, UserInfo currentUser) {
+    public ScrollResponse<RecipeList> getBookmarkedRecipes(int userId, int cursor, int size, String sortType, UserInfo currentUser) {
         log.info("서비스: 마이페이지 북마크 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
 
         validateAccessPermission(targetUser, currentUser);
+        validateSortType(sortType);
 
-        List<RecipeList> bookmarks = bookmarkRepository.findBookmarkedRecipes(userId, cursor, size);
+        List<RecipeList> bookmarks = bookmarkRepository.findBookmarkedRecipes(userId, cursor, size, sortType);
 
         if (bookmarks.isEmpty()) {
             return new ScrollResponse<>(
@@ -198,6 +202,16 @@ public class MyPageServiceImpl implements MyPageService {
     private void validateAccessPermission(User targetUser, UserInfo currentUser) {
         if (!targetUser.isActive()) {
             throw new BusinessException(ErrorCode.USER_INACTIVE, "비활성화된 사용자입니다.");
+        }
+    }
+
+    private void validateSortType(String sortType) {
+        boolean isValid = switch (sortType) {
+            case "created_at", "view_cnt", "like_cnt" -> true;
+            default -> false;
+        };
+        if(!isValid) {
+            throw new BusinessException(ErrorCode.INVALID_SEARCH_TYPE, "존재하지 않는 정렬 타입입니다.");
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.damul.api.user.repository;
 
 import com.damul.api.auth.entity.User;
+import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.auth.entity.type.Role;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.user.dto.request.SettingUpdate;
@@ -12,12 +13,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-
+@Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     // 닉네임 중복 확인
@@ -69,4 +71,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT COUNT(u) FROM User u WHERE u.active = true")
     int countActiveUsers();
 
+    @Query("SELECT u.accessRange FROM User u WHERE u.id = :userId")
+    AccessRange findAccessRangeById(@Param("userId") int userId);
 }

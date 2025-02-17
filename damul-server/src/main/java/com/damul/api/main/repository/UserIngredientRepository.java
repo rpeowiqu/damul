@@ -58,4 +58,6 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
     """)
     List<RecipeList> findRecommandedRecipes(@Param("userId") int userId);
 
+    int countByCategoryIdAndUserReciept_User_Id(Integer categoryId, Integer userId);
+
 }

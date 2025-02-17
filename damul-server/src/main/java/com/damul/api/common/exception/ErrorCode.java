@@ -19,6 +19,7 @@ public enum ErrorCode {
     INVALID_COMMENT(HttpStatus.BAD_REQUEST, "댓글이 존재하지 않습니다"),
     INVALID_MONTH(HttpStatus.BAD_REQUEST, "유효하지 않은 월입니다. 1에서 12 사이의 값을 입력해주세요"),
     INVALID_PERIOD(HttpStatus.BAD_REQUEST, "유효하지 않은 PERIOD 입니다. yearly, recent 중 입력해주세요"),
+    INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "유효하지 않은 카테고리 입니다"),
 
     // 중복 관련 에러
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 등록된 이메일입니다."),
@@ -26,6 +27,8 @@ public enum ErrorCode {
 
     // API 요청 관련
     EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API 요청에 실패하였습니다"),
+    DATA_ANALYSIS_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "최근 데이터 분석에 실패하였습니다"),
+
 
     // 데이터베이스 관련 에러
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다"),
@@ -48,7 +51,7 @@ public enum ErrorCode {
     USER_NICKNAME_NOT_PROVIDED(HttpStatus.BAD_REQUEST, "검색할 닉네임이 존재하지 않습니다."),
     USER_FORBIDDEN(HttpStatus.FORBIDDEN, "해당 유저 ID가 존재하지 않습니다"),
     ADMIN_FORBIDDEN(HttpStatus.FORBIDDEN, "관리자 계정이 존재하지 않습니다"),
-
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "해당 컨텐츠의 수정 권한이 없습니다"),
 
 
     // 파일 관련 에러
