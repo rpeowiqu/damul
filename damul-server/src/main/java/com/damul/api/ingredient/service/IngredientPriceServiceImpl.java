@@ -28,7 +28,7 @@ public class IngredientPriceServiceImpl implements IngredientPriceService {
 
     @Override
     public IngredientPriceResponse getIngredientPrice(String period, String itemCode, String kindCode, boolean ecoFlag) {
-        log.info("식자재 가격 동향 조회 시작 - period: {}, itemCode: {}, itemCategoryCode: {}, ecoFlag: {}", period, itemCode, kindCode, ecoFlag);
+        log.info("식자재 가격 동향 조회 시작 - period: {}, itemCode: {}, kindCode: {}, ecoFlag: {}", period, itemCode, kindCode, ecoFlag);
 
         try {
             if (!period.equals("monthly") && !period.equals("recent")) {
@@ -41,7 +41,7 @@ public class IngredientPriceServiceImpl implements IngredientPriceService {
                 itemCode = String.valueOf(getRandomItemCode());
                 log.info("랜덤 선택된 itemCode: {}", itemCode);
             }
-            // PriceAnalysisService를 통해 데이터 분석
+
             IngredientPriceResponse response = priceAnalysisService.analyzePrices(itemCode, period, LocalDate.now(), kindCode, ecoFlag);
             log.info("식자재 가격 동향 조회 완료");
             return response;

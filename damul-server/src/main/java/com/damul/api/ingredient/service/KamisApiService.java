@@ -35,16 +35,30 @@ public class KamisApiService {
     private static final String RETAIL_ACTION = "periodRetailProductList";
 
 
-    public String getPrice(String itemCode, String kindCode, boolean ecoFlag) {
+    public String getPrice(String itemCode, String kindCode, boolean ecoFlag, String period) {
         String kamisAction = ecoFlag ? ECO_ACTION : RETAIL_ACTION;
         log.info("Kamis API 호출 시작 - itemCode: {}, kindCode: {}, ecoFlag: {}", itemCode, kindCode, ecoFlag);
 
 
         // 날짜 계산
         LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusMonths(6)
-                .withDayOfMonth(1)  // 6개월 전 월의 1일
-                .plusMonths(1);
+        LocalDate startDate;
+
+        if ("monthly".equals(period)) {
+            // 6개월 전부터 현재까지
+            startDate = endDate.minusMonths(6)
+                    .withDayOfMonth(1)  // 6개월 전 월의 1일
+                    .plusMonths(1);
+        } else if ("recent".equals(period)) {
+            // 1개월 전부터 현재까지
+            startDate = endDate.minusMonths(1)
+                    .withDayOfMonth(1);
+        } else {
+            // 기본값으로 6개월 설정
+            startDate = endDate.minusMonths(6)
+                    .withDayOfMonth(1)
+                    .plusMonths(1);
+        }
 
         try {
             URI fullUri = UriComponentsBuilder.fromUriString(KAMIS_BASE_URL)
@@ -55,7 +69,7 @@ public class KamisApiService {
                     .queryParam("p_startday", startDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
                     .queryParam("p_endday", endDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
                     .queryParam("p_itemcode", itemCode)
-                    .queryParam("p_itemcategorycode", kindCode)
+                    .queryParam("p_kindcode", kindCode)
                     .queryParam("p_convert_kg_yn", CONVERT_KG_YN)
                     .build()
                     .toUri();
@@ -84,7 +98,7 @@ public class KamisApiService {
                             .queryParam("p_startday", startDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
                             .queryParam("p_endday", endDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
                             .queryParam("p_itemcode", itemCode)
-                            .queryParam("p_itemcategorycode", kindCode)
+                            .queryParam("p_kindcode", kindCode)
                             .queryParam("p_convert_kg_yn", CONVERT_KG_YN)
                             .build())
                     .retrieve()

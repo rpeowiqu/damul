@@ -30,7 +30,7 @@ public class IngredientPriceController {
 
         IngredientPriceResponse response = ingredientPriceService.getIngredientPrice(period, itemCode, kindCode, ecoFlag);
 
-        if (response == null) {
+        if (response.getPriceDataList() == null || response.getPriceDataList().isEmpty()) {
             log.info("식자재 가격 동향 조회 성공 - 데이터 없음");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }

@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PriceData {
     private String period;
-    private int price;
+    private String price;
 }
