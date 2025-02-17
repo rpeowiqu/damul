@@ -306,6 +306,11 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         chatRoomMemberRepository.save(currentMember);
         chatRoomMemberRepository.save(targetMember);
 
+        String systemMessage = String.format("%s님이 ", currentMember.getNickname()) +
+                targetMember.getNickname() +
+                "님을 초대하였습니다.";
+        createSystemMessage(savedRoom, systemMessage);
+
         log.info("서비스: 1:1 채팅방 생성 완료 - roomId: {}", savedRoom.getId());
 
         List<ChatRoomMember> members = List.of(currentMember, targetMember);
@@ -333,7 +338,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
         // 자기 자신 초대 방지 검증
         if (members.stream().anyMatch(member -> member.getId() == userId)) {
-            throw new IllegalArgumentException("자기 자신은 초대할 수 없습니다.");
+            throw new BusinessException(ErrorCode.CHATROOM_SELF_CHAT_DENIED, "자기 자신은 초대할 수 없습니다.");
         }
 
         // 채팅방 이름 생성 (방장 포함 모든 멤버의 닉네임을 ", "로 구분)
