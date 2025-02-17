@@ -20,7 +20,7 @@ const LoadingScreen = ({ setIsLoading }: LoadingScreenProps) => {
         requestAnimationFrame(updateProgress);
         setProgress(newProgress);
       } else {
-        setIsLoading(false);
+        setTimeout(() => setIsLoading(false), 500);
       }
     };
 
@@ -31,7 +31,7 @@ const LoadingScreen = ({ setIsLoading }: LoadingScreenProps) => {
     if (progress <= 40) {
       return "열심히 달려볼게요!";
     } else if (progress <= 80) {
-      return "오늘은 어떤 음식을 하실건가요!";
+      return "오늘은 어떤 음식을 하실건가요?";
     } else if (progress <= 99) {
       return "거의 다 왔어요!!";
     }
@@ -39,14 +39,14 @@ const LoadingScreen = ({ setIsLoading }: LoadingScreenProps) => {
   };
 
   return (
-    <div className="flex flex-col flex-1 gap-5 justify-center items-center bg-white">
+    <div className="flex flex-col flex-1 gap-8 justify-center items-center bg-white">
       <motion.div
         className="box"
         whileHover={{ scale: 1.1 }}
         transition={{ type: "spring", stiffness: 400, damping: 10 }}
       >
         <img
-          className="w-60 h-60 rounded-full object-cover"
+          className="size-36 sm:size-52 rounded-full object-cover"
           src={loadingGif}
           alt=""
         />

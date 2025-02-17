@@ -50,7 +50,7 @@ const IntroContent = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-52 bg-white">
+    <div className="flex flex-col justify-center gap-20 bg-white">
       <motion.div
         ref={(el) => el && (sectionRefs.current[0] = el)}
         initial={{
@@ -68,7 +68,7 @@ const IntroContent = () => {
               }
             : {}
         }
-        className="relative h-96 bg-positive-50 border-t-2 border-b-2 border-positive-400"
+        className="relative h-96"
       >
         <motion.img
           initial={{
@@ -160,7 +160,7 @@ const IntroContent = () => {
               }
             : {}
         }
-        className="relative h-96 bg-positive-50 border-t-2 border-b-2 border-positive-400"
+        className="relative h-96"
       >
         <motion.img
           initial={{
@@ -252,7 +252,7 @@ const IntroContent = () => {
               }
             : {}
         }
-        className="relative h-96 bg-positive-50 border-t-2 border-b-2 border-positive-400"
+        className="relative h-96"
       >
         <motion.img
           initial={{
@@ -341,7 +341,7 @@ const IntroContent = () => {
               }
             : {}
         }
-        className="relative h-96 bg-positive-50 border-t-2 border-b-2 border-positive-400"
+        className="relative h-96"
       >
         <motion.img
           initial={{
