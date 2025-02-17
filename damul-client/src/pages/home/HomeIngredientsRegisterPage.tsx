@@ -141,7 +141,7 @@ const HomeIngredientsRegisterPage = () => {
       <div className="flex justify-between">
         <DamulButton
           onClick={handleResetData}
-          className="flex bg-white items-center justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50 shadow-md transition ease-in-out duration-150 active:scale-75"
+          className="flex bg-white items-center border justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50 transition ease-in-out duration-150 active:scale-75"
         >
           <ResetIcon className="stroke-2 stroke-normal-200" />
           <p>초기화</p>
@@ -168,7 +168,7 @@ const HomeIngredientsRegisterPage = () => {
               maxLength={20}
               value={storeName}
               onChange={handleStoreNameChange}
-              className="border-1 h-8 w-full min-w-0 cursor-pointer text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+              className="border-1 h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             />
           </div>
           <div className="w-full flex flex-col gap-2">
@@ -180,7 +180,7 @@ const HomeIngredientsRegisterPage = () => {
               type="date"
               value={purchaseAt}
               onChange={handlePurchaseAtChange}
-              className="border-1 flex justify-end h-8 w-full min-w-0 cursor-pointer text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+              className="border-1 h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             />
           </div>
         </div>

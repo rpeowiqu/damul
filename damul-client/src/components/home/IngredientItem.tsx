@@ -95,7 +95,7 @@ const IngredientItem = ({
             id="ingredientName"
             name="ingredientName"
             maxLength={30}
-            className="shadow-md border h-8 w-full min-w-0 cursor-pointer text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+            className="border h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             value={ingredientData.ingredientName}
             onChange={handleChange}
           />
@@ -110,7 +110,7 @@ const IngredientItem = ({
           <select
             id="categoryId"
             name="categoryId"
-            className="shadow-md border rounded-md w-full min-w-0 cursor-pointer text-right focus:outline-positive-300 p-1"
+            className="border rounded-md w-full min-w-0 cursor-pointer focus:outline-positive-300 p-1"
             value={ingredientData.categoryId}
             onChange={handleChange}
           >
@@ -135,7 +135,7 @@ const IngredientItem = ({
             type="text"
             id="productPrice"
             name="productPrice"
-            className="shadow-md border w-full h-8 min-w-0 cursor-pointer text-negative-500 font-bold text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1 pr-6 "
+            className="border w-full h-8 min-w-0 cursor-pointer text-negative-500 font-bold text-right focus-visible:outline-2 focus-visible:outline-positive-300 p-1 pr-6 "
             onChange={(e) => {
               let value = e.target.value;
               if (value === "" || parseInt(value) < 0) {
@@ -164,7 +164,7 @@ const IngredientItem = ({
             type="date"
             id="expirationDate"
             name="expirationDate"
-            className="shadow-md border flex justify-end text-right h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+            className="border h-8 min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             onChange={handleChange}
             value={ingredientData.expirationDate}
           />
@@ -180,7 +180,7 @@ const IngredientItem = ({
           <select
             id="ingredientStorage"
             name="ingredientStorage"
-            className="shadow-md border rounded-md w-full min-w-0 cursor-pointer text-right focus:outline-positive-300 p-1"
+            className="border rounded-md w-full min-w-0 cursor-pointer focus:outline-positive-300 p-1"
             value={ingredientData.ingredientStorage}
             onChange={handleChange}
           >
