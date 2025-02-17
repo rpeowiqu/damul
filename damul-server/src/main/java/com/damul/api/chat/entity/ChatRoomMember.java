@@ -28,7 +28,7 @@ public class ChatRoomMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "nickname", length = 50, nullable = false)
+    @Column(name = "nickname", length = 50)
     private String nickname;
 
     @Enumerated(EnumType.STRING)

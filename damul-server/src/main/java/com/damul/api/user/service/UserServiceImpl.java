@@ -120,8 +120,10 @@ public class UserServiceImpl implements UserService {
             setting.setBackgroundImageUrl(backgroundImageUrl);
         }
 
+        String nickname = user.getNickname();
         // 사용자 설정 업데이트
         user.updateSettings(setting);
+        if(!nickname.equals(user.getNickname())) {}
         log.info("설정 수정 성공");
     }
 

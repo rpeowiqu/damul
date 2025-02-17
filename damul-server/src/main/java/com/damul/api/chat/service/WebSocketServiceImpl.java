@@ -146,7 +146,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         User user = userRepository.findById(userId).get();
 
         ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
-                .orElseThrow(() -> new IllegalStateException("채팅방 멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "채팅방 멤버를 찾을 수 없습니다."));
 
         if (member.getRole() == MemberRole.ADMIN) {
             throw new IllegalStateException("방장은 채팅방을 나갈 수 없습니다.");

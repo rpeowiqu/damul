@@ -150,6 +150,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         return ChatMembersResponse.builder()
                 .content(chatMembers)
                 .totalMembers(chatMembers.size())
+                .adminId(adminId)
                 .build();
     }
 
@@ -162,7 +163,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         validateUserId(userId);
 
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND, "채팅방이 존재하지 않습니다."));
         validateRoomStatus(chatRoom.getStatus());
         // 채팅방 멤버 확인
         ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
@@ -171,8 +172,14 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         if (chatRoom.getRoomType() == ChatRoom.RoomType.PRIVATE) {
             handlePrivateRoomDeletion(chatRoom, userId);
         } else {
-            handleGroupRoomDeletion(chatRoom, member);
+            chatRoomMemberRepository.delete(member);
         }
+
+        List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(roomId);
+        String roomName = members.stream()
+                        .map(ChatRoomMember::getNickname)
+                        .collect(Collectors.joining(", "));
+        chatRoom.updateRoomName(roomName);
 
         log.info("서비스: 채팅방 삭제 완료 - roomId: {}", roomId);
     }
@@ -336,11 +343,6 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                                 String.format("존재하지 않는 사용자입니다. (userId: %d)", member.getId()))))
                 .collect(Collectors.toList());
 
-        // 자기 자신 초대 방지 검증
-        if (members.stream().anyMatch(member -> member.getId() == userId)) {
-            throw new BusinessException(ErrorCode.CHATROOM_SELF_CHAT_DENIED, "자기 자신은 초대할 수 없습니다.");
-        }
-
         // 채팅방 이름 생성 (방장 포함 모든 멤버의 닉네임을 ", "로 구분)
         String roomName = creator.getNickname() + ", " +
                 request.getUsers().stream()
@@ -348,9 +350,10 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                         .collect(Collectors.joining(", "));
 
         // 채팅방 생성
-        ChatRoom newRoom = ChatRoom.createDirectRoom(
+        ChatRoom newRoom = ChatRoom.createMultiRoom(
                 creator,
-                roomName
+                roomName,
+                request.getUsers().size() + 1
         );
 
         ChatRoom savedRoom = chatRoomRepository.save(newRoom);
@@ -369,6 +372,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         for (int i = 0; i < members.size(); i++) {
             User member = members.get(i);
             ChatRoomEntryExitCreate memberDto = request.getUsers().get(i);
+            log.info("현재 멤버 id: {}, nickname: {}", memberDto.getId(), memberDto.getNickname());
 
             ChatRoomMember newMember = ChatRoomMember.create(
                     savedRoom,
@@ -516,20 +520,6 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
             chatRoom.deactivate();
             chatRoomRepository.save(chatRoom);
         }
-    }
-
-    private void handleGroupRoomDeletion(ChatRoom chatRoom, ChatRoomMember member) {
-        // 그룹 채팅방의 경우 방장만 삭제 가능
-        if (!member.getRole().equals("ADMIN")) {
-            throw new BusinessException(ErrorCode.CHATROOM_ADMIN_REQUIRED, "방장만 채팅방을 삭제할 수 있습니다.");
-        }
-
-        // 모든 멤버 삭제
-        chatRoomMemberRepository.deleteAllByRoomId(chatRoom.getId());
-
-        // 채팅방 상태 변경
-        chatRoom.deactivate();
-        chatRoomRepository.save(chatRoom);
     }
 
     private ScrollResponse<ChatRoomList> processRoomResults(List<ChatRoom> rooms, int size, int userId) {
