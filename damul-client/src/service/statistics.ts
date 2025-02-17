@@ -17,10 +17,12 @@ export const getIngredientCategories = () => {
   return apiClient.get("/ingredients/categories/");
 };
 
-export const getPurchaseHistories = () => {
-  return apiClient.get("/purchases/calendar");
+export const getPurchaseHistories = (year: number, month: number) => {
+  console.log("요청");
+  const queryString = toQueryString({ year, month });
+  return apiClient.get(`/receipts/calendar?${queryString}`);
 };
 
 export const getSmartReceipt = (receiptId: number) => {
-  return apiClient.get(`/purchases/${receiptId}`);
+  return apiClient.get(`/receipts/${receiptId}`);
 };
