@@ -305,7 +305,7 @@ const CommunityRecipePostPage = () => {
             >
               {location.pathname.endsWith("edit")
                 ? "레시피 수정하기"
-                : "레시피 작성하기기"}
+                : "레시피 작성하기"}
             </DamulButton>
           </div>
         )}

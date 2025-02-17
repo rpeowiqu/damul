@@ -65,7 +65,7 @@ export const useStompClient = ({
     userId: string;
     messageType: string;
     content?: string;
-    image?: Uint8Array;
+    image?: number[];
   }) => {
     if (!stompClientRef.current || !stompClientRef.current.connected) {
       console.warn("🚨 STOMP 클라이언트가 연결되지 않음");

@@ -15,14 +15,11 @@ const ChattingMainPage = () => {
 
   const navigate = useNavigate();
 
-  const [isLoading, setIsLoading] = useState(false);
-
   const fetchItems = async (pageParam: {
     cursor: number;
     cursorTime?: string;
   }) => {
     try {
-      setIsLoading(true);
       const response = await getChattingList({
         cursorTime: pageParam.cursorTime ?? getKSTISOString(),
         cursor: pageParam.cursor ?? 0,
@@ -35,8 +32,6 @@ const ChattingMainPage = () => {
       return response?.data;
     } catch (error) {
       console.error("Error fetching chat list:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
