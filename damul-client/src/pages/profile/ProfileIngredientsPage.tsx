@@ -4,7 +4,6 @@ import useAuth from "@/hooks/useAuth";
 import { getIngredients } from "@/service/profile";
 import { IngredientData } from "@/types/Ingredient";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { Navigate, useOutletContext } from "react-router-dom";
 
 const ProfileIngredientsPage = () => {
@@ -60,7 +59,7 @@ const ProfileIngredientsPage = () => {
         </div>
       ) : (
         ingredientData &&
-        Object.keys(ingredientData).map((item, index) => (
+        ["freezer", "fridge", "roomTemp"].map((item, index) => (
           <IngredientStorageContainer
             key={index}
             title={item as "freezer" | "fridge" | "roomTemp"}
