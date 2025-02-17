@@ -17,6 +17,7 @@ public class BadgeDetail {
     private String title;
     private String description;
     private LocalDateTime createdAt;
+    private int level;
     private double rank;
     private String catchPhrase;
 

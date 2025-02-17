@@ -124,6 +124,7 @@ public class MyPageServiceImpl implements MyPageService {
                 .title(badge.getTitle())
                 .description(badge.getDescription())
                 .createdAt(userBadge.getCreatedAt())
+                .level(badge.getLevel())
                 .rank(rankValue)
                 .catchPhrase(badge.getCatchPhrase())
                 .build();
