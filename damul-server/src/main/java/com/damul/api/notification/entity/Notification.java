@@ -17,11 +17,11 @@ public class Notification {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "reciever_id")
+    @JoinColumn(name = "reciever_id")
     private User receiver;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "sender_id")
+    @JoinColumn(name = "sender_id")
     private User sender;
 
     @Enumerated(EnumType.STRING)

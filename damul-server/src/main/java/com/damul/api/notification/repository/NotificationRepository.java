@@ -15,10 +15,10 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     List<Notification> findByReceiverIdOrderByCreatedAtDesc(Integer receiverId);
 
     // 읽지 않은 알림만 조회
-    List<Notification> findByReceiverIdAndIsReadFalseOrderByCreatedAtDesc(Integer receiverId);
+    List<Notification> findByReceiverIdAndReadFalseOrderByCreatedAtDesc(Integer receiverId);
 
     // 읽지 않은 알림 개수 조회
-    Integer countByReceiverIdAndIsReadFalse(Integer receiverId);
+    Integer countByReceiverIdAndReadFalse(Integer receiverId);
 
     // 특정 기간 이전의 알림 삭제를 위한 쿼리
     @Query("DELETE FROM Notification n WHERE n.createdAt < :date")
@@ -29,6 +29,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     List<Notification> findByReceiverIdAndType(@Param("receiverId") Integer receiverId, @Param("type") NotificationType type);
 
     // 특정 사용자의 알림을 모두 읽음 처리
-    @Query("UPDATE Notification n SET n.isRead = true WHERE n.receiver.id = :receiverId AND n.isRead = false")
+    @Query("UPDATE Notification n SET n.read = true WHERE n.receiver.id = :receiverId AND n.read = false")
     void markAllAsRead(@Param("receiverId") Integer receiverId);
 }
