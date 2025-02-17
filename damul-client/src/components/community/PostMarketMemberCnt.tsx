@@ -28,7 +28,7 @@ const PostMarketMemberCnt = ({
           type="number"
           value={tempChatSize}
           onChange={handleChange}
-          min={1}
+          min={2}
           max={MAX_COUNT}
           className="w-20 border border-gray-300 rounded-lg px-3 py-1 text-center text-gray-700 focus:outline-none focus:ring-0"
         />

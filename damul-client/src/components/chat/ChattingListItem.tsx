@@ -34,7 +34,7 @@ const ChattingListItem = ({
     <>
       <Link
         to={`/chatting/${id}`}
-        className="flex gap-3 border-t-1 p-3 pc:p-4 cursor-pointer hover:bg-neutral-100"
+        className="flex gap-3 border-t-1 px-3 py-4 pc:p-5 cursor-pointer hover:bg-neutral-100"
       >
         <Image src={thumbnailUrl} className="w-10 h-10 rounded-full" />
         <div className="flex w-full justify-between gap-3">

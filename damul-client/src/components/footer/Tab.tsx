@@ -19,19 +19,19 @@ const Tab = ({
   bgColor = "bg-positive-300",
 }: TabProps) => {
   const [unReadNum, setUnreadNum] = useState(0);
-  const fetchItems = async () => {
-    try {
-      const response = await getUnreads();
-      setUnreadNum(response?.data.unReadMessageNum);
-      return response?.data;
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const fetchItems = async () => {
+  //   try {
+  //     const response = await getUnreads();
+  //     setUnreadNum(response?.data.unReadMessageNum);
+  //     return response?.data;
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
+  // useEffect(() => {
+  //   fetchItems();
+  // }, []);
   return (
     <div className="flex h-full items-center justify-center">
       <div

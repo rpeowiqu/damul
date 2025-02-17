@@ -13,6 +13,7 @@ interface ChatData {
   messages: ChatMessage[];
   memberNum: number;
   roomName: string;
+  postId: number;
 }
 
 const ChattingRoomPage = () => {
@@ -27,6 +28,7 @@ const ChattingRoomPage = () => {
     messages: [],
     memberNum: 0,
     roomName: "",
+    postId: 0,
   });
 
   // 메시지 수신 핸들러
@@ -104,10 +106,11 @@ const ChattingRoomPage = () => {
           messages: response.data.data || [],
           memberNum: response.data.memberNum || 0,
           roomName: response.data.roomName || "",
+          postId: response.data.postId || 0,
         });
       } else {
         console.warn("예상과 다른 데이터 구조:", response?.data);
-        setChatData({ messages: [], memberNum: 0, roomName: "" });
+        setChatData({ messages: [], memberNum: 0, roomName: "", postId: 0 });
       }
 
       return response?.data;
@@ -182,7 +185,7 @@ const ChattingRoomPage = () => {
         <p>
           {chatData.roomName}({chatData.memberNum})
         </p>
-        <ChattingMenuButton roomId={roomId} />
+        <ChattingMenuButton roomId={roomId} postId={chatData.postId} />
       </div>
       <div className="flex-1 justify-end overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
         <DamulInfiniteScrollList
