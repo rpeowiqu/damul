@@ -129,9 +129,11 @@ public class MyPageController {
     }
 
     @GetMapping("/{userId}/ingredients")
-    public ResponseEntity<?> getIngredients(@PathVariable int userId) {
+    public ResponseEntity<?> getIngredients(
+            @PathVariable int userId,
+            @CurrentUser UserInfo currentUser) {
         log.info("다른 유저의 식자재 가져오기 시작 userId: {}", userId);
-        IngredientResponse response = homeService.getUserIngredientList(userId);
+        IngredientResponse response = homeService.getUserIngredientList(userId, currentUser.getId());
 
         if (response.getFreezer().isEmpty() && response.getFridge().isEmpty() && response.getRoomTemp().isEmpty()) {
             return ResponseEntity.noContent().build();
