@@ -120,7 +120,7 @@ const CommunityDetailHeader = ({
           {isBookmarked ? (
             <BookMarkIcon className="w-5 h-5 fill-positive-300 stroke-positive-300" />
           ) : (
-            <BookMarkIcon className="w-5 h-5 stroke-positive-300" />
+            <BookMarkIcon className="w-5 h-5 fill-white stroke-positive-300" />
           )}
           {createdAt ? (
             <p className="text-xs text-neutral-500">{formatDate(createdAt)}</p>

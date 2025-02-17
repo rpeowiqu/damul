@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Image from "./Image";
 import { getTimeAgo } from "@/utils/date";
-import ListBookmarkIcon from "../svg/ListBookmarkIcon";
+import BookMarkIcon from "../svg/BookMarkIcon";
 import ViewIcon from "../svg/ViewIcon";
 import LikesIcon from "../svg/LikesIcon";
 
@@ -46,7 +46,7 @@ const RecipeFeedCard = ({
       />
       <div className="absolute left-0.5 top-[-3px]">
         {bookmarked && (
-          <ListBookmarkIcon className="w-6 h-6 fill-positive-200 stroke-positive-400" />
+          <BookMarkIcon className="w-6 h-6 fill-positive-200 stroke-positive-400" />
         )}
       </div>
       <div className="flex flex-col justify-between flex-1 p-2">
