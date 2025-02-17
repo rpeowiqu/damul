@@ -74,7 +74,7 @@ const IngredientStorageContainer = ({
       ),
     );
 
-    setIngredientData((prevData) => {
+    setIngredientData?.((prevData) => {
       const storage = updatedIngredient.storage as
         | "freezer"
         | "fridge"
@@ -90,7 +90,7 @@ const IngredientStorageContainer = ({
     });
 
     if (updatedIngredient.expirationDate <= EXPIRINGSOON_DAY) {
-      setExpiringSoonItems((prevItems) =>
+      setExpiringSoonItems?.((prevItems) =>
         prevItems?.map((item) =>
           item.userIngredientId === updatedIngredient.userIngredientId
             ? updatedIngredient
@@ -107,7 +107,7 @@ const IngredientStorageContainer = ({
       ),
     );
 
-    setIngredientData((prevData) => {
+    setIngredientData?.((prevData) => {
       const storage = deletedIngredient.storage as
         | "freezer"
         | "fridge"
@@ -121,7 +121,7 @@ const IngredientStorageContainer = ({
     });
 
     if (deletedIngredient.expirationDate < 7) {
-      setExpiringSoonItems((prevItems) =>
+      setExpiringSoonItems?.((prevItems) =>
         prevItems?.filter(
           (item) =>
             item.userIngredientId !== deletedIngredient.userIngredientId,

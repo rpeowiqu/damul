@@ -37,7 +37,7 @@ const ChattingListInfiniteScroll = <T,>({
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey,
-      queryFn: async ({ pageParam }) => {
+      queryFn: ({ pageParam }) => {
         return fetchFn({
           cursor: pageParam?.cursor ?? 0,
           cursorTime: pageParam?.cursorTime ?? undefined,
