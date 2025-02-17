@@ -1,4 +1,4 @@
-package com.damul.api.admin.dto.request;
+package com.damul.api.admin.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminUserUpdate {
+public class AdminUserDetail {
+    private int id;
     private String email;
     private String profileImageUrl;
     private String nickname;
-    private int reportCount;
+    private String selfIntroduction;
     private boolean active;
 }

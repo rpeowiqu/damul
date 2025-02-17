@@ -1,7 +1,7 @@
 package com.damul.api.admin.controller;
 
-import com.amazonaws.Response;
 import com.damul.api.admin.dto.request.AdminUserUpdate;
+import com.damul.api.admin.dto.request.ReportStatusUpdate;
 import com.damul.api.admin.dto.response.ReportList;
 import com.damul.api.admin.service.AdminService;
 import com.damul.api.common.page.PageResponse;
@@ -39,7 +39,8 @@ public class AdminController {
     }
 
     @PatchMapping("/reports/{reportId}")
-    public ResponseEntity<?> updateReportStatus(@PathVariable int reportId) {
+    public ResponseEntity<?> updateReportStatus(@PathVariable int reportId,
+                                                @RequestBody ReportStatusUpdate request) {
         log.info("신고 상태 변경 요청");
 
         log.info("신고 상태 변경 완료");
@@ -47,7 +48,10 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getUsers() {
+    public ResponseEntity<?> getUsers(@RequestParam(required = false, defaultValue = "1") int currentPage,
+                                      @RequestParam(required = false, defaultValue = "10") int pageSize,
+                                      @RequestParam(required = false) String searchType,
+                                      @RequestParam(required = false) String keyword) {
         log.info("관리자 - 유저 전체 조회 및 검색 요청");
         
         log.info("관리자 - 유저 전체 조회 및 검색 완료");
@@ -65,7 +69,7 @@ public class AdminController {
 
     @PutMapping("/users/{userId}")
     public ResponseEntity<?> updateUser(@PathVariable int userId,
-                                        @RequestBody AdminUserUpdate adminUserUpdate) {
+                                        @RequestBody AdminUserUpdate request) {
         log.info("관리자 - 유저 정보 수정 요청");
 
         log.info("관리자 - 유저 정보 수정 완료");
@@ -82,9 +86,9 @@ public class AdminController {
 
     @PatchMapping("/users/{userId}")
     public ResponseEntity<?> updateUserActive(@PathVariable int userId) {
-        log.info("유저 활성화 정보 수정 요청");
+        log.info("유저 활성화 여부 수정 요청");
 
-        log.info("유저 활성화 정보 수정 완료");
+        log.info("유저 활성화 여부 수정 완료");
         return null;
     }
 
