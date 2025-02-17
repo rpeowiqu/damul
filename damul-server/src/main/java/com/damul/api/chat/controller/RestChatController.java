@@ -33,11 +33,12 @@ public class RestChatController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorTime,
             @RequestParam int cursor,
             @RequestParam int size,
+            @RequestParam(required = false) String filter,
             @CurrentUser UserInfo user
     ) {
         log.info("컨트롤러: 채팅방 목록 조회 시작 - cursor: {}, size: {}, cursorTime: {}", cursor, size, cursorTime);
 
-        ScrollResponse<ChatRoomList> response = chatRoomService.getChatRooms(cursorTime, cursor, size, user.getId());
+        ScrollResponse<ChatRoomList> response = chatRoomService.getChatRooms(cursorTime, cursor, size, filter, user.getId());
 
         if (response.getData().isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -76,6 +77,7 @@ public class RestChatController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorTime,
             @RequestParam int cursor,
             @RequestParam int size,
+            @RequestParam(required = false) String filter,
             @CurrentUser UserInfo user
     ) {
         log.info("컨트롤러: 채팅방 검색 시작 - keyword: {}, cursor: {}, size: {}",
@@ -86,6 +88,7 @@ public class RestChatController {
                 cursorTime,
                 cursor,
                 size,
+                filter,
                 user.getId()
         );
 

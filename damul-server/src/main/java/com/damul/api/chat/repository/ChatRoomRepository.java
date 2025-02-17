@@ -26,6 +26,11 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
          WHERE cr.status = 'ACTIVE'\s
          AND crm.user_id = :userId
          AND (
+            :filter IS NULL
+            OR (:filter = 'with_post' AND cr.post_id IS NOT NULL)
+            OR (:filter = 'without_post' AND cr.post_id IS NULL)
+         )
+         AND (
              COALESCE(last_msg.last_message_time, cr.created_at) < :cursorTime\s
              OR (COALESCE(last_msg.last_message_time, cr.created_at) = :cursorTime AND cr.id < :cursorId)
          )
@@ -34,7 +39,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
     List<ChatRoom> findRoomsWithCursor(
             @Param("userId") int userId,
             @Param("cursorTime") LocalDateTime cursorTime,
-            @Param("cursorId") int cursorId
+            @Param("cursorId") int cursorId,
+            @Param("filter") String filter
     );
 
     // 키워드로 채팅방 검색 (무한 스크롤)
@@ -51,6 +57,11 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
         AND crm.user_id = :userId
         AND (:keyword IS NULL OR cr.room_name LIKE CONCAT('%', :keyword, '%'))
         AND (
+           :filter IS NULL
+           OR (:filter = 'with_post' AND cr.post_id IS NOT NULL)
+           OR (:filter = 'without_post' AND cr.post_id IS NULL)
+        )
+        AND (
             COALESCE(last_msg.last_message_time, cr.created_at) < :cursorTime 
             OR (COALESCE(last_msg.last_message_time, cr.created_at) = :cursorTime AND cr.id < :cursorId)
         )
@@ -60,7 +71,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Integer> {
             @Param("userId") int userId,
             @Param("cursorTime") LocalDateTime cursorTime,
             @Param("cursorId") int cursorId,
-            @Param("keyword") String keyword
+            @Param("keyword") String keyword,
+            @Param("filter") String filter
     );
 
     // 다음 페이지 존재 여부 확인
