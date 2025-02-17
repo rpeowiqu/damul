@@ -131,7 +131,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<MyRecipeList> getMyRecipes(int userId, int cursor, int size, UserInfo currentUser) {
+    public ScrollResponse<RecipeList> getMyRecipes(int userId, int cursor, int size, UserInfo currentUser) {
         log.info("서비스: 마이페이지 레시피 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
@@ -139,7 +139,7 @@ public class MyPageServiceImpl implements MyPageService {
 
         validateAccessPermission(targetUser, currentUser);
 
-        List<MyRecipeList> recipes = recipeRepository.findMyRecipes(userId, cursor, size);
+        List<RecipeList> recipes = recipeRepository.findMyRecipes(userId, cursor, size);
 
         if (recipes.isEmpty()) {
             return new ScrollResponse<>(

@@ -16,6 +16,7 @@ import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.post.entity.Post;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -103,8 +104,10 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
                 .map(this::convertToChatMessageResponse)
                 .collect(Collectors.toList());
 
+        Post post = chatRoom.getPost();
+
         log.info("서비스: 채팅 메시지 조회 성공 - roomId: {}", roomId);
-        return createScrollResponse(messageResponses, roomId, chatRoom.getRoomName(), currentMemberCount);
+        return createScrollResponse(messageResponses, roomId, chatRoom.getRoomName(), currentMemberCount, post == null ? 0 : post.getPostId());
     }
 
     @Override
@@ -143,11 +146,12 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
                 Collections.emptyList(),
                 new CursorPageMetaInfo(0, false),
                 null,
+                0,
                 0
         );
     }
 
-    private ChatScrollResponse<ChatMessageResponse> createScrollResponse(List<ChatMessageResponse> messages, int roomId, String roomName, int memberNum) {
+    private ChatScrollResponse<ChatMessageResponse> createScrollResponse(List<ChatMessageResponse> messages, int roomId, String roomName, int memberNum, Integer postId) {
         int nextCursor = messages.get(0).getId();
         boolean hasNext = chatMessageRepository.existsByRoomIdAndIdLessThan(roomId, nextCursor);
 
@@ -155,7 +159,8 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
                 messages,
                 new CursorPageMetaInfo(nextCursor, hasNext),
                 roomName,
-                memberNum
+                memberNum,
+                postId
         );
     }
 }
