@@ -16,6 +16,7 @@ interface ChattingListInfiniteScrollProps<T> {
   initPage?: { cursor: number; cursorTime?: string };
   renderItems: (item: T, index: number) => ReactNode;
   skeleton?: ReactNode;
+  noContent?: ReactNode;
   className?: string;
 }
 
@@ -25,6 +26,7 @@ const ChattingListInfiniteScroll = <T,>({
   initPage = { cursor: 0, cursorTime: getKSTISOString() }, // KST 적용
   renderItems,
   skeleton,
+  noContent,
   className,
 }: ChattingListInfiniteScrollProps<T>) => {
   const { ref, inView } = useInView({
@@ -59,15 +61,23 @@ const ChattingListInfiniteScroll = <T,>({
     }
   }, [inView, hasNextPage, isFetchingNextPage]);
 
+  const hasData = data?.pages?.some((page) => page.data.length > 0);
+
   return (
-    <div className={className}>
-      {data?.pages.map((page, pageIndex) =>
-        page.data?.map((item, index) =>
-          renderItems(item, index + pageIndex * page.data.length),
-        ),
+    <>
+      {hasData ? (
+        <div className={className}>
+          {data?.pages.map((page, pageIndex) =>
+            page.data?.map((item, index) =>
+              renderItems(item, index + pageIndex * page.data.length),
+            ),
+          )}
+          {isFetchingNextPage ? skeleton : <div ref={ref} className="h-10" />}
+        </div>
+      ) : (
+        noContent
       )}
-      {isFetchingNextPage ? skeleton : <div ref={ref} className="h-10" />}
-    </div>
+    </>
   );
 };
 

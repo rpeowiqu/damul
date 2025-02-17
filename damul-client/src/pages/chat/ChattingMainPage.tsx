@@ -47,6 +47,11 @@ const ChattingMainPage = () => {
         skeleton={
           <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
         }
+        noContent={
+          <p className="text-center text-normal-200">
+            참여중인 채팅방이 없습니다.
+          </p>
+        }
       />
     </div>
   );

@@ -119,7 +119,7 @@ const AuthorInfo = ({
                 className="flex items-center gap-1 cursor-pointer"
               >
                 <motion.div
-                  animate={{ scale: isLiked ? [1, 1.3, 1] : 1 }}
+                  animate={{ scale: isLiked ? [1, 1.5, 1] : 1 }}
                   transition={{ duration: 0.5 }}
                 >
                   {isLiked ? (
