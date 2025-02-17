@@ -45,6 +45,11 @@ public class RecipeComment {
     @OneToMany(mappedBy = "parent")
     private List<RecipeComment> children;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
     @Builder
     public RecipeComment(Recipe recipe, User user, RecipeComment parent, String comment) {
         this.recipe = Objects.requireNonNull(recipe, "Recipe must not be null");
