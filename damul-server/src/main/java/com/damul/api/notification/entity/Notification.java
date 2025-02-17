@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "notifications")
 @Getter
 @NoArgsConstructor
 public class Notification {
@@ -17,7 +18,7 @@ public class Notification {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reciever_id")
+    @JoinColumn(name = "receiver_id")
     private User receiver;
 
     @ManyToOne(fetch = FetchType.LAZY)
