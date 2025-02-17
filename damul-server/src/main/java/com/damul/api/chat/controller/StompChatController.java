@@ -32,6 +32,7 @@ public class StompChatController {
                         ChatMessageCreate messageRequest // 이미지를 bitcode로 받는 방식 혹은 http 통신으로 이미지만 받는 방식
                         ) {
         log.info("메세지 보내기, roomId={}, senderId={}", roomId, messageRequest.getUserId());
+        log.info("메세지: {}, {}", messageRequest.getContent(), messageRequest.getImage());
         webSocketService.handleMessage(roomId, messageRequest);
     }
 

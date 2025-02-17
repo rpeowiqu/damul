@@ -14,6 +14,6 @@ public class ChatMessageCreate {
     private int userId;
     private MessageType messageType;  // ENUM('TEXT', 'IMAGE', 'FILE')
     private String content;
-    private String image;
+    private String image; // bitcode? bytecode?로 받을 예정
 
 }
