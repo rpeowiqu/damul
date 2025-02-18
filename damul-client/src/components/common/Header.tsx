@@ -2,7 +2,7 @@ import AlarmIcon from "@/components/svg/AlarmIcon";
 import OptionIcon from "@/components/svg/OptionIcon";
 import { Link } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
-import { useNotificationSubscriber } from "@/hooks/useAlarmSubscription";
+import { useAlarmSubscription } from "@/hooks/useAlarmSubscription";
 import { useState } from "react";
 
 const Header = () => {
@@ -10,7 +10,7 @@ const Header = () => {
   const userId = data?.data.id;
   const [alarmCnt, setAlarmCnt] = useState(0);
 
-  useNotificationSubscriber({
+  useAlarmSubscription({
     userId,
     onAlarmReceived: (alarm) => {
       console.log("새 알림:", alarm);

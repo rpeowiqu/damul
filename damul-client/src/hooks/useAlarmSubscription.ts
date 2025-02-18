@@ -7,15 +7,17 @@ interface ExtendedOptions extends SockJS.Options {
   withCredentials: boolean;
 }
 
-export const useNotificationSubscriber = ({
-  userId,
-  onAlarmReceived,
-  setAlarmCnt,
-}: {
+interface AlarmSubscription {
   userId: string;
   onAlarmReceived: (message: any) => void;
   setAlarmCnt: (count: number) => void;
-}) => {
+}
+
+export const useAlarmSubscription = ({
+  userId,
+  onAlarmReceived,
+  setAlarmCnt,
+}: AlarmSubscription) => {
   const wsUrl = import.meta.env.VITE_WS_BASE_URL;
   const stompClientRef = useRef<Client | null>(null);
 
@@ -66,5 +68,17 @@ export const useNotificationSubscriber = ({
     };
   }, [userId]);
 
-  return stompClientRef;
+  const readMessage = ({ alarmId }: { alarmId: number }) => {
+    if (!stompClientRef.current || !stompClientRef.current.connected) {
+      console.warn("🚨 STOMP 클라이언트가 연결되지 않음");
+      return;
+    }
+
+    console.log("📤 메시지 읽음:", alarmId);
+    stompClientRef.current.publish({
+      destination: `/pub/notification/read/${alarmId}`,
+    });
+  };
+
+  return { readMessage };
 };

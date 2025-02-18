@@ -3,15 +3,17 @@ import { getAlarms, getUnreadAlarmCnt } from "@/service/alarm";
 import { useEffect, useState } from "react";
 
 interface Alarm {
-  sender: {
+  id: number;
+  sender?: {
     id: number;
-    nickname: string;
+    nickname?: string;
     profileImageUrl: string;
   };
   content: string;
   createdAt: string;
   read: boolean;
-  targetUrl: string;
+  targetUrl?: string;
+  postType?: string;
   type: "COMMENT" | "LIKE" | "BADGE" | "FOLLOW";
 }
 
@@ -51,18 +53,7 @@ const AlarmPage = () => {
   return (
     <div className="h-full text-center">
       <div className="text-start px-7 py-3 border-b">알림 {alarmCnt}개</div>
-      <div>
-        {alarms?.map((alarm) => (
-          <AlarmItem
-            key={alarm.createdAt}
-            senderId={alarm.sender.id}
-            content={alarm.content}
-            profileImageUrl={alarm.sender.profileImageUrl}
-            createdAt={alarm.createdAt}
-            read={alarm.read}
-          />
-        ))}
-      </div>
+      <div>{alarms?.map((alarm) => <AlarmItem {...alarm} />)}</div>
     </div>
   );
 };

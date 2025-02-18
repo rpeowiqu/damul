@@ -52,7 +52,7 @@ export const useStompClient = ({
     return () => {
       stompClientRef.current
         ?.deactivate()
-        .then(() => console.log("🔌 STOMP 연결 종료"));
+        .then(() => console.log("STOMP 연결 종료"));
     };
   }, [roomId]);
 

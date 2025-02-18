@@ -6,7 +6,7 @@ import ChattingMenuButton from "@/components/chat/ChattingMenuButton";
 import { getChattingContents } from "@/service/chatting";
 import { ChatMessage } from "@/types/chatting";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
-import { useStompClient } from "@/hooks/useStompClient";
+import { useChattingSubscription } from "@/hooks/useChattingSubscription";
 import useAuth from "@/hooks/useAuth";
 
 interface ChatData {
@@ -47,7 +47,7 @@ const ChattingRoomPage = () => {
   };
 
   // STOMP 클라이언트 초기화
-  const { sendMessage } = useStompClient({
+  const { sendMessage } = useChattingSubscription({
     roomId: roomId,
     onMessageReceived: handleMessageReceived,
   });

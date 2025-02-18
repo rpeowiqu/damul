@@ -26,6 +26,8 @@ const ChattingMainPage = () => {
         size: 15,
         filter: filterType,
       });
+
+      console.log(response?.data);
       if (response.status === 204) {
         return { data: [], meta: { nextCursor: 0, hasNext: 0 } };
       }
