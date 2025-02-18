@@ -1,10 +1,13 @@
 package com.damul.api.main.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.HomeIngredientDetail;
 import com.damul.api.main.dto.response.HomeSuggestedResponse;
 import com.damul.api.main.dto.response.IngredientResponse;
 import com.damul.api.main.dto.response.SelectedIngredientList;
+import com.damul.api.receipt.dto.request.UserIngredientPost;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,5 +26,7 @@ public interface HomeService {
     void deleteIngredient(int userIngredientId, int userId, Integer warningEnable);
 
     HomeSuggestedResponse getRecommendedRecipes(int userId);
+
+//    UserIngredientPost processImage(MultipartFile file, UserInfo user);
 
 }

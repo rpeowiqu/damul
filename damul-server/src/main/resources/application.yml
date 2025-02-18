@@ -131,6 +131,10 @@ jwt:
   refresh-token-expiration: ${JWT_REFRESH_VALIDITY}
   temporary-token-expiration: ${JWT_TEMPORARY_VALIDITY}
 
+fastapi:
+  server:
+    url: ${FASTAPI_URL}
+
 logging:
   level:
     root: INFO
