@@ -1,8 +1,11 @@
 package com.damul.api.main.controller;
 
 import com.damul.api.auth.dto.response.UserInfo;
-import com.damul.api.auth.entity.User;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.sse.service.SseService;
 import com.damul.api.common.user.CurrentUser;
+import com.damul.api.main.dto.OcrList;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.HomeIngredientDetail;
 import com.damul.api.main.dto.response.HomeSuggestedResponse;
@@ -13,11 +16,14 @@ import com.damul.api.receipt.dto.request.UserIngredientPost;
 import com.damul.api.receipt.service.UserReceiptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/home")
@@ -27,6 +33,7 @@ public class HomeController {
 
     private final HomeService homeService;
     private final UserReceiptService userReceiptService;
+    private final SseService sseService;
 
     @GetMapping
     public ResponseEntity<?> getUserIngredients(@CurrentUser UserInfo user) {
@@ -118,6 +125,26 @@ public class HomeController {
         homeService.deleteIngredient(userIngredientId, user.getId(), warningEnable);
         log.info("유저 식자재 삭제 성공");
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/upload/{userId}")
+    public ResponseEntity<?> handleImageUpload(
+            @RequestParam("image") MultipartFile image,
+            @PathVariable int userId
+    ) {
+        log.info("컨트롤러: 이미지 업로드 시작 - userId: {}", userId);
+
+        try {
+            OcrList ocrResult = homeService.processImage(image, userId);
+            sseService.sendToClient(userId, ocrResult);
+
+            log.info("컨트롤러: 이미지 업로드 완료 - userId: {}", userId);
+            return ResponseEntity.ok().body(Map.of("result", ocrResult));
+        } catch (Exception e) {
+            log.error("이미지 처리 중 에러 발생 - userId: {}", userId, e);
+            sseService.sendToClient(userId, new BusinessException(ErrorCode.BAD_REQUEST, "이미지 처리 중 오류가 발생했습니다"));
+            throw e;
+        }
     }
 
 }

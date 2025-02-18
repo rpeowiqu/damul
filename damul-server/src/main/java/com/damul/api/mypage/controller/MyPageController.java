@@ -113,7 +113,7 @@ public class MyPageController {
         log.info("컨트롤러: 마이페이지 북마크 조회 시작 - userId: {}, cursor: {}, size: {}",
                 userId, cursor, size);
 
-        ScrollResponse<RecipeList> response = myPageService.getBookmarkedRecipes(
+        ScrollResponse<MyBookmarkList> response = myPageService.getBookmarkedRecipes(
                 userId,
                 cursor,
                 size,

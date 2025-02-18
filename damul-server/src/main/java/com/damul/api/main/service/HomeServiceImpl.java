@@ -1,14 +1,18 @@
 package com.damul.api.main.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.main.dto.IngredientStorage;
+import com.damul.api.main.dto.OcrDto;
+import com.damul.api.main.dto.OcrList;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.*;
 import com.damul.api.main.entity.UserIngredient;
 import com.damul.api.main.repository.UserIngredientRepository;
+import com.damul.api.receipt.dto.request.UserIngredientPost;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
 import com.damul.api.recipe.entity.RecipeTag;
@@ -16,13 +20,24 @@ import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.recipe.repository.RecipeTagRepository;
 import com.damul.api.user.repository.FollowRepository;
 import com.damul.api.user.repository.UserRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -35,11 +50,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class HomeServiceImpl implements HomeService {
 
+    private final ObjectMapper objectMapper;
+    @Value("${fastapi.server.url}")
+    private String fastApiServerUrl;
+
     private final UserIngredientRepository userIngredientRepository;
     private final RecipeRepository recipeRepository;
     private final RecipeTagRepository recipeTagRepository;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final RestTemplate restTemplate;
 
     @Override
     public IngredientResponse getUserIngredientList(int targetId, int userId) {
@@ -50,7 +70,7 @@ public class HomeServiceImpl implements HomeService {
             validateUserAccessRange(targetId, userId);
         }
 
-        List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(userId);
+        List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(targetId);
 
         return new IngredientResponse(
                 filterByStorage(userIngredients, "freezer"),
@@ -161,6 +181,63 @@ public class HomeServiceImpl implements HomeService {
                 .collect(Collectors.toList());
 
         return new HomeSuggestedResponse(suggestedRecipes);
+    }
+
+    public OcrList processImage(MultipartFile file, int userId) {
+        try {
+            log.info("서비스: 이미지 처리 시작 - userId: {}", userId);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("image", createFileResource(file));
+            body.add("user_id", userId);
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity =
+                    new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    fastApiServerUrl,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                log.error("서비스: FastAPI 서버 응답 실패 - userId: {}, statusCode: {}",
+                        userId, response.getStatusCode());
+                throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED, "OCR 서버 처리 실패");
+            }
+
+            // FastAPI 응답의 userIngredients 배열을 OcrDto 리스트로 변환
+            JsonNode rootNode = objectMapper.readTree(response.getBody());
+            JsonNode userIngredientsNode = rootNode.get("userIngredients");
+
+            List<OcrDto> ocrResults = objectMapper.convertValue(
+                    userIngredientsNode,
+                    new TypeReference<List<OcrDto>>() {}
+            );
+
+            log.info("서비스: 이미지 처리 완료 - userId: {}", userId);
+            return new OcrList(ocrResults);
+
+        } catch (IOException e) {
+            log.error("서비스: 이미지 처리 중 에러 발생 - userId: {}", userId, e);
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "이미지 처리 중 오류가 발생했습니다");
+        } catch (Exception e) {
+            log.error("서비스: 예상치 못한 에러 발생 - userId: {}", userId, e);
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "이미지 처리 중 오류가 발생했습니다");
+        }
+    }
+
+    private ByteArrayResource createFileResource(MultipartFile file) throws IOException {
+        return new ByteArrayResource(file.getBytes()) {
+            @Override
+            public String getFilename() {
+                return file.getOriginalFilename();
+            }
+        };
     }
 
     private void validateUserId(int userId) {

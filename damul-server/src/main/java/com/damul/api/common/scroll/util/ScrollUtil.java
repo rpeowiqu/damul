@@ -1,15 +1,18 @@
 package com.damul.api.common.scroll.util;
 
-import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+@Slf4j
 public class ScrollUtil {
-    public static <T extends ScrollCursor> ScrollResponse<T> createScrollResponse(List<T> items, int cursorId, int size) {
+    public static <T extends ScrollCursor> ScrollResponse<T> createScrollResponse(List<T> items, int cursor, int size) {
+
         if (items.isEmpty()) {
-            return new ScrollResponse<>(items, new CursorPageMetaInfo(cursorId, false));
+            log.info("ScrollResponse item 없음!!");
+            return new ScrollResponse<>(items, new CursorPageMetaInfo(cursor, false));
         }
 
         // items.size()가 size(원래 요청한 크기)보다 크면 다음 페이지 존재

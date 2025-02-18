@@ -107,6 +107,8 @@ public class UserServiceImpl implements UserService {
             String profileImageUrl = s3Service.uploadFile(profileImage);
             log.info("새로운 프로필 이미지 업로드 완료 - profileImageUrl: {}", profileImageUrl);
             setting.setProfileImageUrl(profileImageUrl);
+        } else { // 새로운 이미지 없음
+
         }
 
         // 배경 이미지 처리

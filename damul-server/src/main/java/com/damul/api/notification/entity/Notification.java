@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class Notification {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -41,11 +42,14 @@ public class Notification {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Transient
+    private String postType;
+
     public void updateCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public static Notification create(User receiver, User sender, NotificationType type, String content, String targetUrl) {
+    public static Notification create(User receiver, User sender, NotificationType type, String content, String targetUrl, String postType) {
         Notification notification = new Notification();
         notification.receiver = receiver;
         notification.sender = sender;
@@ -54,6 +58,7 @@ public class Notification {
         notification.targetUrl = targetUrl;
         notification.read = false;
         notification.createdAt = LocalDateTime.now();
+        notification.postType = postType;
         return notification;
     }
 

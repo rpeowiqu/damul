@@ -16,6 +16,7 @@ public class NotificationResponse {
     private String targetUrl;
     private boolean isRead;
     private LocalDateTime createdAt;
+    private String postType;
 
     // 발신자 정보
     private SenderInfo sender;
@@ -46,6 +47,7 @@ public class NotificationResponse {
                 .isRead(notification.isRead())
                 .createdAt(notification.getCreatedAt())
                 .sender(senderInfo)
+                .postType(notification.getPostType())
                 .build();
     }
 }

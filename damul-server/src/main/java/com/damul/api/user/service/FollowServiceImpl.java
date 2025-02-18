@@ -73,7 +73,7 @@ public class FollowServiceImpl implements FollowService {
                         .build();
                 newFollow.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
                 followRepository.save(newFollow);
-                notificationService.createFollowNotification(currentUser, targetUser);
+                notificationService.createFollowNotification(targetUser, currentUser);
                 return new FollowResponse(true);
             }
         } catch (DataIntegrityViolationException e) {
