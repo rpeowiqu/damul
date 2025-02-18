@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import introMain_1 from "@/assets/intro_main_1.png";
 import introMain_2 from "@/assets/intro_main_2.png";
 import introCommunity_1 from "@/assets/intro_community_1.png";
@@ -8,12 +9,14 @@ import introProfile_1 from "@/assets/intro_profile_1.png";
 import introProfile_2 from "@/assets/intro_profile_2.png";
 import introStatistics_1 from "@/assets/intro_statistics_1.png";
 import introStatistics_2 from "@/assets/intro_statistics_2.png";
+import DamulButton from "../common/DamulButton";
 
 const IntroContent = () => {
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [visibleSections, setVisibleSections] = useState<boolean[]>(
-    new Array(4).fill(false),
+    new Array(5).fill(false),
   );
+  const nav = useNavigate();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -418,6 +421,35 @@ const IntroContent = () => {
             </p>
           </div>
         </motion.h1>
+      </motion.div>
+
+      <motion.div
+        ref={(el) => el && (sectionRefs.current[4] = el)}
+        initial={{
+          opacity: 0,
+          y: 50,
+        }}
+        animate={
+          visibleSections[4]
+            ? {
+                opacity: 1,
+                y: 0,
+                transition: {
+                  duration: 0.5,
+                  delay: 1.5,
+                },
+              }
+            : {}
+        }
+        className="px-10"
+      >
+        <DamulButton
+          variant="positive"
+          className="w-full"
+          onClick={() => nav("/login")}
+        >
+          시작하기
+        </DamulButton>
       </motion.div>
     </div>
   );
