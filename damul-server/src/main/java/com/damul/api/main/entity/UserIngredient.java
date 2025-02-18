@@ -48,11 +48,16 @@ public class UserIngredient {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;  // 삭제 상태 필드 추가
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "normalized_ingredient_id")
+    private NormalizedIngredient normalizedIngredient;
+
     @Builder
     public UserIngredient(UserReceipt userReciept, int userIngredientId, int categoryId,
                           int ingredientQuantity, LocalDateTime ingredientUp,
                           String ingredientName, LocalDateTime expirationDate,
-                          IngredientStorage ingredientStorage, int price) {
+                          IngredientStorage ingredientStorage, int price,
+                          NormalizedIngredient normalizedIngredient) {
         this.userReciept = userReciept;
         this.userIngredientId = userIngredientId;
         this.categoryId = categoryId;
@@ -63,6 +68,7 @@ public class UserIngredient {
         this.ingredientStorage = ingredientStorage;
         this.price = price;
         this.isDeleted = false;
+        this.normalizedIngredient = normalizedIngredient;
     }
 
     // 논리적 삭제를 위한 메서드

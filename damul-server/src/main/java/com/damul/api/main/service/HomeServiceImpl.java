@@ -5,6 +5,7 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.util.IngredientNormalizerUtil;
 import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.dto.OcrDto;
 import com.damul.api.main.dto.OcrList;
@@ -60,6 +61,12 @@ public class HomeServiceImpl implements HomeService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final RestTemplate restTemplate;
+    private final IngredientNormalizerUtil ingredientNormalizerUtil;
+
+
+    public String normalizeIngredient(String originalName) {
+        return ingredientNormalizerUtil.normalize(originalName);
+    }
 
     @Override
     public IngredientResponse getUserIngredientList(int targetId, int userId) {

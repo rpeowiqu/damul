@@ -5,6 +5,7 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.util.IngredientNormalizerUtil;
 import com.damul.api.main.entity.UserIngredient;
 import com.damul.api.main.repository.UserIngredientRepository;
 import com.damul.api.mypage.entity.FoodCategory;
@@ -43,6 +44,7 @@ public class UserReceiptServiceImpl implements UserReceiptService {
     private final FoodPreferenceRepository foodPreferenceRepository;
     private final FoodCategoryRepository foodCategoryRepository;
     private final TimeZoneConverter timeZoneConverter;
+    private final IngredientNormalizerUtil ingredientNormalizerUtil;
 
     @Override
     @Transactional
