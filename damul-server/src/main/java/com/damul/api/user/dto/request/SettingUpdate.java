@@ -14,4 +14,6 @@ public class SettingUpdate {
     private String backgroundImageUrl;
     private AccessRange accessRange;
     private boolean warningEnabled;
+    private boolean profileImageDefault;
+    private boolean backgroundImageDefault;
 }
