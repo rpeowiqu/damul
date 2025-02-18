@@ -4,7 +4,7 @@ spring:
       - optional:classpath:.env[.properties]
       - optional:file:.env[.properties]
     profiles:
-      active: prod
+      active: local
       # on-profile: local
 
   application:
@@ -134,6 +134,10 @@ jwt:
 fastapi:
   server:
     url: ${FASTAPI_URL}
+
+socket:
+  server:
+    url: ${FRONT_URL}
 
 logging:
   level:
