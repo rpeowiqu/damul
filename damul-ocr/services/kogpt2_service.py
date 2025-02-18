@@ -1,22 +1,24 @@
 import torch
 from transformers import GPT2LMHeadModel, PreTrainedTokenizerFast
+import os
 
-# 모델과 토크나이저의 경로 지정
-model_path = 'app/models/chatbot_model5.pth'
-tokenizer_path = 'app/models/tokenizer'
+# 현재 스크립트 기준으로 models 디렉토리의 절대경로 설정
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "chatbot_model5.pth")
+TOKENIZER_PATH = os.path.join(BASE_DIR, "models", "tokenizer")
 
 # 디바이스 설정
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 모델 로드
 model = GPT2LMHeadModel.from_pretrained("skt/kogpt2-base-v2")  # 기본 모델 불러오기
-checkpoint = torch.load(model_path, map_location=device)  # 체크포인트 로드
+checkpoint = torch.load(MODEL_PATH, map_location=device)  # 체크포인트 로드
 model.load_state_dict(checkpoint["model_state_dict"])  # 저장된 가중치 불러오기
 model.to(device)
 model.eval()
 
 # 토크나이저 로드
-tokenizer = PreTrainedTokenizerFast.from_pretrained(tokenizer_path)
+tokenizer = PreTrainedTokenizerFast.from_pretrained(TOKENIZER_PATH)
 
 print("모델과 토크나이저가 성공적으로 로드되었습니다!")
 
