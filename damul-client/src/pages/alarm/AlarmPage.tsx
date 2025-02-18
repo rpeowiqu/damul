@@ -2,14 +2,30 @@ import AlarmItem from "@/components/alarm/AlarmItem";
 import { getAlarms, getUnreadAlarmCnt } from "@/service/alarm";
 import { useEffect, useState } from "react";
 
+interface Alarm {
+  sender: {
+    id: number;
+    nickname: string;
+    profileImageUrl: string;
+  };
+  content: string;
+  createdAt: string;
+  read: boolean;
+  targetUrl: string;
+  type: "COMMENT" | "LIKE" | "BADGE" | "FOLLOW";
+}
+
 const AlarmPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [alarmCnt, setAlarmCnt] = useState(0);
+  const [alarms, setAlarms] = useState<Alarm[]>([]);
 
   const fetchAlarms = async () => {
     try {
       setIsLoading(true);
       const response = await getAlarms();
-      console.log(response);
+      setAlarms(response.data.notifications);
+      console.log(response.data.notifications);
     } catch (error) {
       console.log(error);
     } finally {
@@ -20,6 +36,7 @@ const AlarmPage = () => {
   const fetchUnreadAlarmCnt = async () => {
     try {
       const response = await getUnreadAlarmCnt();
+      setAlarmCnt(response.data.unReadMessageNum);
       console.log(response);
     } catch (error) {
       console.log(error);
@@ -27,16 +44,26 @@ const AlarmPage = () => {
   };
 
   useEffect(() => {
-    // fetchAlarms();
+    fetchAlarms();
     fetchUnreadAlarmCnt();
   }, []);
+
   return (
-    <main className="h-full text-centerspace-y-2">
-      <div className="text-start p-3 border-b">읽지 않은 알림 6개</div>
-      {[...Array(5)].map((_, index) => (
-        <AlarmItem key={index} />
-      ))}
-    </main>
+    <div className="h-full text-center">
+      <div className="text-start px-7 py-3 border-b">알림 {alarmCnt}개</div>
+      <div>
+        {alarms?.map((alarm) => (
+          <AlarmItem
+            key={alarm.createdAt}
+            senderId={alarm.sender.id}
+            content={alarm.content}
+            profileImageUrl={alarm.sender.profileImageUrl}
+            createdAt={alarm.createdAt}
+            read={alarm.read}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 

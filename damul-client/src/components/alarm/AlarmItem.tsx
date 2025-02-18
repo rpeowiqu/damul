@@ -1,19 +1,37 @@
+import { Link } from "react-router-dom";
 import Image from "../common/Image";
+import { getTimeAgo } from "@/utils/date";
 
-const AlarmItem = () => {
+interface AlarmItemProps {
+  senderId: number;
+  profileImageUrl: string;
+  content: string;
+  createdAt: string;
+  read: boolean;
+}
+
+const AlarmItem = ({
+  profileImageUrl,
+  content,
+  createdAt,
+  read,
+}: AlarmItemProps) => {
   return (
-    <main className="h-full text-centerspace-y-2">
-      <div className="flex items-center justify-between px-7 border-b">
-        <div className="flex items-center gap-3 py-3">
-          <Image className="w-14 h-14 rounded-full" />
-          <div className="">나는서히 님이 내 레시피에 좋아요를 눌렀대요</div>
+    <div className="h-full text-center space-y-2 border-b">
+      <div className="flex items-center justify-between px-7 cursor-pointer">
+        <div className="flex items-center gap-3 h-20">
+          <Image
+            src={profileImageUrl}
+            className="w-10 h-10 pc:w-12 pc:h-12 rounded-full"
+          />
+          <div className="text-xs pc:text-md">{content}</div>
         </div>
-        <div className="text-sm text-neutral-500 justify-between">
-          <p>3분 전</p>
-          <p>안읽음</p>
+        <div className="flex flex-col text-xs pc:text-sm text-neutral-500 h-20 py-2 justify-between">
+          <div className="self-start">{getTimeAgo(createdAt)}</div>
+          <div className="self-end">{read ? "읽음" : "안읽음"}</div>
         </div>
       </div>
-    </main>
+    </div>
   );
 };
 
