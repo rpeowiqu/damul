@@ -14,6 +14,8 @@ import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
+import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.post.entity.Post;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -144,7 +146,14 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         Post post = chatRoom.getPost();
 
         log.info("서비스: 채팅 메시지 조회 성공 - roomId: {}", roomId);
-        return createScrollResponse(messageResponses, roomId, chatRoom.getRoomName(), currentMemberCount, post == null ? 0 : post.getPostId());
+        return createScrollResponse(
+                messageResponses,
+                cursor,
+                size,
+                chatRoom.getRoomName(),
+                currentMemberCount,
+                post == null ? 0 : post.getPostId()
+        );
     }
 
     @Override
@@ -200,13 +209,20 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         );
     }
 
-    private ChatScrollResponse<ChatMessageResponse> createScrollResponse(List<ChatMessageResponse> messages, int roomId, String roomName, int memberNum, Integer postId) {
-        int nextCursor = messages.get(0).getId();
-        boolean hasNext = chatMessageRepository.existsByRoomIdAndIdLessThan(roomId, nextCursor);
+    private ChatScrollResponse<ChatMessageResponse> createScrollResponse(
+            List<ChatMessageResponse> messages,
+            int cursor,  // 추가
+            int size,    // 추가
+            String roomName,
+            int memberNum,
+            Integer postId
+    ) {
+        // ScrollUtil 사용
+        ScrollResponse<ChatMessageResponse> scrollResponse = ScrollUtil.createScrollResponse(messages, cursor, size);
 
         return new ChatScrollResponse<>(
-                messages,
-                new CursorPageMetaInfo(nextCursor, hasNext),
+                scrollResponse.getData(),
+                scrollResponse.getMeta(),
                 roomName,
                 memberNum,
                 postId
