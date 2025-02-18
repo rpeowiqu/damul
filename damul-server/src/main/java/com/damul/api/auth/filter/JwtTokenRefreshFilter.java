@@ -54,8 +54,6 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
             "/api/v1/home/upload/**"
     );
 
-
-
     /**
      * 필터 메인 로직
      * 토큰 처리 및 갱신을 담당
