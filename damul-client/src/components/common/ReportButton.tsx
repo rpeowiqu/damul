@@ -12,38 +12,55 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChangeEvent, FormEvent, ReactNode, useState } from "react";
 import DamulButton from "./DamulButton";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
-
-interface ReportData {
-  reportCategoryId: number;
-  contentType: string;
-  targetId: number;
-  description: string;
-}
+import { report } from "@/service/report";
+import { ReportForm } from "@/types/report";
 
 interface ReportButtonProps {
+  contentId: number;
+  targetId: number;
   className?: string;
   children: ReactNode;
 }
 
-const ReportButton = ({ className, children }: ReportButtonProps) => {
+const ReportButton = ({
+  contentId,
+  targetId,
+  className,
+  children,
+}: ReportButtonProps) => {
   const [isOpen, setIsOpen] = useCloseOnBack();
-  const [reportData, setReportData] = useState<ReportData>({
+  const [reportForm, setReportForm] = useState<ReportForm>({
     reportCategoryId: 1,
+    reportType: "RECIPE",
     contentType: "",
     targetId: 0,
     description: "",
   });
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert("신고처리 되었습니다.");
+
+    try {
+      const response = await report({
+        reportCategoryId: reportForm.reportCategoryId,
+        reportType: reportForm.reportType,
+        contentId,
+        targetId,
+        description: reportForm.description,
+      });
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      alert("신고 처리 되었습니다.");
+    }
   };
 
   const onChangeReportData = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     console.log(e.target.name, e.target.value);
-    setReportData({ ...reportData, [e.target.name]: e.target.value });
+    setReportForm({ ...reportForm, [e.target.name]: e.target.value });
   };
 
   return (
@@ -59,7 +76,7 @@ const ReportButton = ({ className, children }: ReportButtonProps) => {
             history.back();
           }
         }}
-        headerStyle="border-none"
+        contentStyle="max-w-96"
       >
         <div>
           <h1 className="text-xl font-black text-normal-700">신고 접수하기</h1>
@@ -81,10 +98,10 @@ const ReportButton = ({ className, children }: ReportButtonProps) => {
               </Label>
               <Select
                 name="reportCategoryId"
-                value={String(reportData.reportCategoryId)}
+                value={String(reportForm.reportCategoryId)}
                 onValueChange={(value) =>
-                  setReportData({
-                    ...reportData,
+                  setReportForm({
+                    ...reportForm,
                     reportCategoryId: parseInt(value),
                   })
                 }
@@ -131,7 +148,7 @@ const ReportButton = ({ className, children }: ReportButtonProps) => {
               <input
                 type="hidden"
                 name="reportCategoryId"
-                value={reportData.reportCategoryId || ""}
+                value={reportForm.reportCategoryId || ""}
                 required
               />
             </div>
@@ -148,14 +165,14 @@ const ReportButton = ({ className, children }: ReportButtonProps) => {
                 name="description"
                 className="h-28 resize-none focus-visible:ring-1 focus-visible:ring-positive-400 focus-visible:ring-offset-0"
                 placeholder="신고 내용을 입력해 주세요."
-                value={reportData.description}
+                value={reportForm.description}
                 onChange={onChangeReportData}
                 required
               />
             </div>
 
             <DamulButton type="submit" variant="positive" className="w-full">
-              신고하기
+              신고 하기
             </DamulButton>
           </form>
         </div>

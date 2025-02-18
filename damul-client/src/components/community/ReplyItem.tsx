@@ -67,7 +67,11 @@ const ReplyItem = ({
       </div>
       <p className="text-xs pc:text-sm ml-12 pb-1">{reply.comment}</p>
       <div className="flex justify-start gap-2 ml-12 cursor-pointer text-xxs pc:text-xs text-neutral-500">
-        <ReportButton className="flex items-center gap-1">
+        <ReportButton
+          contentId={parseInt(id)}
+          targetId={comment.userId}
+          className="flex items-center gap-1"
+        >
           <p>신고</p>
         </ReportButton>
         <div
