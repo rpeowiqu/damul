@@ -50,7 +50,8 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
             "/api/v1/auth/consent",
             "/favicon.ico",
             "/v3/api-docs/**",
-            "/swagger-ui/**"
+            "/swagger-ui/**",
+            "/api/v1/home/upload/**"
     );
 
 

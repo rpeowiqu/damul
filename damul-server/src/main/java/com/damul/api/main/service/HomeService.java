@@ -1,6 +1,7 @@
 package com.damul.api.main.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.main.dto.OcrList;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.HomeIngredientDetail;
 import com.damul.api.main.dto.response.HomeSuggestedResponse;
@@ -27,6 +28,6 @@ public interface HomeService {
 
     HomeSuggestedResponse getRecommendedRecipes(int userId);
 
-//    UserIngredientPost processImage(MultipartFile file, UserInfo user);
+    OcrList processImage(MultipartFile file, int userId);
 
 }
