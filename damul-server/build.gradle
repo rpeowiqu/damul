@@ -40,6 +40,7 @@ dependencies {
 	implementation 'org.openkoreantext:open-korean-text:2.3.1'
 	implementation 'org.scala-lang:scala-library:2.12.4'
 	implementation 'com.twitter.penguin:korean-text:4.4.4'
+	implementation 'org.springframework.boot:spring-boot-starter-batch'
 
 	// JWT 관련 의존성
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'

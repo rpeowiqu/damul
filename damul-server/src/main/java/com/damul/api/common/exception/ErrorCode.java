@@ -11,6 +11,11 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "리프레시 토큰을 찾을 수 없습니다."),
 
+    // API 관련 에러코드 추가
+    API_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API 서버 오류가 발생했습니다."),
+    API_REQUEST_ERROR(HttpStatus.BAD_REQUEST, "API 요청 중 오류가 발생했습니다."),
+    API_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API 응답 처리 중 오류가 발생했습니다."),
+
 
     // 유효성 검증
     INVALID_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자 ID가 포함되어 있습니다."),

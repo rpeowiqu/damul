@@ -1,5 +1,6 @@
 package com.damul.api.ingredient.service;
 
+import com.damul.api.ingredient.dto.FoodCategory;
 import com.damul.api.ingredient.dto.response.IngredientPriceResponse;
 import com.damul.api.ingredient.entity.FoodItem;
 import com.damul.api.ingredient.repository.FoodItemRepository;
@@ -33,78 +34,61 @@ public class PriceBatchService {
     private static final String BATCH_CACHE_KEY = "batch:price:%s:%s:%s:%s";
     private static final int BATCH_SIZE = 10;
 
-    @Getter
-    @AllArgsConstructor
-    private enum FoodCategory {
-        GRAIN(1, "곡물"),
-        FRUIT(2, "과일"),
-        OIL(3, "기름"),
-        EGG(4, "달걀류"),
-        SEAFOOD(5, "수산물"),
-        SEASONING(6, "양념"),
-        DAIRY(7, "유제품"),
-        MEAT(8, "육류"),
-        VEGETABLE(9, "채소"),
-        OTHER(10, "기타");
-
-        private final int id;
-        private final String name;
-    }
     @Async
-    @Scheduled(cron = "0 10 18 * * *")  // UTC 05:35 (KST 14:35)
+    @Scheduled(cron = "0 0 18 * * *")  // UTC 새벽 3시 (KST)
     public void updateVegetablePrices() {
         updatePricesByCategory(FoodCategory.VEGETABLE);
     }
 
     @Async
-    @Scheduled(cron = "0 20 18 * * *")  // UTC 05:45 (KST 14:45)
+    @Scheduled(cron = "0 10 18 * * *")  // UTC 새벽 3시 10분 후 (KST)
     public void updateFruitPrices() {
         updatePricesByCategory(FoodCategory.FRUIT);
     }
 
     @Async
-    @Scheduled(cron = "0 30 18 * * *")  // UTC 05:55 (KST 14:55)
+    @Scheduled(cron = "0 20 18 * * *")  // UTC 새벽 3시 20분 후 (KST)
     public void updateDairyPrices() {
         updatePricesByCategory(FoodCategory.DAIRY);
     }
 
     @Async
-    @Scheduled(cron = "0 40 18 * * *")   // UTC 06:05 (KST 15:05)
+    @Scheduled(cron = "0 30 18 * * *")  // UTC 새벽 3시 30분 후 (KST)
     public void updateMeatPrices() {
         updatePricesByCategory(FoodCategory.MEAT);
     }
 
     @Async
-    @Scheduled(cron = "0 50 18 * * *")  // UTC 06:15 (KST 15:15)
+    @Scheduled(cron = "0 40 18 * * *")  // UTC 새벽 3시 40분 후 (KST)
     public void updateEggPrices() {
         updatePricesByCategory(FoodCategory.EGG);
     }
 
     @Async
-    @Scheduled(cron = "0 0 19 * * *")  // UTC 06:25 (KST 15:25)
+    @Scheduled(cron = "0 50 18 * * *")  // UTC 새벽 3시 50분 후 (KST)
     public void updateSeafoodPrices() {
         updatePricesByCategory(FoodCategory.SEAFOOD);
     }
 
     @Async
-    @Scheduled(cron = "0 10 19 * * *")  // UTC 06:35 (KST 15:35)
+    @Scheduled(cron = "0 0 19 * * *")  // UTC 새벽 4시 (KST)
     public void updateOilPrices() {
         updatePricesByCategory(FoodCategory.OIL);
     }
 
     @Async
-    @Scheduled(cron = "0 20 19 * * *")  // UTC 06:45 (KST 15:45)
+    @Scheduled(cron = "0 10 19 * * *")  // UTC 새벽 4시 10분 후 (KST)
     public void updateSeasoningPrices() {
         updatePricesByCategory(FoodCategory.SEASONING);
     }
 
     @Async
-    @Scheduled(cron = "0 30 19 * * *")  // UTC 06:55 (KST 15:55)
+    @Scheduled(cron = "0 20 19 * * *")  // UTC 새벽 4시 20분 후 (KST)
     public void updateOtherPrices() {
         updatePricesByCategory(FoodCategory.OTHER);
     }
 
-    private void updatePricesByCategory(FoodCategory category) {
+    public void updatePricesByCategory(FoodCategory category) {
         String lockKey = String.format(BATCH_LOCK_KEY, category.getName());
         String lockValue = LocalDateTime.now().toString();
         boolean locked = false;
@@ -153,7 +137,7 @@ public class PriceBatchService {
         }
     }
 
-    private void updateItemPrice(FoodItem item, String period, boolean ecoFlag) {
+    public void updateItemPrice(FoodItem item, String period, boolean ecoFlag) {
         try {
             String response = kamisApiService.getPrice(
                     item.getItemCode(),
