@@ -22,7 +22,7 @@ public class User {
     @Id    // Primary Key 지정
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "INT AUTO_INCREMENT")
-    private int id;
+    private Integer id;
 
     @Setter
     private String nickname;

@@ -113,7 +113,7 @@ public class KamisApiService {
             return response;
         } catch (Exception e) {
             log.error("Kamis API 호출 실패: {}", e.getMessage());
-            throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR);
+            throw new BusinessException(ErrorCode.API_SERVER_ERROR);
         }
     }
 }

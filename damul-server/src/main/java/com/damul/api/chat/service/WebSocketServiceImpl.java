@@ -45,6 +45,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     private final S3Service s3Service;
     private final UserRepository userRepository;
     private final TimeZoneConverter timeZoneConverter;
+    private final UnreadMessageService unreadMessageService;
 
     @Override
     @Transactional
@@ -189,9 +190,6 @@ public class WebSocketServiceImpl implements WebSocketService {
 
         member.updateLastReadMessageId(readRequest.getMessageId());
         chatRoomMemberRepository.save(member);
-
-        messagingTemplate.convertAndSend("/sub/chat/room/" + readRequest.getRoomId(),
-                new ReadStatus(readRequest.getRoomId(), readRequest.getUserId(), readRequest.getMessageId()));
     }
 
     private ChatRoom getChatRoom(int roomId) {
@@ -203,12 +201,13 @@ public class WebSocketServiceImpl implements WebSocketService {
         List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(message.getRoom().getId());
         for (ChatRoomMember member : members) {
             if (member.getUser().getId() != message.getSender().getId()) {
-                int unreadCount = chatMessageRepository.countUnreadMessages(
-                        message.getRoom().getId(),
-                        member.getLastReadMessageId()
-                );
+                // Redis에 안 읽은 메시지 수 증가
+                unreadMessageService.incrementUnreadCount(member.getUser().getId());
+
+                // 웹소켓으로 업데이트된 카운트 전송
+                int unreadCount = unreadMessageService.getUnreadCount(member.getUser().getId());
                 messagingTemplate.convertAndSend(
-                        "/sub/chat/unread/" + member.getUser().getId(),
+                        "/sub/chat/" + member.getUser().getId() + "/count",
                         unreadCount
                 );
             }

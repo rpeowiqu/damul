@@ -5,6 +5,7 @@ import com.damul.api.auth.oauth2.service.CustomOAuth2UserService;
 import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.service.AuthService;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.chat.service.UnreadMessageService;
 import com.damul.api.common.user.CustomUserDetails;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
 
+    private final UnreadMessageService unreadMessageService;
     @Value("${jwt.access-token-expiration}")
     private long accessTokenExpire;        // Access Token 만료 시간 (ms)
 
@@ -82,6 +84,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     TimeUnit.MILLISECONDS
             );
 
+            unreadMessageService.initializeUnreadCount(userDetails.getId());
 
             // Refresh Token 저장 로그 추가
             log.info("Refresh Token이 Redis에 저장되었습니다. userEmail: {}, refreshToken: {}", userEmail, refreshToken);

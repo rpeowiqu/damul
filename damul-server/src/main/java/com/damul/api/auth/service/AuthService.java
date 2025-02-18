@@ -13,6 +13,7 @@ import com.damul.api.auth.jwt.TokenService;
 import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.chat.service.UnreadMessageService;
 import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
@@ -48,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class AuthService {
     private final TimeZoneConverter timeZoneConverter;
+    private final UnreadMessageService unreadMessageService;
     @Value("${spring.security.admin.password}")
     private String hashedAdminPassword;
 
@@ -91,6 +93,7 @@ public class AuthService {
             if (accessTokenCookie.isPresent()) {
                 String accessToken = accessTokenCookie.get().getValue();
                 String email = jwtTokenProvider.getUserEmailFromToken(accessToken);
+                unreadMessageService.removeUnreadCount(jwtTokenProvider.getUserIdFromToken(accessToken));
                 tokenService.removeRefreshToken(email);
             }
 
@@ -237,6 +240,7 @@ public class AuthService {
     // 관리자 로그인
     public void adminLogin(AdminLoginRequest request, HttpServletResponse response) {
         // 관리자 존재 확인
+        log.info("관리자계정: {}", userRepository.findByRole(Role.ADMIN).get().getEmail());
         User admin = userRepository.findByRole(Role.ADMIN)
                 .orElseThrow(() -> new IllegalArgumentException("관리자 계정이 존재하지 않습니다."));
 

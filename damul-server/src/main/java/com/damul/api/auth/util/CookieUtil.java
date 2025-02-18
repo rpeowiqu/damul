@@ -53,26 +53,18 @@ public class CookieUtil {
      * addCookie와 동일한 형식으로 맞추고, 실제 응답에 쿠키를 추가하도록 수정
      */
     public void deleteCookie(HttpServletResponse response, String name) {
-        log.debug("쿠키 삭제 시작 - 이름: {}", name);
+        log.info("쿠키 삭제 시작 - 이름: {}", name);
 
-        ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from(name, "")
+        // 쿠키 삭제를 위한 더 명확한 설정
+        ResponseCookie cookie = ResponseCookie.from(name, "")
                 .path("/")
-                .sameSite("None")
+                .maxAge(0)  // 만료 시간을 0으로
                 .httpOnly(true)
-                .maxAge(0);        // 즉시 만료
+                .sameSite("Lax")  // None 대신 Lax 권장
+                .domain(activeProfile.equals("local") ? "localhost" : "i12a306.p.ssafy.io")
+                .secure(activeProfile.equals("prod"))  // 로컬일 때만 secure false
+                .build();
 
-        // 환경에 따른 설정 분기
-        if ("local".equals(activeProfile)) {
-            cookieBuilder
-                    .domain("localhost")
-                    .secure(false);
-        } else {
-            cookieBuilder
-                    .domain("i12a306.p.ssafy.io")
-                    .secure(true);
-        }
-
-        ResponseCookie cookie = cookieBuilder.build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         log.debug("쿠키 삭제 완료 - 이름: {}, 환경: {}", name, activeProfile);
     }

@@ -2,6 +2,7 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MemberRole;
+import com.damul.api.chat.dto.request.ChatReadRequest;
 import com.damul.api.chat.dto.response.ChatMessageResponse;
 import com.damul.api.chat.dto.response.ChatScrollResponse;
 import com.damul.api.chat.dto.response.UnReadResponse;
@@ -20,11 +21,13 @@ import com.damul.api.post.entity.Post;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +40,8 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
+    private final UnreadMessageService unreadMessageService;
+    private final SimpMessageSendingOperations messagingTemplate;
 
     @Override
     @Transactional  // ✨ readOnly 제거 (멤버 추가 필요할 수 있으므로)
@@ -52,11 +57,10 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         int currentMemberCount = chatRoomMemberRepository.countMembersByRoomId(roomId);;
 
         // ✨ 내가 속한 채팅방인지 검증
-        ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_ROOM_MEMBER, "해당 채팅방의 멤버가 아닙니다."));
+        Optional<ChatRoomMember> member = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId);
 
         // ✨ 멤버십 확인 및 신규 멤버 처리 로직 추가
-        if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
+        if (member.isEmpty()) {
             if (chatRoom.getStatus() == ChatRoom.Status.INACTIVE) {
                 throw new BusinessException(ErrorCode.CHATROOM_INACTIVE, "비활성화된 채팅방입니다.");
             }
@@ -90,7 +94,6 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
             chatMessageRepository.save(systemMessage);
             log.info("서비스: 새로운 멤버 추가 완료 - roomId: {}, userId: {}", roomId, userId);
         }
-        // validateMembership(roomId, userId); // ✨ 제거 (위에서 이미 처리됨)
 
         int lastReadMessageId = chatRoomMemberRepository.findLastReadMessageIdByUserIdAndRoomId(userId, roomId);
         List<ChatMessage> messages = fetchMessages(roomId, cursor, lastReadMessageId);
@@ -103,6 +106,41 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         List<ChatMessageResponse> messageResponses = messages.stream()
                 .map(this::convertToChatMessageResponse)
                 .collect(Collectors.toList());
+
+        // ✨ 현재 채팅방의 가장 최신 메시지 ID 조회
+        ChatMessage latestMessage = chatMessageRepository
+                .findFirstByRoomIdOrderByCreatedAtDesc(roomId)
+                .orElse(null);
+
+        // 최신 메시지가 있다면 사용자의 lastReadMessageId 업데이트
+        if (latestMessage != null) {
+            // 이전에 읽지 않은 메시지 수 계산
+            int unreadCount = chatMessageRepository.countUnreadMessagesInRoom(
+                    roomId,
+                    lastReadMessageId,
+                    latestMessage.getId()
+            );
+
+            // Redis의 안 읽은 메시지 수 감소
+            if (unreadCount > 0) {
+                unreadMessageService.decrementUnreadCount(userId, unreadCount);
+
+                // 업데이트된 전체 안 읽은 메시지 수 전송
+                int totalUnread = unreadMessageService.getUnreadCount(userId);
+                messagingTemplate.convertAndSend(
+                        "/sub/chat/" + userId + "/count",
+                        totalUnread
+                );
+            }
+
+            chatRoomMemberRepository.updateLastReadMessageId(
+                    userId,
+                    roomId,
+                    latestMessage.getId()
+            );
+            log.info("서비스: 사용자의 마지막 읽은 메시지 ID 업데이트 - userId: {}, roomId: {}, messageId: {}",
+                    userId, roomId, latestMessage.getId());
+        }
 
         Post post = chatRoom.getPost();
 
