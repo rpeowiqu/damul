@@ -2,9 +2,11 @@ package com.damul.api.admin.controller;
 
 import com.damul.api.admin.dto.request.AdminUserUpdate;
 import com.damul.api.admin.dto.request.ReportStatusUpdate;
+import com.damul.api.admin.dto.response.AdminUserList;
 import com.damul.api.admin.dto.response.ReportList;
 import com.damul.api.admin.service.AdminService;
 import com.damul.api.common.page.PageResponse;
+import com.damul.api.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +19,23 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
 
     private final AdminService adminService;
+    private final ReportService reportService;
 
     @GetMapping("/reports")
     public ResponseEntity<?> getReports(@RequestParam(required = false, defaultValue = "1") int currentPage,
                                         @RequestParam(required = false, defaultValue = "10") int pageSize,
                                         @RequestParam(required = false) String searchType,
                                         @RequestParam(required = false) String keyword) {
-        log.info("신고 전체 조회 및 검색 요청");
-        PageResponse<ReportList> response = null;
+        log.info("컨트롤러: 신고 목록 조회 시작 - page: {}, size: {}, searchType: {}, keyword: {}",
+                currentPage, pageSize, searchType, keyword);
 
-        log.info("신고 전체 조회 및 검색 완료");
-        return null;
+        PageResponse<ReportList> response = reportService.getReports(currentPage, pageSize, searchType, keyword);
+
+        if (response.getContent().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/reports/{reportId}")
@@ -48,14 +56,22 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getUsers(@RequestParam(required = false, defaultValue = "1") int currentPage,
-                                      @RequestParam(required = false, defaultValue = "10") int pageSize,
-                                      @RequestParam(required = false) String searchType,
-                                      @RequestParam(required = false) String keyword) {
-        log.info("관리자 - 유저 전체 조회 및 검색 요청");
-        
-        log.info("관리자 - 유저 전체 조회 및 검색 완료");
-        return null;
+    public ResponseEntity<?> getUsers(
+            @RequestParam(required = false, defaultValue = "1") int currentPage,
+            @RequestParam(required = false, defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String searchType,
+            @RequestParam(required = false) String keyword) {
+        log.info("컨트롤러: 관리자 - 유저 전체 조회 및 검색 요청 - page: {}, size: {}, searchType: {}, keyword: {}",
+                currentPage, pageSize, searchType, keyword);
+
+        PageResponse<AdminUserList> response = adminService.getUsers(currentPage, pageSize, searchType, keyword);
+
+        if (response.getContent().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        log.info("컨트롤러: 관리자 - 유저 전체 조회 및 검색 완료");
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users/{userId}")
