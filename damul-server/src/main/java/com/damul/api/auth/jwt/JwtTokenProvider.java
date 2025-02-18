@@ -135,6 +135,10 @@ public class JwtTokenProvider {
         return getClaims(token).getSubject();
     }
 
+    public int getUserIdFromToken(String token) {
+        return getClaims(token).get("userId", Integer.class);
+    }
+
     public boolean validateToken(String token) {
         try {
             getClaims(token);

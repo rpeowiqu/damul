@@ -13,6 +13,7 @@ import com.damul.api.auth.jwt.TokenService;
 import com.damul.api.auth.repository.AuthRepository;
 import com.damul.api.auth.repository.TermsRepository;
 import com.damul.api.auth.util.CookieUtil;
+import com.damul.api.chat.service.UnreadMessageService;
 import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
@@ -48,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class AuthService {
     private final TimeZoneConverter timeZoneConverter;
+    private final UnreadMessageService unreadMessageService;
     @Value("${spring.security.admin.password}")
     private String hashedAdminPassword;
 
@@ -88,10 +90,10 @@ public class AuthService {
             log.info("로그아웃 요청");
             Optional<Cookie> accessTokenCookie = cookieUtil.getCookie(request, "access_token");
 
-
             if (accessTokenCookie.isPresent()) {
                 String accessToken = accessTokenCookie.get().getValue();
                 String email = jwtTokenProvider.getUserEmailFromToken(accessToken);
+                unreadMessageService.removeUnreadCount(jwtTokenProvider.getUserIdFromToken(accessToken));
                 tokenService.removeRefreshToken(email);
             }
 
