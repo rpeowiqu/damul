@@ -45,7 +45,7 @@ const DamulModal = ({
             </DialogTitle>
           </DialogHeader>
         ) : (
-          <DialogHeader>
+          <DialogHeader className="hidden">
             <DialogTitle></DialogTitle>
           </DialogHeader>
         )}
