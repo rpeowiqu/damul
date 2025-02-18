@@ -1,6 +1,7 @@
 package com.damul.api.recipe.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,4 +28,18 @@ public class RecipeIngredient {
 
     @Column(name = "unit", length = 10)
     private String unit;
+
+    @Column(name = "normalized_ingredient_name")
+    private String normalizedIngredientName;
+
+    @Builder
+    public RecipeIngredient(Recipe recipe, String ingredientName,
+                            String amount, String unit,
+                            String normalizedIngredientName) {
+        this.recipe = recipe;
+        this.ingredientName = ingredientName;
+        this.amount = amount;
+        this.unit = unit;
+        this.normalizedIngredientName = normalizedIngredientName;
+    }
 }
