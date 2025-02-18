@@ -10,7 +10,6 @@ import statisticsRoutes from "./statisticsRoutes";
 import NotFoundPage from "@/pages/notFound/NotFoundPage";
 import IntroPage from "@/pages/intro/IntroPage";
 
-const HomePage = lazy(() => import("@/pages/home/HomePage"));
 const LoginPage = lazy(() => import("@/pages/login/LoginPage"));
 const SignUpPage = lazy(() => import("@/pages/signup/SignUpPage"));
 const SettingPage = lazy(() => import("@/pages/setting/SettingPage"));
