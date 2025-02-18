@@ -5,11 +5,13 @@ import { useState } from "react";
 const IntroPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  return isLoading ? (
-    <LoadingScreen setIsLoading={setIsLoading} />
-  ) : (
-    <IntroContent />
-  );
+  return <IntroContent />;
+
+  // return isLoading ? (
+  //   <LoadingScreen setIsLoading={setIsLoading} />
+  // ) : (
+  //   <IntroContent />
+  // );
 };
 
 export default IntroPage;

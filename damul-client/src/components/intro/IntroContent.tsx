@@ -10,447 +10,83 @@ import introProfile_2 from "@/assets/intro_profile_2.png";
 import introStatistics_1 from "@/assets/intro_statistics_1.png";
 import introStatistics_2 from "@/assets/intro_statistics_2.png";
 import DamulButton from "../common/DamulButton";
+import IntroItem from "./IntroItem";
+import QRScanIcon from "../svg/QRScanIcon";
+import ReceiptScanIcon from "../svg/ReceiptScanIcon";
 
 const IntroContent = () => {
-  const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [visibleSections, setVisibleSections] = useState<boolean[]>(
-    new Array(5).fill(false),
-  );
-  const nav = useNavigate();
+  const [stepIndex, setStepIndex] = useState<number>(0);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = sectionRefs.current.findIndex(
-              (el) => el === entry.target,
-            );
+  const renderElement = () => {
+    switch (stepIndex) {
+      case 0:
+        return (
+          <IntroItem
+            title={"효율적인 식자재 관리하기"}
+            subTitle={"식자재 관리 어떻게해? 다믈랭에 다믈랭"}
+            key={stepIndex}
+            imageSrc={introMain_1}
+          >
+            <motion.div
+              animate={{
+                scale: [0, 1.2, 1],
+                transition: {
+                  duration: 1,
+                  delay: 0.6,
+                  ease: "easeInOut",
+                },
+              }}
+              className="flex flex-col justify-center items-center absolute left-5 w-24 h-24 object-cover bg-red-300 rounded-full"
+            >
+              <ReceiptScanIcon className="size-12 fill-white stroke-white" />
+              <p className="text-white text-xs font-black">영수증 스캔</p>
+            </motion.div>
 
-            if (index !== -1) {
-              setVisibleSections((prev) => {
-                const updated = [...prev];
-                updated[index] = true;
-                return updated;
-              });
-
-              observer.unobserve(entry.target);
-            }
-          }
-        });
-      },
-      { threshold: 0.9 },
-    );
-
-    console.log(sectionRefs.current);
-    sectionRefs.current.forEach((el) => {
-      if (el) {
-        observer.observe(el);
-      }
-    });
-
-    return () => observer.disconnect();
-  }, []);
+            <motion.div
+              animate={{
+                scale: [0, 1.2, 1],
+                transition: {
+                  duration: 1,
+                  delay: 1.0,
+                  ease: "easeInOut",
+                },
+              }}
+              className="flex flex-col justify-center items-center absolute top-24 right-5 w-20 h-20 object-cover bg-blue-200 rounded-full"
+            >
+              <QRScanIcon className="size-10 fill-white stroke-white" />
+              <p className="text-white text-xs font-black">QR스캔</p>
+            </motion.div>
+          </IntroItem>
+        );
+      case 1:
+        return (
+          <IntroItem
+            title={"안녕하세요2"}
+            subTitle={"가나다라마바사아자차카타파하"}
+            key={stepIndex}
+            imageSrc={introMain_2}
+          />
+        );
+    }
+  };
 
   return (
-    <div className="flex flex-col justify-center gap-20 bg-white">
-      <motion.div
-        ref={(el) => el && (sectionRefs.current[0] = el)}
-        initial={{
-          opacity: 0,
-          y: 50,
-        }}
-        animate={
-          visibleSections[0]
-            ? {
-                opacity: 1,
-                y: 0,
-                transition: {
-                  duration: 1.0,
-                },
-              }
-            : {}
-        }
-        className="relative h-96"
-      >
-        <motion.img
-          initial={{
-            opacity: 0,
-            y: 50,
-          }}
-          animate={
-            visibleSections[0]
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.5,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-6 left-10 w-36"
-          src={introMain_1}
-        />
+    <div className="flex flex-col justify-center items-center gap-12 flex-1 p-10">
+      {renderElement()}
 
-        <motion.img
-          initial={{
-            opacity: 0,
-            y: 50,
-          }}
-          animate={
-            visibleSections[0]
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.8,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-14 left-28 w-36"
-          src={introMain_2}
-        />
+      <div className="flex gap-5">
+        {Array.from({ length: 4 }).map((item, index) => (
+          <button
+            key={index}
+            className={`w-4 h-4 bg-normal-50 rounded-full ${index === stepIndex && "bg-positive-300"}`}
+            onClick={() => setStepIndex(index)}
+          />
+        ))}
+      </div>
 
-        <motion.h1
-          initial={{
-            opacity: 0,
-            x: 100,
-          }}
-          animate={
-            visibleSections[0]
-              ? {
-                  opacity: 1,
-                  x: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 1.0,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-20 right-10 text-xl text-positive-400 font-bold"
-        >
-          효율적인 식자재 관리
-          <div className="flex flex-col mt-5 text-sm text-normal-400 font-normal">
-            <p>
-              # OCR 기술을 통해
-              <br />
-              식자재를 간편하게 등록할 수 있어요.
-            </p>
-            <p># 보유한 식자재를 기반으로 레시피를 추천해줘요.</p>
-          </div>
-        </motion.h1>
-      </motion.div>
-
-      <motion.div
-        ref={(el) => el && (sectionRefs.current[1] = el)}
-        initial={{
-          opacity: 0,
-          y: 50,
-        }}
-        animate={
-          visibleSections[1]
-            ? {
-                opacity: 1,
-                y: 0,
-                transition: {
-                  duration: 1.0,
-                },
-              }
-            : {}
-        }
-        className="relative h-96"
-      >
-        <motion.img
-          initial={{
-            opacity: 0,
-            y: 50,
-          }}
-          animate={
-            visibleSections[1]
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.8,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-6 right-10 w-36"
-          src={introCommunity_1}
-        />
-
-        <motion.img
-          initial={{
-            opacity: 0,
-            y: 50,
-          }}
-          animate={
-            visibleSections[1]
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.5,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-14 right-28 w-36"
-          src={introCommunity_2}
-        />
-
-        <motion.h1
-          initial={{
-            opacity: 0,
-            x: -100,
-          }}
-          animate={
-            visibleSections[1]
-              ? {
-                  opacity: 1,
-                  x: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 1.0,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-20 left-10 text-xl text-positive-400 font-bold"
-        >
-          자유로운 소통 공간
-          <div className="flex flex-col mt-5 text-sm text-normal-400 font-normal">
-            <p>
-              # 나만의 레시피 공유하거나
-              <br />
-              식자재 공구/나눔 게시판에서 식자재를 나누어요.
-            </p>
-            <p># 채팅, 팔로잉 등의 SNS 서비스를 제공해요.</p>
-          </div>
-        </motion.h1>
-      </motion.div>
-
-      <motion.div
-        ref={(el) => el && (sectionRefs.current[2] = el)}
-        initial={{
-          opacity: 0,
-          y: 50,
-        }}
-        animate={
-          visibleSections[2]
-            ? {
-                opacity: 1,
-                y: 0,
-                transition: {
-                  duration: 1.0,
-                },
-              }
-            : {}
-        }
-        className="relative h-96"
-      >
-        <motion.img
-          initial={{
-            opacity: 0,
-            y: 50,
-          }}
-          animate={
-            visibleSections[2]
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.5,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-6 left-10 w-36"
-          src={introProfile_1}
-        />
-
-        <motion.img
-          initial={{
-            opacity: 0,
-            y: 50,
-          }}
-          animate={
-            visibleSections[2]
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.8,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-14 left-28 w-36"
-          src={introProfile_2}
-        />
-
-        <motion.h1
-          initial={{
-            opacity: 0,
-            x: 100,
-          }}
-          animate={
-            visibleSections[2]
-              ? {
-                  opacity: 1,
-                  x: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 1.0,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-20 right-10 text-xl text-positive-400 font-bold"
-        >
-          친구의 냉장고 살펴보기
-          <div className="flex flex-col mt-5 text-sm text-normal-400 font-normal">
-            <p># 프로필에서 선호 식자재를 확인할 수 있어요.</p>
-            <p># 숨겨진 미션을 수행하고 뱃지를 획득해 보세요.</p>
-            <p># 다른 유저의 냉장고 현황을 살펴볼 수 있어요.</p>
-          </div>
-        </motion.h1>
-      </motion.div>
-
-      <motion.div
-        ref={(el) => el && (sectionRefs.current[3] = el)}
-        initial={{
-          opacity: 0,
-          y: 50,
-        }}
-        animate={
-          visibleSections[3]
-            ? {
-                opacity: 1,
-                y: 0,
-                transition: {
-                  duration: 1.0,
-                },
-              }
-            : {}
-        }
-        className="relative h-96"
-      >
-        <motion.img
-          initial={{
-            opacity: 0,
-            y: 50,
-          }}
-          animate={
-            visibleSections[3]
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.8,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-6 right-10 w-36"
-          src={introStatistics_1}
-        />
-
-        <motion.img
-          initial={{
-            opacity: 0,
-            y: 50,
-          }}
-          animate={
-            visibleSections[3]
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.5,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-14 right-28 w-36"
-          src={introStatistics_2}
-        />
-
-        <motion.h1
-          initial={{
-            opacity: 0,
-            x: -100,
-          }}
-          animate={
-            visibleSections[3]
-              ? {
-                  opacity: 1,
-                  x: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 1.0,
-                  },
-                }
-              : {}
-          }
-          className="absolute top-20 left-10 text-xl text-positive-400 font-bold"
-        >
-          식자재 가격 동향 & 스마트 영수증
-          <div className="flex flex-col mt-5 text-sm text-normal-400 font-normal">
-            <p>
-              # 다양한 식자재의 최근 가격을 그래프로
-              <br />
-              확인할 수 있어요.
-            </p>
-            <p>
-              # 등록한 식자재의 영수증과 지출 내역을
-              <br />
-              확인할 수 있어요.
-            </p>
-          </div>
-        </motion.h1>
-      </motion.div>
-
-      <motion.div
-        ref={(el) => el && (sectionRefs.current[4] = el)}
-        initial={{
-          opacity: 0,
-          y: 50,
-        }}
-        animate={
-          visibleSections[4]
-            ? {
-                opacity: 1,
-                y: 0,
-                transition: {
-                  duration: 0.5,
-                  delay: 1.5,
-                },
-              }
-            : {}
-        }
-        className="px-10"
-      >
-        <DamulButton
-          variant="positive"
-          className="w-full"
-          onClick={() => nav("/login")}
-        >
-          시작하기
-        </DamulButton>
-      </motion.div>
+      <DamulButton variant="positive" className="w-full">
+        시작하기
+      </DamulButton>
     </div>
   );
 };
