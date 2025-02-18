@@ -1,6 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { getKSTISOString } from "@/utils/date";
 
 interface ChattingListInfiniteScrollProps<T> {
   queryKey: string[];
@@ -15,15 +16,17 @@ interface ChattingListInfiniteScrollProps<T> {
   initPage?: { cursor: number; cursorTime?: string };
   renderItems: (item: T, index: number) => ReactNode;
   skeleton?: ReactNode;
+  noContent?: ReactNode;
   className?: string;
 }
 
 const ChattingListInfiniteScroll = <T,>({
   queryKey,
   fetchFn,
-  initPage = { cursor: 0, cursorTime: new Date().toISOString() },
+  initPage = { cursor: 0, cursorTime: getKSTISOString() }, // KST 적용
   renderItems,
   skeleton,
+  noContent,
   className,
 }: ChattingListInfiniteScrollProps<T>) => {
   const { ref, inView } = useInView({
@@ -34,7 +37,7 @@ const ChattingListInfiniteScroll = <T,>({
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey,
-      queryFn: async ({ pageParam }) => {
+      queryFn: ({ pageParam }) => {
         return fetchFn({
           cursor: pageParam?.cursor ?? 0,
           cursorTime: pageParam?.cursorTime ?? undefined,
@@ -42,7 +45,6 @@ const ChattingListInfiniteScroll = <T,>({
       },
       initialPageParam: initPage,
       getNextPageParam: (lastPage) => {
-        console.log("lastPage:", lastPage);
         if (lastPage.meta?.hasNext) {
           return {
             cursor: lastPage.meta.nextCursor ?? 0,
@@ -59,15 +61,23 @@ const ChattingListInfiniteScroll = <T,>({
     }
   }, [inView, hasNextPage, isFetchingNextPage]);
 
+  const hasData = data?.pages?.some((page) => page.data.length > 0);
+
   return (
-    <div className={className}>
-      {data?.pages.map((page, pageIndex) =>
-        page.data?.map((item, index) =>
-          renderItems(item, index + pageIndex * page.data.length),
-        ),
+    <>
+      {hasData ? (
+        <div className={className}>
+          {data?.pages.map((page, pageIndex) =>
+            page.data?.map((item, index) =>
+              renderItems(item, index + pageIndex * page.data.length),
+            ),
+          )}
+          {isFetchingNextPage ? skeleton : <div ref={ref} className="h-10" />}
+        </div>
+      ) : (
+        noContent
       )}
-      {isFetchingNextPage ? skeleton : <div ref={ref} className="h-10" />}
-    </div>
+    </>
   );
 };
 

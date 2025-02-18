@@ -49,7 +49,7 @@ export const getFollowers = (
 export const getFollowings = (
   userId: number,
   queryParams: {
-    keyword: string;
+    keyword?: string;
     cursor: number;
     size: number;
   },

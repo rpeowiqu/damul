@@ -1,18 +1,28 @@
 import apiClient from "./http";
+import { Friend } from "@/types/chatting";
 
-// 레시피 상세조회
+// 모든 채팅 목록 조회
 export const getChattingList = async ({
   cursorTime,
   cursor = 0,
   size = 5,
+  filter,
 }: {
   cursorTime: string | Date;
   cursor?: number;
   size?: number;
+  filter?: string;
 }) => {
-  return apiClient.get(
-    `chats/rooms?cursorTime=${cursorTime}&cursor=${cursor}&size=${size}`,
-  );
+  const params = new URLSearchParams({
+    cursorTime: cursorTime.toString(),
+    cursor: cursor.toString(),
+    size: size.toString(),
+  });
+
+  if (filter) {
+    params.append("filter", filter);
+  }
+  return apiClient.get(`chats/rooms?${params.toString()}`);
 };
 
 // 채팅방 내용조회
@@ -55,20 +65,20 @@ export const getChattingMembers = async ({
 };
 
 // 채팅방 나가기
-export const deleteFromChattingRoom = async ({
+export const deleteFromRoom = async ({
   roomId,
 }: {
-  roomId: number;
+  roomId: string | undefined;
 }) => {
   return apiClient.delete(`chats/rooms/${roomId}`);
 };
 
 // 채팅방 멤버 추방
-export const deleteMember = async ({
+export const deleteMemberFromRoom = async ({
   roomId,
   memberId,
 }: {
-  roomId: number;
+  roomId: string | undefined;
   memberId: number;
 }) => {
   return apiClient.delete(`chats/rooms/${roomId}/members/${memberId}`);
@@ -81,17 +91,12 @@ export const getUnreads = async () => {
   return apiClient.get(`chats/unreads`);
 };
 
-// 공구나눔 채팅방 입장하기
-export const postIntoMarketRoom = async ({ roomId }: { roomId: number }) => {
-  return apiClient.post(`chats/rooms/${roomId}`);
-};
-
 // 일대일 채팅 입장
 export const postIntoPrivateRoom = async ({ userId }: { userId: number }) => {
   return apiClient.post(`chats/direct/${userId}`);
 };
 
 // 단체 채팅 생성
-export const postIntoGroupRoom = async ({ users }: { users: number[] }) => {
+export const postIntoGroupRoom = async ({ users }: { users: Friend[] }) => {
   return apiClient.post(`chats/rooms`, { users });
 };

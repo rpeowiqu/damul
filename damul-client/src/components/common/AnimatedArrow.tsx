@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { ReactNode } from "react";
 
 interface AnimatedArrowProps {
-  className?: string;
   direction: "up" | "down";
   children: ReactNode;
 }
@@ -31,7 +30,7 @@ const arrowVariants = {
     hidden: { color: "#fd6c6c" },
     visible: {
       opacity: [0, 1, 0],
-      y: [10, 5, 0],
+      y: [10, 0],
       transition: {
         duration: 1.5,
         repeat: Infinity,
@@ -43,7 +42,7 @@ const arrowVariants = {
     hidden: { color: "#60a5fa" },
     visible: {
       opacity: [0, 1, 0],
-      y: [0, 5, 10],
+      y: [0, 10],
       transition: {
         duration: 1.5,
         repeat: Infinity,
@@ -53,24 +52,15 @@ const arrowVariants = {
   },
 };
 
-const AnimatedArrow = ({
-  className,
-  direction,
-  children,
-}: AnimatedArrowProps) => {
+const AnimatedArrow = ({ direction, children }: AnimatedArrowProps) => {
   return (
     <motion.div
       initial="hidden"
       animate="visible"
-      className={`flex flex-col justify-end ${className}`}
       variants={containerVariants[direction]}
     >
       {Array.from({ length: 2 }).map((_, index) => (
-        <motion.div
-          key={index}
-          variants={arrowVariants[direction]}
-          className="-m-2"
-        >
+        <motion.div key={index} variants={arrowVariants[direction]}>
           {children}
         </motion.div>
       ))}

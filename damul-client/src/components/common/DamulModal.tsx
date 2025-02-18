@@ -21,7 +21,7 @@ interface DamulModalProps {
   footerComponent?: ReactNode; // 모달창 하단 컴포넌트 요소
 }
 
-const defaultContentStyle = "p-5 max-w-88 pc:max-w-96 rounded-xl";
+const defaultContentStyle = "p-5 max-w-96 rounded-xl";
 const defaultHeaderStyle = "pb-3 border-b border-b-normal-100";
 const defaultTitleStyle = "text-positive-300 text-xl text-center";
 
@@ -45,14 +45,12 @@ const DamulModal = ({
             </DialogTitle>
           </DialogHeader>
         ) : (
-          <DialogHeader>
+          <DialogHeader className="hidden">
             <DialogTitle></DialogTitle>
           </DialogHeader>
         )}
-
-        <DialogDescription>
-          <div>{children}</div>
-        </DialogDescription>
+        <DialogDescription className="hidden"></DialogDescription>
+        {children}
         {footerComponent && <DialogFooter>{footerComponent}</DialogFooter>}
       </DialogContent>
     </Dialog>

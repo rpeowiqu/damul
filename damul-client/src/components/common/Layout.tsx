@@ -1,7 +1,5 @@
 import { Suspense } from "react";
 import { Outlet, useMatches } from "react-router-dom";
-import { QueryClientProvider } from "@tanstack/react-query";
-import queryClient from "@/utils/queryClient";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -17,19 +15,17 @@ const Layout = () => {
   const FooterComponent = (layoutConfig.footer ?? true) ? <Footer /> : null;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col w-full min-w-[320px] max-w-[600px] h-full min-h-screen mx-auto bg-white pc:border-x border-normal-100">
-        {HeaderComponent}
+    <div className="flex flex-col w-full min-w-[320px] max-w-[600px] h-full min-h-screen mx-auto bg-white pc:border-x border-normal-100">
+      {HeaderComponent}
 
-        <main className="flex flex-col flex-1 pt-14 pb-16">
-          <Suspense fallback={<div>Loading...</div>}>
-            <Outlet />
-          </Suspense>
-        </main>
+      <main className="flex flex-col flex-1 pt-14 pb-16">
+        <Suspense fallback={<div>Loading...</div>}>
+          <Outlet />
+        </Suspense>
+      </main>
 
-        {FooterComponent}
-      </div>
-    </QueryClientProvider>
+      {FooterComponent}
+    </div>
   );
 };
 

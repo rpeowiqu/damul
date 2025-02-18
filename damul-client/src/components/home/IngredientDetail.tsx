@@ -2,10 +2,11 @@ import { Ingredient } from "@/types/Ingredient";
 import DeleteIcon from "../svg/DeleteIcon";
 import SaveIcon from "../svg/SaveIcon";
 import { Slider } from "../ui/slider";
-import { CATEGORY_INFO } from "@/constants/category";
+import { CATEGORY_ICON_MAPPER } from "@/constants/category";
 import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
 import { useEffect, useState } from "react";
 import useAuth from "@/hooks/useAuth";
+import DamulButton from "../common/DamulButton";
 
 interface IngredientDetailProps {
   selectedIngredient: Ingredient;
@@ -17,29 +18,9 @@ interface IngredientDetailProps {
 
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col text-sm font-bold w-full">
-    <p className="text-positive-300">{label}</p>
-    <p>{value}</p>
+    <div className="text-positive-300">{label}</div>
+    <div>{value}</div>
   </div>
-);
-
-const ActionButton = ({
-  icon: Icon,
-  text,
-  className = "",
-  onClick,
-}: {
-  icon: React.ElementType;
-  text: string;
-  className?: string;
-  onClick?: () => void;
-}) => (
-  <button
-    className={`flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-positive-300 px-7 ${className}`}
-    onClick={onClick}
-  >
-    <Icon />
-    <p className="text-xs pc:text-sm text-white">{text}</p>
-  </button>
 );
 
 const getExpirationDate = (
@@ -59,8 +40,7 @@ const IngredientDetail = ({
   setIsDeleteOpen,
   setIsOpen,
 }: IngredientDetailProps) => {
-  const IconComponent =
-    Object.values(CATEGORY_INFO)[selectedIngredient.categoryId - 1].icon;
+  const IconComponent = CATEGORY_ICON_MAPPER[selectedIngredient.categoryId];
   const [ingredient, setIngredient] = useState<Ingredient>(selectedIngredient);
   const { data, isLoading, refetch } = useAuth();
 
@@ -159,18 +139,22 @@ const IngredientDetail = ({
       </div>
 
       <div className="flex justify-between w-full gap-2">
-        <ActionButton
-          icon={DeleteIcon}
-          text="제거"
-          className="w-full"
+        <DamulButton
+          variant="negative"
+          className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
           onClick={handleDeleteClick}
-        />
-        <ActionButton
+        >
+          <DeleteIcon />
+          <p className="text-xs pc:text-sm text-white">제거</p>
+        </DamulButton>
+        <DamulButton
+          variant="positive"
           onClick={handleSaveClick}
-          icon={SaveIcon}
-          text="저장"
-          className="w-full"
-        />
+          className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
+        >
+          <SaveIcon />
+          <p className="text-xs pc:text-sm text-white">저장</p>
+        </DamulButton>
       </div>
     </div>
   );

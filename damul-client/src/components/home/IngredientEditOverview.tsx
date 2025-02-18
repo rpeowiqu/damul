@@ -12,7 +12,7 @@ const IngredientEditOverview = ({ onClose }: IngredientEditOverviewProps) => {
 
   return (
     <div
-      className={`fixed rounded-t-3xl w-full h-48 p-5 flex flex-col gap-5 bottom-5 max-w-[600px] bg-white border-4 border-positive-200`}
+      className={`fixed rounded-t-3xl w-full h-48 p-5 flex flex-col gap-5 bottom-5 max-w-[600px] bg-white border-4 border-positive-200 z-40`}
     >
       <p className="text-lg flex gap-2">
         <span>선택된 식자재 개수 : </span>

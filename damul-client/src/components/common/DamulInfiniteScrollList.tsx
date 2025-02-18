@@ -19,7 +19,7 @@ interface DamulInfiniteScrollListProps<T> {
 const DamulInfiniteScrollList = <T,>({
   queryKey,
   fetchFn,
-  enabled = false,
+  enabled,
   initPage = 0,
   renderItems,
   skeleton,
@@ -38,7 +38,7 @@ const DamulInfiniteScrollList = <T,>({
       enabled,
       initialPageParam: initPage,
       getNextPageParam: (lastPage) =>
-        lastPage.meta.hasNext ? lastPage.meta.nextCursor : undefined,
+        lastPage.meta?.hasNext ? lastPage.meta.nextCursor : undefined,
     });
 
   useEffect(() => {
@@ -53,7 +53,6 @@ const DamulInfiniteScrollList = <T,>({
     <>
       {hasData ? (
         <div className={className}>
-          <p>{data?.pages.length}</p>
           {data?.pages.map((page, pageIndex) =>
             page.data.map((item, index) =>
               renderItems(item, index + pageIndex * page.data.length),

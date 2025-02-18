@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Image from "../common/Image";
 import ReportButton from "../common/ReportButton";
 import ReplyItem from "./ReplyItem";
@@ -53,28 +54,35 @@ const CommentItem = ({
 
   return (
     <div className="py-3">
-      <div className="flex items-center gap-2">
-        <Image
-          src={comment.profileImageUrl}
-          className="w-10 h-10 rounded-full"
-        />
-        <div className="flex flex-1 justify-between pr-2">
-          <p className="font-semibold text-sm">{comment.nickname}</p>
-          <p className="text-xs text-neutral-500">
-            {formatDate(comment.createdAt)}
-          </p>
-        </div>
+      <div className="flex items-center justify-between gap-2 px-2">
+        <Link
+          to={`/profile/${comment.userId}/info`}
+          className="flex items-center gap-2"
+        >
+          <Image
+            src={comment.profileImageUrl}
+            className="w-8 h-8 pc:w-10 pc:h-10 rounded-full"
+          />
+          <p className="font-semibold text-xs pc:text-sm">{comment.nickname}</p>
+        </Link>
+        <p className="text-xxs pc:text-xs text-neutral-500">
+          {formatDate(comment.createdAt)}
+        </p>
       </div>
-      <p className="text-sm ml-12 pb-1">{comment.comment}</p>
-      <div className="flex justify-start gap-2 ml-12 cursor-pointer text-neutral-500">
-        <ReportButton className="flex items-center gap-1">
-          <p className="text-xs">신고</p>
+      <p className="text-xs pc:text-sm ml-12 pb-1">{comment.comment}</p>
+      <div className="flex justify-start gap-2 ml-12 cursor-pointer text-xxs pc:text-xs text-neutral-500">
+        <ReportButton
+          contentId={parseInt(id)}
+          targetId={comment.userId}
+          className="flex items-center gap-1"
+        >
+          <p>신고</p>
         </ReportButton>
         <div
           className="flex items-center gap-1"
           onClick={() => onReply(comment)}
         >
-          <p className="text-xs">답글</p>
+          <p>답글</p>
         </div>
         {data?.data.id === comment.userId && (
           <div
@@ -83,7 +91,7 @@ const CommentItem = ({
               deleteComment(comment.id);
             }}
           >
-            <p className="text-xs">삭제</p>
+            <p>삭제</p>
           </div>
         )}
       </div>

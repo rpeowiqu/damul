@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import IngredientButton from "./IngredientButton";
 import { STORAGE_ICON, STORAGE_TYPE } from "@/constants/storage";
 import {
@@ -16,9 +17,9 @@ import { initialIngrdientItem } from "@/constants/initialData";
 interface IngredientStorageContainerProps {
   title: keyof typeof STORAGE_TYPE | keyof typeof ITEM_STATUS;
   items: Ingredient[];
-  onEdit: boolean;
-  setExpiringSoonItems: React.Dispatch<React.SetStateAction<Ingredient[]>>;
-  setIngredientData: React.Dispatch<React.SetStateAction<IngredientData>>;
+  onEdit?: boolean;
+  setExpiringSoonItems?: React.Dispatch<React.SetStateAction<Ingredient[]>>;
+  setIngredientData?: React.Dispatch<React.SetStateAction<IngredientData>>;
 }
 
 const COLUMN_SIZE = {
@@ -74,7 +75,7 @@ const IngredientStorageContainer = ({
       ),
     );
 
-    setIngredientData((prevData) => {
+    setIngredientData?.((prevData) => {
       const storage = updatedIngredient.storage as
         | "freezer"
         | "fridge"
@@ -90,7 +91,7 @@ const IngredientStorageContainer = ({
     });
 
     if (updatedIngredient.expirationDate <= EXPIRINGSOON_DAY) {
-      setExpiringSoonItems((prevItems) =>
+      setExpiringSoonItems?.((prevItems) =>
         prevItems?.map((item) =>
           item.userIngredientId === updatedIngredient.userIngredientId
             ? updatedIngredient
@@ -107,7 +108,7 @@ const IngredientStorageContainer = ({
       ),
     );
 
-    setIngredientData((prevData) => {
+    setIngredientData?.((prevData) => {
       const storage = deletedIngredient.storage as
         | "freezer"
         | "fridge"
@@ -121,7 +122,7 @@ const IngredientStorageContainer = ({
     });
 
     if (deletedIngredient.expirationDate < 7) {
-      setExpiringSoonItems((prevItems) =>
+      setExpiringSoonItems?.((prevItems) =>
         prevItems?.filter(
           (item) =>
             item.userIngredientId !== deletedIngredient.userIngredientId,
@@ -150,7 +151,9 @@ const IngredientStorageContainer = ({
   }, []);
 
   return (
-    <div className="pt-[10px] my-3 border border-normal-100 rounded-xl min-h-[100px]">
+    <div
+      className={`pt-[10px] my-3 border border-normal-100 rounded-xl min-h-[100px]`}
+    >
       <div className="flex items-center gap-1 px-2 text-sm">
         <IconComponent />
         <p
@@ -166,12 +169,13 @@ const IngredientStorageContainer = ({
       ) : (
         <>
           <div
-            className={`grid grid-cols-2 gap-2 p-2 mt-2 mb-3 pc:grid-cols-5 sm:grid-cols-4 xs:grid-cols-3 ${!isExpanded && "overflow-y-hidden h-[70px]"}`}
+            className={`grid grid-cols-2 gap-2 p-2 mt-2 pc:grid-cols-5 sm:grid-cols-4 xs:grid-cols-3 ${!isExpanded && "overflow-y-hidden h-[70px]"}`}
           >
             {ingredients.map((ingredient, idx) => {
               return (
                 <IngredientButton
                   key={idx}
+                  title={title}
                   variant={ingredient.categoryId}
                   name={ingredient.ingredientName}
                   quantity={ingredient.ingredientQuantity}
@@ -183,6 +187,7 @@ const IngredientStorageContainer = ({
               );
             })}
           </div>
+
           <button
             onClick={handleOnClick}
             className={`${isOverColumnLimit ? "block" : "hidden"}
