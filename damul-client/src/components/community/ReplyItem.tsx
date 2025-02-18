@@ -49,7 +49,7 @@ const ReplyItem = ({
   }
 
   return (
-    <div className="ml-6 mt-2 bg-neutral-100 p-2 rounded-md">
+    <div className="ml-6 mt-2 bg-neutral-100 p-2 pr-4 rounded-md">
       <div className="flex items-center justify-between gap-2">
         <Link
           to={`/profile/${reply.userId}/info`}
@@ -65,7 +65,9 @@ const ReplyItem = ({
           {formatDate(reply.createdAt)}
         </p>
       </div>
-      <p className="text-xs pc:text-sm ml-12 pb-1">{reply.comment}</p>
+      <p className="text-xs pc:text-sm ml-12 pb-1 whitespace-pre-wrap break-words break-all">
+        {reply.comment}
+      </p>
       <div className="flex justify-start gap-2 ml-12 cursor-pointer text-xxs pc:text-xs text-neutral-500">
         <ReportButton className="flex items-center gap-1">
           <p>신고</p>

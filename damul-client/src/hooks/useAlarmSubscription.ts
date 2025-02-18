@@ -8,9 +8,9 @@ interface ExtendedOptions extends SockJS.Options {
 }
 
 interface AlarmSubscription {
-  userId: string;
-  onAlarmReceived: (message: any) => void;
-  setAlarmCnt: (count: number) => void;
+  userId?: string;
+  onAlarmReceived?: (message: any) => void;
+  setAlarmCnt?: (count: number) => void;
 }
 
 export const useAlarmSubscription = ({
@@ -24,7 +24,9 @@ export const useAlarmSubscription = ({
   const fetchUnreadAlarmCnt = async () => {
     try {
       const response = await getUnreadAlarmCnt();
-      setAlarmCnt(response.data.unReadMessageNum);
+      if (setAlarmCnt) {
+        setAlarmCnt(response.data.unReadMessageNum);
+      }
     } catch (error) {
       console.log(error);
     }
