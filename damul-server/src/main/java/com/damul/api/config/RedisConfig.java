@@ -3,6 +3,7 @@ package com.damul.api.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -67,6 +68,11 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplateObject() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
+
+        // ObjectMapper 설정
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // LocalDateTime을 위한 모듈 추가
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
         // Object JSON 직렬화를 위한 설정
         redisTemplate.setKeySerializer(new StringRedisSerializer());

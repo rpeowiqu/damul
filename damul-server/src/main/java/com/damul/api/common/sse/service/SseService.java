@@ -45,7 +45,7 @@ public class SseService {
         });
 
         // Redis에 연결 정보 저장
-        EmitterInfo emitterInfo = new EmitterInfo(userId, LocalDateTime.now());
+        EmitterInfo emitterInfo = new EmitterInfo(userId, LocalDateTime.now().toString());
         redisTemplate.opsForValue().set(redisKey, emitterInfo, TIMEOUT, TimeUnit.MILLISECONDS);
 
         // 로컬 맵에도 저장
