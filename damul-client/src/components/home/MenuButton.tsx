@@ -23,7 +23,7 @@ const MenuButton = ({ onClick }: MenuButtonProps) => {
   });
 
   return (
-    <div className="fixed w-full flex justify-end bottom-0 max-w-[600px] bg-white">
+    <div className="fixed w-full flex justify-end bottom-0 max-w-[600px] bg-white z-50">
       <div ref={menuRef} className="relative">
         <div className="absolute z-40 flex flex-col items-center w-12 bottom-20 right-8">
           <div className="flex justify-center w-12 h-12">

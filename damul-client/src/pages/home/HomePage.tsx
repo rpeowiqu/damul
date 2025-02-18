@@ -128,7 +128,7 @@ const HomePage = () => {
           if (storage === "expiringSoon") return null;
 
           return (
-            <div className="relative" key={`${storage}${Math.random()}`}>
+            <div className="relative w-full" key={`${storage}${Math.random()}`}>
               {(storage === "freezer" || storage === "fridge") && (
                 <RefrigeratorDoor />
               )}

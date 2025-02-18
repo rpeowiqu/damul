@@ -151,7 +151,9 @@ const IngredientStorageContainer = ({
   }, []);
 
   return (
-    <div className="pt-[10px] my-3 border border-normal-100 rounded-xl min-h-[100px]">
+    <div
+      className={`pt-[10px] my-3 border border-normal-100 rounded-xl min-h-[100px]`}
+    >
       <div className="flex items-center gap-1 px-2 text-sm">
         <IconComponent />
         <p
