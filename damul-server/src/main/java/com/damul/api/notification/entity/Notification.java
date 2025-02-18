@@ -42,6 +42,7 @@ public class Notification {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Transient
     private String postType;
 
     public void updateCreatedAt(LocalDateTime createdAt) {

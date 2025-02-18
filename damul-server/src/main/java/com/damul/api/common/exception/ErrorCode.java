@@ -98,7 +98,9 @@ public enum ErrorCode {
     USER_BADGE_NOT_FOUND(HttpStatus.NOT_FOUND, "획득하지 않은 뱃지입니다."),
     INVALID_PAGE_SIZE(HttpStatus.BAD_REQUEST, "유효하지 않은 페이지 크기입니다."),
     INVALID_CURSOR(HttpStatus.BAD_REQUEST, "유효하지 않은 커서값입니다."),
-    PROFILE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "프로필 접근 권한이 없습니다.");
+    PROFILE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "프로필 접근 권한이 없습니다."),
+
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "올바르지 않은 요처입니다.");
 
 
     private final HttpStatus status;
