@@ -221,7 +221,7 @@ const ChattingRoomPage = () => {
         <div ref={messagesEndRef} />
       </div>
       <div className="fixed w-full pc:w-[598px] bottom-16 p-2 pc:p-4 border-t bg-white flex items-end">
-        <label
+        {/* <label
           htmlFor="image-upload"
           className="bg-neutral-200 p-1 pc:p-2 rounded-full cursor-pointer mr-2"
         >
@@ -235,7 +235,7 @@ const ChattingRoomPage = () => {
           className="hidden"
           accept="image/*"
           onChange={handleImageUpload}
-        />
+        /> */}
         {prevImage ? (
           <div className="flex-1 border-1 p-3 rounded-lg relative">
             <div className="relative h-24 w-24">
