@@ -611,7 +611,7 @@ public class RecipeServiceImpl implements RecipeService {
         comment.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         RecipeComment savedComment = recipeCommentRepository.save(comment);
-        notificationService.createCommentNotification(recipe.getUser(), user, comment.getId(), "recipe");
+        notificationService.createCommentNotification(recipe.getUser(), user, recipeId, "recipe");
         return new CreateResponse(savedComment.getId());
     }
 

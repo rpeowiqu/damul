@@ -13,6 +13,7 @@ import com.damul.api.notification.dto.response.NotificationResponse;
 import com.damul.api.notification.entity.Notification;
 import com.damul.api.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final SimpMessageSendingOperations messagingTemplate;
@@ -72,6 +74,8 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void createCommentNotification(User receiver, User sender, Integer postId, String type) {
+        log.info("알림 생성 타입: {}", type);
+        if(receiver.getId() == sender.getId()) return;
         Notification notification = Notification.create(
                 receiver,
                 sender,
@@ -82,6 +86,7 @@ public class NotificationServiceImpl implements NotificationService {
         );
         notification.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         notificationRepository.save(notification);
+        log.info("저장 완료 타입: {}", type);
         sendNotification(receiver.getId(), NotificationResponse.from(notification));
     }
 
@@ -104,6 +109,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void createLikeNotification(User receiver, User sender, Integer postId, String type) {
+        if(receiver.getId() == sender.getId()) return;
         Notification notification = Notification.create(
                 receiver,
                 sender,
@@ -122,6 +128,7 @@ public class NotificationServiceImpl implements NotificationService {
                 "/sub/notification/" + userId,
                 notification
         );
+        log.info("알림 발송 타입: {}", notification.getPostType());
     }
 
     @Override
