@@ -14,8 +14,6 @@ import com.damul.api.config.service.S3Service;
 import com.damul.api.main.dto.response.HomeSuggestedResponse;
 import com.damul.api.main.dto.response.RecipeTagList;
 import com.damul.api.main.dto.response.SuggestedRecipeList;
-import com.damul.api.main.entity.NormalizedIngredient;
-import com.damul.api.main.repository.NormalizedIngredientRepository;
 import com.damul.api.notification.service.NotificationService;
 import com.damul.api.recipe.dto.request.RecipeRequest;
 import com.damul.api.recipe.dto.response.*;
@@ -36,7 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -54,7 +51,6 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeBookmarkRepository bookmarkRepository;
     private final RecipeLikeRepository likeRepository;
     private final S3Service s3Service;
-    private final NormalizedIngredientRepository normalizedIngredientRepository;
     private final IngredientNormalizerUtil ingredientNormalizerUtil;
 
     private static final String VIEW_COUNT_KEY = "recipe:view";
@@ -177,7 +173,6 @@ public class RecipeServiceImpl implements RecipeService {
                             .recipeId(recipe.getRecipeId())
                             .title(recipe.getTitle())
                             .thumbnailUrl(recipe.getThumbnailUrl())
-                            .recipeTags(recipeTags)
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -361,24 +356,13 @@ public class RecipeServiceImpl implements RecipeService {
                 String normalizedName = ingredientNormalizerUtil.normalize(ingredientList.getName());
                 log.info("재료 정규화 결과 - 원본: {}, 정규화: {}", ingredientList.getName(), normalizedName);
 
-                // 정규화된 재료 조회 또는 생성
-                NormalizedIngredient normalizedIngredient = normalizedIngredientRepository
-                        .findByName(normalizedName)
-                        .orElseGet(() -> {
-                            log.info("새로운 정규화 재료 등록: {}", normalizedName);
-                            NormalizedIngredient newIngredient = NormalizedIngredient.builder()
-                                    .name(normalizedName)
-                                    .build();
-                            return normalizedIngredientRepository.save(newIngredient);
-                        });
-
-                // 레시피 재료 생성
+                // RecipeIngredient 생성 부분 수정
                 RecipeIngredient ingredient = RecipeIngredient.builder()
                         .recipe(recipe)
                         .ingredientName(ingredientList.getName())
                         .amount(ingredientList.getAmount())
                         .unit(ingredientList.getUnit())
-                        .normalizedIngredient(normalizedIngredient)
+                        .normalizedIngredientName(normalizedName)  // 정규화된 이름 추가
                         .build();
 
                 ingredients.add(ingredient);

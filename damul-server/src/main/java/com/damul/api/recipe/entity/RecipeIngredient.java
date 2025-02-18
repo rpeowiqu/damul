@@ -1,6 +1,5 @@
 package com.damul.api.recipe.entity;
 
-import com.damul.api.main.entity.NormalizedIngredient;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,19 +29,17 @@ public class RecipeIngredient {
     @Column(name = "unit", length = 10)
     private String unit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "normalized_ingredient_id")
-    private NormalizedIngredient normalizedIngredient;
-
+    @Column(name = "normalized_ingredient_name")
+    private String normalizedIngredientName;
 
     @Builder
     public RecipeIngredient(Recipe recipe, String ingredientName,
                             String amount, String unit,
-                            NormalizedIngredient normalizedIngredient) {
+                            String normalizedIngredientName) {
         this.recipe = recipe;
         this.ingredientName = ingredientName;
         this.amount = amount;
         this.unit = unit;
-        this.normalizedIngredient = normalizedIngredient;
+        this.normalizedIngredientName = normalizedIngredientName;
     }
 }

@@ -79,12 +79,18 @@ public class UserReceiptServiceImpl implements UserReceiptService {
                     // 카테고리 카운트 증가
                     categoryCount.merge(item.getCategoryId(), 1, Integer::sum);
 
+                    // 재료명 정규화 추가
+                    String normalizedName = ingredientNormalizerUtil.normalize(item.getIngredientName());
+                    log.info("재료 정규화 결과 - 원본: {}, 정규화: {}",
+                            item.getIngredientName(), normalizedName);
+
                     return UserIngredient.builder()
-                            .userReciept(savedReceipt)
+                            .userReceipt(savedReceipt)
                             .categoryId(item.getCategoryId())
                             .ingredientQuantity(100)
                             .ingredientUp(timeZoneConverter.convertUtcToSeoul(request.getPurchaseAt().atStartOfDay()))
                             .ingredientName(item.getIngredientName())
+                            .normalizedIngredientName(normalizedName)  // 정규화된 이름 추가
                             .expirationDate(item.getExpirationDate().atStartOfDay())
                             .ingredientStorage(item.getIngredientStorage())
                             .price(item.getProductPrice())

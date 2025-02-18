@@ -206,7 +206,7 @@ public class BadgeService {
         );
 
         for (Map.Entry<Integer, String> entry : categoryBadges.entrySet()) {
-            Integer count = userIngredientRepository.countByCategoryIdAndUserReciept_User_Id(entry.getKey(), user.getId());
+            Integer count = userIngredientRepository.countByCategoryIdAndUserReceipt_User_Id(entry.getKey(), user.getId());
 
             short[] standards = {1, 10, 50, 100, 500};
             for (short standard : standards) {
