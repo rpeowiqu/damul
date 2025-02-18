@@ -9,7 +9,7 @@ const PostMarketMemberCnt = ({
   tempChatSize,
   setTempChatSize,
 }: PostMarketMemberCntProps) => {
-  const MAX_COUNT = 100;
+  const MAX_COUNT = 20;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);

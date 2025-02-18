@@ -7,23 +7,12 @@ import { getSearchedChattingList } from "@/service/chatting";
 import ChattingListInfiniteScroll from "@/components/chat/ChattingListInfiniteScroll";
 import ChattingListItem from "@/components/chat/ChattingListItem";
 import { ChattingItem } from "@/types/chatting";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const ChattingSearchResultPage = () => {
   const navigate = useNavigate();
   const [resultCnt, setResultCnt] = useState(0);
   const [searchParams, setSearchParams] = useSearchParams();
   const keyword = searchParams.get("keyword") || "";
-
-  const [sortType, setSortType] = useState("all");
 
   const fetchItems = async (pageParam: {
     cursor: number;
@@ -36,8 +25,10 @@ const ChattingSearchResultPage = () => {
         cursor: pageParam.cursor ?? 0,
         size: 10,
       });
+      if (response.status === 204) {
+        return { data: [], meta: { nextCursor: 0, hasNext: 0 } };
+      }
       setResultCnt(response?.data.count);
-
       return response?.data;
     } catch (error) {
       console.log(error);
@@ -60,39 +51,6 @@ const ChattingSearchResultPage = () => {
             <p>에 대한</p>
             {resultCnt}개의 검색 결과
           </div>
-          <Select
-            value={sortType}
-            onValueChange={(value) => setSortType(value)}
-          >
-            <SelectTrigger className="w-40 h-8 text-xs pc:text-sm">
-              <SelectValue placeholder="채팅 보기" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel className="text-xs pc:text-sm">
-                  채팅 보기
-                </SelectLabel>
-                <SelectItem
-                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500 text-xs pc:text-sm"
-                  value="all"
-                >
-                  전체 채팅
-                </SelectItem>
-                <SelectItem
-                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500 text-xs pc:text-sm"
-                  value="normal"
-                >
-                  일반 채팅
-                </SelectItem>
-                <SelectItem
-                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500 text-xs pc:text-sm"
-                  value="market"
-                >
-                  공동구매/나눔 채팅
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
         </div>
       </div>
       <ChattingListInfiniteScroll
@@ -103,6 +61,9 @@ const ChattingSearchResultPage = () => {
         )}
         skeleton={
           <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
+        }
+        noContent={
+          <p className="text-center text-normal-200">검색 결과가 없습니다. </p>
         }
       />
       <PostButton to="/chatting/create" icon={<PlusIcon />} />

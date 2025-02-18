@@ -72,7 +72,7 @@ const AuthorInfo = ({
           ? await deleteRecipe({ recipeId: id })
           : await deletePost({ postId: id });
 
-      navigate("/community/recipe");
+      navigate(`/community/${type}`);
       console.log(response);
     } catch (error) {
       console.log(error);
