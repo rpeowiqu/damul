@@ -6,6 +6,7 @@ import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
+import com.damul.api.common.scroll.util.ScrollUtil;
 import com.damul.api.mypage.dto.response.*;
 import com.damul.api.mypage.entity.Badge;
 import com.damul.api.mypage.entity.UserBadge;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -141,27 +143,15 @@ public class MyPageServiceImpl implements MyPageService {
         validateAccessPermission(targetUser, currentUser);
         validateSortType(sortType);
 
-        List<RecipeList> recipes = recipeRepository.findMyRecipes(userId, cursor, size, sortType);
+        List<RecipeList> recipes = recipeRepository.findMyRecipes(userId, cursor, size + 1, sortType);
+        log.info("recipes Size: {}", recipes.size());
 
-        if (recipes.isEmpty()) {
-            return new ScrollResponse<>(
-                    Collections.emptyList(),
-                    new CursorPageMetaInfo(0, false)
-            );
-        }
-
-        int nextCursor = recipes.get(recipes.size() - 1).getId();
-        boolean hasNext = recipeRepository.existsByUserIdAndIdLessThan(userId, nextCursor);
-
-        return new ScrollResponse<>(
-                recipes,
-                new CursorPageMetaInfo(nextCursor, hasNext)
-        );
+        return ScrollUtil.createScrollResponse(recipes, cursor, size);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollResponse<RecipeList> getBookmarkedRecipes(int userId, int cursor, int size, String sortType, UserInfo currentUser) {
+    public ScrollResponse<MyBookmarkList> getBookmarkedRecipes(int userId, int cursor, int size, String sortType, UserInfo currentUser) {
         log.info("서비스: 마이페이지 북마크 조회 시작 - userId: {}", userId);
 
         User targetUser = userRepository.findById(userId)
@@ -170,22 +160,15 @@ public class MyPageServiceImpl implements MyPageService {
         validateAccessPermission(targetUser, currentUser);
         validateSortType(sortType);
 
-        List<RecipeList> bookmarks = bookmarkRepository.findBookmarkedRecipes(userId, cursor, size, sortType);
 
-        if (bookmarks.isEmpty()) {
-            return new ScrollResponse<>(
-                    Collections.emptyList(),
-                    new CursorPageMetaInfo(0, false)
-            );
-        }
+        // 커서가 0이 아닐 경우 커서에 해당하는 북마크를 조회하여 정렬 기준값을 가져옴
+        LocalDateTime cursorCreatedAt = LocalDateTime.now();
+        int cursorViewCnt = 0;
+        int cursorLikeCnt = 0;
 
-        int nextCursor = bookmarks.get(bookmarks.size() - 1).getId();
-        boolean hasNext = bookmarkRepository.existsByUserIdAndIdLessThan(userId, nextCursor);
+        List<MyBookmarkList> bookmarks = bookmarkRepository.findBookmarkedRecipes(userId, cursor, size + 1, sortType);
 
-        return new ScrollResponse<>(
-                bookmarks,
-                new CursorPageMetaInfo(nextCursor, hasNext)
-        );
+        return ScrollUtil.createScrollResponse(bookmarks, cursor, size);
     }
 
     private double calculateRankPercentage(int badgeId, int userLevel) {
