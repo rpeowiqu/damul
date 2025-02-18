@@ -257,11 +257,15 @@ public class PriceAnalysisService {
             for (JsonNode item : allItems) {
                 String yearMonth = item.get("yyyy").asText() + "-"
                         + item.get("regday").asText().split("/")[0];
+
+                LocalDate date = LocalDate.parse(yearMonth + "/01", DateTimeFormatter.ofPattern("yyyy-MM/dd"));
+                String periodKey = date.format(dateFormatter);
+
                 String priceStr = item.get("price").asText().replace(",", "");
 
                 try {
                     int price = Integer.parseInt(priceStr);
-                    monthlyPriceMap.computeIfAbsent(yearMonth, k -> new ArrayList<>()).add(price);
+                    monthlyPriceMap.computeIfAbsent(periodKey, k -> new ArrayList<>()).add(price);
                 } catch (NumberFormatException e) {
                     log.warn("월별 가격 변환 실패: {}", priceStr);
                 }
@@ -289,13 +293,13 @@ public class PriceAnalysisService {
                 if (itemDate.isAfter(LocalDate.now().minusMonths(1))) {
                     // 해당 날짜가 속한 주의 시작일 계산
                     LocalDate weekStart = itemDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-                    String weekKey = weekStart.format(DateTimeFormatter.ISO_LOCAL_DATE);
+                    String periodKey = weekStart.format(dateFormatter);
 
                     String priceStr = item.get("price").asText().replace(",", "");
 
                     try {
                         int price = Integer.parseInt(priceStr);
-                        weeklyPriceMap.computeIfAbsent(weekKey, k -> new ArrayList<>()).add(price);
+                        weeklyPriceMap.computeIfAbsent(periodKey, k -> new ArrayList<>()).add(price);
                     } catch (NumberFormatException e) {
                         log.warn("주간 가격 변환 실패: {}", priceStr);
                     }
