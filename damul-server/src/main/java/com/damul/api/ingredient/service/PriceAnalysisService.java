@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -34,6 +35,9 @@ public class PriceAnalysisService {
     private static final String REDIS_KEY_PATTERN = "price:%s:itemCode:%s:itemCategoryCode:%s:date:%s:ecoFlag:%s";
     private static final String BATCH_CACHE_KEY = "batch:price:%s:%s:%s:%s";  // 배치용 캐시 키
     private static final Duration CACHE_TTL = Duration.ofHours(24);
+    private static final DateTimeFormatter MONTHLY_FORMATTER = DateTimeFormatter.ofPattern("yy년 MM월");
+    private static final DateTimeFormatter WEEKLY_FORMATTER = DateTimeFormatter.ofPattern("yy년 MM월 W주");
+    private static LocalDate now = LocalDate.now();
 
     public IngredientPriceResponse analyzePrices(String itemCode, String period, LocalDate currentDate, String kindCode, boolean ecoFlag) {
         // 먼저 배치 처리된 데이터 확인
@@ -117,6 +121,8 @@ public class PriceAnalysisService {
         List<PriceData> prices = new ArrayList<>();
 
         JsonNode itemsNode = rootNode.path("item");
+        // 현재 날짜 기준
+        DateTimeFormatter dateFormatter = "monthly".equals(period) ? MONTHLY_FORMATTER : WEEKLY_FORMATTER;
 
         List<JsonNode> allItems = StreamSupport.stream(itemsNode.spliterator(), false)
                 .filter(item -> {
@@ -127,10 +133,23 @@ public class PriceAnalysisService {
                     return !priceStr.equals("-") && !priceStr.isEmpty();
                 })
                 .sorted((a, b) -> {
-                    String currentYear = LocalDate.now().getYear() + "";
-                    String dateA = currentYear + "-" + a.get("regday").asText();
-                    String dateB = currentYear + "-" + b.get("regday").asText();
-                    return dateB.compareTo(dateA);
+                    // 날짜 파싱
+                    String[] datePartsA = a.get("regday").asText().split("/");
+                    String[] datePartsB = b.get("regday").asText().split("/");
+
+                    int monthA = Integer.parseInt(datePartsA[0]);
+                    int monthB = Integer.parseInt(datePartsB[0]);
+
+                    // 연도 결정
+                    int yearA = now.getYear();
+                    int yearB = now.getYear();
+                    if (monthA > now.getMonthValue()) yearA--;
+                    if (monthB > now.getMonthValue()) yearB--;
+
+                    LocalDate dateA = LocalDate.of(yearA, monthA, Integer.parseInt(datePartsA[1]));
+                    LocalDate dateB = LocalDate.of(yearB, monthB, Integer.parseInt(datePartsB[1]));
+
+                    return dateA.compareTo(dateB);  // 옛날 날짜순
                 })
                 .collect(Collectors.toList());
 
@@ -139,16 +158,16 @@ public class PriceAnalysisService {
             Map<String, List<Integer>> monthlyPriceMap = new LinkedHashMap<>();
 
             for (JsonNode item : allItems) {
-                String currentYear = LocalDate.now().getYear() + "";
-                String yearMonth = currentYear + "-" + item.get("regday").asText().split("/")[0];
-                String priceStr = item.get("price").asText().replace(",", "");
+                String[] dateParts = item.get("regday").asText().split("/");
+                int month = Integer.parseInt(dateParts[0]);
+                int year = month > now.getMonthValue() ? now.getYear() - 1 : now.getYear();
 
-                try {
-                    int price = Integer.parseInt(priceStr);
-                    monthlyPriceMap.computeIfAbsent(yearMonth, k -> new ArrayList<>()).add(price);
-                } catch (NumberFormatException e) {
-                    log.warn("월별 가격 변환 실패: {}", priceStr);
-                }
+
+                LocalDate date = LocalDate.of(year, month, 1);
+                String periodKey = date.format(dateFormatter);
+                int price = Integer.parseInt(item.get("price").asText().replace(",", ""));
+
+                monthlyPriceMap.computeIfAbsent(periodKey, k -> new ArrayList<>()).add(price);
             }
 
             prices = monthlyPriceMap.entrySet().stream()
@@ -163,30 +182,30 @@ public class PriceAnalysisService {
                     .collect(Collectors.toList());
 
         } else if ("recent".equals(period)) {
-            // 주별 평균
+            // 최근 1개월 데이터만 필터링
+            LocalDate oneMonthAgo = now.minusMonths(1);
             Map<String, List<Integer>> weeklyPriceMap = new LinkedHashMap<>();
 
-            for (JsonNode item : allItems) {
-                String currentYear = LocalDate.now().getYear() + "";
-                String dateStr = item.get("regday").asText();
-                LocalDate itemDate = LocalDate.parse(currentYear + "-" + dateStr, DateTimeFormatter.ofPattern("yyyy-MM/dd"));
 
-                LocalDate oneMonthAgo = LocalDate.now().minusMonths(1);
+            for (JsonNode item : allItems) {
+                String[] dateParts = item.get("regday").asText().split("/");
+                int month = Integer.parseInt(dateParts[0]);
+                int day = Integer.parseInt(dateParts[1]);
+                int year = month > now.getMonthValue() ? now.getYear() - 1 : now.getYear();
+
+
+                LocalDate itemDate = LocalDate.of(year, month, day);
                 if (itemDate.isAfter(oneMonthAgo.minusDays(1))) {
                     LocalDate weekStart = itemDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-                    String weekKey = weekStart.format(DateTimeFormatter.ISO_LOCAL_DATE);
+                    int weekOfMonth = weekStart.get(WeekFields.ISO.weekOfMonth());
+                    String periodKey = weekStart.format(WEEKLY_FORMATTER);
 
-                    String priceStr = item.get("price").asText().replace(",", "");
 
-                    try {
-                        int price = Integer.parseInt(priceStr);
-                        weeklyPriceMap.computeIfAbsent(weekKey, k -> new ArrayList<>()).add(price);
-                    } catch (NumberFormatException e) {
-                        log.warn("주간 가격 변환 실패: {}", priceStr);
-                    }
+                    int price = Integer.parseInt(item.get("price").asText().replace(",", ""));
+
+                    weeklyPriceMap.computeIfAbsent(periodKey, k -> new ArrayList<>()).add(price);
                 }
             }
-
             prices = weeklyPriceMap.entrySet().stream()
                     .map(entry -> {
                         List<Integer> weekPrices = entry.getValue();
@@ -206,17 +225,28 @@ public class PriceAnalysisService {
     private List<PriceData> calculateNormalPrices(JsonNode dataNode, String period) {
         List<PriceData> prices = new ArrayList<>();
 
+        JsonNode itemsNode = dataNode.path("item");
+        DateTimeFormatter dateFormatter = "monthly".equals(period) ? MONTHLY_FORMATTER : WEEKLY_FORMATTER;
+
         // 전체 아이템을 날짜 순으로 정렬
-        List<JsonNode> allItems = StreamSupport.stream(dataNode.path("item").spliterator(), false)
+        List<JsonNode> allItems = StreamSupport.stream(itemsNode.spliterator(), false)
                 .filter(item -> {
-                    String priceStr = item.path("price").asText().trim();
-                    // "-" 또는 빈 문자열 제외
+                    String priceStr = Optional.ofNullable(item.get("price"))
+                            .map(JsonNode::asText)
+                            .orElse("")
+                            .replace(",", "");
                     return !priceStr.equals("-") && !priceStr.isEmpty();
                 })
                 .sorted((a, b) -> {
-                    String dateA = a.get("yyyy").asText() + "-" + a.get("regday").asText();
-                    String dateB = b.get("yyyy").asText() + "-" + b.get("regday").asText();
-                    return dateB.compareTo(dateA);
+                    // 날짜 파싱
+                    String dateStrA = a.get("yyyy").asText() + "-" + a.get("regday").asText();
+                    String dateStrB = b.get("yyyy").asText() + "-" + b.get("regday").asText();
+
+                    // 날짜 형식 추가
+                    LocalDate dateA = LocalDate.parse(dateStrA, DateTimeFormatter.ofPattern("yyyy-MM/dd"));
+                    LocalDate dateB = LocalDate.parse(dateStrB, DateTimeFormatter.ofPattern("yyyy-MM/dd"));
+
+                    return dateA.compareTo(dateB);  // 오래된 날짜순
                 })
                 .collect(Collectors.toList());
 
