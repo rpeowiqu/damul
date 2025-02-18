@@ -179,13 +179,11 @@ const HomeIngredientsRegisterPage = () => {
         }
       } catch (error: any) {
         console.error("데이터 처리 중 오류가 발생했습니다.", error);
-        alert("서버에서 받은 데이터를 처리하는 중 오류가 발생했습니다.");
       }
     };
 
-    eventSource.onerror = (error) => {
+    eventSource.onerror = (error: any) => {
       console.error("SSE 연결 중 오류가 발생했습니다.", error);
-      alert("서버와의 연결에서 문제가 발생했습니다.");
       eventSource.close();
     };
 
