@@ -53,4 +53,8 @@ public class UnreadMessageService {
         }
         return Integer.parseInt(count);
     }
+
+    public void removeUnreadCount(int userId) {
+        redisTemplate.delete(getKey(userId));
+    }
 }

@@ -88,6 +88,7 @@ public class AuthService {
             log.info("로그아웃 요청");
             Optional<Cookie> accessTokenCookie = cookieUtil.getCookie(request, "access_token");
 
+
             if (accessTokenCookie.isPresent()) {
                 String accessToken = accessTokenCookie.get().getValue();
                 String email = jwtTokenProvider.getUserEmailFromToken(accessToken);
