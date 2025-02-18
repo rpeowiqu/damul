@@ -7,12 +7,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(BASE_DIR, "models", "chatbot_model5.pth")
 TOKENIZER_PATH = os.path.join(BASE_DIR, "models", "tokenizer")
 
-print(os.path.exists(MODEL_PATH))
-print(os.path.exists(TOKENIZER_PATH))
-
-print("현재 작업 디렉토리:", os.getcwd())
-print("모델 파일 경로:", os.path.abspath(MODEL_PATH))
-
 # 디바이스 설정
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

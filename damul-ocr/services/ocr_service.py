@@ -49,10 +49,13 @@ def data_cleansing_9_to_g(ocr_res):
 
 # image resize
 def resize_image(image):
-    image = Image.fromarray(image)
-    width, height = image.size
+    print("원본 이미지 크기", image.size)
 
-    print("원본 이미지 크기", width, height)
+    # 이미지 회전
+    image = ImageOps.exif_transpose(image)
+    print("회전 이미지 크기", image.size)
+
+    width, height = image.size
 
     if width > height and width > MAX_IMAGE_SIZE_WIDTH:
         image = image.resize((MAX_IMAGE_SIZE_WIDTH, int(height/(width/MAX_IMAGE_SIZE_WIDTH))))
@@ -69,6 +72,8 @@ async def ocr_service_execution(image_bytes: bytes):
     image = Image.open(io.BytesIO(image_bytes))
     if image is None:   # 이미지 없을 때 error 반환
         return [0, 'image load fail']
+    if len(image_bytes) > 10 * 1024 * 1024: # 이미지 크기 10MB로 제한
+        return [0, 'error: image size exceeds 10MB']
     # 이미지 크기 변경
     image = resize_image(image)
 
