@@ -72,4 +72,14 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
         """, nativeQuery = true)
     LocalDateTime findLastMessageTimeByRoomId(@Param("roomId") int roomId);
 
+    @Query("SELECT COUNT(m) FROM ChatMessage m " +
+            "WHERE m.room.id = :roomId " +
+            "AND m.id > :lastReadId " +
+            "AND m.id <= :currentReadId")
+    int countUnreadMessagesInRoom(
+            @Param("roomId") int roomId,
+            @Param("lastReadId") int lastReadId,
+            @Param("currentReadId") int currentReadId
+    );
+
 }

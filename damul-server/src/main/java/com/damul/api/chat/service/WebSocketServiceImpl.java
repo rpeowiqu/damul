@@ -45,6 +45,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     private final S3Service s3Service;
     private final UserRepository userRepository;
     private final TimeZoneConverter timeZoneConverter;
+    private final UnreadMessageService unreadMessageService;
 
     @Override
     @Transactional
@@ -185,13 +186,33 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     @Transactional
     public void handleMessageRead(ChatReadRequest readRequest) {
-        ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(readRequest.getRoomId(), readRequest.getUserId()).get();
+        ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(
+                readRequest.getRoomId(),
+                readRequest.getUserId()
+        ).get();
 
+        // 이전에 읽지 않은 메시지 수 계산
+        int unreadCount = chatMessageRepository.countUnreadMessagesInRoom(
+                readRequest.getRoomId(),
+                member.getLastReadMessageId(),
+                readRequest.getMessageId()
+        );
+
+        // Redis의 안 읽은 메시지 수 감소
+        if (unreadCount > 0) {
+            unreadMessageService.decrementUnreadCount(readRequest.getUserId(), unreadCount);
+        }
+
+        // lastReadMessageId 업데이트
         member.updateLastReadMessageId(readRequest.getMessageId());
         chatRoomMemberRepository.save(member);
 
-        messagingTemplate.convertAndSend("/sub/chat/room/" + readRequest.getRoomId(),
-                new ReadStatus(readRequest.getRoomId(), readRequest.getUserId(), readRequest.getMessageId()));
+        // 업데이트된 전체 안 읽은 메시지 수 전송
+        int totalUnread = unreadMessageService.getUnreadCount(readRequest.getUserId());
+        messagingTemplate.convertAndSend(
+                "/sub/chat/" + readRequest.getUserId() + "/count",
+                totalUnread
+        );
     }
 
     private ChatRoom getChatRoom(int roomId) {
@@ -203,12 +224,13 @@ public class WebSocketServiceImpl implements WebSocketService {
         List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(message.getRoom().getId());
         for (ChatRoomMember member : members) {
             if (member.getUser().getId() != message.getSender().getId()) {
-                int unreadCount = chatMessageRepository.countUnreadMessages(
-                        message.getRoom().getId(),
-                        member.getLastReadMessageId()
-                );
+                // Redis에 안 읽은 메시지 수 증가
+                unreadMessageService.incrementUnreadCount(member.getUser().getId());
+
+                // 웹소켓으로 업데이트된 카운트 전송
+                int unreadCount = unreadMessageService.getUnreadCount(member.getUser().getId());
                 messagingTemplate.convertAndSend(
-                        "/sub/chat/unread/" + member.getUser().getId(),
+                        "/sub/chat/" + member.getUser().getId() + "/count",
                         unreadCount
                 );
             }

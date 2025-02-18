@@ -1,5 +1,6 @@
 package com.damul.api.user.repository;
 
+import com.damul.api.admin.dto.response.AdminUserList;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.auth.entity.type.Role;
@@ -73,4 +74,26 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT u.accessRange FROM User u WHERE u.id = :userId")
     AccessRange findAccessRangeById(@Param("userId") int userId);
+
+    @Modifying
+    @Query("UPDATE User u SET u.reportCount = u.reportCount + 1 WHERE u.id = :userId")
+    void incrementReportCount(@Param("userId") int userId);
+
+    @Query("""
+        SELECT new com.damul.api.admin.dto.response.AdminUserList(
+            u.id,
+            u.nickname,
+            u.email
+        )
+        FROM User u
+        WHERE (:searchType = 'nickname' AND u.nickname LIKE %:keyword%)
+            OR (:searchType = 'email' AND u.email LIKE %:keyword%)
+            OR (:searchType IS NULL OR :searchType = '')
+        """)
+    Page<AdminUserList> findUsersWithSearch(
+            @Param("searchType") String searchType,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
 }

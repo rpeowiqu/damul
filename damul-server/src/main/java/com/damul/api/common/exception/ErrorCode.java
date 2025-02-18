@@ -106,7 +106,9 @@ public enum ErrorCode {
     PROFILE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "프로필 접근 권한이 없습니다."),
     BOOKMARK_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 북마크입니다." ),
 
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, "올바르지 않은 요처입니다.");
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "올바르지 않은 요청입니다."),
+    REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 신고입니다."),
+    INVALID_REPORT_STATUS(HttpStatus.BAD_REQUEST, "올바르지 않은 신고 설정입니다.");
 
 
     private final HttpStatus status;
