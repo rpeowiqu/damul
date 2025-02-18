@@ -1,7 +1,6 @@
 package com.damul.api.main.controller;
 
 import com.damul.api.auth.dto.response.UserInfo;
-import com.damul.api.auth.entity.User;
 import com.damul.api.common.user.CurrentUser;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.HomeIngredientDetail;
@@ -13,11 +12,14 @@ import com.damul.api.receipt.dto.request.UserIngredientPost;
 import com.damul.api.receipt.service.UserReceiptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/home")
@@ -118,6 +120,19 @@ public class HomeController {
         homeService.deleteIngredient(userIngredientId, user.getId(), warningEnable);
         log.info("유저 식자재 삭제 성공");
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> handleImageUpload(
+            @RequestParam("file") MultipartFile file,
+            @CurrentUser UserInfo user
+    ) {
+        log.info("컨트롤러: 이미지 업로드 시작 - userId: {}", user.getId());
+
+        UserIngredientPost ocrResult = null; /*homeService.processImage(file, user);*/
+
+        log.info("컨트롤러: 이미지 업로드 완료 - userId: {}", user.getId());
+        return ResponseEntity.ok().body(Map.of("result", ocrResult));
     }
 
 }
