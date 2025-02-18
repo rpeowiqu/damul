@@ -75,6 +75,7 @@ public class AuthService {
                 .id(u.getId())
                 .nickname(u.getNickname())
                 .warningEnabled(u.isWarningEnabled())
+                .role(u.getRole())
                 .build())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
 

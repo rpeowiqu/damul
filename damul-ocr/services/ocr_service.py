@@ -18,14 +18,25 @@ DIGIT_REGEX = re.compile(r'\d')
 LAST_NINE_REGEX = re.compile(r'(9)(?!.*\d)')
 
 # 이미지 최대 크기
-MAX_IMAGE_SIZE_WIDTH = 1000
-MAX_IMAGE_SIZE_HEIGHT = 1000
+MAX_IMAGE_SIZE_WIDTH = 960
+MAX_IMAGE_SIZE_HEIGHT = 960
 
 Image.MAX_IMAGE_PIXELS = None  # 이미지 크기 제한 해제
 
 # PaddleOCR 초기화
-ocr = PaddleOCR(lang='korean', use_mp=False)  # 'korean' 언어 설정
-
+ocr = PaddleOCR(
+    lang='korean',  # 'korean' 언어 설정
+    use_mp=True,   # 멀티 프로세싱 활성화 (CPU 최적화)
+    enable_mkldnn=True,  # Intel CPU 최적화 라이브러리
+    use_gpu=False,    # GPU 사용
+    gpu_id=0,   # 사용하려는 GPU ID
+    cpu_threads=10, # cpu에서 최대 사용 스레드 수
+    max_batch_size=10,   # 한 번에 처리할 수 있는 최대 배치 크기
+    rec_batch_num=6,    # 한 번에 처리할 배치 크기(6개의 텍스트 인식 요청을 동시에 처리 가능)
+    layout=False,   # 문서 레이아웃 분석
+    table=False,    # 표 인식
+    use_tensorrt=False  # tensorRT 최적화 (gpu 속도 향상)
+)
 
 # 9 -> g
 def data_cleansing_9_to_g(ocr_res):
@@ -47,9 +58,9 @@ def resize_image(image):
     width, height = image.size
 
     if width > height and width > MAX_IMAGE_SIZE_WIDTH:
-        image = image.resize((1000, int(height/(width/1000))))
+        image = image.resize((MAX_IMAGE_SIZE_WIDTH, int(height/(width/MAX_IMAGE_SIZE_WIDTH))))
     elif height >= width and height > MAX_IMAGE_SIZE_HEIGHT:
-        image = image.resize((int(width/(height/1000)), 1000))
+        image = image.resize((int(width/(height/MAX_IMAGE_SIZE_HEIGHT)), MAX_IMAGE_SIZE_HEIGHT))
 
     print("변경된 이미지 크기", image.size)
 
@@ -61,6 +72,8 @@ async def ocr_service_execution(image_bytes: bytes):
     image = Image.open(io.BytesIO(image_bytes))
     if image is None:   # 이미지 없을 때 error 반환
         return [0, 'image load fail']
+    if len(image_bytes) > 10 * 1024 * 1024: # 이미지 크기 10MB로 제한
+        return [0, 'error: image size exceeds 10MB']
     # 이미지 크기 변경
     image = resize_image(image)
 
