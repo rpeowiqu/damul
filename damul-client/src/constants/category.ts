@@ -195,3 +195,5 @@ export const CATEGORY_ICON_MAPPER: Record<
   9: VegetableIcon,
   10: EtcIcon,
 };
+
+export const CATEGORY_COUNT = Object.keys(CATEGORY_ID_MAPPER).length;

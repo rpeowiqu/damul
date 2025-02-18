@@ -20,7 +20,6 @@ export const getIngredientCategories = () => {
 };
 
 export const getPurchaseHistories = (year: number, month: number) => {
-  console.log("요청");
   const queryString = toQueryString({ year, month });
   return apiClient.get(`/receipts/calendar?${queryString}`);
 };

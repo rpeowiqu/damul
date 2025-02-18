@@ -1,11 +1,18 @@
-import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
+import {
+  CartesianGrid,
+  LabelList,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Input } from "@/components/ui/input";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import DamulButton from "@/components/common/DamulButton";
 import {
   KamisChartConfig,
@@ -28,41 +35,42 @@ import {
 } from "@/service/statistics";
 import {
   CATEGORY_COLOR_MAPPER,
+  CATEGORY_COUNT,
   CATEGORY_ICON_MAPPER,
   CATEGORY_ID_MAPPER,
-  CATEGORY_INFO,
+  CATEGORY_NAME_MAPPER,
 } from "@/constants/category";
 import { debounce } from "@/utils/optimize";
 
 const StatisticsTrendPage = () => {
   const [searchKeyword, setSearchKeyword] = useState<string>("");
-  const [period, setPeriod] = useState<"monthly" | "recent">("monthly");
-  const [categoryBit, setCategoryBit] = useState<number>(0);
-  const { data, isLoading } = useQuery<KamisIngredient[]>({
-    queryKey: ["kamisIngredients"],
-    queryFn: async () => {
-      try {
-        const response = await getKamisIngredients();
-        const list = response.data.ingredientsProductNameLists;
-        await handleKamisIngredientSelect(
-          list[Math.round(Math.random() * list.length)],
-        );
-        return list;
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    staleTime: 1000 * 60 * 60,
-    refetchOnWindowFocus: false,
-  });
-  const [chartData, setChartData] = useState<KamisChartData[]>([]);
+  const [periodText, setPeriodText] = useState<string>("");
+  const [period, setPeriod] = useState<"monthly" | "recent">("recent");
+  const [categoryBit, setCategoryBit] = useState<number>(
+    (1 << CATEGORY_COUNT) - 1,
+  );
+
+  const [selectedItem, setSelectedItem] = useState<KamisIngredient>();
   const [chartConfig, setChartConfig] = useState<KamisChartConfig>({
     price: {
       label: "",
       color: "",
     },
   });
-  const [isLoadingKamisData, setIsLoadingKamisData] = useState<boolean>(false);
+  const { data: kamisIngredientData, isLoading: isLoadingKamisIngredientData } =
+    useQuery<KamisIngredient[]>({
+      queryKey: ["kamisIngredients"],
+      queryFn: async () => {
+        try {
+          const response = await getKamisIngredients();
+          return response.data.ingredientsProductNameLists;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      staleTime: 1000 * 60 * 60,
+      refetchOnWindowFocus: false,
+    });
 
   const handleSelectCategory = (index: number) => {
     if (categoryBit & (1 << index)) {
@@ -72,47 +80,55 @@ const StatisticsTrendPage = () => {
     }
   };
 
-  const handleKamisIngredientSelect = async (item: KamisIngredient) => {
-    try {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+  const handleKamisIngredientSelect = (item: KamisIngredient) => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
-      setIsLoadingKamisData(true);
-      const response = await getKamisIngredientTrends({
-        period,
-        itemCode: item.itemCode,
-        kindCode: item.kindCode,
-        ecoFlag: item.ecoFlag,
-      });
-      const formattedChartData = response.data.priceDataList.map(
-        ({ period, price }: KamisChartData) => {
-          const [year, month] = period.split("-").map(Number);
-          return {
-            period: `${year % 100}년 ${month}월`,
-            price,
-          };
-        },
-      );
-
-      setChartData(formattedChartData);
-      setChartConfig({
-        price: {
-          label: `${item.itemName} (${item.unit})`,
-          color: CATEGORY_COLOR_MAPPER[item.categoryId],
-        },
-      });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoadingKamisData(false);
-    }
+    setSelectedItem(item);
+    setChartConfig({
+      price: {
+        label: `${item!.itemName} (${item!.unit})`,
+        color: CATEGORY_COLOR_MAPPER[item!.categoryId],
+      },
+    });
   };
 
-  if (isLoading) {
+  const handlePeriodChange = (value: "monthly" | "recent") => {
+    setPeriod(value);
+    setPeriodText(value === "monthly" ? "최근 6개월" : "최근 1개월");
+  };
+
+  const fetchChartData = async () => {
+    try {
+      const response = await getKamisIngredientTrends({
+        period,
+        itemCode: selectedItem!.itemCode,
+        kindCode: selectedItem!.kindCode,
+        ecoFlag: selectedItem!.ecoFlag,
+      });
+      if (response.status === 200) {
+        return response.data.priceDataList;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    return [];
+  };
+  const { data: chartData, isLoading: isLoadingChartData } = useQuery<
+    KamisChartData[]
+  >({
+    queryKey: ["chart", selectedItem?.itemName, selectedItem?.kindCode, period],
+    queryFn: fetchChartData,
+    enabled: !!selectedItem,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  if (isLoadingKamisIngredientData) {
     return null;
   }
 
   const filteredData =
-    data?.filter(
+    kamisIngredientData?.filter(
       (item) =>
         (categoryBit & (1 << (item.categoryId - 1))) !== 0 &&
         item.itemName.includes(searchKeyword),
@@ -126,55 +142,107 @@ const StatisticsTrendPage = () => {
             식자재 평균 가격 변동 그래프
           </h1>
           <p className="text-sm sm:text-base">
-            {period === "monthly" ? "최근 6개월" : "최근 1개월"} 동안의{" "}
+            {periodText}동안의{" "}
             <span style={{ color: chartConfig.price.color }}>
               {chartConfig.price.label}
             </span>
-            의 평균 가격 변동을 알려 드릴게요.
+            평균 가격 변동을 알려 드릴게요.
           </p>
         </div>
 
-        <div className="relative my-6">
+        <div className="flex justify-end">
+          <Select
+            value={period}
+            onValueChange={(value: "monthly" | "recent") =>
+              handlePeriodChange(value)
+            }
+          >
+            <SelectTrigger className="w-28 h-10 text-xs xs:text-sm">
+              <SelectValue placeholder="조회 기간" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>조회 기간</SelectLabel>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="recent"
+                >
+                  최근 1개월
+                </SelectItem>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="monthly"
+                >
+                  최근 6개월
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="relative">
           <ChartContainer
             config={{ ...chartConfig }}
-            className={`${isLoadingKamisData && "opacity-30"}`}
+            className={`${isLoadingChartData && "opacity-30"}`}
           >
             <LineChart
               accessibilityLayer
               data={chartData}
               margin={{
                 top: 12,
-                left: 24,
-                right: 24,
+                left: 40,
+                right: 40,
               }}
             >
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="period"
-                tickLine={false}
+                tickLine={true}
                 axisLine={true}
                 interval={0}
                 className="text-xxxs xs:text-xxs sm:text-xs font-bold"
               />
-              <ChartTooltip cursor={true} content={<ChartTooltipContent />} />
-              <Line
+              <YAxis
                 dataKey="price"
-                type="linear"
-                stroke="var(--color-price)"
-                strokeWidth={2}
-                dot={true}
-              >
-                <LabelList
+                domain={[
+                  (dataMin: number) => dataMin * 0.05,
+                  (dataMax: number) => dataMax * 1.8,
+                ]}
+                hide={true}
+              />
+
+              <ChartTooltip cursor={true} content={<ChartTooltipContent />} />
+
+              {chartData && chartData.length > 0 ? (
+                <Line
                   dataKey="price"
-                  position="top"
-                  fill="var(--color-price)"
-                  className="text-xxxs xs:text-xxs sm:text-xs"
-                />
-              </Line>
+                  type="linear"
+                  stroke="var(--color-price)"
+                  strokeWidth={2}
+                  dot={true}
+                >
+                  <LabelList
+                    dataKey="price"
+                    position="insideTop"
+                    fill="var(--color-price)"
+                    className="text-xxxs xs:text-xxs sm:text-xs"
+                  />
+                </Line>
+              ) : (
+                <text
+                  x="50%"
+                  y="50%"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="fill-normal-200 text-sm"
+                >
+                  해당 기간의 식자재 데이터가 존재하지 않네요.
+                </text>
+              )}
             </LineChart>
           </ChartContainer>
 
-          {isLoadingKamisData && (
+          {isLoadingChartData && (
             <div className="flex flex-col items-center gap-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
               <svg
                 aria-hidden="true"
@@ -207,49 +275,18 @@ const StatisticsTrendPage = () => {
           <h1 className="text-lg sm:text-xl font-black text-normal-700">
             검색 필터
           </h1>
-          <div className="flex items-center gap-2">
-            <Input
-              className="flex-1 text-xs xs:text-sm bg-normal-50 rounded-lg"
-              placeholder="찾으시는 식자재를 검색해 주세요."
-              onChange={(e) => {
-                debounce(
-                  "setStatisticsSearchKeyword",
-                  () => setSearchKeyword(e.target.value),
-                  200,
-                )();
-              }}
-            />
 
-            <div className="flex justify-end">
-              <Select
-                value={period}
-                onValueChange={(value: "monthly" | "recent") =>
-                  setPeriod(value)
-                }
-              >
-                <SelectTrigger className="w-28 h-10 text-xs xs:text-sm">
-                  <SelectValue placeholder="조회 기간" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>조회 기간</SelectLabel>
-                    <SelectItem
-                      className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                      value="monthly"
-                    >
-                      최근 6개월
-                    </SelectItem>
-                    <SelectItem
-                      className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                      value="recent"
-                    >
-                      최근 1개월
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <Input
+            className="flex-1 text-xs xs:text-sm bg-normal-50 rounded-lg"
+            placeholder="찾으시는 식자재를 검색해 주세요."
+            onChange={(e) => {
+              debounce(
+                "setStatisticsSearchKeyword",
+                () => setSearchKeyword(e.target.value),
+                200,
+              )();
+            }}
+          />
         </div>
 
         <div className="flex flex-col gap-1">
@@ -285,8 +322,8 @@ const StatisticsTrendPage = () => {
                   className: "size-8",
                 })}
                 <div className="flex flex-col flex-1">
-                  <p className="text-normal-200 text-xs sm:text-sm">
-                    {Object.values(CATEGORY_INFO)[item.categoryId - 1].name}
+                  <p className="text-normal-300 text-xxs sm:text-xs">
+                    {CATEGORY_NAME_MAPPER[item.categoryId]}
                   </p>
                   <p className="font-bold text-xs sm:text-sm">
                     {item.itemName} ({item.unit})
