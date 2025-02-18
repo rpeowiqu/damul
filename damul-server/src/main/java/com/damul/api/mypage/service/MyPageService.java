@@ -23,6 +23,6 @@ public interface MyPageService {
 
     ScrollResponse<RecipeList> getMyRecipes(int userId, int cursor, int size, String sortType, UserInfo currentUser);
 
-    ScrollResponse<RecipeList> getBookmarkedRecipes(int userId, int cursor, int size, String sortType, UserInfo currentUser);
+    ScrollResponse<MyBookmarkList> getBookmarkedRecipes(int userId, int cursor, int size, String sortType, UserInfo currentUser);
 
 }
