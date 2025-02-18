@@ -2,7 +2,6 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MemberRole;
-import com.damul.api.chat.dto.request.ChatReadRequest;
 import com.damul.api.chat.dto.response.ChatMessageResponse;
 import com.damul.api.chat.dto.response.ChatScrollResponse;
 import com.damul.api.chat.dto.response.UnReadResponse;
@@ -14,13 +13,13 @@ import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
-import com.damul.api.common.scroll.dto.request.ScrollRequest;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
-import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.post.entity.Post;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,7 +95,7 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         }
 
         int lastReadMessageId = chatRoomMemberRepository.findLastReadMessageIdByUserIdAndRoomId(userId, roomId);
-        List<ChatMessage> messages = fetchMessages(roomId, cursor, lastReadMessageId);
+        List<ChatMessage> messages = fetchMessages(roomId, cursor, size, lastReadMessageId);
 
         if (messages.isEmpty()) {
             return createEmptyResponse();
@@ -173,10 +172,22 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         );
     }
 
-    private List<ChatMessage> fetchMessages(int roomId, int cursor, int lastReadMessageId) {
-        return cursor == 0
-                ? chatMessageRepository.findInitialMessages(roomId, lastReadMessageId)
-                : chatMessageRepository.findPreviousMessages(roomId, cursor);
+    private List<ChatMessage> fetchMessages(int roomId, int cursor, int size, int lastReadMessageId) {
+        Pageable pageable = PageRequest.of(0, size + 1);
+
+        if (cursor == 0) { // 초기 로딩
+            return chatMessageRepository.findInitialMessages(
+                    roomId,
+                    lastReadMessageId,
+                    pageable
+            );
+        } else { // 스크롤 시 이전 메시지 로딩
+            return chatMessageRepository.findPreviousMessages(
+                    roomId,
+                    cursor,
+                    pageable
+            );
+        }
     }
 
     private ChatScrollResponse<ChatMessageResponse> createEmptyResponse() {
