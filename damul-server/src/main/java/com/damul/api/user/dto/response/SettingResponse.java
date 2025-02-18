@@ -17,6 +17,4 @@ public class SettingResponse {
     private String profileBackgroundImageUrl;
     private String accessRange;
     private boolean warningEnabled;
-    private boolean profileImageDefault;
-    private boolean backgroundImageDefault;
 }
