@@ -1,7 +1,22 @@
-export interface IngredientTrendInfo {
+export interface KamisIngredient {
   categoryId: number;
-  ingredientName: "string";
-  ingredientCode: number;
+  itemName: string;
+  itemCode: number;
+  kindCode: number;
+  unit: string;
+  ecoFlag: boolean;
+}
+
+export interface KamisChartData {
+  period: string;
+  price: number;
+}
+
+export interface KamisChartConfig {
+  price: {
+    label: string;
+    color: string;
+  };
 }
 
 export interface DailyReceiptInfo {
