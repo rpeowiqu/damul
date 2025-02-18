@@ -14,6 +14,7 @@ const LoginPage = lazy(() => import("@/pages/login/LoginPage"));
 const SignUpPage = lazy(() => import("@/pages/signup/SignUpPage"));
 const SettingPage = lazy(() => import("@/pages/setting/SettingPage"));
 const AlarmPage = lazy(() => import("@/pages/alarm/AlarmPage"));
+const QrCodePage = lazy(() => import("@/pages/qrcode/QrCodePage"));
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,11 @@ const router = createBrowserRouter([
         path: "alarm",
         element: <AlarmPage />,
         handle: { header: true, footer: false },
+      },
+      {
+        path: "qrcode/:userId",
+        element: <QrCodePage />,
+        handle: { header: false, footer: false },
       },
       ...homeRoutes,
       ...chatRoutes,

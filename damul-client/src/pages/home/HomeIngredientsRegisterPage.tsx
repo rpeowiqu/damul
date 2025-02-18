@@ -2,22 +2,36 @@ import DamulButton from "@/components/common/DamulButton";
 import DamulHoverCard from "@/components/common/DamulHoverCard";
 import IngredientItem from "@/components/home/IngredientItem";
 import OcrButton from "@/components/home/OcrButton";
+import QrCodeBox from "@/components/home/QrCodeBox";
 import AlertCircleIcon from "@/components/svg/AlertCircleIcon";
 import PlusIcon from "@/components/svg/PlusIcon";
 import ResetIcon from "@/components/svg/ResetIcon";
 import { Input } from "@/components/ui/input";
+import { CATEGORY_ID_MAPPER } from "@/constants/category";
 import { initialRegisterIngredient } from "@/constants/initialData";
+import useAuth from "@/hooks/useAuth";
 import { postUserIndegredient } from "@/service/home";
 import { RegisterIngredient } from "@/types/Ingredient";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+interface responseData {
+  ingredientName: string;
+  category: keyof typeof CATEGORY_ID_MAPPER;
+  productPrice: number;
+  expiration_date: string;
+  ingredientStorage: "FREEZER" | "FRIDGE" | "ROOMTEMP";
+}
+
 const LIMIT_ADD_COUNT = 50;
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const HomeIngredientsRegisterPage = () => {
   const [ingredientRegisterData, setIngredientRegisterData] = useState<
     RegisterIngredient[]
   >([initialRegisterIngredient]);
+
+  const { data } = useAuth();
 
   const [storeName, setStoreName] = useState("");
   const [purchaseAt, setPurchaseAt] = useState("");
@@ -122,8 +136,66 @@ const HomeIngredientsRegisterPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (!data?.data?.id) return;
+
+    const eventSource = new EventSource(
+      `${API_URL}sse/connect/${data.data.id}`,
+      { withCredentials: true },
+    );
+
+    eventSource.onopen = () => {
+      console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
+    };
+
+    eventSource.onmessage = (event) => {
+      try {
+        const updatedData = JSON.parse(event.data);
+        console.log(updatedData);
+
+        if (updatedData.userIngredients.length > 0) {
+          setIngredientRegisterData((prevData) => {
+            const newIngredientRegisterData = [...prevData];
+
+            updatedData.userIngredients.forEach((ingredient: responseData) => {
+              newIngredientRegisterData.push({
+                id: Math.floor(Math.random() * 10000),
+                ingredientName: ingredient.ingredientName,
+                categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
+                productPrice: ingredient.productPrice,
+                expirationDate: ingredient.expiration_date,
+                ingredientStorage:
+                  ingredient.ingredientStorage === "ROOMTEMP"
+                    ? "ROOM_TEMPERATURE"
+                    : ingredient.ingredientStorage,
+              });
+            });
+
+            setPurchaseAt(updatedData.purchaseAt);
+            setStoreName(updatedData.storeName);
+
+            return newIngredientRegisterData;
+          });
+        }
+      } catch (error: any) {
+        console.error("데이터 처리 중 오류가 발생했습니다.", error);
+        alert("서버에서 받은 데이터를 처리하는 중 오류가 발생했습니다.");
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("SSE 연결 중 오류가 발생했습니다.", error);
+      alert("서버와의 연결에서 문제가 발생했습니다.");
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [data]);
+
   return (
-    <div className="flex flex-col p-5">
+    <div className="flex flex-col p-5 relative">
       {isLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[9999999999]">
           <div className="bg-white p-5 rounded-lg shadow-lg">
@@ -156,7 +228,7 @@ const HomeIngredientsRegisterPage = () => {
             }
           >
             <div className="text-sm">
-              영수증 이미지는 최대 5MB까지 이용가능합니다.
+              영수증 이미지는 최대 10MB까지 이용가능합니다.
             </div>
           </DamulHoverCard>
           <OcrButton
@@ -234,6 +306,8 @@ const HomeIngredientsRegisterPage = () => {
       >
         등록
       </DamulButton>
+
+      <QrCodeBox />
     </div>
   );
 };
