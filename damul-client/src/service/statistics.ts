@@ -1,15 +1,17 @@
 import toQueryString from "@/utils/toQueryString";
 import apiClient from "./http";
 
-export const getIngredientTrends = (queryParams: {
+export const getKamisIngredientTrends = (queryParams: {
   period: string;
-  productNo: string;
+  itemCode: number;
+  kindCode: number;
+  ecoFlag: boolean;
 }) => {
   const queryString = toQueryString(queryParams);
   return apiClient.get(`/ingredients/prices?${queryString}`);
 };
 
-export const getIngredientItems = () => {
+export const getKamisIngredients = () => {
   return apiClient.get("/ingredients/categories/items");
 };
 
@@ -18,7 +20,6 @@ export const getIngredientCategories = () => {
 };
 
 export const getPurchaseHistories = (year: number, month: number) => {
-  console.log("요청");
   const queryString = toQueryString({ year, month });
   return apiClient.get(`/receipts/calendar?${queryString}`);
 };

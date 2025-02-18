@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { getUnreads } from "@/service/chatting";
+import { useState } from "react";
 import { ElementType } from "react";
 import ChatAlarm from "./ChatAlram";
+import useAuth from "@/hooks/useAuth";
+import { useChattingSubscription } from "@/hooks/useChattingSubscription";
 
 interface TabProps {
   iconType: ElementType;
@@ -18,20 +19,18 @@ const Tab = ({
   label = "홈",
   bgColor = "bg-positive-300",
 }: TabProps) => {
-  const [unReadNum, setUnreadNum] = useState(0);
-  // const fetchItems = async () => {
-  //   try {
-  //     const response = await getUnreads();
-  //     setUnreadNum(response?.data.unReadMessageNum);
-  //     return response?.data;
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  const { data, isLoading } = useAuth();
+  const userId = data?.data.id;
+  const [chatCnt, setChatCnt] = useState(0);
 
-  // useEffect(() => {
-  //   fetchItems();
-  // }, []);
+  useChattingSubscription({
+    onMessageReceived: (alarm) => {
+      console.log("새 알림:", alarm);
+      setChatCnt((prev) => prev + 1);
+    },
+    setChatCnt,
+  });
+
   return (
     <div className="flex h-full items-center justify-center">
       <div
@@ -39,8 +38,8 @@ const Tab = ({
       >
         {Icon && <Icon iconFill={iconFill} iconStroke={menuColor} />}
         <p className={`text-xxs text-${menuColor} font-bold`}>{label}</p>
-        {label === "채팅" && unReadNum > 0 && (
-          <ChatAlarm unReadNum={unReadNum} className="absolute" />
+        {label === "채팅" && chatCnt > 0 && (
+          <ChatAlarm unReadNum={chatCnt} className="absolute" />
         )}
       </div>
     </div>

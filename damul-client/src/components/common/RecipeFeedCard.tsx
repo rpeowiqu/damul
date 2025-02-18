@@ -46,7 +46,7 @@ const RecipeFeedCard = ({
       />
       <div className="absolute left-0.5 top-[-3px]">
         {bookmarked && (
-          <BookMarkIcon className="w-6 h-6 fill-positive-200 stroke-positive-400" />
+          <BookMarkIcon className="w-6 h-6 fill-positive-300 stroke-positive-300" />
         )}
       </div>
       <div className="flex flex-col justify-between flex-1 p-2">

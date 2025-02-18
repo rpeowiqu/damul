@@ -47,7 +47,6 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
       const response = await getChattingMembers({
         roomId: roomId,
       });
-      console.log("ㅇㅇ", response?.data);
       setMemberData(response?.data.content);
       setMemberCnt(response?.data.totalMembers);
       setAdminId(response?.data.adminId);
@@ -71,13 +70,16 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
     }
   };
 
-  const handleRemoveMember = async (memberId: number) => {
+  const handleRemoveMember = async (memberId: number, nickname: string) => {
     try {
+      if (!confirm(`${nickname}님이 강제 퇴장됩니다.`)) {
+        return;
+      }
       const response = await deleteMemberFromRoom({
         roomId: roomId,
         memberId: memberId,
       });
-      console.log(response);
+      fetchItems();
     } catch (error) {
       console.log(error);
     }
@@ -112,7 +114,7 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
               {data?.data.id === adminId && data?.data.id !== member.id && (
                 <div
                   className="text-sm font-normal text-negative-600 cursor-pointer"
-                  onClick={() => handleRemoveMember(member.id)}
+                  onClick={() => handleRemoveMember(member.id, member.nickname)}
                 >
                   강제 퇴장
                 </div>
@@ -126,9 +128,11 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
                   원본 게시글 바로가기
                 </DamulButton>
               </Link>
-              <div onClick={handleExitRoom}>
-                <ExitIcon className="w-5 h-5 stroke-neutral-500 cursor-pointer" />
-              </div>
+              {data?.data.id !== adminId && (
+                <div onClick={handleExitRoom}>
+                  <ExitIcon className="w-5 h-5 stroke-neutral-500 cursor-pointer" />
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex justify-end" onClick={handleExitRoom}>

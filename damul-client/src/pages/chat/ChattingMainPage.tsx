@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import ChattingListInfo from "@/components/chat/ChattingListInfo";
 import PostButton from "@/components/community/PostButton";
@@ -10,28 +10,30 @@ import { ChattingItem } from "@/types/chatting";
 import { getKSTISOString } from "@/utils/date";
 
 const ChattingMainPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filterType = searchParams.get("filter") || "";
+
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
 
   const fetchItems = async (pageParam: {
     cursor: number;
     cursorTime?: string;
   }) => {
     try {
-      setIsLoading(true);
       const response = await getChattingList({
         cursorTime: pageParam.cursorTime ?? getKSTISOString(),
         cursor: pageParam.cursor ?? 0,
         size: 15,
+        filter: filterType,
       });
+
+      console.log(response?.data);
       if (response.status === 204) {
         return { data: [], meta: { nextCursor: 0, hasNext: 0 } };
       }
       return response?.data;
     } catch (error) {
       console.error("Error fetching chat list:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -49,7 +51,7 @@ const ChattingMainPage = () => {
         <PostButton to="/chatting/create" icon={"+"} />
       </div>
       <ChattingListInfiniteScroll
-        queryKey={["chattRooms"]}
+        queryKey={["chattRooms", filterType]}
         fetchFn={fetchItems}
         renderItems={(item: ChattingItem) => <ChattingListItem {...item} />}
         skeleton={

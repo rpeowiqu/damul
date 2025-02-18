@@ -2,7 +2,7 @@ import { Ingredient } from "@/types/Ingredient";
 import DeleteIcon from "../svg/DeleteIcon";
 import SaveIcon from "../svg/SaveIcon";
 import { Slider } from "../ui/slider";
-import { CATEGORY_INFO } from "@/constants/category";
+import { CATEGORY_ICON_MAPPER } from "@/constants/category";
 import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
 import { useEffect, useState } from "react";
 import useAuth from "@/hooks/useAuth";
@@ -40,8 +40,7 @@ const IngredientDetail = ({
   setIsDeleteOpen,
   setIsOpen,
 }: IngredientDetailProps) => {
-  const IconComponent =
-    Object.values(CATEGORY_INFO)[selectedIngredient.categoryId - 1].icon;
+  const IconComponent = CATEGORY_ICON_MAPPER[selectedIngredient.categoryId];
   const [ingredient, setIngredient] = useState<Ingredient>(selectedIngredient);
   const { data, isLoading, refetch } = useAuth();
 

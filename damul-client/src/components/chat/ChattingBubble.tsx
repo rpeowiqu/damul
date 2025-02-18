@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Image from "../common/Image";
 import { ChatMessage } from "@/types/chatting";
 import useAuth from "@/hooks/useAuth";
@@ -36,7 +37,7 @@ const ChattingBubble = ({ msg }: ChattingBubbleProps) => {
                 {msg.messageType === "TEXT" && <p>{msg.content}</p>}
                 {msg.messageType === "IMAGE" && (
                   <Image
-                    src={msg.fileUrl}
+                    src={msg.image}
                     alt="sent image"
                     className="w-auto h-40 rounded-lg"
                   />
@@ -52,21 +53,25 @@ const ChattingBubble = ({ msg }: ChattingBubbleProps) => {
   return (
     <div key={msg.id} className="flex justify-start">
       <div className="flex items-start space-x-3 mb-5">
-        <Image
-          src={msg.profileImageUrl}
-          alt={msg.nickname}
-          className="min-w-10 w-10 h-10 rounded-full cursor-pointer"
-        />
+        <Link to={`/profile/${msg.senderId}/info`}>
+          <Image
+            src={msg.profileImageUrl}
+            alt={msg.nickname}
+            className="min-w-10 w-10 h-10 rounded-full cursor-pointer"
+          />
+        </Link>
         <div className="flex flex-col">
-          <p className="text-start text-sm pb-1 cursor-pointer">
-            {msg.nickname}
-          </p>
+          <Link to={`/profile/${msg.senderId}/info`}>
+            <p className="text-start text-sm pb-1 cursor-pointer">
+              {msg.nickname}
+            </p>
+          </Link>
           <div className="flex items-end space-x-2">
             <div className="rounded-md text-start text-sm flex-1 whitespace-pre-wrap bg-positive-100 p-3">
               {msg.messageType === "TEXT" && <p>{msg.content}</p>}
               {msg.messageType === "IMAGE" && (
                 <Image
-                  src={msg.fileUrl}
+                  src={msg.image}
                   alt="sent image"
                   className="w-auto h-40 rounded-lg"
                 />

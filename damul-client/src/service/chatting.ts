@@ -6,14 +6,23 @@ export const getChattingList = async ({
   cursorTime,
   cursor = 0,
   size = 5,
+  filter,
 }: {
   cursorTime: string | Date;
   cursor?: number;
   size?: number;
+  filter?: string;
 }) => {
-  return apiClient.get(
-    `chats/rooms?cursorTime=${cursorTime}&cursor=${cursor}&size=${size}`,
-  );
+  const params = new URLSearchParams({
+    cursorTime: cursorTime.toString(),
+    cursor: cursor.toString(),
+    size: size.toString(),
+  });
+
+  if (filter) {
+    params.append("filter", filter);
+  }
+  return apiClient.get(`chats/rooms?${params.toString()}`);
 };
 
 // 채팅방 내용조회

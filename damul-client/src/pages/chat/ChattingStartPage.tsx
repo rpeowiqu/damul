@@ -38,6 +38,10 @@ const ChattingStartPage = () => {
   };
 
   const toggleSelection = (id: number, nickname: string) => {
+    if (selectedFriends.length >= 10) {
+      alert("최대 10명까지 초대가 가능합니다.");
+      return;
+    }
     setSelectedFriends((prev) =>
       prev.some((friend) => friend.id === id)
         ? prev.filter((friend) => friend.id !== id)
@@ -97,7 +101,7 @@ const ChattingStartPage = () => {
         </DamulButton>
       </div>
       {selectedFriends.length > 0 && (
-        <div className="flex gap-2 py-3 whitespace-nowrap">
+        <div className="flex gap-2 py-3 whitespace-nowrap overflow-auto no-scrollbar">
           {selectedFriends.map((friend) => (
             <div
               key={friend.id}

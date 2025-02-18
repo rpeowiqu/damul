@@ -13,25 +13,13 @@ import { getProfileDetail } from "@/service/profile";
 import { toggleFollow } from "@/service/user";
 import useAuth from "@/hooks/useAuth";
 import { postIntoPrivateRoom } from "@/service/chatting";
+import { CATEGORY_COLOR_MAPPER } from "@/constants/category";
 
 const chartConfig = {
   categoryPreference: {
     label: "등록 횟수",
   },
 } satisfies ChartConfig;
-
-const colorList = [
-  "#f28b82",
-  "#fbbc04",
-  "#fdd663",
-  "#97d174",
-  "#6fcf97",
-  "#76d7ea",
-  "#4a90e2",
-  "#ab7fd0",
-  "#f4a9c0",
-  "#cfd8dc",
-];
 
 const ProfileInfoPage = () => {
   const { user } = useOutletContext();
@@ -113,7 +101,9 @@ const ProfileInfoPage = () => {
         {user.nickname}님은
         <span
           className={"font-bold ml-0.5"}
-          style={{ color: colorList[favoriteFood.index] }}
+          style={{
+            color: CATEGORY_COLOR_MAPPER[favoriteFood.item.categoryName],
+          }}
         >
           {favoriteFood.item.categoryName}
         </span>
@@ -194,8 +184,11 @@ const ProfileInfoPage = () => {
             <YAxis className="text-sm" type="category" dataKey="categoryName" />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar dataKey="categoryPreference">
-              {profileInfo.foodPreference.map((item, index) => (
-                <Cell key={item.categoryId} fill={colorList[index]} />
+              {profileInfo.foodPreference.map((item) => (
+                <Cell
+                  key={item.categoryId}
+                  fill={CATEGORY_COLOR_MAPPER[item.categoryName]}
+                />
               ))}
             </Bar>
           </BarChart>

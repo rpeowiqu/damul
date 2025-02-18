@@ -1,22 +1,37 @@
 import { useEffect, useRef } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import { getUnreads } from "@/service/chatting";
 
 interface ExtendedOptions extends SockJS.Options {
   withCredentials: boolean;
 }
 
-interface SendChattingProps {
+interface ChattingSubscriptionProps {
   roomId?: string | number | undefined;
   onMessageReceived?: (message: any) => void;
+  setChatCnt?: (count: number) => void;
 }
 
-export const useStompClient = ({
+export const useChattingSubscription = ({
   roomId,
   onMessageReceived,
-}: SendChattingProps) => {
+  setChatCnt,
+}: ChattingSubscriptionProps) => {
   const wsUrl = import.meta.env.VITE_WS_BASE_URL;
   const stompClientRef = useRef<Client | null>(null);
+
+  const fetchUnreadChatCnt = async () => {
+    try {
+      const response = await getUnreads();
+      {
+        setChatCnt && setChatCnt(response?.data.unReadMessageNum);
+      }
+      return response?.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const initializeStompClient = () => {
     const stompClient = new Client({
@@ -26,8 +41,19 @@ export const useStompClient = ({
           withCredentials: true,
         } as ExtendedOptions),
       onConnect: (frame) => {
-        console.log("Connected: " + frame);
+        console.log("Chat Connected: " + frame);
+
+        fetchUnreadChatCnt();
+
         stompClient.subscribe(`/sub/chat/room/${roomId}`, (message) => {
+          const receivedMessage = JSON.parse(message.body);
+          console.log("📩 메시지 수신:", receivedMessage);
+          if (onMessageReceived) {
+            onMessageReceived(receivedMessage);
+          }
+        });
+
+        stompClient.subscribe(`/sub/chat/room/${roomId}/read`, (message) => {
           const receivedMessage = JSON.parse(message.body);
           console.log("📩 메시지 수신:", receivedMessage);
           if (onMessageReceived) {
@@ -87,6 +113,33 @@ export const useStompClient = ({
     });
   };
 
+  const readMessage = ({
+    userId,
+    roomId,
+    messageId,
+  }: {
+    userId: string;
+    roomId: string | undefined;
+    messageId?: number;
+  }) => {
+    if (!stompClientRef.current || !stompClientRef.current.connected) {
+      console.warn("🚨 STOMP 클라이언트가 연결되지 않음");
+      return;
+    }
+
+    const message = {
+      userId,
+      roomId,
+      messageId,
+    };
+
+    console.log("📤 메시지 읽음:", message);
+    stompClientRef.current.publish({
+      destination: `/pub/chat/read`,
+      body: JSON.stringify(message),
+    });
+  };
+
   const sendEnterRoom = (roomId: number, userId: string) => {
     if (!stompClientRef.current || !stompClientRef.current.connected) {
       console.warn("🚨 STOMP 클라이언트가 연결되지 않음");
@@ -102,5 +155,5 @@ export const useStompClient = ({
     });
   };
 
-  return { sendMessage, sendEnterRoom };
+  return { sendMessage, readMessage, sendEnterRoom };
 };

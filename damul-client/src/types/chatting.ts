@@ -27,7 +27,7 @@ export interface ChatMessage {
   nickname?: string;
   messageType: "TEXT" | "IMAGE" | "SYSTEM";
   content?: string;
-  fileUrl?: string;
+  image?: string;
   createdAt: string;
   unReadCount?: number;
 }

@@ -6,7 +6,7 @@ import ChattingMenuButton from "@/components/chat/ChattingMenuButton";
 import { getChattingContents } from "@/service/chatting";
 import { ChatMessage } from "@/types/chatting";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
-import { useStompClient } from "@/hooks/useStompClient";
+import { useChattingSubscription } from "@/hooks/useChattingSubscription";
 import useAuth from "@/hooks/useAuth";
 
 interface ChatData {
@@ -47,7 +47,7 @@ const ChattingRoomPage = () => {
   };
 
   // STOMP 클라이언트 초기화
-  const { sendMessage } = useStompClient({
+  const { sendMessage } = useChattingSubscription({
     roomId: roomId,
     onMessageReceived: handleMessageReceived,
   });
@@ -64,25 +64,6 @@ const ChattingRoomPage = () => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
-    }
-  };
-
-  // 이미지 업로드하기
-  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>): void => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const prevReader = new FileReader();
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(file);
-      prevReader.onloadend = () => {
-        setPrevImage(prevReader.result as string);
-
-        if (reader.result instanceof ArrayBuffer) {
-          const byteArray = new Uint8Array(reader.result);
-          setImage(byteArray);
-        }
-      };
-      prevReader.readAsDataURL(file);
     }
   };
 
@@ -127,8 +108,36 @@ const ChattingRoomPage = () => {
   }, [chatData.messages]);
 
   // 메시지 전송
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>): void => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (reader.result) {
+        const byteArray = new Uint8Array(reader.result as ArrayBuffer);
+        setImage(byteArray); // Uint8Array 저장
+      } else {
+        console.error("❌ 파일 변환 실패: reader.result가 null");
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+
+    // 미리보기용 Base64 변환
+    const previewReader = new FileReader();
+    previewReader.onloadend = () => {
+      setPrevImage(previewReader.result as string);
+    };
+    previewReader.readAsDataURL(file);
+  };
+
   const handleSendMessage = () => {
+    console.log("📤 Uint8Array 데이터:", image);
+
     if (message.trim()) {
+      // 텍스트 메시지 전송
       const newTextMessage: ChatMessage = {
         id: Date.now(),
         roomId: Number(roomId),
@@ -150,16 +159,14 @@ const ChattingRoomPage = () => {
       });
 
       setMessage("");
-    } else if (prevImage && image) {
-      const imageBlob = new Blob([image]);
-      const previewUrl = URL.createObjectURL(imageBlob);
-
+    } else if (image) {
+      // 바이너리 이미지 전송
       const newImageMessage: ChatMessage = {
         id: Date.now(),
         roomId: Number(roomId),
         senderId: data?.data.id,
         messageType: "IMAGE",
-        fileUrl: previewUrl,
+        image: URL.createObjectURL(new Blob([image])), // 미리보기 URL
         createdAt: new Date().toISOString(),
       };
 
@@ -171,7 +178,7 @@ const ChattingRoomPage = () => {
       sendMessage({
         userId: data?.data.id,
         messageType: "IMAGE",
-        image: image,
+        image: Array.from(image), // Uint8Array를 배열로 변환하여 서버로 전송
       });
 
       setPrevImage(null);
