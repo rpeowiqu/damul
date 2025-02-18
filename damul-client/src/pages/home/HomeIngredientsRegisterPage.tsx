@@ -3,6 +3,7 @@ import DamulHoverCard from "@/components/common/DamulHoverCard";
 import IngredientItem from "@/components/home/IngredientItem";
 import OcrButton from "@/components/home/OcrButton";
 import AlertCircleIcon from "@/components/svg/AlertCircleIcon";
+import PlusIcon from "@/components/svg/PlusIcon";
 import ResetIcon from "@/components/svg/ResetIcon";
 import { Input } from "@/components/ui/input";
 import { initialRegisterIngredient } from "@/constants/initialData";
@@ -137,10 +138,10 @@ const HomeIngredientsRegisterPage = () => {
         </button>
         <p>식자재 등록하기</p>
       </div>
-      <p className="text-positive-300 font-bold p-1 mb-2">
+      <p className="text-positive-300 font-bold p-1">
         오늘은 이런 품목을 구매하셨네요!
       </p>
-      <div className="flex justify-between">
+      <div className="flex justify-between pt-2">
         <DamulButton
           onClick={handleResetData}
           className="flex bg-white items-center border justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50 transition ease-in-out duration-150 active:scale-75"
@@ -148,13 +149,15 @@ const HomeIngredientsRegisterPage = () => {
           <ResetIcon className="stroke-2 stroke-normal-200" />
           <p>초기화</p>
         </DamulButton>
-        <div className="flex justify-center items-center gap-3">
+        <div className="flex justify-center items-center gap-1">
           <DamulHoverCard
             hoverCardTrigger={
-              <AlertCircleIcon className="size-6 stroke-normal-200" />
+              <AlertCircleIcon className="size-5 stroke-normal-200" />
             }
           >
-            <div>영수증 이미지는 최대 5MB까지 이용가능합니다.</div>
+            <div className="text-sm">
+              영수증 이미지는 최대 5MB까지 이용가능합니다.
+            </div>
           </DamulHoverCard>
           <OcrButton
             setStoreName={setStoreName}
@@ -165,7 +168,7 @@ const HomeIngredientsRegisterPage = () => {
         </div>
       </div>
 
-      <div className="my-4 flex flex-col gap-3 justify-center">
+      <div className="flex flex-col gap-3 pt-5 justify-center">
         <div className="flex w-full gap-2">
           <div className="w-full flex flex-col gap-2">
             <label className="cursor-pointer font-bold" htmlFor="storeName">
@@ -178,7 +181,7 @@ const HomeIngredientsRegisterPage = () => {
               maxLength={20}
               value={storeName}
               onChange={handleStoreNameChange}
-              className="border-1 h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+              className="border h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             />
           </div>
           <div className="w-full flex flex-col gap-2">
@@ -190,7 +193,7 @@ const HomeIngredientsRegisterPage = () => {
               type="date"
               value={purchaseAt}
               onChange={handlePurchaseAtChange}
-              className="border-1 h-8 w-full min-w-0 justify-end text-right cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+              className="border h-8 w-full min-w-0 justify-end text-right cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             />
           </div>
         </div>
@@ -207,21 +210,22 @@ const HomeIngredientsRegisterPage = () => {
         </div>
       </div>
 
-      <div className="flex justify-end items-center gap-2 font-bold">
-        총 구매 금액:
-        <span className="text-negative-500">
-          {totalAmount.toLocaleString()}
-        </span>
-        원
-      </div>
-
-      <div className="flex justify-center p-2">
-        <DamulButton
-          className="bg-normal-200 hover:bg-normal-300 shadow-md transition ease-in-out duration-150 active:scale-90"
+      <div className="flex justify-between px-6 pb-6">
+        <button
+          type="button"
+          className="active:bg-positive-200 w-6 h-6 rounded-full transition ease-in-out duration-150 active:scale-90"
           onClick={addIngredient}
         >
-          +
-        </DamulButton>
+          <PlusIcon className="w-full fill-positive-300" />
+        </button>
+
+        <div className="flex justify-end items-center gap-2 font-bold">
+          총 구매 금액:
+          <span className="text-negative-500">
+            {totalAmount.toLocaleString()}
+          </span>
+          원
+        </div>
       </div>
 
       <DamulButton
