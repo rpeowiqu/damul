@@ -10,6 +10,7 @@ import { postUserIndegredient } from "@/service/home";
 import { RegisterIngredient } from "@/types/Ingredient";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import OcrLoading from "@/components/common/OcrLoading";
 
 const LIMIT_ADD_COUNT = 50;
 
@@ -124,10 +125,10 @@ const HomeIngredientsRegisterPage = () => {
   return (
     <div className="flex flex-col p-5">
       {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[9999999999]">
-          <div className="bg-white p-5 rounded-lg shadow-lg">
-            <p className="text-xl font-bold">처리 중...</p>
-          </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-[9999999999]">
+          <p className="text-lg text-white">영수증 등록 중입니다</p>
+          <p className="text-lg text-white">잠시만 기다려주세요</p>
+          <OcrLoading />
         </div>
       )}
 

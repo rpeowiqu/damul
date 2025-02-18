@@ -46,7 +46,7 @@ const CommunityDetailHeader = ({
             </div>
           </>
         ) : (
-          <div className="py-3 px-1 text-sm pc:text-md whitespace-pre-wrap whitespace-pre-wrap break-words break-all">
+          <div className="py-3 px-1 text-sm pc:text-md whitespace-pre-wrap break-words break-all">
             {content}
           </div>
         )}

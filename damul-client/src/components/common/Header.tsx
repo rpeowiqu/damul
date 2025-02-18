@@ -10,10 +10,9 @@ const Header = () => {
   const userId = data?.data.id;
   const [alarmCnt, setAlarmCnt] = useState(0);
 
-  const { readMessage } = useAlarmSubscription({
+  const {} = useAlarmSubscription({
     userId,
-    onAlarmReceived: (alarm) => {
-      console.log("새 알림:", alarm);
+    onAlarmReceived: () => {
       setAlarmCnt((prev) => prev + 1);
     },
     setAlarmCnt,
