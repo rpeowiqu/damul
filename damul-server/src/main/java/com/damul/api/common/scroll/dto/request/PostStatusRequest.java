@@ -1,4 +1,4 @@
-package com.damul.api.common.dto.request;
+package com.damul.api.common.scroll.dto.request;
 
 import com.damul.api.post.dto.PostStatus;
 import lombok.AllArgsConstructor;
