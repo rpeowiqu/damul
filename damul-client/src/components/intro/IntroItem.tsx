@@ -3,12 +3,27 @@ import { ReactNode } from "react";
 
 interface IntroItemProps {
   title: string;
-  subTitle: string;
-  imageSrc: string;
-  children?: ReactNode;
+  content: string;
+  screenImage: string;
+  firstEffectClassName?: string;
+  firstEffectContent?: ReactNode;
+  secondEffectClassName?: string;
+  secondEffectContent?: ReactNode;
+  thirdEffectClassName?: string;
+  thirdEffectContent?: ReactNode;
 }
 
-const IntroItem = ({ title, subTitle, imageSrc, children }: IntroItemProps) => {
+const IntroItem = ({
+  title,
+  content,
+  screenImage,
+  firstEffectClassName,
+  firstEffectContent,
+  secondEffectClassName,
+  secondEffectContent,
+  thirdEffectClassName,
+  thirdEffectContent,
+}: IntroItemProps) => {
   return (
     <motion.div
       initial={{
@@ -19,24 +34,20 @@ const IntroItem = ({ title, subTitle, imageSrc, children }: IntroItemProps) => {
         opacity: 1,
         y: 0,
         transition: {
-          duration: 0.8,
+          duration: 1.0,
         },
       }}
-      className="relative w-full flex flex-col items-center"
+      className="relative w-full h-full flex flex-col items-center"
     >
-      <img
-        src={imageSrc}
-        className="absolute left-0 top-0 w-full h-96 object-cover opacity-5"
-      />
       <motion.img
-        src={imageSrc}
-        className="w-56 object-cover mask-gradient -mb-16"
+        src={screenImage}
+        className="w-48 sm:w-56 object-cover mask-gradient -mb-16"
       />
       <motion.div
         animate={{
           y: [0, -5, 0],
           transition: {
-            duration: 1,
+            duration: 1.0,
             repeat: Infinity,
             repeatType: "reverse",
             ease: "easeInOut",
@@ -44,11 +55,64 @@ const IntroItem = ({ title, subTitle, imageSrc, children }: IntroItemProps) => {
         }}
         className="flex flex-col items-center gap-2"
       >
-        <h1 className="text-2xl font-black">{title}</h1>
-        <p className="text-positive-300">{subTitle}</p>
+        <h1 className="text-xl sm:text-2xl font-black text-positive-300 select-none">
+          {title}
+        </h1>
+        <p className="text-sm sm:text-base text-normal-400 select-none">
+          {content}
+        </p>
       </motion.div>
 
-      {children}
+      <motion.div
+        animate={{
+          scale: [0, 1.2, 1],
+          transition: {
+            duration: 1.0,
+            delay: 0.6,
+            ease: "easeInOut",
+            type: "spring",
+            stiffness: 400,
+            damping: 10,
+          },
+        }}
+        className={`flex flex-col justify-center items-center absolute object-cover rounded-full opacity-75 ${firstEffectClassName}`}
+      >
+        {firstEffectContent}
+      </motion.div>
+
+      <motion.div
+        animate={{
+          scale: [0, 1.2, 1],
+          transition: {
+            duration: 1.0,
+            delay: 1.0,
+            ease: "easeInOut",
+            type: "spring",
+            stiffness: 400,
+            damping: 10,
+          },
+        }}
+        className={`flex flex-col justify-center items-center absolute object-cover rounded-full opacity-75  ${secondEffectClassName}`}
+      >
+        {secondEffectContent}
+      </motion.div>
+
+      <motion.div
+        animate={{
+          scale: [0, 1.2, 1],
+          transition: {
+            duration: 1.0,
+            delay: 1.4,
+            ease: "easeInOut",
+            type: "spring",
+            stiffness: 400,
+            damping: 10,
+          },
+        }}
+        className={`flex flex-col justify-center items-center absolute object-cover rounded-full opacity-75 ${thirdEffectClassName}`}
+      >
+        {thirdEffectContent}
+      </motion.div>
     </motion.div>
   );
 };
