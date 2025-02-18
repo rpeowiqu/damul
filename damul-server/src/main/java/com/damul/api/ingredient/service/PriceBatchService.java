@@ -51,55 +51,55 @@ public class PriceBatchService {
         private final String name;
     }
     @Async
-    @Scheduled(cron = "0 40 5 * * *")  // UTC 05:35 (KST 14:35)
+    @Scheduled(cron = "0 10 18 * * *")  // UTC 05:35 (KST 14:35)
     public void updateVegetablePrices() {
         updatePricesByCategory(FoodCategory.VEGETABLE);
     }
 
     @Async
-    @Scheduled(cron = "0 50 5 * * *")  // UTC 05:45 (KST 14:45)
+    @Scheduled(cron = "0 20 18 * * *")  // UTC 05:45 (KST 14:45)
     public void updateFruitPrices() {
         updatePricesByCategory(FoodCategory.FRUIT);
     }
 
     @Async
-    @Scheduled(cron = "0 0 6 * * *")  // UTC 05:55 (KST 14:55)
+    @Scheduled(cron = "0 30 18 * * *")  // UTC 05:55 (KST 14:55)
     public void updateDairyPrices() {
         updatePricesByCategory(FoodCategory.DAIRY);
     }
 
     @Async
-    @Scheduled(cron = "0 10 6 * * *")   // UTC 06:05 (KST 15:05)
+    @Scheduled(cron = "0 40 18 * * *")   // UTC 06:05 (KST 15:05)
     public void updateMeatPrices() {
         updatePricesByCategory(FoodCategory.MEAT);
     }
 
     @Async
-    @Scheduled(cron = "0 20 6 * * *")  // UTC 06:15 (KST 15:15)
+    @Scheduled(cron = "0 50 18 * * *")  // UTC 06:15 (KST 15:15)
     public void updateEggPrices() {
         updatePricesByCategory(FoodCategory.EGG);
     }
 
     @Async
-    @Scheduled(cron = "0 30 6 * * *")  // UTC 06:25 (KST 15:25)
+    @Scheduled(cron = "0 0 19 * * *")  // UTC 06:25 (KST 15:25)
     public void updateSeafoodPrices() {
         updatePricesByCategory(FoodCategory.SEAFOOD);
     }
 
     @Async
-    @Scheduled(cron = "0 40 6 * * *")  // UTC 06:35 (KST 15:35)
+    @Scheduled(cron = "0 10 19 * * *")  // UTC 06:35 (KST 15:35)
     public void updateOilPrices() {
         updatePricesByCategory(FoodCategory.OIL);
     }
 
     @Async
-    @Scheduled(cron = "0 50 6 * * *")  // UTC 06:45 (KST 15:45)
+    @Scheduled(cron = "0 20 19 * * *")  // UTC 06:45 (KST 15:45)
     public void updateSeasoningPrices() {
         updatePricesByCategory(FoodCategory.SEASONING);
     }
 
     @Async
-    @Scheduled(cron = "0 0 7 * * *")  // UTC 06:55 (KST 15:55)
+    @Scheduled(cron = "0 30 19 * * *")  // UTC 06:55 (KST 15:55)
     public void updateOtherPrices() {
         updatePricesByCategory(FoodCategory.OTHER);
     }
