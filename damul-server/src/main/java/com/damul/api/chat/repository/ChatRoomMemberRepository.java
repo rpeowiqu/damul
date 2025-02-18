@@ -49,4 +49,11 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     @Query("SELECT m.lastReadMessageId FROM ChatRoomMember m WHERE m.user.id = :userId AND m.room.id = :roomId")
     int findLastReadMessageIdByUserIdAndRoomId(@Param("userId") int userId, @Param("roomId") int roomId);
 
+    @Modifying
+    @Query("UPDATE ChatRoomMember m SET m.lastReadMessageId = :messageId " +
+            "WHERE m.user.id = :userId AND m.room.id = :roomId")
+    void updateLastReadMessageId(@Param("userId") int userId,
+                                 @Param("roomId") int roomId,
+                                 @Param("messageId") int messageId);
+
 }
