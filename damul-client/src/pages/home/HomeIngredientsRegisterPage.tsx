@@ -1,6 +1,8 @@
 import DamulButton from "@/components/common/DamulButton";
+import DamulHoverCard from "@/components/common/DamulHoverCard";
 import IngredientItem from "@/components/home/IngredientItem";
 import OcrButton from "@/components/home/OcrButton";
+import AlertCircleIcon from "@/components/svg/AlertCircleIcon";
 import ResetIcon from "@/components/svg/ResetIcon";
 import { Input } from "@/components/ui/input";
 import { initialRegisterIngredient } from "@/constants/initialData";
@@ -146,13 +148,21 @@ const HomeIngredientsRegisterPage = () => {
           <ResetIcon className="stroke-2 stroke-normal-200" />
           <p>초기화</p>
         </DamulButton>
-
-        <OcrButton
-          setStoreName={setStoreName}
-          setPurchaseAt={setPurchaseAt}
-          setIngredientRegisterData={setIngredientRegisterData}
-          setIsLoading={setIsLoading}
-        />
+        <div className="flex justify-center items-center gap-3">
+          <DamulHoverCard
+            hoverCardTrigger={
+              <AlertCircleIcon className="size-6 stroke-normal-200" />
+            }
+          >
+            <div>영수증 이미지는 최대 5MB까지 이용가능합니다.</div>
+          </DamulHoverCard>
+          <OcrButton
+            setStoreName={setStoreName}
+            setPurchaseAt={setPurchaseAt}
+            setIngredientRegisterData={setIngredientRegisterData}
+            setIsLoading={setIsLoading}
+          />
+        </div>
       </div>
 
       <div className="my-4 flex flex-col gap-3 justify-center">

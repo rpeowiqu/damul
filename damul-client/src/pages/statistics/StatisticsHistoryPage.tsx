@@ -250,18 +250,24 @@ const StatisticsHistoryPage = () => {
             총 {receiptDetailInfoRef.current.receiptIds.length}
             개의 영수증
           </p>
-          <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
-            {receiptDetailInfoRef.current.receiptIds.map((item, index) => (
-              <div
-                key={index}
-                className="flex justify-center items-center gap-1 py-1 bg-normal-50 hover:bg-normal-100 text-normal-400 rounded-lg cursor-pointer"
-                onClick={() => setReceiptId(item)}
-              >
-                <ReceiptIcon className="size-4 sm:size-5 fill-normal-200" />
-                <p className="text-xs sm:text-sm">영수증</p>
-              </div>
-            ))}
-          </div>
+          {receiptDetailInfoRef.current.receiptIds.length > 0 ? (
+            <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+              {receiptDetailInfoRef.current.receiptIds.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex justify-center items-center gap-1 py-1 bg-normal-50 hover:bg-normal-100 text-normal-400 rounded-lg cursor-pointer"
+                  onClick={() => setReceiptId(item)}
+                >
+                  <ReceiptIcon className="size-4 sm:size-5 fill-normal-200" />
+                  <p className="text-xs sm:text-sm">영수증</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-sm text-normal-200">
+              등록된 영수증이 없습니다.
+            </p>
+          )}
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { CATEGORY_INFO } from "@/constants/category";
+import { CATEGORY_ID_MAPPER, CATEGORY_NAME_MAPPER } from "@/constants/category";
 import { STORAGE_TYPE_CONST } from "@/constants/storage";
 import { RegisterIngredient } from "@/types/Ingredient";
 import { useEffect, useState } from "react";
@@ -114,12 +114,12 @@ const IngredientItem = ({
             value={ingredientData.categoryId}
             onChange={handleChange}
           >
-            {Object.values(CATEGORY_INFO).map((category) => (
+            {Object.values(CATEGORY_ID_MAPPER).map((category) => (
               <option
-                key={`${category.number} ${Math.random()}`}
-                value={category.number}
+                key={`${category} ${Math.random()}`}
+                value={`${category}`}
               >
-                {category.name}
+                {CATEGORY_NAME_MAPPER[category]}
               </option>
             ))}
           </select>
