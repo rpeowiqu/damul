@@ -47,8 +47,8 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
-
-
+	// SSE 관련 의존성
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 	// AWS S3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'

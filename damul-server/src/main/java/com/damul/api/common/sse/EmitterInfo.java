@@ -11,6 +11,6 @@ import java.time.LocalDateTime;
 public class EmitterInfo implements Serializable {
 
     private int userId;
-    private LocalDateTime createdAt;
+    private String createdAt;
 
 }
