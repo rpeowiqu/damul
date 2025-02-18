@@ -1,7 +1,11 @@
 package com.damul.api.main.controller;
 
 import com.damul.api.auth.dto.response.UserInfo;
+import com.damul.api.common.exception.BusinessException;
+import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.sse.service.SseService;
 import com.damul.api.common.user.CurrentUser;
+import com.damul.api.main.dto.OcrList;
 import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.HomeIngredientDetail;
 import com.damul.api.main.dto.response.HomeSuggestedResponse;
@@ -29,6 +33,7 @@ public class HomeController {
 
     private final HomeService homeService;
     private final UserReceiptService userReceiptService;
+    private final SseService sseService;
 
     @GetMapping
     public ResponseEntity<?> getUserIngredients(@CurrentUser UserInfo user) {
@@ -122,17 +127,24 @@ public class HomeController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/upload")
+    @PostMapping("/upload/{userId}")
     public ResponseEntity<?> handleImageUpload(
-            @RequestParam("file") MultipartFile file,
-            @CurrentUser UserInfo user
+            @RequestParam("image") MultipartFile image,
+            @PathVariable int userId
     ) {
-        log.info("컨트롤러: 이미지 업로드 시작 - userId: {}", user.getId());
+        log.info("컨트롤러: 이미지 업로드 시작 - userId: {}", userId);
 
-        UserIngredientPost ocrResult = null; /*homeService.processImage(file, user);*/
+        try {
+            OcrList ocrResult = homeService.processImage(image, userId);
+            sseService.sendToClient(userId, ocrResult);
 
-        log.info("컨트롤러: 이미지 업로드 완료 - userId: {}", user.getId());
-        return ResponseEntity.ok().body(Map.of("result", ocrResult));
+            log.info("컨트롤러: 이미지 업로드 완료 - userId: {}", userId);
+            return ResponseEntity.ok().body(Map.of("result", ocrResult));
+        } catch (Exception e) {
+            log.error("이미지 처리 중 에러 발생 - userId: {}", userId, e);
+            sseService.sendToClient(userId, new BusinessException(ErrorCode.BAD_REQUEST, "이미지 처리 중 오류가 발생했습니다"));
+            throw e;
+        }
     }
 
 }

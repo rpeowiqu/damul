@@ -99,7 +99,9 @@ public enum ErrorCode {
     INVALID_PAGE_SIZE(HttpStatus.BAD_REQUEST, "유효하지 않은 페이지 크기입니다."),
     INVALID_CURSOR(HttpStatus.BAD_REQUEST, "유효하지 않은 커서값입니다."),
     PROFILE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "프로필 접근 권한이 없습니다."),
-    BOOKMARK_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 북마크입니다." );
+    BOOKMARK_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 북마크입니다." ),
+
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "올바르지 않은 요처입니다.");
 
 
     private final HttpStatus status;

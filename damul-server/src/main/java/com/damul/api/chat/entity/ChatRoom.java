@@ -84,6 +84,7 @@ public class ChatRoom {
         room.roomName = roomName;
         room.roomType = RoomType.PRIVATE;
         room.memberLimit = 2;
+        room.thumbnailUrl = creator.getProfileImageUrl();
         return room;
     }
 
@@ -93,6 +94,7 @@ public class ChatRoom {
         room.roomName = roomName;
         room.roomType = RoomType.GROUP;
         room.memberLimit = memberLimit;
+        room.thumbnailUrl = creator.getProfileImageUrl();
         return room;
     }
 
@@ -103,6 +105,7 @@ public class ChatRoom {
         room.roomName = roomName;
         room.roomType = RoomType.GROUP;
         room.memberLimit = chatSize;
+        room.thumbnailUrl = creator.getProfileImageUrl();
         return room;
     }
 }

@@ -89,7 +89,12 @@ public class SecurityConfig {
                     log.info("URL 접근 권한 설정");
                     auth
                             .requestMatchers("/multibranch-webhook-trigger/invoke*").permitAll()
-                            .requestMatchers("/login", "/admin/login", "/api/v1/test/token").permitAll() // 누구나 접근 가능
+                            .requestMatchers(
+                                    "/login",
+                                    "/admin/login",
+                                    "/api/v1/test/token",
+                                    "/api/v1/home/upload/**"
+                                    ).permitAll() // 누구나 접근 가능
                             .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
                             .requestMatchers("/ws/**").authenticated()
                             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
