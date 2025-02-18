@@ -40,7 +40,8 @@ public class UserServiceImpl implements UserService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
 
-
+    private final String DEFAULT_BACKGROUND_IMAGE = "https://damulbucket.s3.ap-northeast-2.amazonaws.com/b7aee2b6-fbbe-4919-b98e-4d9f25ac9349-profile-background.jpg";
+    private final String DEFAULT_PROFILE_IMAGE = "https://damulbucket.s3.ap-northeast-2.amazonaws.com/81a469ff-3e77-498b-ab9c-9f293826f784-profile.png";
     // 닉네임 중복 확인
     @Override
     public boolean checkNicknameDuplication(String nickname) {
@@ -52,7 +53,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public SettingResponse getSetting(int userId) {
         log.info("설정 조회 시작 - userId: {}", userId);
-
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -108,7 +108,16 @@ public class UserServiceImpl implements UserService {
             log.info("새로운 프로필 이미지 업로드 완료 - profileImageUrl: {}", profileImageUrl);
             setting.setProfileImageUrl(profileImageUrl);
         } else { // 새로운 이미지 없음
+            log.info("이미지 파일 없음");
+            if(setting.isProfileImageDefault()) {
+                log.info("프로필 사진 기본이미지로 변경");
+                setting.setProfileImageUrl(DEFAULT_PROFILE_IMAGE);
+            }
 
+            if(setting.isBackgroundImageDefault()) {
+                log.info("배경 사진 기본이미지로 변경");
+                setting.setBackgroundImageUrl(DEFAULT_BACKGROUND_IMAGE);
+            }
         }
 
         // 배경 이미지 처리

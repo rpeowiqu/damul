@@ -32,7 +32,7 @@ public class PriceAnalysisService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    private static final String REDIS_KEY_PATTERN = "price:%s:itemCode:%s:itemCategoryCode:%s:date:%s:ecoFlag:%s";
+    private static final String REDIS_KEY_PATTERN = "price:%s:itemCode:%s:kindCode:%s:date:%s:ecoFlag:%s";
     private static final String BATCH_CACHE_KEY = "batch:price:%s:%s:%s:%s";  // 배치용 캐시 키
     private static final Duration CACHE_TTL = Duration.ofHours(24);
     private static final DateTimeFormatter MONTHLY_FORMATTER = DateTimeFormatter.ofPattern("yy년 MM월");
@@ -280,7 +280,7 @@ public class PriceAnalysisService {
                     .collect(Collectors.toList());
 
             log.info("총 아이템 수: {}", allItems.size());
-            log.info("월/주별 가격 맵: {}", monthlyPriceMap); // 또는 weeklyPriceMap
+            // log.info("월/주별 가격 맵: {}", monthlyPriceMap); // 또는 weeklyPriceMap
         } else if ("recent".equals(period)) {
             // 한 달 전까지의 주 평균 데이터
             Map<String, List<Integer>> weeklyPriceMap = new LinkedHashMap<>();
