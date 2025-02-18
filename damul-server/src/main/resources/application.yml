@@ -5,7 +5,6 @@ spring:
       - optional:file:.env[.properties]
     profiles:
       active: prod
-      # on-profile: local
 
   application:
     name: damul-server
@@ -20,6 +19,13 @@ spring:
         pool:
           size: 5  # 스케줄링 스레드 풀 크기
         thread-name-prefix: schedule-task-  # 스케줄링 스레드 이름 접두사
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: true
+
   data:
     redis:
       host: ${REDIS_HOST:localhost}
