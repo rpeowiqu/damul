@@ -9,7 +9,6 @@ import java.util.List;
 @Slf4j
 public class ScrollUtil {
     public static <T extends ScrollCursor> ScrollResponse<T> createScrollResponse(List<T> items, int cursor, int size) {
-        log.info("items.size = {}", items.size());
 
         if (items.isEmpty()) {
             log.info("ScrollResponse item 없음!!");
