@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { CATEGORY_INFO } from "@/constants/category";
+import { CATEGORY_ID_MAPPER, CATEGORY_NAME_MAPPER } from "@/constants/category";
 
 interface IngredientCategoryFilterProps {
   onValueChange: (value: string) => void;
@@ -32,13 +32,13 @@ const IngredientCategoryFilter = ({
           >
             전체
           </SelectItem>
-          {Object.values(CATEGORY_INFO).map((category) => (
+          {Object.values(CATEGORY_ID_MAPPER).map((category) => (
             <SelectItem
               key={`${category} ${Math.random()}`}
               className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-              value={`${category.number}`}
+              value={`${category}`}
             >
-              {category.name}
+              {CATEGORY_NAME_MAPPER[category]}
             </SelectItem>
           ))}
         </SelectGroup>

@@ -1,5 +1,5 @@
 import { MouseEventHandler } from "react";
-import { CATEGORY_INFO } from "@/constants/category";
+import { CATEGORY_ICON_MAPPER } from "@/constants/category";
 import DamulButton from "../common/DamulButton";
 import AlertCircleIcon from "../svg/AlertCircleIcon";
 import { useIngredientStore } from "@/stores/ingredientStore";
@@ -25,7 +25,7 @@ const IngredientButton = ({
   onClick,
   onEdit,
 }: IngredientButtonProps) => {
-  const IconComponent = Object.values(CATEGORY_INFO)[variant - 1].icon;
+  const IconComponent = CATEGORY_ICON_MAPPER[variant];
 
   const { selectedIngredients } = useIngredientStore();
 

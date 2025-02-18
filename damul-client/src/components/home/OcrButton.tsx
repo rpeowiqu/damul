@@ -2,7 +2,7 @@ import { ChangeEvent, useRef } from "react";
 import DamulButton from "../common/DamulButton";
 import { postReceiptForOCR } from "@/service/home";
 import { RegisterIngredient } from "@/types/Ingredient";
-import { CATEGORY_INFO_KR } from "@/constants/category";
+import { CATEGORY_ID_MAPPER } from "@/constants/category";
 import ReceiptIcon from "../svg/ReceiptIcon";
 
 interface OcrButtonProps {
@@ -16,11 +16,13 @@ interface OcrButtonProps {
 
 interface responseData {
   ingredientName: string;
-  category: keyof typeof CATEGORY_INFO_KR;
+  category: keyof typeof CATEGORY_ID_MAPPER;
   productPrice: number;
   expiration_date: string;
   ingredientStorage: "FREEZER" | "FRIDGE" | "ROOMTEMP";
 }
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const OcrButton = ({
   setStoreName,
@@ -49,8 +51,8 @@ const OcrButton = ({
             newIngredientRegisterData.push({
               id: Math.floor(Math.random() * 10000),
               ingredientName: ingredient.ingredientName,
-              categoryId: CATEGORY_INFO_KR[ingredient.category]
-                ? CATEGORY_INFO_KR[ingredient.category].number
+              categoryId: CATEGORY_ID_MAPPER[ingredient.category]
+                ? CATEGORY_ID_MAPPER[ingredient.category]
                 : 10,
               productPrice: ingredient.productPrice,
               expirationDate: ingredient.expiration_date,
@@ -77,8 +79,18 @@ const OcrButton = ({
 
   const onChangeFile = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      const file = e.target.files[0];
+
+      if (file.size > MAX_FILE_SIZE) {
+        alert("파일 크기는 10MB 이하로 업로드해 주세요.");
+        if (inputRef.current) {
+          inputRef.current.value = "";
+        }
+        return;
+      }
+
       const newFormData = new FormData();
-      newFormData.append("image", e.target.files[0]);
+      newFormData.append("image", file);
       fetchData(newFormData);
 
       if (inputRef.current) {
