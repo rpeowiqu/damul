@@ -237,6 +237,7 @@ public class AuthService {
     // 관리자 로그인
     public void adminLogin(AdminLoginRequest request, HttpServletResponse response) {
         // 관리자 존재 확인
+        log.info("관리자계정: {}", userRepository.findByRole(Role.ADMIN).get().getEmail());
         User admin = userRepository.findByRole(Role.ADMIN)
                 .orElseThrow(() -> new IllegalArgumentException("관리자 계정이 존재하지 않습니다."));
 
