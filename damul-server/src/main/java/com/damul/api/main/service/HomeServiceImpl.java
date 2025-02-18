@@ -50,7 +50,7 @@ public class HomeServiceImpl implements HomeService {
             validateUserAccessRange(targetId, userId);
         }
 
-        List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(userId);
+        List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(targetId);
 
         return new IngredientResponse(
                 filterByStorage(userIngredients, "freezer"),
