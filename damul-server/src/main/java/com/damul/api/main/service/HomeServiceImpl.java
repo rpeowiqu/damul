@@ -1,5 +1,6 @@
 package com.damul.api.main.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.common.exception.BusinessException;
@@ -9,6 +10,7 @@ import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.*;
 import com.damul.api.main.entity.UserIngredient;
 import com.damul.api.main.repository.UserIngredientRepository;
+import com.damul.api.receipt.dto.request.UserIngredientPost;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
 import com.damul.api.recipe.entity.RecipeTag;
@@ -19,10 +21,20 @@ import com.damul.api.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.http.HttpHeaders;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -34,6 +46,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class HomeServiceImpl implements HomeService {
+
+    @Value("${fastapi.server.url}")
+    private String fastApiServerUrl;
 
     private final UserIngredientRepository userIngredientRepository;
     private final RecipeRepository recipeRepository;
@@ -50,7 +65,7 @@ public class HomeServiceImpl implements HomeService {
             validateUserAccessRange(targetId, userId);
         }
 
-        List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(userId);
+        List<UserIngredient> userIngredients = userIngredientRepository.findAllByUserId(targetId);
 
         return new IngredientResponse(
                 filterByStorage(userIngredients, "freezer"),
@@ -162,6 +177,54 @@ public class HomeServiceImpl implements HomeService {
 
         return new HomeSuggestedResponse(suggestedRecipes);
     }
+
+//    public UserIngredientPost processImage(MultipartFile file, UserInfo user) {
+//        try {
+//            log.info("서비스: 이미지 처리 시작 - userId: {}", user.getId());
+//
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+//
+//            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+//            body.add("file", createFileResource(file));
+//            body.add("user_id", user.getId()); // JWT에서 얻은 사용자 ID 전달
+//
+//            HttpEntity<MultiValueMap<String, Object>> requestEntity =
+//                    new HttpEntity<>(body, headers);
+//
+//            ResponseEntity<String> response = restTemplate.exchange(
+//                    fastApiServerUrl + "/api/v1/ocr",
+//                    HttpMethod.POST,
+//                    requestEntity,
+//                    String.class
+//            );
+//
+//            if (!response.getStatusCode().is2xxSuccessful()) {
+//                log.error("서비스: FastAPI 서버 응답 실패 - userId: {}, statusCode: {}",
+//                        user.getId(), response.getStatusCode());
+//                throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED, "OCR 서버 처리 실패");
+//            }
+//
+//            log.info("서비스: 이미지 처리 완료 - userId: {}", user.getId());
+//            return response.getBody();
+//
+//        } catch (IOException e) {
+//            log.error("서비스: 이미지 처리 중 에러 발생 - userId: {}", user.getId(), e);
+//            throw new ImageProcessingException("이미지 처리 중 오류가 발생했습니다");
+//        } catch (Exception e) {
+//            log.error("서비스: 예상치 못한 에러 발생 - userId: {}", user.getId(), e);
+//            throw new ImageProcessingException("이미지 처리 중 오류가 발생했습니다");
+//        }
+//    }
+//
+//    private ByteArrayResource createFileResource(MultipartFile file) throws IOException {
+//        return new ByteArrayResource(file.getBytes()) {
+//            @Override
+//            public String getFilename() {
+//                return file.getOriginalFilename();
+//            }
+//        };
+//    }
 
     private void validateUserId(int userId) {
         if (userId <= 0) {

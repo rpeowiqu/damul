@@ -17,11 +17,11 @@ public interface NotificationService {
 
     void createBadgeNotification(User receiver, String badgeName);
 
-    void createCommentNotification(User receiver, User sender, Integer postId);
+    void createCommentNotification(User receiver, User sender, Integer postId, String type);
 
     void createFollowNotification(User receiver, User follower);
 
-    void createLikeNotification(User receiver, User sender, Integer postId);
+    void createLikeNotification(User receiver, User sender, Integer postId, String type);
 
     void markAsRead(Integer notificationId);
 

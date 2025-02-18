@@ -61,7 +61,8 @@ public class NotificationServiceImpl implements NotificationService {
                 null,
                 NotificationType.BADGE,
                 String.format("새로운 뱃지를 획득했습니다: %s", badgeName),
-                "/profile/badges"
+                null,
+                null
         );
         notification.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         notificationRepository.save(notification);
@@ -70,13 +71,14 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional
-    public void createCommentNotification(User receiver, User sender, Integer postId) {
+    public void createCommentNotification(User receiver, User sender, Integer postId, String type) {
         Notification notification = Notification.create(
                 receiver,
                 sender,
                 NotificationType.COMMENT,
                 String.format("%s님이 회원님의 게시글에 댓글을 달았습니다.", sender.getNickname()),
-                "/posts/" + postId
+                "" + postId,
+                type
         );
         notification.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         notificationRepository.save(notification);
@@ -91,7 +93,8 @@ public class NotificationServiceImpl implements NotificationService {
                 follower,
                 NotificationType.FOLLOW,
                 String.format("%s님이 회원님을 팔로우했습니다.", follower.getNickname()),
-                "/profile/" + follower.getId()
+                "/profile/" + follower.getId(),
+                null
         );
         notification.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         notificationRepository.save(notification);
@@ -100,13 +103,14 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional
-    public void createLikeNotification(User receiver, User sender, Integer postId) {
+    public void createLikeNotification(User receiver, User sender, Integer postId, String type) {
         Notification notification = Notification.create(
                 receiver,
                 sender,
                 NotificationType.LIKE,
                 String.format("%s님이 회원님의 게시글을 좋아합니다.", sender.getNickname()),
-                "/posts/" + postId
+                "" + postId,
+                type
         );
         notification.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
         notificationRepository.save(notification);

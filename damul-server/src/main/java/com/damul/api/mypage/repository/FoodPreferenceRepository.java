@@ -21,6 +21,7 @@ public interface FoodPreferenceRepository extends JpaRepository<FoodPreference, 
         )
         FROM FoodCategory fc
         LEFT JOIN FoodPreference fp ON fc.id = fp.category.id AND fp.user.id = :userId
+        ORDER BY fc.id ASC
         """)
     List<FoodPreferenceList> findPreferencesByUserId(@Param("userId") int userId);
 

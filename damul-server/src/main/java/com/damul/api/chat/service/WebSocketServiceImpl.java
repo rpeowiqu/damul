@@ -179,7 +179,7 @@ public class WebSocketServiceImpl implements WebSocketService {
                 typingRequest.isTyping()
         );
 
-        messagingTemplate.convertAndSend("/sub/chat/room/" + typingRequest.getRoomId() + "/typing", status);
+        messagingTemplate.convertAndSend("/sub/chat/room/" + typingRequest.getRoomId(), status);
     }
 
     @Override
@@ -190,7 +190,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         member.updateLastReadMessageId(readRequest.getMessageId());
         chatRoomMemberRepository.save(member);
 
-        messagingTemplate.convertAndSend("/sub/chat/room/" + readRequest.getRoomId() + "/read",
+        messagingTemplate.convertAndSend("/sub/chat/room/" + readRequest.getRoomId(),
                 new ReadStatus(readRequest.getRoomId(), readRequest.getUserId(), readRequest.getMessageId()));
     }
 

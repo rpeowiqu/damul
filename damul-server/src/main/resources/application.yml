@@ -4,7 +4,7 @@ spring:
       - optional:classpath:.env[.properties]
       - optional:file:.env[.properties]
     profiles:
-      active: prod
+      active: local
       # on-profile: local
 
   application:
@@ -130,6 +130,10 @@ jwt:
   access-token-expiration: ${JWT_ACCESS_VALIDITY}
   refresh-token-expiration: ${JWT_REFRESH_VALIDITY}
   temporary-token-expiration: ${JWT_TEMPORARY_VALIDITY}
+
+fastapi:
+  server:
+    url: ${FASTAPI_URL}
 
 logging:
   level:

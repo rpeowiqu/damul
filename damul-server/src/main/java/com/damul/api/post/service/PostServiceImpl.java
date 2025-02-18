@@ -379,7 +379,7 @@ public class PostServiceImpl implements PostService {
         comment.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         PostComment savedComment = postCommentRepository.save(comment);
-        notificationService.createCommentNotification(post.getUser(), user, postId);
+        notificationService.createCommentNotification(post.getUser(), user, postId, "post");
         return new CreateResponse(savedComment.getPostCommentId());
     }
 

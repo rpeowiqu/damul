@@ -540,7 +540,7 @@ public class RecipeServiceImpl implements RecipeService {
             recipeLikeRepository.save(newLike);
             recipe.incrementLikeCnt();  // likeCnt 증가
             recipeRepository.save(recipe);  // 변경사항 저장
-            notificationService.createLikeNotification(recipe.getUser(), currentUser, recipeId);
+            notificationService.createLikeNotification(recipe.getUser(), currentUser, recipeId, "recipe");
             return true;
         }
     }
@@ -577,7 +577,7 @@ public class RecipeServiceImpl implements RecipeService {
         comment.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         RecipeComment savedComment = recipeCommentRepository.save(comment);
-        notificationService.createCommentNotification(recipe.getUser(), user, comment.getId());
+        notificationService.createCommentNotification(recipe.getUser(), user, comment.getId(), "recipe");
         return new CreateResponse(savedComment.getId());
     }
 
