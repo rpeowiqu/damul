@@ -144,8 +144,6 @@ public class MyPageServiceImpl implements MyPageService {
         validateSortType(sortType);
 
         List<RecipeList> recipes = recipeRepository.findMyRecipes(userId, cursor, size + 1, sortType);
-        log.info("recipes Size: {}", recipes.size());
-
         return ScrollUtil.createScrollResponse(recipes, cursor, size);
     }
 
