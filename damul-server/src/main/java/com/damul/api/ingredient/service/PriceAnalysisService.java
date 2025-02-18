@@ -319,7 +319,7 @@ public class PriceAnalysisService {
                     .collect(Collectors.toList());
 
             log.info("총 아이템 수: {}", allItems.size());
-            log.info("월/주별 가격 맵: {}", weeklyPriceMap); // 또는 weeklyPriceMap
+            // log.info("월/주별 가격 맵: {}", weeklyPriceMap); // 또는 weeklyPriceMap
         }
 
         return prices;
