@@ -70,7 +70,7 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
             >
               <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
                 <div className="flex gap-1 ">
-                  {recipe.recipeTags.map((tag, index) => {
+                  {recipe.recipeTags?.map((tag, index) => {
                     return (
                       <div
                         key={`${index}-${tag.tagId}`}

@@ -17,7 +17,7 @@ const PostRecipeOrderForm = ({
   preImage,
 }: PostRecipeOrderFormProps) => {
   const [isLimitExceeded, setIsLimitExceeded] = useState(false);
-  const MAX_LENGTH = 500;
+  const MAX_LENGTH = 200;
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -33,6 +33,11 @@ const PostRecipeOrderForm = ({
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        alert("이미지 용량은 5MB 이하만 업로드 가능합니다.");
+        return;
+      }
       setOrderImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -84,17 +89,14 @@ const PostRecipeOrderForm = ({
       <textarea
         value={orderDescription}
         onChange={handleChange}
-        className={`w-full mt-3 p-3 border-2 rounded-md outline-none resize-none ${
-          isLimitExceeded ? "border-red-500" : "border-gray-300"
-        }`}
+        className={
+          "w-full mt-3 p-3 border-2 rounded-md outline-none resize-none border-gray-300"
+        }
         placeholder="제목을 입력해주세요"
         rows={4}
       />
-      <div className="flex justify-between items-center mt-1 text-sm">
-        {isLimitExceeded && (
-          <p className="text-red-500">최대 50자까지 입력 가능합니다.</p>
-        )}
-        <p className={isLimitExceeded ? "text-red-500" : "text-gray-500"}>
+      <div className="flex justify-end items-center mt-1 text-sm">
+        <p className="text-gray-500">
           {orderDescription.length} / {MAX_LENGTH}
         </p>
       </div>

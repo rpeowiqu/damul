@@ -23,7 +23,7 @@ const ChattingMainPage = () => {
       const response = await getChattingList({
         cursorTime: pageParam.cursorTime ?? getKSTISOString(),
         cursor: pageParam.cursor ?? 0,
-        size: 15,
+        size: 10,
         filter: filterType,
       });
 

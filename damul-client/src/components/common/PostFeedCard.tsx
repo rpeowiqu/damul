@@ -49,9 +49,13 @@ const PostFeedCard = ({
       <div className="flex flex-col justify-between flex-1 p-2">
         <div className="text-left">
           <div className="flex justify-between">
-            <h3 className="text-sm font-bold line-clamp-1 w-full">{title}</h3>
+            <h3 className="text-sm font-bold line-clamp-1 w-full whitespace-pre-wrap break-words break-all">
+              {title}
+            </h3>
           </div>
-          <p className="text-xs pc:text-sm line-clamp-1">{content}</p>
+          <p className="text-xs pc:text-sm line-clamp-1 whitespace-pre-wrap break-words break-all">
+            {content}
+          </p>
         </div>
         <div className="flex justify-between pt-2 text-xxs pc:text-xs text-normal-500">
           <div className="flex items-center gap-1">

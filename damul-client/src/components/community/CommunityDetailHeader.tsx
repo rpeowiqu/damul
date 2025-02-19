@@ -110,12 +110,14 @@ const CommunityDetailHeader = ({
             <p className="text-sm text-neutral-600">공구/나눔 게시판</p>
           </Link>
         )}
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className="text-md pc:text-lg font-semibold flex-1 break-words break-all">
+          {title}
+        </h3>
       </div>
       {type === "recipe" ? (
         <div
           onClick={bookmarkRecipe}
-          className="flex flex-col max-w-1/3 justify-between items-end py-0.5 cursor-pointer"
+          className="flex flex-col min-w-24 pc:min-w-32 justify-between items-end py-0.5 cursor-pointer"
         >
           {isBookmarked ? (
             <BookMarkIcon className="w-5 h-5 fill-positive-300 stroke-positive-300" />
@@ -123,21 +125,23 @@ const CommunityDetailHeader = ({
             <BookMarkIcon className="w-5 h-5 fill-white stroke-positive-300" />
           )}
           {createdAt ? (
-            <p className="text-xs text-neutral-500">{formatDate(createdAt)}</p>
+            <p className="text-xxs pc:text-xs text-neutral-500">
+              {formatDate(createdAt)}
+            </p>
           ) : (
             <Skeleton width={80} height={14} />
           )}
         </div>
       ) : (
-        <div className="flex flex-col justify-between items-end">
+        <div className="flex flex-col min-w-24 pc:min-w-32 justify-between items-end py-0.5 cursor-pointer">
           <StatusMarker />
-          <p className="text-xs text-neutral-500">
-            {createdAt ? (
-              createdAt.split("T")[0] + " " + createdAt.split("T")[1]
-            ) : (
-              <Skeleton width={100} height={14} />
-            )}
-          </p>
+          {createdAt ? (
+            <p className="text-xxs pc:text-xs text-neutral-500">
+              {formatDate(createdAt)}
+            </p>
+          ) : (
+            <Skeleton width={100} height={14} />
+          )}
         </div>
       )}
     </div>

@@ -40,10 +40,12 @@ const ChattingListItem = ({
         <div className="flex w-full justify-between gap-3">
           <div className="flex flex-1 flex-col text-start justify-between">
             <div className="flex text-sm gap-1">
-              <p className="line-clamp-1">{highlightTitle(title)}</p>
+              <p className="line-clamp-1 whitespace-pre-wrap break-words break-all">
+                {highlightTitle(title)}
+              </p>
               <p>({memberNum})</p>
             </div>
-            <p className="text-xs text-neutral-600 line-clamp-1">
+            <p className="text-xs text-neutral-600 line-clamp-1 whitespace-pre-wrap break-words break-all">
               {lastMessage}
             </p>
           </div>
