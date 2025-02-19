@@ -141,7 +141,7 @@ const HomeIngredientsRegisterPage = () => {
     if (!data?.data?.id) return;
 
     const eventSource = new EventSource(
-      `${API_URL}/sse/connect/${data.data.id}`,
+      `${API_URL}sse/connect/${data.data.id}`,
       { withCredentials: true },
     );
 
