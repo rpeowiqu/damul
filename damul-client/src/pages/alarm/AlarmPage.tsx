@@ -1,8 +1,6 @@
 import AlarmItem from "@/components/alarm/AlarmItem";
 import { getAlarms, getUnreadAlarmCnt } from "@/service/alarm";
 import { useEffect, useState } from "react";
-import { useAlarmSubscription } from "@/hooks/useAlarmSubscription";
-import useAuth from "@/hooks/useAuth";
 import { useAlarmStore } from "@/stores/alarmStore";
 
 interface Alarm {
@@ -21,15 +19,8 @@ interface Alarm {
 }
 
 const AlarmPage = () => {
-  const { alarmCnt, setAlarmCnt, increaseAlarmCnt } = useAlarmStore();
+  const { alarmCnt, setAlarmCnt } = useAlarmStore();
   const [alarms, setAlarms] = useState<Alarm[]>([]);
-  const { data, isLoading } = useAuth();
-
-  useAlarmSubscription({
-    userId: data?.data.id,
-    onAlarmReceived: increaseAlarmCnt,
-    setAlarmCnt,
-  });
 
   const fetchAlarms = async () => {
     try {
@@ -54,7 +45,8 @@ const AlarmPage = () => {
   useEffect(() => {
     fetchAlarms();
     fetchUnreadAlarmCnt();
-  }, []);
+  }, [alarmCnt]);
+
   return (
     <div className="h-full text-center">
       <div className="text-start px-7 py-3 border-b">

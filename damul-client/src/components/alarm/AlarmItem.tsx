@@ -69,7 +69,9 @@ const AlarmItem = ({
       className="h-full text-center space-y-2 border-b"
       onClick={() => {
         readAlarm({ alarmId: id });
-        setAlarmCnt(alarmCnt - 1);
+        if (!read) {
+          setAlarmCnt(alarmCnt - 1);
+        }
       }}
     >
       <Link to={link}>
