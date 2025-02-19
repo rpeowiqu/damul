@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -30,7 +32,10 @@ public class SseService {
         String redisKey = SSE_KEY_PREFIX + userId;
         SseEmitter emitter = new SseEmitter(TIMEOUT);
 
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
         try {
+            SecurityContextHolder.setContext(securityContext);
             emitter.send(SseEmitter.event()
                     .name("connect")
                     .data("")
