@@ -56,16 +56,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // 사용자 검색
     @Query("SELECT new com.damul.api.user.dto.response.UserList(u.id, u.profileImageUrl, u.nickname) " +
             "FROM User u " +
-            "WHERE u.nickname LIKE :contains " +
+            "WHERE u.nickname LIKE :startsWith " +
             "AND u.id > :cursor " +  // cursor 기반 페이징 추가
-            "ORDER BY CASE " +
-            "   WHEN u.nickname = :exactMatch THEN 0 " +  // 정확히 일치
-            "   WHEN u.nickname LIKE :startsWith THEN 1 " +  // 검색어로 시작
-            "   ELSE 2 " +  // 그 외 포함
-            "END, u.id")  // id로 2차 정렬 추가
-    List<UserList> findByNicknameContainingWithPaging(@Param("contains") String contains,
-                                                        @Param("exactMatch") String exactMatch,
-                                                        @Param("startsWith") String startsWith,
+            "ORDER BY u.id")  // id로 2차 정렬 추가
+    List<UserList> findByNicknameContainingWithPaging(@Param("startsWith") String startsWith,
                                                         @Param("cursor") int cursor,
                                                         Pageable pageable);
 

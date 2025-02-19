@@ -170,13 +170,11 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ErrorCode.USER_NICKNAME_NOT_PROVIDED);
         }
 
-        String exactMatch = keyword; // 정확히 일치하는 경우
         String startsWith = keyword + "%"; // 검색어로 시작하는 경우
-        String contains = "%" + keyword + "%"; // 검색어가 포함된 경우
         Pageable pageable = PageRequest.of(0, size + 1);
 
-        log.info("검색어 있음 - 검색어 포함: {}, 정확히 일치: {}, 검색어 시작:{}", cursor, pageable, contains, exactMatch, startsWith);
-        List<UserList> userList = userRepository.findByNicknameContainingWithPaging(contains, exactMatch, startsWith, cursor, pageable);
+        log.info("검색어 있음 - 검색어 포함: {}, 정확히 일치: {}, 검색어 시작:{}", cursor, pageable, startsWith);
+        List<UserList> userList = userRepository.findByNicknameContainingWithPaging(startsWith, cursor, pageable);
 
         log.info("사용자 목록 검색 조회 성공");
         return ScrollUtil.createScrollResponse(userList, cursor, size);

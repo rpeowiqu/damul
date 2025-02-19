@@ -6,6 +6,7 @@ import com.damul.api.main.repository.UserIngredientRepository;
 import com.damul.api.mypage.entity.Badge;
 import com.damul.api.mypage.entity.UserBadge;
 import com.damul.api.mypage.repository.BadgeRepository;
+import com.damul.api.mypage.repository.FoodPreferenceRepository;
 import com.damul.api.mypage.repository.UserBadgeRepository;
 import com.damul.api.post.repository.PostRepository;
 import com.damul.api.recipe.repository.RecipeRepository;
@@ -54,6 +55,7 @@ public class BadgeService {
     private static final int BATCH_SIZE = 100;
     private static final short[] BADGE_STANDARDS = {1, 10, 50, 100, 500};
     private final RedisTemplate<String, String> redisTemplate;
+    private final FoodPreferenceRepository foodPreferenceRepository;
 
     /**
      * 배지 수여 배치 작업 메인 메서드
@@ -206,7 +208,11 @@ public class BadgeService {
         );
 
         for (Map.Entry<Integer, String> entry : categoryBadges.entrySet()) {
-            Integer count = userIngredientRepository.countByCategoryIdAndUserReceipt_User_Id(entry.getKey(), user.getId());
+            Integer count = foodPreferenceRepository.findByUserIdAndCategoryId(
+                    user.getId(),
+                    entry.getKey())
+                    .get()
+                    .getCategoryPreference();
 
             short[] standards = {1, 10, 50, 100, 500};
             for (short standard : standards) {
