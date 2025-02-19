@@ -37,7 +37,7 @@ const PopularRecipeCarousel = () => {
     const fetchData = async () => {
       try {
         const response = await getPoppularRecipes();
-        console.log(response.data)
+        console.log(response.data);
         setsuggestedRecipe(response.data);
       } catch (err: any) {
         console.log("레시피 데이터를 받아오지 못했습니다.");
@@ -63,16 +63,6 @@ const PopularRecipeCarousel = () => {
             }}
           >
             <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
-              <div className="flex gap-1 ">
-                {recipe.recipeTags.map((tag, index) => {
-                  return (
-                    <div
-                      key={`${index}-${tag.tagId}`}
-                      className="font-thin text-xxs"
-                    >{`#${tag.tagName}`}</div>
-                  );
-                })}
-              </div>
               <div className="font-bold text-2xl">{recipe.title}</div>
             </div>
             <img
