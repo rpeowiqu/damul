@@ -61,4 +61,7 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
     Integer countByCategoryIdAndUserReceipt_User_Id(Integer categoryId, Integer userId);
 
     List<UserIngredient> findByUserReceipt_User_IdAndIsDeletedFalse(int userId);
+
+    @Query("SELECT ui.userReceipt.user.id FROM UserIngredient ui WHERE ui.userIngredientId = :userIngredientId")
+    Integer findUserIdByUserIngredientId(@Param("userIngredientId") Integer userIngredientId);
 }
