@@ -20,7 +20,7 @@ public interface HomeService {
 
     HomeIngredientDetail getUserIngredientDetail(int ingredientId);
 
-    void updateQuantity(int ingredientId, UserIngredientUpdate update);
+    void updateQuantity(int ingredientId, UserIngredientUpdate update, UserInfo user);
 
     SelectedIngredientList getSelectedIngredientList(List<Integer> ingredientIds);
 
