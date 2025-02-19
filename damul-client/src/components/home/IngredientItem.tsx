@@ -3,6 +3,7 @@ import { STORAGE_TYPE_CONST } from "@/constants/storage";
 import { RegisterIngredient } from "@/types/Ingredient";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
+import MinusIcon from "../svg/MinusIcon";
 
 interface IngredientItemProps {
   ingredient: RegisterIngredient;
@@ -77,9 +78,9 @@ const IngredientItem = ({
         <button
           type="button"
           onClick={onDelete}
-          className="flex items-center justify-center w-5 h-5 rounded-full text-negative-600 hover:negative-700 border-2 border-negative-600 text-xl font-semibold shadow-md transition ease-in-out duration-150 active:scale-75 active:bg-negative-200"
+          className="flex items-center justify-center w-6 h-6 rounded-full transition ease-in-out duration-150 active:scale-75 active:bg-negative-300"
         >
-          -
+          <MinusIcon className="w-full fill-negative-500" />
         </button>
       </div>
       <div className="flex flex-col w-full gap-2 min-w-0">
@@ -110,7 +111,7 @@ const IngredientItem = ({
           <select
             id="categoryId"
             name="categoryId"
-            className="border rounded-md w-full min-w-0 cursor-pointer focus:outline-positive-300 p-1"
+            className="border h-8 rounded-md w-full min-w-0 cursor-pointer focus:outline-positive-300 p-1"
             value={ingredientData.categoryId}
             onChange={handleChange}
           >
@@ -136,7 +137,7 @@ const IngredientItem = ({
           <select
             id="ingredientStorage"
             name="ingredientStorage"
-            className="border rounded-md w-full min-w-0 cursor-pointer focus:outline-positive-300 p-1"
+            className="border h-8 rounded-md w-full min-w-0 cursor-pointer focus:outline-positive-300 p-1"
             value={ingredientData.ingredientStorage}
             onChange={handleChange}
           >

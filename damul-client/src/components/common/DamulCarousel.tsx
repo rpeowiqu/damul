@@ -45,7 +45,12 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
     const fetchRecipeData = async () => {
       try {
         const response = await fetchFn();
-        setsuggestedRecipe(response.data.suggestedRecipes);
+
+        if (response.status === 204) {
+          setsuggestedRecipe([]);
+        } else {
+          setsuggestedRecipe(response.data.suggestedRecipes);
+        }
       } catch (error: any) {
         console.log("레시피 정보를 받지 못했습니다.");
       }
@@ -69,16 +74,6 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
               onClick={() => handleCarouselItemClick(idx)}
             >
               <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
-                <div className="flex gap-1 ">
-                  {recipe.recipeTags?.map((tag, index) => {
-                    return (
-                      <div
-                        key={`${index}-${tag.tagId}`}
-                        className="font-thin text-xxs"
-                      >{`#${tag.tagName}`}</div>
-                    );
-                  })}
-                </div>
                 <div className="font-bold text-2xl">{recipe.title}</div>
               </div>
               <img

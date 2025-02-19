@@ -13,9 +13,9 @@ module.exports = {
       keyframes: {
         shiver: {
           "0%, 100%": { transform: "translate(0, 0)" },
-          "20%": { transform: "translate(-1px, 2px)" },
-          "40%": { transform: "translate(2px, -2px)" },
-          "60%": { transform: "translate(-2px, 1px)" },
+          "20%": { transform: "translate(-1px, 1px)" },
+          "40%": { transform: "translate(0px, -1px)" },
+          "60%": { transform: "translate(-1px, 0px)" },
           "80%": { transform: "translate(1px, -1px)" },
         },
         wind: {
