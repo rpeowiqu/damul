@@ -26,6 +26,8 @@ interface responseData {
 
 const LIMIT_ADD_COUNT = 50;
 const API_URL = import.meta.env.VITE_API_BASE_URL;
+const MAX_RETRY_ATTEMPTS = 5; // 최대 재시도 횟수
+const INITIAL_RETRY_DELAY = 5000; // 최초 재시도 대기 시간 (5초)
 
 const HomeIngredientsRegisterPage = () => {
   const [ingredientRegisterData, setIngredientRegisterData] = useState<
@@ -141,6 +143,8 @@ const HomeIngredientsRegisterPage = () => {
     if (!data?.data?.id) return;
 
     let eventSource: EventSource | null = null;
+    let retryAttempt = 0;
+    let retryTimeout: NodeJS.Timeout;
 
     const connectSSE = () => {
       eventSource = new EventSource(`${API_URL}sse/connect/${data.data.id}`, {
@@ -149,6 +153,7 @@ const HomeIngredientsRegisterPage = () => {
 
       eventSource.onopen = () => {
         console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
+        retryAttempt = 0; // 연결 성공 시 재시도 횟수 초기화
       };
 
       eventSource.onmessage = (event) => {
@@ -180,15 +185,25 @@ const HomeIngredientsRegisterPage = () => {
               return newIngredientRegisterData;
             });
           }
-        } catch (error: any) {
+        } catch (error) {
           console.error("데이터 처리 중 오류가 발생했습니다.", error);
         }
       };
 
-      eventSource.onerror = (error: any) => {
-        console.error(error);
+      eventSource.onerror = (error) => {
+        console.error("❌ SSE 연결 오류 발생", error);
         eventSource?.close();
-        setTimeout(connectSSE, 5000);
+
+        if (retryAttempt < MAX_RETRY_ATTEMPTS) {
+          const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryAttempt); // 5초 → 10초 → 20초 → 40초
+          retryTimeout = setTimeout(connectSSE, retryDelay);
+          retryAttempt += 1;
+          console.log(
+            `⏳ ${retryDelay / 1000}초 후 SSE 재연결 시도... (시도 ${retryAttempt}/${MAX_RETRY_ATTEMPTS})`,
+          );
+        } else {
+          console.warn("🚨 최대 재시도 횟수를 초과하여 SSE 재연결 중단");
+        }
       };
     };
 
@@ -196,6 +211,7 @@ const HomeIngredientsRegisterPage = () => {
 
     return () => {
       eventSource?.close();
+      clearTimeout(retryTimeout);
     };
   }, [data]);
 
