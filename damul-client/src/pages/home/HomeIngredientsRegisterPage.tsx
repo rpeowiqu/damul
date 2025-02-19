@@ -26,6 +26,8 @@ interface responseData {
 
 const LIMIT_ADD_COUNT = 50;
 const API_URL = import.meta.env.VITE_API_BASE_URL;
+const MAX_RETRY_ATTEMPTS = 5; // 최대 재시도 횟수
+const INITIAL_RETRY_DELAY = 5000; // 최초 재시도 대기 시간 (5초)
 
 const HomeIngredientsRegisterPage = () => {
   const [ingredientRegisterData, setIngredientRegisterData] = useState<
@@ -140,63 +142,83 @@ const HomeIngredientsRegisterPage = () => {
   useEffect(() => {
     if (!data?.data?.id) return;
 
-    const eventSource = new EventSource(
-      `${API_URL}/sse/connect/${data.data.id}`,
-      { withCredentials: true },
-    );
+    let eventSource: EventSource | null = null;
+    let retryAttempt = 0;
+    let retryTimeout: NodeJS.Timeout;
 
-    eventSource.onopen = () => {
-      console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
-    };
+    const connectSSE = () => {
+      eventSource = new EventSource(`${API_URL}sse/connect/${data.data.id}`, {
+        withCredentials: true,
+      });
 
-    eventSource.onmessage = (event) => {
-      try {
-        const updatedData = JSON.parse(event.data);
-        console.log(updatedData);
+      eventSource.onopen = () => {
+        console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
+        retryAttempt = 0; // 연결 성공 시 재시도 횟수 초기화
+      };
 
-        if (updatedData.userIngredients.length > 0) {
-          setIngredientRegisterData((prevData) => {
-            const newIngredientRegisterData = [...prevData];
+      eventSource.onmessage = (event) => {
+        try {
+          const updatedData = JSON.parse(event.data);
+          console.log(updatedData);
+          if (updatedData.userIngredients.length > 0) {
+            setIngredientRegisterData((prevData) => {
+              const newIngredientRegisterData = [...prevData];
+              updatedData.userIngredients.forEach(
+                (ingredient: responseData) => {
+                  newIngredientRegisterData.push({
+                    id: Math.floor(Math.random() * 10000),
+                    ingredientName: ingredient.ingredientName,
+                    categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
+                    productPrice: ingredient.productPrice,
+                    expirationDate: ingredient.expiration_date,
+                    ingredientStorage:
+                      ingredient.ingredientStorage === "ROOMTEMP"
+                        ? "ROOM_TEMPERATURE"
+                        : ingredient.ingredientStorage,
+                  });
+                },
+              );
 
-            updatedData.userIngredients.forEach((ingredient: responseData) => {
-              newIngredientRegisterData.push({
-                id: Math.floor(Math.random() * 10000),
-                ingredientName: ingredient.ingredientName,
-                categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
-                productPrice: ingredient.productPrice,
-                expirationDate: ingredient.expiration_date,
-                ingredientStorage:
-                  ingredient.ingredientStorage === "ROOMTEMP"
-                    ? "ROOM_TEMPERATURE"
-                    : ingredient.ingredientStorage,
-              });
+              setPurchaseAt(updatedData.purchaseAt);
+              setStoreName(updatedData.storeName);
+
+              return newIngredientRegisterData;
             });
-
-            setPurchaseAt(updatedData.purchaseAt);
-            setStoreName(updatedData.storeName);
-
-            return newIngredientRegisterData;
-          });
+          }
+        } catch (error) {
+          console.error("데이터 처리 중 오류가 발생했습니다.", error);
         }
-      } catch (error: any) {
-        console.error("데이터 처리 중 오류가 발생했습니다.", error);
-      }
+      };
+
+      eventSource.onerror = (error) => {
+        console.error("❌ SSE 연결 오류 발생", error);
+        eventSource?.close();
+
+        if (retryAttempt < MAX_RETRY_ATTEMPTS) {
+          const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryAttempt); // 5초 → 10초 → 20초 → 40초
+          retryTimeout = setTimeout(connectSSE, retryDelay);
+          retryAttempt += 1;
+          console.log(
+            `⏳ ${retryDelay / 1000}초 후 SSE 재연결 시도... (시도 ${retryAttempt}/${MAX_RETRY_ATTEMPTS})`,
+          );
+        } else {
+          console.warn("🚨 최대 재시도 횟수를 초과하여 SSE 재연결 중단");
+        }
+      };
     };
 
-    eventSource.onerror = (error: any) => {
-      console.error("SSE 연결 중 오류가 발생했습니다.", error);
-      eventSource.close();
-    };
+    connectSSE();
 
     return () => {
-      eventSource.close();
+      eventSource?.close();
+      clearTimeout(retryTimeout);
     };
   }, [data]);
 
   return (
     <div className="flex flex-col p-5 relative">
       {isLoading && (
-        <div className=" mx-auto fixed w-[600px] inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-[9999999999]">
+        <div className=" mx-auto fixed w-full pc:w-[600px] inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-[9999999999]">
           <p className="text-lg text-white">영수증 등록 중입니다</p>
           <p className="text-lg text-white">잠시만 기다려주세요</p>
           <OcrLoading />

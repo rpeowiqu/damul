@@ -11,6 +11,8 @@ export const modifyUserSetting = (
     selfIntroduction: string;
     accessRange: "PUBLIC" | "FRIENDS" | "PRIVATE";
     warningEnabled: boolean;
+    profileImageDefault: boolean;
+    backgroundImageDefault: boolean;
   },
   profileImage: File | null,
   backgroundImage: File | null,

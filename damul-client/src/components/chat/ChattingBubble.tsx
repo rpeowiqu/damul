@@ -33,7 +33,7 @@ const ChattingBubble = ({ msg }: ChattingBubbleProps) => {
                   minute: "2-digit",
                 })}
               </div>
-              <div className="rounded-md text-start text-sm flex-1 whitespace-pre-wrap bg-neutral-100 p-3">
+              <div className="rounded-md text-start text-sm flex-1 bg-neutral-100 p-3 whitespace-pre-wrap break-words break-all">
                 {msg.messageType === "TEXT" && <p>{msg.content}</p>}
                 {msg.messageType === "IMAGE" && (
                   <Image
@@ -67,7 +67,7 @@ const ChattingBubble = ({ msg }: ChattingBubbleProps) => {
             </p>
           </Link>
           <div className="flex items-end space-x-2">
-            <div className="rounded-md text-start text-sm flex-1 whitespace-pre-wrap bg-positive-100 p-3">
+            <div className="rounded-md text-start text-sm flex-1 bg-positive-100 p-3 whitespace-pre-wrap break-words break-all">
               {msg.messageType === "TEXT" && <p>{msg.content}</p>}
               {msg.messageType === "IMAGE" && (
                 <Image

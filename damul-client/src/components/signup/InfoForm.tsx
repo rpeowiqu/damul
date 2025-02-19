@@ -28,12 +28,18 @@ interface InfoFormProps {
 
 const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
   const [status, setStatus] = useState<
-    "none" | "available" | "duplicate" | "validLength"
+    "none" | "available" | "duplicate" | "validLength" | "noCheck"
   >("none");
+  const [isCheck, setIsCheck] = useState<boolean>(false);
   const nav = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!isCheck) {
+      setStatus("noCheck");
+      return;
+    }
 
     try {
       const newStatus = await checkNickname();
@@ -71,14 +77,17 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
         }
         break;
     }
+
+    setIsCheck(false);
   };
 
   const handleDuplicationCheck = async () => {
     try {
       const newStatus = await checkNickname();
       setStatus(newStatus!);
+      setIsCheck(true);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -87,6 +96,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
       return "validLength";
     } else {
       try {
+        setIsCheck(true);
         const response = await checkNicknameDuplication(userInfo.nickname);
         if (!response.data) {
           return "available";
@@ -94,7 +104,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
           return "duplicate";
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   };
@@ -107,6 +117,8 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
         return "이미 사용중인 닉네임입니다.";
       case "validLength":
         return "닉네임은 한글, 영문 2-8자로만 구성되어야 합니다.";
+      case "noCheck":
+        return "닉네임 중복 확인을 해주세요.";
     }
 
     return "";
@@ -188,7 +200,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
           </p>
         </div>
 
-        <div className="flex flex-col justify-end w-full">
+        <div className="relative flex flex-col justify-end w-full">
           <Label
             htmlFor="selfIntroduction"
             className="text-sm text-positive-400 font-bold"

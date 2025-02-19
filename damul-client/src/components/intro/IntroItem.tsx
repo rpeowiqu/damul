@@ -37,7 +37,7 @@ const IntroItem = ({
           duration: 1.0,
         },
       }}
-      className="relative w-full h-full flex flex-col items-center"
+      className="relative w-full min-h-[405px] sm:min-h-[500px] flex flex-col justify-center items-center"
     >
       <motion.img
         src={screenImage}

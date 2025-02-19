@@ -127,7 +127,7 @@ const TermsForm = ({
             })}
           </div>
 
-          <p className="absolute -bottom-16 text-sm text-negative-400">
+          <p className="absolute -bottom-12 text-sm text-negative-400">
             {infoText}
           </p>
         </div>
