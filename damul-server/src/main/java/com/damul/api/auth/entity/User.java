@@ -42,7 +42,6 @@ public class User {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", columnDefinition = "DATETIME")
-    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @Column(name = "active")

@@ -48,7 +48,6 @@ public class Recipe {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @Column(name = "is_deleted", nullable = false)

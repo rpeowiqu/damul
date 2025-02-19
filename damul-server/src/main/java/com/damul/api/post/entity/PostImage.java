@@ -25,7 +25,6 @@ public class PostImage {
     @Column(length = 255, nullable = false)
     private String imageUrl;
 
-    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

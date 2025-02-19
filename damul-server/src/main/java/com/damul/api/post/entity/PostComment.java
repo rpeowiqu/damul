@@ -36,7 +36,6 @@ public class PostComment {
     @Column(nullable = false)
     private String comment;
 
-    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
