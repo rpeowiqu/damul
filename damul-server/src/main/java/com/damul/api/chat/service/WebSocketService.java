@@ -13,7 +13,7 @@ public interface WebSocketService {
 
     void handleMessage(int roomId, ChatMessageCreate messageRequest);
 
-    void handleImageMessage(int roomId, ChatMessageCreate messageRequest);
+    void handleImageMessage(int roomId, int userId, String content, String imagePath);
 
     void handleEnter(int roomId, int userId);
 

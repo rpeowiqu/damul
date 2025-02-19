@@ -1,7 +1,9 @@
 package com.damul.api.chat.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MemberRole;
+import com.damul.api.chat.dto.response.ChatImageUploadResponse;
 import com.damul.api.chat.dto.response.ChatMessageResponse;
 import com.damul.api.chat.dto.response.ChatScrollResponse;
 import com.damul.api.chat.dto.response.UnReadResponse;
@@ -11,11 +13,13 @@ import com.damul.api.chat.entity.ChatRoomMember;
 import com.damul.api.chat.repository.ChatMessageRepository;
 import com.damul.api.chat.repository.ChatRoomMemberRepository;
 import com.damul.api.chat.repository.ChatRoomRepository;
+import com.damul.api.common.TimeZoneConverter;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
+import com.damul.api.config.service.S3Service;
 import com.damul.api.post.entity.Post;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +29,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +49,8 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
     private final UserRepository userRepository;
     private final UnreadMessageService unreadMessageService;
     private final SimpMessageSendingOperations messagingTemplate;
+    private final S3Service s3Service;
+    private final TimeZoneConverter timeZoneConverter;
 
     @Override
     @Transactional  // ✨ readOnly 제거 (멤버 추가 필요할 수 있으므로)
@@ -167,6 +175,74 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         log.info("서비스: 전체 안 읽은 메시지 수 조회 완료 - count: {}", unreadCount);
 
         return new UnReadResponse(unreadCount);
+    }
+
+    @Override
+    public ChatImageUploadResponse uploadChatImage(int roomId, String content, MultipartFile image, UserInfo currentUser) {
+        log.info("서비스: 채팅 이미지 업로드 시작 - roomId: {}, userId: {}",
+                roomId, currentUser.getId());
+
+        // 유효성 검증
+        validateRoomId(roomId);
+        validateUserId(currentUser.getId());
+        validateImage(image);
+
+        // 채팅방 및 사용자 조회
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND, "존재하지 않는 채팅방입니다."));
+
+        User user = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다."));
+
+        try {
+            // S3에 이미지 업로드
+            String imagePath = s3Service.uploadFile(image);
+            log.info("서비스: S3 이미지 업로드 완료 - path: {}", imagePath);
+
+            // 채팅 메시지 생성 및 저장
+            ChatMessage message = createImageMessage(room, user, content, imagePath);
+            chatMessageRepository.save(message);
+
+            // 웹소켓으로 메시지 전송
+            sendMessageToSubscribers(message);
+
+            // 안 읽은 메시지 수 업데이트
+            updateUnreadCount(message);
+
+            return new ChatImageUploadResponse(imagePath);
+        } catch (Exception e) {
+            log.error("서비스: 채팅 이미지 업로드 실패", e);
+            throw new BusinessException(ErrorCode.FILE_UPLOAD_ERROR, "이미지 업로드에 실패했습니다.");
+        }
+    }
+
+    private ChatMessage createImageMessage(ChatRoom room, User user, String content, String imagePath) {
+        ChatMessage message = ChatMessage.createFileMessage(room, user, (content != null) ? content : "", imagePath);
+        message.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
+        return message;
+    }
+
+    private void sendMessageToSubscribers(ChatMessage message) {
+        int unReadCount = chatMessageRepository.countUnreadMessages(
+                message.getRoom().getId(), message.getId());
+
+        messagingTemplate.convertAndSend(
+                "/sub/chat/room/" + message.getRoom().getId(),
+                ChatMessageResponse.from(message, unReadCount)
+        );
+    }
+
+    private void updateUnreadCount(ChatMessage message) {
+        // 채팅방의 모든 멤버를 조회하고 발신자를 제외한 모든 멤버의 안 읽은 메시지 수 증가
+        chatRoomMemberRepository.findAllByRoomId(message.getRoom().getId()).stream()
+                .filter(member -> member.getUser().getId() != message.getSender().getId())
+                .forEach(member -> unreadMessageService.incrementUnreadCount(member.getUser().getId()));
+    }
+
+    private void validateImage(Object image) {
+        if (image == null) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "이미지가 필요합니다.");
+        }
     }
 
     private ChatMessageResponse convertToChatMessageResponse(ChatMessage chatMessage) {
