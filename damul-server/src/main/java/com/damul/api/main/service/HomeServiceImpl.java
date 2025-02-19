@@ -5,6 +5,7 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.sse.service.SseService;
 import com.damul.api.common.util.IngredientNormalizerUtil;
 import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.dto.OcrDto;
@@ -52,6 +53,7 @@ import java.util.stream.Collectors;
 public class HomeServiceImpl implements HomeService {
 
     private final ObjectMapper objectMapper;
+    private final SseService sseService;
     @Value("${fastapi.server.url}")
     private String fastApiServerUrl;
 
@@ -226,6 +228,7 @@ public class HomeServiceImpl implements HomeService {
     public OcrList processImage(MultipartFile file, int userId) {
         try {
             log.info("서비스: 이미지 처리 시작 - userId: {}", userId);
+            sseService.sendToClient(userId, "OCR 요청을 시작합니다");
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
