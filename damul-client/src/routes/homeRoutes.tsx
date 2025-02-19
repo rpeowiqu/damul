@@ -17,7 +17,7 @@ const homeRoutes = [
     path: "home/register",
 
     element: (
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div></div>}>
         <HomeIngredientsRegisterPage />
       </Suspense>
     ),

@@ -28,7 +28,7 @@ const AdminPostPage = () => {
         </NavLink>
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div></div>}>
         <Outlet />
       </Suspense>
     </div>
