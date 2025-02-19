@@ -12,8 +12,8 @@ export const initialIngrdientData: IngredientData = {
       ingredientName: "쌀",
       ingredientQuantity: 50,
       expirationDate: 10,
-      storage: "Freezer",
-      purchaseDate: "2024-01-15",
+      storage: "freezer",
+      purchaseDate: new Date().toISOString().split("T")[0],
     },
   ],
   fridge: [
@@ -23,19 +23,19 @@ export const initialIngrdientData: IngredientData = {
       ingredientName: "토마토",
       ingredientQuantity: 60,
       expirationDate: 16,
-      storage: "Fridge",
-      purchaseDate: "2024-02-01",
+      storage: "fridge",
+      purchaseDate: new Date().toISOString().split("T")[0],
     },
   ],
   roomTemp: [
     {
       userIngredientId: 23512,
-      categoryId: 3,
+      categoryId: 2,
       ingredientName: "사과",
       ingredientQuantity: 30,
       expirationDate: 10,
-      storage: "Room Temp",
-      purchaseDate: "2023-08-20",
+      storage: "roomTemp",
+      purchaseDate: new Date().toISOString().split("T")[0],
     },
   ],
 };
@@ -49,23 +49,23 @@ export const initialIngrdientEmptyData: IngredientData = {
 export const initialIngrdientItems = [
   {
     userIngredientId: 4123432,
-    categoryId: 9,
+    categoryId: 6,
     ingredientName: "맛소금",
-    ingredientQuantity: 2,
+    ingredientQuantity: 20,
     expirationDate: 16,
     storage: "roomTemp",
-    purchaseDate: "2024-01-15",
+    purchaseDate: new Date().toISOString().split("T")[0],
   },
 ];
 
 export const initialIngrdientItem = {
   userIngredientId: 321342,
-  categoryId: 8,
+  categoryId: 3,
   ingredientName: "식용유",
   ingredientQuantity: 50,
   expirationDate: 30,
   storage: "roomTemp",
-  purchaseDate: "2025-02-10",
+  purchaseDate: new Date().toISOString().split("T")[0],
 };
 
 export const initialIngredientRegisterData: RegisterIngredientData = {

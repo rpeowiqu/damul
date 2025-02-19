@@ -123,7 +123,7 @@ const IngredientStorageContainer = ({
       return { ...prevData, [storage]: newData };
     });
 
-    if (deletedIngredient.expirationDate < 7) {
+    if (deletedIngredient.expirationDate <= EXPIRINGSOON_DAY) {
       setExpiringSoonItems?.((prevItems) =>
         prevItems?.filter(
           (item) =>

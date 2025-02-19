@@ -38,10 +38,10 @@ const IngredientButton = ({
   return (
     <DamulButton
       onClick={onClick}
-      className={`${expirationDate < 0 && "opacity-40"} ${randomDelay == 1 && title === "freezer" && "animate-shiver"} hover:animate-wave bg-white h-full text-black flex items-center justify-center py-2 shadow-md border border-normal-100 rounded-xl hover:bg-normal-50 focus:outline-none ${onEdit && "border-2 border-positive-300"} transition ease-in-out duration-1500 active:scale-75`}
+      className={`${randomDelay == 1 && title === "freezer" && "animate-shiver"} hover:animate-wave bg-white h-full text-black flex items-center justify-center py-2 shadow-md border border-normal-100 rounded-xl hover:bg-normal-50 focus:outline-none ${onEdit && "border-2 border-positive-300"} transition ease-in-out duration-1500 active:scale-75 ${expirationDate < 0 && "bg-negative-200 text-negative-400"}`}
     >
       <div className="relative">
-        {expirationDate <= 7 && expirationDate > 0 && (
+        {expirationDate <= 7 && expirationDate >= 0 && (
           <AlertCircleIcon className="animate-pulse duration-1000 stroke-negative-500 absolute scale-110 -left-4 bottom-4 fill-white" />
         )}
         {onEdit && (

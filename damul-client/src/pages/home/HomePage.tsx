@@ -51,7 +51,7 @@ const HomePage = () => {
           .filter((ingredient: Ingredient) => {
             return (
               ingredient.expirationDate <= EXPIRINGSOON_DAY &&
-              ingredient.expirationDate > 0
+              ingredient.expirationDate >= 0
             );
           });
         setExpiringSoonItems(expiringSoonData);

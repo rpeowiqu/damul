@@ -7,6 +7,9 @@ import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
 import { useEffect, useState } from "react";
 import useAuth from "@/hooks/useAuth";
 import DamulButton from "../common/DamulButton";
+import CancelIcon from "../svg/CancelIcon";
+import AlertCircleIcon from "../svg/AlertCircleIcon";
+import { EXPIRINGSOON_DAY } from "@/constants/itemStatus";
 
 interface IngredientDetailProps {
   selectedIngredient: Ingredient;
@@ -17,21 +20,36 @@ interface IngredientDetailProps {
   readOnly?: boolean;
 }
 
-const InfoRow = ({ label, value }: { label: string; value: string }) => (
+const InfoRow = ({
+  label,
+  labelStyle,
+  value,
+  valueStyle,
+}: {
+  label: string;
+  labelStyle?: string;
+  value: string;
+  valueStyle?: string;
+}) => (
   <div className="flex flex-col text-sm font-bold w-full">
-    <div className="text-positive-300">{label}</div>
-    <div>{value}</div>
+    <div className={`text-positive-300 ${labelStyle}`}>{label}</div>
+    <div className={valueStyle}>{value}</div>
   </div>
 );
 
-const getExpirationDate = (
-  purchaseDate: string,
-  expirationDate: number,
-): string => {
-  const purchase = new Date(purchaseDate);
-  purchase.setDate(purchase.getDate() + expirationDate);
+const getExpirationDate = (expirationDate: number): string => {
+  const expiration = new Date();
+  console.log(expiration);
+  expiration.setDate(expiration.getDate() + expirationDate);
 
-  return purchase.toISOString().split("T")[0];
+  return expiration
+    .toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+    .replace(/\. /g, "-")
+    .replace(".", "");
 };
 
 const IngredientDetail = ({
@@ -97,13 +115,22 @@ const IngredientDetail = ({
 
   return (
     <div className="flex flex-col items-center w-full gap-4 p-5">
-      <p className="w-full pb-3 text-xl font-bold text-center border-b-2 text-positive-300 border-b-normal-50">
+      <p className="w-full pb-3 text-xl font-bold text-center border-2der-b-2 text-positive-300 border-b-normal-50">
         식자재 상세보기
       </p>
 
       <div className="flex items-center justify-center w-full gap-4">
-        <div className="flex items-center justify-center w-full border-2 p-6 rounded-full border-normal-50">
-          <IconComponent className="w-full h-full max-h-40" />
+        <div
+          className={`relative flex items-center justify-center w-full h-full rounded-full border-2 border-normal-50 ${selectedIngredient.expirationDate < 0 && "border-negative-500"}`}
+        >
+          {selectedIngredient.expirationDate >= 0 &&
+            selectedIngredient.expirationDate <= EXPIRINGSOON_DAY && (
+              <AlertCircleIcon className="animate-pulse absolute size-14 top-0 left-0 stroke-negative-500" />
+            )}
+          {selectedIngredient.expirationDate < 0 && (
+            <CancelIcon className="fill-negative-500 animate-pulse absolute size-14 top-0 left-0" />
+          )}
+          <IconComponent className="size-40 p-6 max-h-40" />
         </div>
 
         <div className="flex flex-col w-full gap-3">
@@ -111,10 +138,8 @@ const IngredientDetail = ({
           <InfoRow label="구매일" value={selectedIngredient.purchaseDate} />
           <InfoRow
             label="소비기한"
-            value={getExpirationDate(
-              selectedIngredient.purchaseDate,
-              selectedIngredient.expirationDate,
-            )}
+            value={getExpirationDate(selectedIngredient.expirationDate)}
+            valueStyle={`${selectedIngredient.expirationDate <= EXPIRINGSOON_DAY && "text-negative-500 font-extrabold"}`}
           />
         </div>
       </div>
