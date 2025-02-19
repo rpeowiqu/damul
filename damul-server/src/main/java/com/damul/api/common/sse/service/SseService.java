@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -21,7 +23,7 @@ public class SseService {
     private final Map<Integer, SseEmitter> localEmitters = new ConcurrentHashMap<>();
 
     private static final String SSE_KEY_PREFIX = "sse:emitter:";
-    private static final long TIMEOUT = 5 * 60 * 1000L; // 5분
+    private static final long TIMEOUT = Long.MAX_VALUE;
 
     public SseEmitter createEmitter(int userId) {
         String redisKey = SSE_KEY_PREFIX + userId;
@@ -51,12 +53,31 @@ public class SseService {
         // 로컬 맵에도 저장
         localEmitters.put(userId, emitter);
 
+        // 하트비트 스케줄러 추가
+        ScheduledExecutorService heartbeatExecutor = Executors.newSingleThreadScheduledExecutor();
+        heartbeatExecutor.scheduleAtFixedRate(() -> {
+            try {
+                if (localEmitters.containsKey(userId)) {
+                    emitter.send(SseEmitter.event().name("heartbeat").data("ping"));
+                    log.debug("Heartbeat sent to userId: {}", userId);
+                } else {
+                    heartbeatExecutor.shutdown();
+                }
+            } catch (IOException e) {
+                log.error("Heartbeat 전송 실패 - userId: {}", userId, e);
+                heartbeatExecutor.shutdown();
+                emitter.complete();
+                removeEmitter(userId);
+            }
+        }, 0, 30, TimeUnit.SECONDS);
+
         try {
             emitter.send(SseEmitter.event()
                     .name("connect")
                     .data("connected!"));
         } catch (IOException e) {
             log.error("초기 이벤트 전송 실패 - userId: {}", userId, e);
+            heartbeatExecutor.shutdown();
             removeEmitter(userId);
         }
 
