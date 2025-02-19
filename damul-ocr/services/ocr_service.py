@@ -8,9 +8,6 @@ import io
 
 import re   # 정규식
 
-import json
-
-
 
 # 속도 향상을 위한 정규식 컴파일
 HANGUL_REGEX = re.compile('[ㄱ-ㅎ가-힣]+')
