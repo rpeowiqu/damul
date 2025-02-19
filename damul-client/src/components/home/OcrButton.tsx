@@ -45,7 +45,8 @@ const OcrButton = ({
 
       if (response.data.userIngredients.length > 0) {
         setIngredientRegisterData((prevData) => {
-          const newIngredientRegisterData = [...prevData];
+          const newIngredientRegisterData =
+            prevData[0].ingredientName.length > 0 ? [...prevData] : [];
 
           response.data.userIngredients.map((ingredient: responseData) => {
             newIngredientRegisterData.push({
