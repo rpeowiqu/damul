@@ -64,7 +64,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
             "FROM ChatMessage cm " +
             "JOIN ChatRoomMember crm ON cm.room = crm.room " +
             "WHERE crm.user.id = :userId")
-    int countAllUnreadMessages(@Param("userId") int userId);
+    Integer countAllUnreadMessages(@Param("userId") int userId);
 
     @Query(value = """
         SELECT created_at 
@@ -79,7 +79,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
             "WHERE m.room.id = :roomId " +
             "AND m.id > :lastReadId " +
             "AND m.id <= :currentReadId")
-    int countUnreadMessagesInRoom(
+    Integer countUnreadMessagesInRoom(
             @Param("roomId") int roomId,
             @Param("lastReadId") int lastReadId,
             @Param("currentReadId") int currentReadId
