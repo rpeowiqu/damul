@@ -23,7 +23,7 @@ public class SseService {
     private final Map<Integer, SseEmitter> localEmitters = new ConcurrentHashMap<>();
 
     private static final String SSE_KEY_PREFIX = "sse:emitter:";
-    private static final long TIMEOUT = Long.MAX_VALUE;
+    private static final long TIMEOUT = 10 * 60 * 1000L;
 
     public SseEmitter createEmitter(int userId) {
         String redisKey = SSE_KEY_PREFIX + userId;
