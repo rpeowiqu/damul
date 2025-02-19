@@ -66,7 +66,7 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
       className="relative w-full"
     >
       <CarouselContent>
-        {suggestedRecipe.length !== 0 &&
+        {suggestedRecipe.length > 0 &&
           suggestedRecipe.map((recipe, idx) => (
             <CarouselItem
               key={`${idx}-${recipe.recipeId}`}
