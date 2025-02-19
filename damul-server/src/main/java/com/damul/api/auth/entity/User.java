@@ -58,7 +58,7 @@ public class User {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private AccessRange accessRange = AccessRange.PUBLIC;
+    private AccessRange accessRange = AccessRange.PRIVATE;
 
     @Column(name = "warning_enabled")
     @Builder.Default
