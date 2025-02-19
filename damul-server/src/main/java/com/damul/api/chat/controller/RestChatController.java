@@ -213,7 +213,7 @@ public class RestChatController {
 
         ChatImageUploadResponse response = chatMessageService.uploadChatImage(roomId, content, image, user);
 
-        log.info("컨트롤러: 채팅 이미지 업로드 완료 - imagePath: {}", response.getImagePath());
+        log.info("컨트롤러: 채팅 이미지 업로드 완료 - imagePath: {}", response.getImage());
         return ResponseEntity.ok(response);
     }
 
