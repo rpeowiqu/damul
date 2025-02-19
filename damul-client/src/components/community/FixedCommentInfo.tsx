@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { useRef, useEffect, Dispatch, SetStateAction } from "react";
 import CommentInput from "../common/CommentInput";
 import { Comment } from "@/types/community";
 
@@ -22,6 +22,12 @@ const FixedCommentInfo = ({
   fetchDetailData,
   type,
 }: FixedCommentInfoProps) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    if (replyingTo) {
+      inputRef.current?.focus();
+    }
+  }, [replyingTo]);
   return (
     <div className="fixed bottom-16 left-0 w-full pc:w-[598px] pc:left-1/2 pc:-translate-x-1/2 bg-white border-t p-2 shadow-md">
       {replyingTo && (
@@ -39,6 +45,7 @@ const FixedCommentInfo = ({
         </div>
       )}
       <CommentInput
+        ref={inputRef}
         placeholder={
           replyingTo ? "대댓글을 입력해주세요" : "댓글을 입력해주세요"
         }
