@@ -3,18 +3,16 @@ import OptionIcon from "@/components/svg/OptionIcon";
 import { Link } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import { useAlarmSubscription } from "@/hooks/useAlarmSubscription";
-import { useState } from "react";
+import { useAlarmStore } from "@/stores/alarmStore";
 
 const Header = () => {
   const { data, isLoading } = useAuth();
   const userId = data?.data.id;
-  const [alarmCnt, setAlarmCnt] = useState(0);
+  const { alarmCnt, increaseAlarmCnt, setAlarmCnt } = useAlarmStore(); // Zustand 상태 사용
 
-  const {} = useAlarmSubscription({
+  useAlarmSubscription({
     userId,
-    onAlarmReceived: () => {
-      setAlarmCnt((prev) => prev + 1);
-    },
+    onAlarmReceived: increaseAlarmCnt, // 새 알림이 올 때 증가
     setAlarmCnt,
   });
 
