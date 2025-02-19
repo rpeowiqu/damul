@@ -1,6 +1,6 @@
+import { useState } from "react";
 import IntroContent from "@/components/intro/IntroContent";
 import LoadingScreen from "@/components/intro/LoadingScreen";
-import { useState } from "react";
 
 const IntroPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
