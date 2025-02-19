@@ -1,5 +1,6 @@
 package com.damul.api.main.service;
 
+import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.common.exception.BusinessException;
@@ -117,8 +118,9 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     @Transactional
-    public void updateQuantity(int ingredientId, UserIngredientUpdate update) {
+    public void updateQuantity(int ingredientId, UserIngredientUpdate update, UserInfo user) {
         validateIngredientQuantity(update.getIngredientQuantity());
+        validateUpdateUser(user, ingredientId);
 
         UserIngredient ingredient = userIngredientRepository.findById(ingredientId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INGREDIENT_NOT_FOUND));
@@ -388,6 +390,11 @@ public class HomeServiceImpl implements HomeService {
             case "date" -> "expirationDate";
             default -> "ingredientName";
         };
+    }
+
+    private void validateUpdateUser(UserInfo user, int ingredientId) {
+        int targetUserId = userIngredientRepository.findUserIdByUserIngredientId(ingredientId);
+        if(user.getId() != targetUserId) throw new BusinessException(ErrorCode.INVALID_ID, "다른 유저의 식자재를 수정할 수 없습니다.");
     }
 
 }
