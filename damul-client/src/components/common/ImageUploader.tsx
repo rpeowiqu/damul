@@ -12,6 +12,7 @@ interface ImageUploaderProps {
   initImage?: string;
   className?: string;
   setFile?: Dispatch<SetStateAction<File | null>>;
+  onChange?: () => void;
   children: (props: { onEdit: () => void; onReset: () => void }) => ReactNode;
 }
 
@@ -20,6 +21,7 @@ const ImageUploader = ({
   initImage,
   className,
   setFile,
+  onChange,
   children,
 }: ImageUploaderProps) => {
   const [previewURL, setPreviewURL] = useState<string>(
@@ -35,6 +37,7 @@ const ImageUploader = ({
 
       if (setFile) {
         setFile(file);
+        onChange?.();
       }
     }
   };

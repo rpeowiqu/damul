@@ -46,6 +46,8 @@ interface UserSetting {
   profileBackgroundImageUrl: string;
   accessRange: "PUBLIC" | "FRIENDS" | "PRIVATE";
   warningEnabled: boolean;
+  profileImageDefault: boolean;
+  backgroundImageDefault: boolean;
 }
 
 const SettingPage = () => {
@@ -58,6 +60,8 @@ const SettingPage = () => {
     profileBackgroundImageUrl: "",
     accessRange: "PUBLIC",
     warningEnabled: true,
+    profileImageDefault: false,
+    backgroundImageDefault: false,
   });
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [backgroundFile, setBackgroundFile] = useState<File | null>(null);
@@ -72,7 +76,13 @@ const SettingPage = () => {
       try {
         const response = await getUserSetting();
         if (response) {
-          setUserSetting(response.data);
+          setUserSetting({
+            ...response.data,
+            profileImageDefault: response.data.profileImageUrl ? false : true,
+            backgroundImageDefault: response.data.profileBackgroundImageUrl
+              ? false
+              : true,
+          });
         }
       } catch (error) {
         console.log(error);
@@ -96,6 +106,10 @@ const SettingPage = () => {
             selfIntroduction: userSetting.selfIntroduction,
             accessRange: userSetting.accessRange,
             warningEnabled: userSetting.warningEnabled,
+            profileImageDefault:
+              !profileFile && userSetting.profileImageDefault,
+            backgroundImageDefault:
+              !backgroundFile && userSetting.backgroundImageDefault,
           },
           profileFile,
           backgroundFile,
@@ -140,6 +154,20 @@ const SettingPage = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleBackgroundImageChange = (isDefault: boolean) => {
+    setUserSetting({
+      ...userSetting,
+      backgroundImageDefault: isDefault,
+    });
+  };
+
+  const handleProfileImageChange = (isDefault: boolean) => {
+    setUserSetting({
+      ...userSetting,
+      profileImageDefault: isDefault,
+    });
   };
 
   const checkNickname = async () => {
@@ -224,6 +252,7 @@ const SettingPage = () => {
               defaultImage={defaultBackgroundImage}
               initImage={userSetting.profileBackgroundImageUrl}
               setFile={setBackgroundFile}
+              onChange={() => handleBackgroundImageChange(false)}
               className="relative w-full h-44"
             >
               {({ onEdit, onReset }) => (
@@ -239,7 +268,12 @@ const SettingPage = () => {
                   <DropdownMenuContent>
                     <DropdownMenuLabel>프로필 배경 변경하기</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={onReset}>
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        handleBackgroundImageChange(true);
+                        onReset();
+                      }}
+                    >
                       기본 배경으로 변경
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={onEdit}>
@@ -254,6 +288,7 @@ const SettingPage = () => {
               defaultImage={defaultProfileImage}
               initImage={userSetting.profileImageUrl}
               setFile={setProfileFile}
+              onChange={() => handleProfileImageChange(false)}
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border-4 border-normal-50 bg-white overflow-hidden"
             >
               {({ onEdit, onReset }) => (
@@ -271,7 +306,12 @@ const SettingPage = () => {
                       프로필 이미지 변경하기
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={onReset}>
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        handleProfileImageChange(true);
+                        onReset();
+                      }}
+                    >
                       기본 이미지로 변경
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={onEdit}>
