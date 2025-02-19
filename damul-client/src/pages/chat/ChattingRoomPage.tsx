@@ -18,6 +18,7 @@ interface ChatData {
 
 const ChattingRoomPage = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement | null>(null);
   const { roomId } = useParams();
   const { data, isLoading: authLoading } = useAuth();
 
@@ -159,6 +160,10 @@ const ChattingRoomPage = () => {
       });
 
       setMessage("");
+
+      if (messageInputRef.current) {
+        messageInputRef.current.style.height = "2.5rem";
+      }
     } else if (image) {
       // 바이너리 이미지 전송
       const newImageMessage: ChatMessage = {
@@ -254,10 +259,11 @@ const ChattingRoomPage = () => {
           </div>
         ) : (
           <textarea
+            ref={messageInputRef}
             value={message}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            className="flex-1 border rounded-md px-5 py-2 focus:outline-none text-sm resize-none min-h-[2rem] max-h-[6rem]"
+            className="flex-1 border rounded-md px-5 py-2 focus:outline-none text-sm resize-none min-h-[2.5rem] max-h-[10rem]"
             placeholder="메시지 입력"
             rows={1}
           />

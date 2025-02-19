@@ -41,7 +41,11 @@ const AlarmItem = ({
         setLink(`/community/${postType}/${targetUrl}`);
         break;
       case "LIKE":
-        setLink(`/community/${postType}/${targetUrl}`);
+        if (postType === "recipe") {
+          setLink(`/community/recipe/${targetUrl}`);
+        } else {
+          setLink(`/community/market/${targetUrl}`);
+        }
         break;
       case "BADGE":
         setLink(`/profile/${userId}/badge`);
