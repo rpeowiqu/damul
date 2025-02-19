@@ -64,6 +64,22 @@
     @apply bg-background text-foreground;
   }
 }
+@layer utilities {
+  .mask-gradient {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 0) 85%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 0) 85%
+    );
+  }
+}
 
 @keyframes shine {
   0% {

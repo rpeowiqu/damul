@@ -38,3 +38,7 @@ export const postReceiptForOCR = async (formData: FormData) => {
     withCredentials: true,
   });
 };
+
+export const postReceiptForQR = async (userId: number, formData: FormData) => {
+  return apiClient.post(`/home/upload/${userId}`, formData);
+};

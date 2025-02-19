@@ -52,7 +52,9 @@ const AlarmPage = () => {
 
   return (
     <div className="h-full text-center">
-      <div className="text-start px-7 py-3 border-b">알림 {alarmCnt}개</div>
+      <div className="text-start px-7 py-3 border-b">
+        읽지 않은 알림 {alarmCnt}개
+      </div>
       <div>{alarms?.map((alarm) => <AlarmItem {...alarm} />)}</div>
     </div>
   );

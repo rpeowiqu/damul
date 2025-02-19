@@ -5,7 +5,7 @@ import SendIcon from "@/components/svg/SendIcon";
 import ChattingMenuButton from "@/components/chat/ChattingMenuButton";
 import { getChattingContents } from "@/service/chatting";
 import { ChatMessage } from "@/types/chatting";
-import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
+import ChattingRoomInfiniteScroll from "@/components/chat/ChattingRoomInfiniteScroll";
 import { useChattingSubscription } from "@/hooks/useChattingSubscription";
 import useAuth from "@/hooks/useAuth";
 
@@ -47,7 +47,7 @@ const ChattingRoomPage = () => {
   };
 
   // STOMP 클라이언트 초기화
-  const { sendMessage } = useChattingSubscription({
+  const { sendMessage, readMessage } = useChattingSubscription({
     roomId: roomId,
     onMessageReceived: handleMessageReceived,
   });
@@ -78,7 +78,7 @@ const ChattingRoomPage = () => {
       const response = await getChattingContents({
         roomId: roomId,
         cursor: pageParam,
-        size: 5,
+        size: 100,
       });
 
       console.log(response?.data);
@@ -186,6 +186,19 @@ const ChattingRoomPage = () => {
     }
   };
 
+  // 채팅 읽음 처리
+  useEffect(() => {
+    if (!chatData.messages.length || !roomId || !data?.data.id) return;
+
+    const lastMessage = chatData.messages[chatData.messages.length - 1];
+
+    readMessage({
+      userId: data?.data.id,
+      roomId: roomId,
+      messageId: lastMessage.id,
+    });
+  }, [chatData.messages]);
+
   return (
     <main className="h-full text-center py-6 space-y-2">
       <div className="fixed flex top-14 p-5 items-center justify-between border-b-1 border-neutral-200 bg-white font-semibold text-start h-12 pc:h-16 w-full pc:w-[598px]">
@@ -195,7 +208,7 @@ const ChattingRoomPage = () => {
         <ChattingMenuButton roomId={roomId} postId={chatData.postId} />
       </div>
       <div className="flex-1 justify-end overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
-        <DamulInfiniteScrollList
+        <ChattingRoomInfiniteScroll
           key={chatData.messages.length} // 새로운 메시지가 추가될 때마다 key 변경
           queryKey={["chats"]}
           fetchFn={fetchItems}
@@ -208,7 +221,7 @@ const ChattingRoomPage = () => {
         <div ref={messagesEndRef} />
       </div>
       <div className="fixed w-full pc:w-[598px] bottom-16 p-2 pc:p-4 border-t bg-white flex items-end">
-        <label
+        {/* <label
           htmlFor="image-upload"
           className="bg-neutral-200 p-1 pc:p-2 rounded-full cursor-pointer mr-2"
         >
@@ -222,7 +235,7 @@ const ChattingRoomPage = () => {
           className="hidden"
           accept="image/*"
           onChange={handleImageUpload}
-        />
+        /> */}
         {prevImage ? (
           <div className="flex-1 border-1 p-3 rounded-lg relative">
             <div className="relative h-24 w-24">

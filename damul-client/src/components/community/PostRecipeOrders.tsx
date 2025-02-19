@@ -132,7 +132,10 @@ const PostRecipeSteps = ({
         footerContent={<SubmitButton />}
         onFooterClick={handleSubmit}
         onTriggerClick={() => {
-          console.log("추가");
+          if (tempOrders.length >= 10) {
+            alert("요리 순서는 최대 10개까지 입력 가능합니다.");
+            return;
+          }
           setIsOpen(true);
         }}
       />

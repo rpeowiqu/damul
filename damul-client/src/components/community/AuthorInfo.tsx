@@ -158,7 +158,11 @@ const AuthorInfo = ({
           </>
         ) : (
           <div className="flex items-center gap-0.5 cursor-pointer">
-            <ReportButton className="flex items-center gap-0.5 cursor-pointer">
+            <ReportButton
+              contentId={parseInt(id)}
+              targetId={authorId}
+              className="flex items-center gap-0.5 cursor-pointer"
+            >
               <ReportIcon className="w-3 h-3 pc:w-4 pc:h-4 pb-0.5 fill-neutral-700" />
               <p className="text-xs pc:text-sm">신고하기</p>
             </ReportButton>

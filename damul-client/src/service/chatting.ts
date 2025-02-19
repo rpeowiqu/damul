@@ -28,8 +28,8 @@ export const getChattingList = async ({
 // 채팅방 내용조회
 export const getChattingContents = async ({
   roomId,
-  cursor = 0,
-  size = 5,
+  cursor,
+  size,
 }: {
   roomId: string | undefined;
   cursor?: number;

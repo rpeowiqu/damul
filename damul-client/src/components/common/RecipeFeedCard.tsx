@@ -52,9 +52,11 @@ const RecipeFeedCard = ({
       <div className="flex flex-col justify-between flex-1 p-2">
         <div className="text-left">
           <div className="flex justify-between">
-            <h3 className="text-sm font-bold line-clamp-1 w-full">{title}</h3>
+            <h3 className="text-sm font-bold line-clamp-1 w-full whitespace-pre-wrap break-words break-all">
+              {title}
+            </h3>
           </div>
-          <p className="text-xs pc:text-sm line-clamp-1 text-neutral-600">
+          <p className="text-xs pc:text-sm line-clamp-1 text-neutral-600 whitespace-pre-wrap break-words break-all">
             {content}
           </p>
         </div>

@@ -2,21 +2,37 @@ import DamulButton from "@/components/common/DamulButton";
 import DamulHoverCard from "@/components/common/DamulHoverCard";
 import IngredientItem from "@/components/home/IngredientItem";
 import OcrButton from "@/components/home/OcrButton";
+import QrCodeBox from "@/components/home/QrCodeBox";
 import AlertCircleIcon from "@/components/svg/AlertCircleIcon";
+import PlusIcon from "@/components/svg/PlusIcon";
 import ResetIcon from "@/components/svg/ResetIcon";
 import { Input } from "@/components/ui/input";
+import { CATEGORY_ID_MAPPER } from "@/constants/category";
 import { initialRegisterIngredient } from "@/constants/initialData";
+import useAuth from "@/hooks/useAuth";
 import { postUserIndegredient } from "@/service/home";
 import { RegisterIngredient } from "@/types/Ingredient";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import OcrLoading from "@/components/common/OcrLoading";
+
+interface responseData {
+  ingredientName: string;
+  category: keyof typeof CATEGORY_ID_MAPPER;
+  productPrice: number;
+  expiration_date: string;
+  ingredientStorage: "FREEZER" | "FRIDGE" | "ROOMTEMP";
+}
 
 const LIMIT_ADD_COUNT = 50;
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const HomeIngredientsRegisterPage = () => {
   const [ingredientRegisterData, setIngredientRegisterData] = useState<
     RegisterIngredient[]
   >([initialRegisterIngredient]);
+
+  const { data } = useAuth();
 
   const [storeName, setStoreName] = useState("");
   const [purchaseAt, setPurchaseAt] = useState("");
@@ -121,13 +137,69 @@ const HomeIngredientsRegisterPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (!data?.data?.id) return;
+
+    const eventSource = new EventSource(
+      `${API_URL}sse/connect/${data.data.id}`,
+      { withCredentials: true },
+    );
+
+    eventSource.onopen = () => {
+      console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
+    };
+
+    eventSource.onmessage = (event) => {
+      try {
+        const updatedData = JSON.parse(event.data);
+        console.log(updatedData);
+
+        if (updatedData.userIngredients.length > 0) {
+          setIngredientRegisterData((prevData) => {
+            const newIngredientRegisterData = [...prevData];
+
+            updatedData.userIngredients.forEach((ingredient: responseData) => {
+              newIngredientRegisterData.push({
+                id: Math.floor(Math.random() * 10000),
+                ingredientName: ingredient.ingredientName,
+                categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
+                productPrice: ingredient.productPrice,
+                expirationDate: ingredient.expiration_date,
+                ingredientStorage:
+                  ingredient.ingredientStorage === "ROOMTEMP"
+                    ? "ROOM_TEMPERATURE"
+                    : ingredient.ingredientStorage,
+              });
+            });
+
+            setPurchaseAt(updatedData.purchaseAt);
+            setStoreName(updatedData.storeName);
+
+            return newIngredientRegisterData;
+          });
+        }
+      } catch (error: any) {
+        console.error("데이터 처리 중 오류가 발생했습니다.", error);
+      }
+    };
+
+    eventSource.onerror = (error: any) => {
+      console.error("SSE 연결 중 오류가 발생했습니다.", error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [data]);
+
   return (
-    <div className="flex flex-col p-5">
+    <div className="flex flex-col p-5 relative">
       {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[9999999999]">
-          <div className="bg-white p-5 rounded-lg shadow-lg">
-            <p className="text-xl font-bold">처리 중...</p>
-          </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-[9999999999]">
+          <p className="text-lg text-white">영수증 등록 중입니다</p>
+          <p className="text-lg text-white">잠시만 기다려주세요</p>
+          <OcrLoading />
         </div>
       )}
 
@@ -137,10 +209,10 @@ const HomeIngredientsRegisterPage = () => {
         </button>
         <p>식자재 등록하기</p>
       </div>
-      <p className="text-positive-300 font-bold p-1 mb-2">
+      <p className="text-positive-300 font-bold p-1">
         오늘은 이런 품목을 구매하셨네요!
       </p>
-      <div className="flex justify-between">
+      <div className="flex justify-between pt-2">
         <DamulButton
           onClick={handleResetData}
           className="flex bg-white items-center border justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50 transition ease-in-out duration-150 active:scale-75"
@@ -148,13 +220,15 @@ const HomeIngredientsRegisterPage = () => {
           <ResetIcon className="stroke-2 stroke-normal-200" />
           <p>초기화</p>
         </DamulButton>
-        <div className="flex justify-center items-center gap-3">
+        <div className="flex justify-center items-center gap-1">
           <DamulHoverCard
             hoverCardTrigger={
-              <AlertCircleIcon className="size-6 stroke-normal-200" />
+              <AlertCircleIcon className="size-5 stroke-normal-200" />
             }
           >
-            <div>영수증 이미지는 최대 5MB까지 이용가능합니다.</div>
+            <div className="text-sm">
+              영수증 이미지는 최대 10MB까지 이용가능합니다.
+            </div>
           </DamulHoverCard>
           <OcrButton
             setStoreName={setStoreName}
@@ -165,7 +239,7 @@ const HomeIngredientsRegisterPage = () => {
         </div>
       </div>
 
-      <div className="my-4 flex flex-col gap-3 justify-center">
+      <div className="flex flex-col gap-3 pt-5 justify-center">
         <div className="flex w-full gap-2">
           <div className="w-full flex flex-col gap-2">
             <label className="cursor-pointer font-bold" htmlFor="storeName">
@@ -178,7 +252,7 @@ const HomeIngredientsRegisterPage = () => {
               maxLength={20}
               value={storeName}
               onChange={handleStoreNameChange}
-              className="border-1 h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+              className="border h-8 w-full min-w-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             />
           </div>
           <div className="w-full flex flex-col gap-2">
@@ -190,7 +264,7 @@ const HomeIngredientsRegisterPage = () => {
               type="date"
               value={purchaseAt}
               onChange={handlePurchaseAtChange}
-              className="border-1 h-8 w-full min-w-0 justify-end text-right cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
+              className="border h-8 w-full min-w-0 justify-end text-right cursor-pointer focus-visible:outline-2 focus-visible:outline-positive-300 p-1"
             />
           </div>
         </div>
@@ -207,21 +281,22 @@ const HomeIngredientsRegisterPage = () => {
         </div>
       </div>
 
-      <div className="flex justify-end items-center gap-2 font-bold">
-        총 구매 금액:
-        <span className="text-negative-500">
-          {totalAmount.toLocaleString()}
-        </span>
-        원
-      </div>
-
-      <div className="flex justify-center p-2">
-        <DamulButton
-          className="bg-normal-200 hover:bg-normal-300 shadow-md transition ease-in-out duration-150 active:scale-90"
+      <div className="flex justify-between px-6 pb-6">
+        <button
+          type="button"
+          className="active:bg-positive-200 w-6 h-6 rounded-full transition ease-in-out duration-150 active:scale-90"
           onClick={addIngredient}
         >
-          +
-        </DamulButton>
+          <PlusIcon className="w-full fill-positive-300" />
+        </button>
+
+        <div className="flex justify-end items-center gap-2 font-bold">
+          총 구매 금액:
+          <span className="text-negative-500">
+            {totalAmount.toLocaleString()}
+          </span>
+          원
+        </div>
       </div>
 
       <DamulButton
@@ -230,6 +305,8 @@ const HomeIngredientsRegisterPage = () => {
       >
         등록
       </DamulButton>
+
+      <QrCodeBox />
     </div>
   );
 };

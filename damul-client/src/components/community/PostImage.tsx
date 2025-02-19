@@ -8,10 +8,15 @@ interface PostImageProps {
 }
 
 const PostImage = ({ setTempImage, preImage, setPreImage }: PostImageProps) => {
-
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert("이미지 용량은 5MB 이하만 업로드 가능합니다.");
+        return;
+      }
+
       setTempImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {

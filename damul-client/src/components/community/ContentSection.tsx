@@ -41,12 +41,12 @@ const CommunityDetailHeader = ({
         {type === "recipe" ? (
           <>
             <h3 className="p-3 text-md pc:text-lg font-semibold">소개</h3>
-            <div className="p-3 bg-neutral-100 text-sm pc:text-md whitespace-pre-wrap">
+            <div className="p-3 bg-neutral-100 text-sm pc:text-md whitespace-pre-wrap break-words break-all">
               {content}
             </div>
           </>
         ) : (
-          <div className="py-3 px-1 text-sm pc:text-md whitespace-pre-wrap">
+          <div className="py-3 px-1 text-sm pc:text-md whitespace-pre-wrap break-words break-all">
             {content}
           </div>
         )}

@@ -28,6 +28,7 @@ const PostRecipeIngrediantForm = ({
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="재료"
+        maxLength={10}
         className="p-2 border focus:ring-0 focus:outline-none focus:border-neutral-400"
       />
       <p className="text-start">수량</p>
@@ -36,6 +37,7 @@ const PostRecipeIngrediantForm = ({
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         placeholder="수량"
+        maxLength={10}
         className="p-2 border focus:ring-0 focus:outline-none focus:border-neutral-400"
       />
       <p className="text-start">단위</p>
@@ -44,6 +46,7 @@ const PostRecipeIngrediantForm = ({
         value={unit}
         onChange={(e) => setUnit(e.target.value)}
         placeholder="단위"
+        maxLength={5}
         className="p-2 border focus:ring-0 focus:outline-none focus:border-neutral-400"
       />
     </div>
