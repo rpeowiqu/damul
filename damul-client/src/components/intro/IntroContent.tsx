@@ -38,13 +38,13 @@ const IntroContent = () => {
           {Array.from({ length: 4 }).map((_, index) => (
             <button
               key={index}
-              className={`w-3 h-3 sm:w-4 sm:h-4  rounded-full ${index === stepIndex ? "bg-positive-300" : "bg-normal-100"}`}
+              className={`w-3 h-3 sm:w-4 sm:h-4 z-50 rounded-full ${index === stepIndex ? "bg-positive-300" : "bg-normal-100"}`}
               onClick={() => setStepIndex(index)}
             />
           ))}
         </div>
 
-        <div className="px-4 sm:px-10">
+        <div className="px-4 sm:px-10 z-50">
           <DamulButton
             variant="positive"
             className="w-full"
