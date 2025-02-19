@@ -41,6 +41,7 @@ import {
   CATEGORY_NAME_MAPPER,
 } from "@/constants/category";
 import { debounce } from "@/utils/optimize";
+import clsx from "clsx";
 
 const StatisticsTrendPage = () => {
   const [searchKeyword, setSearchKeyword] = useState<string>("");
@@ -150,7 +151,9 @@ const StatisticsTrendPage = () => {
           </p>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-between items-end">
+          <p className="text-xs xs:text-sm">단위: (원)</p>
+
           <Select
             value={period}
             onValueChange={(value: "monthly" | "recent") =>
@@ -226,6 +229,39 @@ const StatisticsTrendPage = () => {
                     position="insideTop"
                     fill="var(--color-price)"
                     className="text-xxxs xs:text-xxs sm:text-xs"
+                    content={({ x, y, value }) => {
+                      const lastPrice = chartData[chartData.length - 1].price;
+                      const diff = value - lastPrice;
+
+                      return (
+                        <text
+                          x={x}
+                          y={y}
+                          textAnchor="middle"
+                          fill="var(--color-price)"
+                          className="text-xxs xs:text-xs sm:text-sm"
+                        >
+                          <tspan
+                            x={x}
+                            dy="-10"
+                            className={clsx(
+                              "text-xxxs xs:text-xxs sm:text-xs",
+                              {
+                                "fill-blue-400": diff < 0,
+                                "fill-normal-600": diff === 0,
+                                "fill-red-400": diff > 0,
+                              },
+                            )}
+                          >
+                            ({diff > 0 ? "+" : ""}
+                            {diff})
+                          </tspan>
+                          <tspan x={x} dy="-12">
+                            {value}
+                          </tspan>
+                        </text>
+                      );
+                    }}
                   />
                 </Line>
               ) : (
