@@ -200,7 +200,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
           </p>
         </div>
 
-        <div className="flex flex-col justify-end w-full">
+        <div className="relative flex flex-col justify-end w-full">
           <Label
             htmlFor="selfIntroduction"
             className="text-sm text-positive-400 font-bold"
