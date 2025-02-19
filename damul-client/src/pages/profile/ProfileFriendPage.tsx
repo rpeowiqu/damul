@@ -50,7 +50,7 @@ const ProfileFriendPage = () => {
             팔로잉
           </NavLink>
         </div>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div></div>}>
           <Outlet context={{ searchKeyword: submitSearchKeyword }} />
         </Suspense>
       </div>

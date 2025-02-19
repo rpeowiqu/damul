@@ -17,7 +17,7 @@ const CommunityPage = () => {
   return (
     <main className="flex flex-col">
       <DamulTab tabList={tabItems} />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div></div>}>
         <Outlet />
       </Suspense>
     </main>

@@ -80,7 +80,7 @@ const ProfilePage = () => {
       />
       <DamulTab tabList={tabItems} />
       <div className="flex-1 bg-normal-50">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div></div>}>
           <Outlet context={{ user: header }} />
         </Suspense>
       </div>
