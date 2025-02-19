@@ -76,7 +76,7 @@ public class ChatMessage {
         message.sender = sender;
         message.content = content;
         message.fileUrl = fileUrl;
-        message.messageType = MessageType.FILE;
+        message.messageType = MessageType.IMAGE;
         message.createdAt = LocalDateTime.now();
         return message;
     }

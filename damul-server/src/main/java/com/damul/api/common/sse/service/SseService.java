@@ -4,6 +4,7 @@ import com.damul.api.common.sse.EmitterInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -28,6 +29,17 @@ public class SseService {
     public SseEmitter createEmitter(int userId) {
         String redisKey = SSE_KEY_PREFIX + userId;
         SseEmitter emitter = new SseEmitter(TIMEOUT);
+
+        try {
+            emitter.send(SseEmitter.event()
+                    .name("connect")
+                    .data("")
+                    .id(String.valueOf(userId)));
+        } catch (IOException e) {
+            emitter.complete();
+            throw new RuntimeException(e);
+        }
+
 
         emitter.onCompletion(() -> {
             log.info("SSE 연결 완료 - userId: {}", userId);
@@ -119,4 +131,26 @@ public class SseService {
             }
         }
     }
+
+    public void checkConnection(int userId) {
+        SseEmitter emitter = localEmitters.get(userId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("check")
+                        .data(""));
+                log.debug("Connection check sent to userId: {}", userId);
+            } catch (IOException e) {
+                log.error("Connection check failed for userId: {}", userId);
+                removeEmitter(userId);
+            }
+        }
+    }
+
+    @Scheduled(fixedRate = 30 * 1000) // 1분마다 실행
+    public void checkAllConnections() {
+        localEmitters.keySet().forEach(this::checkConnection);
+        log.debug("Checked all SSE connections");
+    }
+
 }
