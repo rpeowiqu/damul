@@ -64,6 +64,7 @@ const ProfileIngredientsPage = () => {
             key={index}
             title={item as "freezer" | "fridge" | "roomTemp"}
             items={ingredientData[item as "freezer" | "fridge" | "roomTemp"]}
+            readOnly={true}
           />
         ))
       )}

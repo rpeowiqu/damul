@@ -14,6 +14,7 @@ interface IngredientDetailProps {
   deleteIngredient?: (deletedIngredient: Ingredient) => void;
   setIsDeleteOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  readOnly?: boolean;
 }
 
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
@@ -39,6 +40,7 @@ const IngredientDetail = ({
   deleteIngredient,
   setIsDeleteOpen,
   setIsOpen,
+  readOnly,
 }: IngredientDetailProps) => {
   const IconComponent = CATEGORY_ICON_MAPPER[selectedIngredient.categoryId];
   const [ingredient, setIngredient] = useState<Ingredient>(selectedIngredient);
@@ -49,12 +51,14 @@ const IngredientDetail = ({
   }
 
   const handleQuantityChange = (value: number[]) => {
-    setIngredient((prev) => {
-      return {
-        ...prev,
-        ingredientQuantity: value[0],
-      };
-    });
+    if (!readOnly) {
+      setIngredient((prev) => {
+        return {
+          ...prev,
+          ingredientQuantity: value[0],
+        };
+      });
+    }
   };
 
   const handleDeleteClick = async () => {
@@ -66,7 +70,7 @@ const IngredientDetail = ({
           ingredient.userIngredientId,
           data?.data.warningEnabled ? 1 : 0,
         );
-        refetch(); // 삭제 재확인 정보를 새로 불러옴
+        refetch();
         deleteIngredient?.(ingredient);
       } catch (error) {
         console.log("식자재 정보를 삭제 하지 못했습니다.");
@@ -137,25 +141,26 @@ const IngredientDetail = ({
           남았어요
         </p>
       </div>
-
-      <div className="flex justify-between w-full gap-2">
-        <DamulButton
-          variant="negative"
-          className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
-          onClick={handleDeleteClick}
-        >
-          <DeleteIcon />
-          <p className="text-xs pc:text-sm text-white">제거</p>
-        </DamulButton>
-        <DamulButton
-          variant="positive"
-          onClick={handleSaveClick}
-          className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
-        >
-          <SaveIcon />
-          <p className="text-xs pc:text-sm text-white">저장</p>
-        </DamulButton>
-      </div>
+      {!readOnly && (
+        <div className="flex justify-between w-full gap-2">
+          <DamulButton
+            variant="negative"
+            className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
+            onClick={handleDeleteClick}
+          >
+            <DeleteIcon />
+            <p className="text-xs pc:text-sm text-white">제거</p>
+          </DamulButton>
+          <DamulButton
+            variant="positive"
+            onClick={handleSaveClick}
+            className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
+          >
+            <SaveIcon />
+            <p className="text-xs pc:text-sm text-white">저장</p>
+          </DamulButton>
+        </div>
+      )}
     </div>
   );
 };

@@ -18,6 +18,7 @@ interface IngredientStorageContainerProps {
   title: keyof typeof STORAGE_TYPE | keyof typeof ITEM_STATUS;
   items: Ingredient[];
   onEdit?: boolean;
+  readOnly?: boolean;
   setExpiringSoonItems?: React.Dispatch<React.SetStateAction<Ingredient[]>>;
   setIngredientData?: React.Dispatch<React.SetStateAction<IngredientData>>;
 }
@@ -33,6 +34,7 @@ const IngredientStorageContainer = ({
   title,
   items,
   onEdit,
+  readOnly,
   setExpiringSoonItems,
   setIngredientData,
 }: IngredientStorageContainerProps) => {
@@ -213,6 +215,7 @@ const IngredientStorageContainer = ({
                 deleteIngredient={deleteIngredient}
                 setIsOpen={setIsOpen}
                 updateIngredient={updateIngredient}
+                readOnly={readOnly}
               />
             )}
           </DamulModal>
