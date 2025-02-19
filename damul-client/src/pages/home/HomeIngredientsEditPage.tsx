@@ -62,6 +62,7 @@ const HomeIngredientsEditPage = () => {
                   selectedIngredient={ingredient}
                   setIsDeleteOpen={() => setIsDeleteOpen(true)}
                   updateIngredient={updateIngredient}
+                  deleteIngredient={updateIngredient}
                 />
               </div>
               <DamulModal
