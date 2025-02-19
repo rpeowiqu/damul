@@ -8,11 +8,11 @@ import { useAlarmStore } from "@/stores/alarmStore";
 const Header = () => {
   const { data, isLoading } = useAuth();
   const userId = data?.data.id;
-  const { alarmCnt, increaseAlarmCnt, setAlarmCnt } = useAlarmStore(); // Zustand 상태 사용
+  const { alarmCnt, increaseAlarmCnt, setAlarmCnt } = useAlarmStore();
 
   useAlarmSubscription({
     userId,
-    onAlarmReceived: increaseAlarmCnt, // 새 알림이 올 때 증가
+    onAlarmReceived: increaseAlarmCnt,
     setAlarmCnt,
   });
 
