@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 
 import Badge from "./Badge";
 import DamulModal from "../common/DamulModal";
@@ -7,6 +7,7 @@ import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getBadge } from "@/service/profile";
+import useOverlayStore from "@/stores/overlayStore";
 
 interface BadgeShowcaseProps {
   list: BadgeBasic[];
@@ -16,7 +17,10 @@ interface BadgeShowcaseProps {
 const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
   const { userId } = useParams();
   const [currentBadgeIndex, setCurrentBadgeIndex] = useState(-1);
-  const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentBadgeIndex(-1));
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("BadgeShowcase");
+
+  useCloseOnBack("BadgeShowcase");
 
   const sortedList = useMemo(() => {
     return [...list].sort((a, b) => {
@@ -35,7 +39,6 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
     const badge = sortedList[currentBadgeIndex];
     return list.findIndex((b) => b.badgeId === badge.badgeId);
   }, [currentBadgeIndex, sortedList, list]);
-
   const badgeId = originalIndex > -1 ? list[originalIndex].badgeId : null;
   const { data, isLoading } = useQuery<BadgeDetail>({
     queryKey: ["badge", userId, badgeId],
@@ -50,10 +53,6 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
     refetchOnWindowFocus: false,
     enabled: !!badgeId,
   });
-
-  useEffect(() => {
-    setIsOpen(currentBadgeIndex > -1 ? true : false);
-  }, [currentBadgeIndex]);
 
   const selectedBadge = data ?? {
     id: 0,
@@ -77,6 +76,7 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
               {...badge}
               onClick={() => {
                 setCurrentBadgeIndex(index);
+                openOverlay("BadgeShowcase");
               }}
             />
           ))}
@@ -89,11 +89,11 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
         </p>
       )}
 
-      {currentBadgeIndex > -1 && !isLoading && (
+      {!isLoading && (
         <DamulModal
-          isOpen={isOpen}
+          isOpen={isOpenOverlay}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}

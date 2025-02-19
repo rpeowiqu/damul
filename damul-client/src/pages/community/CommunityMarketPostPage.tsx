@@ -10,6 +10,7 @@ import PostMarketMemberCnt from "@/components/community/PostMarketMemberCnt";
 import DamulButton from "@/components/common/DamulButton";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { postPost, putPost, getPostDetail } from "@/service/market";
+import useOverlayStore from "@/stores/overlayStore";
 
 const CommunityMarketPostPage = () => {
   const navigate = useNavigate();
@@ -25,11 +26,14 @@ const CommunityMarketPostPage = () => {
   const [chatSize, setChatSize] = useState<number>(0);
   const [tempChatSize, setTempChatSize] = useState<number>(0);
   const [currentDrawerIndex, setCurrentDrawerIndex] = useState<number>(-1);
-  const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentDrawerIndex(-1));
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("CommunityMarketPostPage");
+
+  useCloseOnBack("CommunityMarketPostPage", () => setCurrentDrawerIndex(-1));
 
   useEffect(() => {
     if (currentDrawerIndex > -1) {
-      setIsOpen(true);
+      openOverlay("CommunityMarketPostPage");
     }
   }, [currentDrawerIndex]);
 
@@ -98,7 +102,7 @@ const CommunityMarketPostPage = () => {
         <DamulDrawer
           isOpen={currentDrawerIndex === 0}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
@@ -123,9 +127,9 @@ const CommunityMarketPostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(0)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 1}
+          isOpen={isOpenOverlay && currentDrawerIndex === 1}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
@@ -150,9 +154,9 @@ const CommunityMarketPostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(1)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 2}
+          isOpen={isOpenOverlay && currentDrawerIndex === 2}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
@@ -176,9 +180,9 @@ const CommunityMarketPostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(2)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 3}
+          isOpen={isOpenOverlay && currentDrawerIndex === 3}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}

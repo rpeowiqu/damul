@@ -14,6 +14,7 @@ import DamulButton from "./DamulButton";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { report } from "@/service/report";
 import { ReportForm } from "@/types/report";
+import useOverlayStore from "@/stores/overlayStore";
 
 interface ReportButtonProps {
   contentId: number;
@@ -28,7 +29,6 @@ const ReportButton = ({
   className,
   children,
 }: ReportButtonProps) => {
-  const [isOpen, setIsOpen] = useCloseOnBack();
   const [reportForm, setReportForm] = useState<ReportForm>({
     reportCategoryId: 1,
     reportType: "RECIPE",
@@ -36,6 +36,11 @@ const ReportButton = ({
     targetId: 0,
     description: "",
   });
+
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("ReportButton");
+
+  useCloseOnBack("ReportButton");
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,14 +70,14 @@ const ReportButton = ({
 
   return (
     <div>
-      <div className={className} onClick={() => setIsOpen(true)}>
+      <button className={className} onClick={() => openOverlay("ReportButton")}>
         {children}
-      </div>
+      </button>
 
       <DamulModal
-        isOpen={isOpen}
+        isOpen={isOpenOverlay}
         onOpenChange={() => {
-          if (isOpen) {
+          if (isOpenOverlay) {
             history.back();
           }
         }}

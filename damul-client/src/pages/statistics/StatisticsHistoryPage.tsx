@@ -15,6 +15,7 @@ import { getPurchaseHistories, getSmartReceipt } from "@/service/statistics";
 import { useQuery } from "@tanstack/react-query";
 import { DailyReceiptInfo, PurchaseHistory, Receipt } from "@/types/statistics";
 import useAuth from "@/hooks/useAuth";
+import useOverlayStore from "@/stores/overlayStore";
 
 const StatisticsHistoryPage = () => {
   const { data, isLoading } = useAuth();
@@ -22,7 +23,10 @@ const StatisticsHistoryPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isTextAnimationEnd, setIsTextAnimationEnd] = useState<boolean>(false);
   const [receiptId, setReceiptId] = useState<number>(0);
-  const [isOpen, setIsOpen] = useCloseOnBack(() => setReceiptId(0));
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("StatisticsHistoryPage");
+
+  useCloseOnBack("StatisticsHistoryPage");
   const {
     data: purchaseHistoryData,
     isLoading: isLoadingPurchaseHistory,
@@ -75,10 +79,6 @@ const StatisticsHistoryPage = () => {
       }
     }
   }, [purchaseHistoryData, isSuccessPurchaseHistory]);
-
-  useEffect(() => {
-    setIsOpen(receiptId > -1 ? true : false);
-  }, [receiptId]);
 
   const handleDayChange = (date: Date) => {
     if (
@@ -256,7 +256,10 @@ const StatisticsHistoryPage = () => {
                 <div
                   key={index}
                   className="flex justify-center items-center gap-1 py-1 bg-normal-50 hover:bg-normal-100 text-normal-400 rounded-lg cursor-pointer"
-                  onClick={() => setReceiptId(item)}
+                  onClick={() => {
+                    setReceiptId(item);
+                    openOverlay("StatisticsHistoryPage");
+                  }}
                 >
                   <ReceiptIcon className="size-4 sm:size-5 fill-normal-200" />
                   <p className="text-xs sm:text-sm">영수증</p>
@@ -273,9 +276,9 @@ const StatisticsHistoryPage = () => {
 
       {receiptId > 0 && !isLoadingReceipt && (
         <DamulModal
-          isOpen={isOpen}
+          isOpen={isOpenOverlay}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}

@@ -5,6 +5,7 @@ import { OrderProps } from "@/types/community";
 import Image from "../common/Image";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import DamulDrawer from "@/components/common/DamulDrawer";
+import useOverlayStore from "@/stores/overlayStore";
 
 interface PostRecipeStepsProps {
   setTempOrders: Dispatch<SetStateAction<OrderProps[]>>;
@@ -18,7 +19,10 @@ const PostRecipeSteps = ({
   const [orderDescription, setOrderDescription] = useState("");
   const [orderImage, setOrderImage] = useState<File | null>(null);
   const [preImage, setPreImage] = useState<string>("");
-  const [isOpen, setIsOpen] = useCloseOnBack();
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("PostRecipeSteps");
+
+  useCloseOnBack("PostRecipeSteps");
 
   // 단계 삭제
   const handleRemoveStep = (id: number) => {
@@ -109,9 +113,9 @@ const PostRecipeSteps = ({
         </tbody>
       </table>
       <DamulDrawer
-        isOpen={isOpen}
+        isOpen={isOpenOverlay}
         onOpenChange={() => {
-          if (isOpen) {
+          if (isOpenOverlay) {
             history.back();
           }
         }}
@@ -136,7 +140,7 @@ const PostRecipeSteps = ({
             alert("요리 순서는 최대 10개까지 입력 가능합니다.");
             return;
           }
-          setIsOpen(true);
+          openOverlay("PostRecipeSteps");
         }}
       />
     </div>
