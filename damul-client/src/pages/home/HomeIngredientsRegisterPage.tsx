@@ -196,7 +196,7 @@ const HomeIngredientsRegisterPage = () => {
   return (
     <div className="flex flex-col p-5 relative">
       {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-[9999999999]">
+        <div className=" mx-auto fixed w-[600px] inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-[9999999999]">
           <p className="text-lg text-white">영수증 등록 중입니다</p>
           <p className="text-lg text-white">잠시만 기다려주세요</p>
           <OcrLoading />
