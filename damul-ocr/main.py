@@ -9,7 +9,7 @@ print('ocr 서버 실행중...')
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["i12a306.p.ssafy.io:5173"],
+    allow_origins=["i12a306.p.ssafy.io:5173", "i12a306.p.ssafy.io:8080"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
