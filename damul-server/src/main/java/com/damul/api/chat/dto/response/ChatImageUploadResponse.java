@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatImageUploadResponse {
-    private String imagePath;
+    private String image;
 }
