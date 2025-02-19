@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -198,6 +199,21 @@ public class RestChatController {
         log.info("컨트롤러: 채팅방 최대 인원 변경 성공 - roomId: {}, newLimit: {}",
                 roomId, request.getMemberLimit());
 
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/rooms/{roomId}/image")
+    public ResponseEntity<?> uploadChatImage(
+            @PathVariable int roomId,
+            @RequestParam(value = "content", required = false, defaultValue = "") String content,
+            @RequestParam("image") MultipartFile image,
+            @CurrentUser UserInfo user
+    ) {
+        log.info("컨트롤러: 채팅 이미지 업로드 시작 - roomId: {}, userId: {}", roomId, user.getId());
+
+        ChatImageUploadResponse response = chatMessageService.uploadChatImage(roomId, content, image, user);
+
+        log.info("컨트롤러: 채팅 이미지 업로드 완료 - imagePath: {}", response.getImagePath());
         return ResponseEntity.ok(response);
     }
 

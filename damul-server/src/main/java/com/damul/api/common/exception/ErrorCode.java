@@ -108,7 +108,8 @@ public enum ErrorCode {
 
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "올바르지 않은 요청입니다."),
     REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 신고입니다."),
-    INVALID_REPORT_STATUS(HttpStatus.BAD_REQUEST, "올바르지 않은 신고 설정입니다.");
+    INVALID_REPORT_STATUS(HttpStatus.BAD_REQUEST, "올바르지 않은 신고 설정입니다."),
+    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "이미지가 올바르지 않습니다.");
 
 
     private final HttpStatus status;
