@@ -9,6 +9,7 @@ import communityRoutes from "./communityRoutes";
 import statisticsRoutes from "./statisticsRoutes";
 import NotFoundPage from "@/pages/notFound/NotFoundPage";
 import IntroPage from "@/pages/intro/IntroPage";
+import AdminLoginPage from "@/pages/admin/AdminLoginPage";
 
 const LoginPage = lazy(() => import("@/pages/login/LoginPage"));
 const SignUpPage = lazy(() => import("@/pages/signup/SignUpPage"));
@@ -55,10 +56,10 @@ const router = createBrowserRouter([
       ...chatRoutes,
       ...profileRoutes,
       ...communityRoutes,
-      ...adminRoutes,
       ...statisticsRoutes,
     ],
   },
+  ...adminRoutes,
   {
     path: "*",
     element: <NotFoundPage />,

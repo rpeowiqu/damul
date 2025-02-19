@@ -34,7 +34,16 @@ const IntroContent = () => {
       <div className="flex flex-col gap-12 w-full h-full">
         {renderItem()}
 
-        <div className="flex justify-center gap-5">
+        <div className="flex justify-center items-center gap-5">
+          <button
+            className={
+              "w-8 h-8 text-lg sm:text-xl font-black text-positive-300 mr-2 z-50"
+            }
+            onClick={() => setStepIndex((stepIndex - 1 + 4) % 4)}
+          >
+            &lt;
+          </button>
+
           {Array.from({ length: 4 }).map((_, index) => (
             <button
               key={index}
@@ -42,6 +51,15 @@ const IntroContent = () => {
               onClick={() => setStepIndex(index)}
             />
           ))}
+
+          <button
+            className={
+              "w-8 h-8 text-lg sm:text-xl font-black text-positive-300 ml-2 z-50"
+            }
+            onClick={() => setStepIndex((stepIndex + 1) % 4)}
+          >
+            &gt;
+          </button>
         </div>
 
         <div className="px-4 sm:px-10 z-50">
