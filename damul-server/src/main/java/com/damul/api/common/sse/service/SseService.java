@@ -1,6 +1,8 @@
 package com.damul.api.common.sse.service;
 
 import com.damul.api.common.sse.EmitterInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -122,9 +124,23 @@ public class SseService {
         SseEmitter emitter = localEmitters.get(userId);
         if (emitter != null) {
             try {
+                // Object를 JSON 문자열로 변환
+                String jsonData;
+                if (data instanceof String) {
+                    jsonData = (String) data;
+                } else {
+                    try {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        jsonData = objectMapper.writeValueAsString(data);
+                    } catch (JsonProcessingException e) {
+                        log.error("JSON 변환 실패 - userId: {}", userId, e);
+                        jsonData = "{\"error\":\"데이터 변환 실패\"}";
+                    }
+                }
+
                 emitter.send(SseEmitter.event()
                         .name("image")
-                        .data(data));
+                        .data(jsonData));
                 log.info("OCR 결과 전송 성공 - userId: {}", userId);
 
                 // TTL 갱신
