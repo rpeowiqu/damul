@@ -8,14 +8,16 @@ interface ExtendedOptions extends SockJS.Options {
 }
 
 interface AlarmSubscription {
-  userId: string;
-  onAlarmReceived: (message: any) => void;
-  setAlarmCnt: (count: number) => void;
+  userId?: string;
+  onAlarmReceived?: (message: any) => void;
+  onChatCntReceived?: (chatCnt: any) => void;
+  setAlarmCnt?: (count: number) => void;
 }
 
 export const useAlarmSubscription = ({
   userId,
   onAlarmReceived,
+  onChatCntReceived,
   setAlarmCnt,
 }: AlarmSubscription) => {
   const wsUrl = import.meta.env.VITE_WS_BASE_URL;
@@ -24,7 +26,9 @@ export const useAlarmSubscription = ({
   const fetchUnreadAlarmCnt = async () => {
     try {
       const response = await getUnreadAlarmCnt();
-      setAlarmCnt(response.data.unReadMessageNum);
+      if (setAlarmCnt) {
+        setAlarmCnt(response.data.unReadMessageNum);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -49,6 +53,13 @@ export const useAlarmSubscription = ({
           console.log("알림 수신:", notification);
           if (onAlarmReceived) {
             onAlarmReceived(notification);
+          }
+        });
+        stompClient.subscribe(`/sub/chat/${userId}/count`, (message) => {
+          const notification = message;
+          console.log("채팅수:", notification.body);
+          if (onChatCntReceived) {
+            onChatCntReceived(notification.body);
           }
         });
       },

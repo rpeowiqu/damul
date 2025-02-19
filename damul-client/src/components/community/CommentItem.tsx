@@ -53,8 +53,8 @@ const CommentItem = ({
   }
 
   return (
-    <div className="py-3">
-      <div className="flex items-center justify-between gap-2 px-2">
+    <div className="py-3 pl-2 pr-4">
+      <div className="flex items-center justify-between gap-2">
         <Link
           to={`/profile/${comment.userId}/info`}
           className="flex items-center gap-2"
@@ -69,7 +69,9 @@ const CommentItem = ({
           {formatDate(comment.createdAt)}
         </p>
       </div>
-      <p className="text-xs pc:text-sm ml-12 pb-1">{comment.comment}</p>
+      <p className="text-xs pc:text-sm ml-12 pb-1 whitespace-pre-wrap break-words break-all">
+        {comment.comment}
+      </p>
       <div className="flex justify-start gap-2 ml-12 cursor-pointer text-xxs pc:text-xs text-neutral-500">
         <ReportButton className="flex items-center gap-1">
           <p>신고</p>

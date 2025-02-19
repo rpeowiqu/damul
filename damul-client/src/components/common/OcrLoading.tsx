@@ -5,7 +5,7 @@ const OcrLoading = () => {
   const icons = [MeatIcon, VegetableIcon, DairyIcon];
 
   return (
-    <div className="flex justify-center items-center h-screen space-x-7">
+    <div className="flex justify-center items-center h-16 space-x-7">
       {icons.map((Icon, index) => (
         <motion.div
           key={index}

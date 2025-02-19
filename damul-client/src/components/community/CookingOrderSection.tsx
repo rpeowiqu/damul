@@ -28,10 +28,13 @@ const CookingOrdersSection = ({
             key={order.id}
             className="flex justify-between text-start bg-neutral-100 p-3"
           >
-            <p className="pr-2 text-xs pc:text-md whitespace-pre-wrap">
+            <p className="pr-2 text-xs pc:text-md flex-1 whitespace-pre-wrap break-words break-all">
               {order.content}
             </p>
-            <Image src={order.imageUrl} className="w-24 pc:w-32 h-auto" />
+            <Image
+              src={order.imageUrl}
+              className="w-28 pc:w-32 h-auto object-contain"
+            />
           </div>
         ))}
       </div>

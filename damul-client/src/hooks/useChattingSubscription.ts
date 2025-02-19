@@ -47,7 +47,7 @@ export const useChattingSubscription = ({
 
         stompClient.subscribe(`/sub/chat/room/${roomId}`, (message) => {
           const receivedMessage = JSON.parse(message.body);
-          console.log("📩 메시지 수신:", receivedMessage);
+          // console.log("📩 메시지 수신:", receivedMessage);
           if (onMessageReceived) {
             onMessageReceived(receivedMessage);
           }
@@ -55,7 +55,7 @@ export const useChattingSubscription = ({
 
         stompClient.subscribe(`/sub/chat/room/${roomId}/read`, (message) => {
           const receivedMessage = JSON.parse(message.body);
-          console.log("📩 메시지 수신:", receivedMessage);
+          // console.log("📩 메시지 수신:", receivedMessage);
           if (onMessageReceived) {
             onMessageReceived(receivedMessage);
           }
@@ -133,7 +133,8 @@ export const useChattingSubscription = ({
       messageId,
     };
 
-    console.log("📤 메시지 읽음:", message);
+    // console.log("📤 메시지 읽음 요청 전송:", message);
+
     stompClientRef.current.publish({
       destination: `/pub/chat/read`,
       body: JSON.stringify(message),
@@ -153,6 +154,9 @@ export const useChattingSubscription = ({
       destination: `/pub/chat/room/${roomId}/enter/${userId}`,
       body: JSON.stringify(enterMessage),
     });
+
+    // 채팅방 입장 시 기존 메시지 읽음 처리
+    readMessage({ userId, roomId: String(roomId) });
   };
 
   return { sendMessage, readMessage, sendEnterRoom };

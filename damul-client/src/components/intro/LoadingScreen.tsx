@@ -39,7 +39,7 @@ const LoadingScreen = ({ setIsLoading }: LoadingScreenProps) => {
   };
 
   return (
-    <div className="flex flex-col flex-1 gap-12 justify-center items-center bg-white">
+    <div className="flex flex-col flex-1 gap-12 justify-center items-center">
       <motion.div
         className="box"
         whileHover={{ scale: 1.1 }}
