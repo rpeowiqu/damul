@@ -1,4 +1,11 @@
-import { useRef, useState, ChangeEvent, useEffect, KeyboardEvent } from "react";
+import {
+  useRef,
+  useState,
+  useCallback,
+  ChangeEvent,
+  useEffect,
+  KeyboardEvent,
+} from "react";
 import { useParams } from "react-router-dom";
 import ChattingBubble from "@/components/chat/ChattingBubble";
 import SendIcon from "@/components/svg/SendIcon";
@@ -21,7 +28,7 @@ const ChattingRoomPage = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const messageInputRef = useRef<HTMLTextAreaElement | null>(null);
   const { roomId } = useParams();
-  const { data, isLoading: authLoading } = useAuth();
+  const { data, isLoading } = useAuth();
 
   const [message, setMessage] = useState("");
   const [image, setImage] = useState<File | null>(null);
@@ -34,19 +41,22 @@ const ChattingRoomPage = () => {
   });
 
   // 메시지 수신 핸들러
-  const handleMessageReceived = (newMessage: ChatMessage) => {
-    if (newMessage.id === data?.data.id) {
-      return;
-    }
+  const handleMessageReceived = useCallback(
+    (newMessage: ChatMessage) => {
+      if (newMessage.id === data?.data.id) {
+        return;
+      }
 
-    setChatData((prevChatData) => {
-      const updatedMessages = [...prevChatData.messages, newMessage];
-      return {
-        ...prevChatData,
-        messages: updatedMessages,
-      };
-    });
-  };
+      setChatData((prevChatData) => {
+        const updatedMessages = [...prevChatData.messages, newMessage];
+        return {
+          ...prevChatData,
+          messages: updatedMessages,
+        };
+      });
+    },
+    [[data?.data.id]],
+  );
 
   // STOMP 클라이언트 초기화
   const { sendMessage, readMessage } = useChattingSubscription({
@@ -130,11 +140,13 @@ const ChattingRoomPage = () => {
     previewReader.readAsDataURL(file);
   };
 
-  const handleSendMessage = () => {
-    console.log("📤 Uint8Array 데이터:", image);
+  // 메세지 전송
+  const handleSendMessage = async () => {
+    if (image) {
+      await sendImage();
+    }
 
     if (message.trim()) {
-      // 텍스트 메시지 전송
       const newTextMessage: ChatMessage = {
         id: Date.now(),
         roomId: Number(roomId),
@@ -160,11 +172,10 @@ const ChattingRoomPage = () => {
       if (messageInputRef.current) {
         messageInputRef.current.style.height = "2.5rem";
       }
-    } else if (image) {
-      sendImage();
     }
   };
 
+  // 이미지 전송
   const sendImage = async () => {
     const formData = new FormData();
     if (image) {
@@ -174,6 +185,23 @@ const ChattingRoomPage = () => {
     try {
       const response = await postImageInRoom({ roomId, formData });
       console.log(response);
+
+      const newImageMessage: ChatMessage = {
+        id: Date.now(),
+        roomId: Number(roomId),
+        senderId: data?.data.id,
+        messageType: "FILE",
+        createdAt: new Date().toISOString(),
+        fileUrl: response.data?.image,
+      };
+
+      setChatData((prevChatData) => ({
+        ...prevChatData,
+        messages: [...prevChatData.messages, newImageMessage],
+      }));
+
+      setImage(null);
+      setPrevImage(null);
     } catch (error) {
       console.log(error);
     }
@@ -202,7 +230,7 @@ const ChattingRoomPage = () => {
       </div>
       <div className="flex-1 justify-end overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
         <ChattingRoomInfiniteScroll
-          // key={chatData.messages.length} // 새로운 메시지가 추가될 때마다 key 변경
+          key={chatData.messages.length}
           queryKey={["chats"]}
           fetchFn={fetchItems}
           renderItems={(msg: ChatMessage) => <ChattingBubble msg={msg} />}
@@ -210,7 +238,6 @@ const ChattingRoomPage = () => {
             <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
           }
         />
-
         <div ref={messagesEndRef} />
       </div>
       <div className="fixed w-full pc:w-[598px] bottom-16 p-2 pc:p-4 border-t bg-white flex items-end">

@@ -25,11 +25,12 @@ export interface ChatMessage {
   senderId: number;
   profileImageUrl?: string | undefined;
   nickname?: string;
-  messageType: "TEXT" | "IMAGE" | "SYSTEM";
+  messageType: "TEXT" | "IMAGE" | "SYSTEM" | "FILE";
   content?: string;
   image?: string;
   createdAt: string;
   unReadCount?: number;
+  fileUrl?: string;
 }
 
 export interface ChatResponse {
