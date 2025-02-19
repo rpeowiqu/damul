@@ -124,11 +124,12 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         // 최신 메시지가 있다면 사용자의 lastReadMessageId 업데이트
         if (latestMessage != null) {
             // 이전에 읽지 않은 메시지 수 계산
-            int unreadCount = chatMessageRepository.countUnreadMessagesInRoom(
+            Integer unreadCount = chatMessageRepository.countUnreadMessagesInRoom(
                     roomId,
                     lastReadMessageId,
                     latestMessage.getId()
             );
+            unreadCount = unreadCount == null ? 0 : unreadCount;
 
             // Redis의 안 읽은 메시지 수 감소
             if (unreadCount > 0) {
@@ -170,11 +171,11 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
 
         validateUserId(userId);
 
-        int unreadCount = chatMessageRepository.countAllUnreadMessages(userId);
+        Integer unreadCount = chatMessageRepository.countAllUnreadMessages(userId);
 
         log.info("서비스: 전체 안 읽은 메시지 수 조회 완료 - count: {}", unreadCount);
 
-        return new UnReadResponse(unreadCount);
+        return new UnReadResponse(unreadCount == null ? 0 : unreadCount);
     }
 
     @Override

@@ -18,8 +18,8 @@ public class UnreadMessageService {
 
     // 초기 카운트 설정 또는 갱신
     public void initializeUnreadCount(int userId) {
-        int totalUnread = chatMessageRepository.countAllUnreadMessages(userId);
-        redisTemplate.opsForValue().set(getKey(userId), String.valueOf(totalUnread));
+        Integer totalUnread = chatMessageRepository.countAllUnreadMessages(userId);
+        redisTemplate.opsForValue().set(getKey(userId), String.valueOf(totalUnread == null ? 0 : totalUnread));
     }
 
     // 메시지 발송 시 수신자들의 카운트 증가
