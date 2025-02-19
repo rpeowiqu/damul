@@ -35,7 +35,7 @@ const CommentInput = ({
 
   // 엔터 키 입력 핸들러
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && (comment || "").trim() !== "") {
+    if (e.key === "Enter") {
       e.preventDefault();
       handleButtonClick();
     }
@@ -44,11 +44,14 @@ const CommentInput = ({
   // 입력 버튼 클릭 핸들러
   const handleButtonClick = () => {
     submitComment();
-    console.log(comment);
   };
 
-  const authorId = "1";
   const submitComment = async () => {
+    if (comment.trim() === "") {
+      alert("앗! 댓글이 비어있어요. 내용을 입력해 주세요. ✏️");
+      setComment("");
+      return;
+    }
     try {
       const response =
         type === "recipe"
