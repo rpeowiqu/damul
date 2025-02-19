@@ -140,56 +140,62 @@ const HomeIngredientsRegisterPage = () => {
   useEffect(() => {
     if (!data?.data?.id) return;
 
-    const eventSource = new EventSource(
-      `${API_URL}/sse/connect/${data.data.id}`,
-      { withCredentials: true },
-    );
+    let eventSource: EventSource | null = null;
 
-    eventSource.onopen = () => {
-      console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
-    };
+    const connectSSE = () => {
+      eventSource = new EventSource(`${API_URL}sse/connect/${data.data.id}`, {
+        withCredentials: true,
+      });
 
-    eventSource.onmessage = (event) => {
-      try {
-        const updatedData = JSON.parse(event.data);
-        console.log(updatedData);
+      eventSource.onopen = () => {
+        console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
+      };
 
-        if (updatedData.userIngredients.length > 0) {
-          setIngredientRegisterData((prevData) => {
-            const newIngredientRegisterData = [...prevData];
+      eventSource.onmessage = (event) => {
+        try {
+          const updatedData = JSON.parse(event.data);
+          console.log(updatedData);
+          if (updatedData.userIngredients.length > 0) {
+            setIngredientRegisterData((prevData) => {
+              const newIngredientRegisterData = [...prevData];
+              updatedData.userIngredients.forEach(
+                (ingredient: responseData) => {
+                  newIngredientRegisterData.push({
+                    id: Math.floor(Math.random() * 10000),
+                    ingredientName: ingredient.ingredientName,
+                    categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
+                    productPrice: ingredient.productPrice,
+                    expirationDate: ingredient.expiration_date,
+                    ingredientStorage:
+                      ingredient.ingredientStorage === "ROOMTEMP"
+                        ? "ROOM_TEMPERATURE"
+                        : ingredient.ingredientStorage,
+                  });
+                },
+              );
 
-            updatedData.userIngredients.forEach((ingredient: responseData) => {
-              newIngredientRegisterData.push({
-                id: Math.floor(Math.random() * 10000),
-                ingredientName: ingredient.ingredientName,
-                categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
-                productPrice: ingredient.productPrice,
-                expirationDate: ingredient.expiration_date,
-                ingredientStorage:
-                  ingredient.ingredientStorage === "ROOMTEMP"
-                    ? "ROOM_TEMPERATURE"
-                    : ingredient.ingredientStorage,
-              });
+              setPurchaseAt(updatedData.purchaseAt);
+              setStoreName(updatedData.storeName);
+
+              return newIngredientRegisterData;
             });
-
-            setPurchaseAt(updatedData.purchaseAt);
-            setStoreName(updatedData.storeName);
-
-            return newIngredientRegisterData;
-          });
+          }
+        } catch (error: any) {
+          console.error("데이터 처리 중 오류가 발생했습니다.", error);
         }
-      } catch (error: any) {
-        console.error("데이터 처리 중 오류가 발생했습니다.", error);
-      }
+      };
+
+      eventSource.onerror = (error: any) => {
+        console.error(error);
+        eventSource?.close();
+        setTimeout(connectSSE, 5000);
+      };
     };
 
-    eventSource.onerror = (error: any) => {
-      console.error("SSE 연결 중 오류가 발생했습니다.", error);
-      eventSource.close();
-    };
+    connectSSE();
 
     return () => {
-      eventSource.close();
+      eventSource?.close();
     };
   }, [data]);
 
