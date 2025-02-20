@@ -14,21 +14,25 @@ import DamulButton from "./DamulButton";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { report } from "@/service/report";
 import { ReportForm } from "@/types/report";
+import useOverlayStore from "@/stores/overlayStore";
 
 interface ReportButtonProps {
+  overlayKey: string;
   contentId: number;
+  targetNickname: string;
   targetId: number;
   className?: string;
   children: ReactNode;
 }
 
 const ReportButton = ({
+  overlayKey,
   contentId,
+  targetNickname,
   targetId,
   className,
   children,
 }: ReportButtonProps) => {
-  const [isOpen, setIsOpen] = useCloseOnBack();
   const [reportForm, setReportForm] = useState<ReportForm>({
     reportCategoryId: 1,
     reportType: "RECIPE",
@@ -36,6 +40,11 @@ const ReportButton = ({
     targetId: 0,
     description: "",
   });
+
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has(overlayKey);
+
+  useCloseOnBack(overlayKey);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -53,6 +62,7 @@ const ReportButton = ({
       console.error(error);
     } finally {
       alert("신고 처리 되었습니다.");
+      history.back();
     }
   };
 
@@ -65,28 +75,33 @@ const ReportButton = ({
 
   return (
     <div>
-      <div className={className} onClick={() => setIsOpen(true)}>
+      <div
+        className={className}
+        onClick={() => {
+          console.log(`key: ${overlayKey}`);
+          openOverlay(overlayKey);
+        }}
+      >
         {children}
       </div>
 
       <DamulModal
-        isOpen={isOpen}
+        isOpen={isOpenOverlay}
         onOpenChange={() => {
-          if (isOpen) {
+          if (isOpenOverlay) {
             history.back();
           }
         }}
-        contentStyle="max-w-96"
       >
         <div>
-          <h1 className="text-xl font-black text-normal-700">신고 접수하기</h1>
-          <p className="text-negative-400">
+          <h1 className="text-lg font-black">신고 접수하기</h1>
+          <p className="text-negative-400 text-sm">
             허위로 신고할 경우 서비스 이용이 제한될 수 있습니다.
           </p>
           <form onSubmit={onSubmit} className="flex flex-col gap-6 mt-4">
             <div className="flex flex-col gap-0.5">
-              <p className="text-positive-400 font-bold">신고 대상</p>
-              <p className="text-base">토마토러버전종우</p>
+              <p className="text-positive-400 font-bold text-sm">신고 대상</p>
+              <p className="text-base">{targetNickname}</p>
             </div>
 
             <div className="flex flex-col justify-end w-full gap-1">
@@ -172,7 +187,7 @@ const ReportButton = ({
             </div>
 
             <DamulButton type="submit" variant="positive" className="w-full">
-              신고 하기
+              신고 하기{targetNickname}
             </DamulButton>
           </form>
         </div>

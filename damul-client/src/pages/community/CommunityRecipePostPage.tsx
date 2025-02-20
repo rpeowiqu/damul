@@ -12,6 +12,7 @@ import DamulButton from "@/components/common/DamulButton";
 import { Ingredient, OrderProps } from "@/types/community";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { postRecipe, putRecipe, getRecipeDetail } from "@/service/recipe";
+import useOverlayStore from "@/stores/overlayStore";
 
 const CommunityRecipePostPage = () => {
   const navigate = useNavigate();
@@ -25,42 +26,19 @@ const CommunityRecipePostPage = () => {
   const [preImage, setPreImage] = useState("");
   const [content, setContent] = useState<string>("");
   const [tempContent, setTempContent] = useState<string>("");
-  const [ingredients, setIngredients] = useState<Ingredient[]>([
-    {
-      id: 0,
-      name: "",
-      amount: "",
-      unit: "",
-    },
-  ]);
-  const [tempIngredients, setTempIngredients] = useState<Ingredient[]>([
-    {
-      id: 0,
-      name: "",
-      amount: "",
-      unit: "",
-    },
-  ]);
-  const [orders, setOrders] = useState<OrderProps[]>([
-    {
-      id: 0,
-      content: "",
-      imageUrl: null,
-    },
-  ]);
-  const [tempOrders, setTempOrders] = useState<OrderProps[]>([
-    {
-      id: 0,
-      content: "",
-      imageUrl: null,
-    },
-  ]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [tempIngredients, setTempIngredients] = useState<Ingredient[]>([]);
+  const [orders, setOrders] = useState<OrderProps[]>([]);
+  const [tempOrders, setTempOrders] = useState<OrderProps[]>([]);
   const [currentDrawerIndex, setCurrentDrawerIndex] = useState<number>(-1);
-  const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentDrawerIndex(-1));
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("CommunityRecipePostPage");
+
+  useCloseOnBack("CommunityRecipePostPage", () => setCurrentDrawerIndex(-1));
 
   useEffect(() => {
     if (currentDrawerIndex > -1) {
-      setIsOpen(true);
+      openOverlay("CommunityRecipePostPage");
     }
   }, [currentDrawerIndex]);
 
@@ -142,25 +120,26 @@ const CommunityRecipePostPage = () => {
 
   return (
     <div className="flex flex-col justify-between px-7 py-4 pc:p-6 gap-5">
-      <div
-        className="p-4 space-x-5 font-semibold cursor-pointer"
-        onClick={() => window.history.back()}
-      >
-        <span>{"<"}</span>
-        <span className="space-y-4">나만의 레시피 작성</span>
+      <div className="flex gap-5">
+        <button className="font-black" onClick={() => history.back()}>
+          &lt;
+        </button>
+        <h1 className="text-lg sm:text-xl font-black text-normal-700">
+          나만의 레시피 작성
+        </h1>
       </div>
       <div className="flex flex-col gap-5">
         <DamulDrawer
-          isOpen={currentDrawerIndex === 0}
+          isOpen={isOpenOverlay && currentDrawerIndex === 0}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
           triggerContent={
             <PostCard
               title="제목"
-              description="제목을 입력해주세요"
+              description="제목을 입력해 주세요."
               isEmpty={!title}
             />
           }
@@ -181,16 +160,16 @@ const CommunityRecipePostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(0)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 1}
+          isOpen={isOpenOverlay && currentDrawerIndex === 1}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
           triggerContent={
             <PostCard
               title="사진"
-              description="사진을 업로드해주세요"
+              description="사진을 업로드해 주세요."
               isEmpty={!image}
             />
           }
@@ -208,16 +187,16 @@ const CommunityRecipePostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(1)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 2}
+          isOpen={isOpenOverlay && currentDrawerIndex === 2}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
           triggerContent={
             <PostCard
               title="소개"
-              description="소개글을 입력해주세요"
+              description="소개글을 입력해 주세요."
               isEmpty={!content}
             />
           }
@@ -238,17 +217,17 @@ const CommunityRecipePostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(2)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 3}
+          isOpen={isOpenOverlay && currentDrawerIndex === 3}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
           triggerContent={
             <PostCard
               title="재료"
-              description="재료를 입력해주세요"
-              isEmpty={!ingredients[0].name}
+              description="재료를 입력해 주세요."
+              isEmpty={ingredients.length === 0 || !ingredients[0].name}
             />
           }
           headerContent={
@@ -264,17 +243,17 @@ const CommunityRecipePostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(3)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 4}
+          isOpen={isOpenOverlay && currentDrawerIndex === 4}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
           triggerContent={
             <PostCard
               title="조리순서"
-              description="조리순서를 입력해주세요"
-              isEmpty={!orders[0].content}
+              description="조리순서를 입력해 주세요."
+              isEmpty={orders.length === 0 || !orders[0].content}
             />
           }
           headerContent={
@@ -293,21 +272,21 @@ const CommunityRecipePostPage = () => {
       {title &&
         image &&
         content &&
+        ingredients.length > 0 &&
         ingredients[0].name &&
+        orders.length > 0 &&
         orders[0].content && (
-          <div className="w-full">
-            <DamulButton
-              variant="positive-outline"
-              className="w-full"
-              onClick={() => {
-                submitRecipe();
-              }}
-            >
-              {location.pathname.endsWith("edit")
-                ? "레시피 수정하기"
-                : "레시피 작성하기"}
-            </DamulButton>
-          </div>
+          <DamulButton
+            variant="positive"
+            className="w-full"
+            onClick={() => {
+              submitRecipe();
+            }}
+          >
+            {location.pathname.endsWith("edit")
+              ? "레시피 수정하기"
+              : "레시피 작성하기"}
+          </DamulButton>
         )}
     </div>
   );

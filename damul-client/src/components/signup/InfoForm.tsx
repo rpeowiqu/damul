@@ -70,6 +70,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
           setStatus("none");
         }
         setUserInfo({ ...userInfo, nickname: value });
+        setIsCheck(false);
         break;
       case "selfIntroduction":
         if (value.length <= 255) {
@@ -77,8 +78,6 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
         }
         break;
     }
-
-    setIsCheck(false);
   };
 
   const handleDuplicationCheck = async () => {

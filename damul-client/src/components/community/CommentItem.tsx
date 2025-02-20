@@ -74,7 +74,9 @@ const CommentItem = ({
       </p>
       <div className="flex justify-start gap-2 ml-12 cursor-pointer text-xxs pc:text-xs text-neutral-500">
         <ReportButton
-          contentId={parseInt(id)}
+          overlayKey={`${comment.id}`}
+          contentId={comment.id}
+          targetNickname={comment.nickname}
           targetId={comment.userId}
           className="flex items-center gap-1"
         >

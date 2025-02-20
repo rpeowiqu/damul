@@ -27,18 +27,20 @@ const PostCard = ({ title, description, isEmpty }: PostCardsProps) => {
     <div
       className={`flex flex-1 items-center justify-between gap-2 p-5 pc:p-6 border-2 rounded-lg border-positive-300 hover:bg-positive-50 active:bg-positive-100 text-sm pc:text-md font-semibold shadow-md ${!isEmpty ? "bg-positive-200" : ""}`}
     >
-      <div className="flex items-center gap-2 w-28">
+      <div className="flex items-center gap-2 w-28 font-bold">
         {iconSelect[title]}
         <div className="w-full">{title}</div>
       </div>
       <div className="flex w-48 pc:w-64">
         {!isEmpty ? (
           <>
-            <div className="w-full text-normal-700 text-center">입력 완료</div>
-            <CheckCircleIcon className="size-5 stroke-positive-800" />
+            <div className="w-full text-positive-500 text-center text-sm">
+              입력 완료
+            </div>
+            <CheckCircleIcon className="size-5 stroke-2 stroke-positive-500" />
           </>
         ) : (
-          <div className="w-full text-normal-700 text-center">
+          <div className="w-full text-normal-400 text-center text-sm">
             {description}
           </div>
         )}

@@ -15,6 +15,7 @@ import { getPurchaseHistories, getSmartReceipt } from "@/service/statistics";
 import { useQuery } from "@tanstack/react-query";
 import { DailyReceiptInfo, PurchaseHistory, Receipt } from "@/types/statistics";
 import useAuth from "@/hooks/useAuth";
+import useOverlayStore from "@/stores/overlayStore";
 
 const StatisticsHistoryPage = () => {
   const { data, isLoading } = useAuth();
@@ -22,7 +23,10 @@ const StatisticsHistoryPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isTextAnimationEnd, setIsTextAnimationEnd] = useState<boolean>(false);
   const [receiptId, setReceiptId] = useState<number>(0);
-  const [isOpen, setIsOpen] = useCloseOnBack(() => setReceiptId(0));
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("StatisticsHistoryPage");
+
+  useCloseOnBack("StatisticsHistoryPage");
   const {
     data: purchaseHistoryData,
     isLoading: isLoadingPurchaseHistory,
@@ -75,10 +79,6 @@ const StatisticsHistoryPage = () => {
       }
     }
   }, [purchaseHistoryData, isSuccessPurchaseHistory]);
-
-  useEffect(() => {
-    setIsOpen(receiptId > -1 ? true : false);
-  }, [receiptId]);
 
   const handleDayChange = (date: Date) => {
     if (
@@ -256,7 +256,10 @@ const StatisticsHistoryPage = () => {
                 <div
                   key={index}
                   className="flex justify-center items-center gap-1 py-1 bg-normal-50 hover:bg-normal-100 text-normal-400 rounded-lg cursor-pointer"
-                  onClick={() => setReceiptId(item)}
+                  onClick={() => {
+                    setReceiptId(item);
+                    openOverlay("StatisticsHistoryPage");
+                  }}
                 >
                   <ReceiptIcon className="size-4 sm:size-5 fill-normal-200" />
                   <p className="text-xs sm:text-sm">영수증</p>
@@ -271,46 +274,44 @@ const StatisticsHistoryPage = () => {
         </div>
       </div>
 
-      {receiptId > 0 && !isLoadingReceipt && (
-        <DamulModal
-          isOpen={isOpen}
-          onOpenChange={() => {
-            if (isOpen) {
-              history.back();
-            }
-          }}
-          title={"스마트 영수증"}
-          titleStyle="text-normal-500"
-        >
-          <div className="flex flex-col gap-4">
-            <p className="text-black text-end line-clamp-1 break-all">
-              매장명 : {receiptData?.storeName}
-            </p>
-            <div className="h-44 overflow-y-auto">
-              {receiptData?.receiptDetails.map((item, index) => (
-                <ReceiptItem key={index} {...item} />
-              ))}
-            </div>
-            <p className="text-end font-black text-base">
-              총 지출금액 :{" "}
-              <span className="text-negative-400">
-                {receiptData?.totalPrice.toLocaleString()}
-              </span>
-              원
-            </p>
-            <div>
-              <div className="flex justify-center gap-1">
-                <BarCodeIcon className="size-12" />
-                <BarCodeIcon className="size-12" />
-                <BarCodeIcon className="size-12" />
-              </div>
-              <p className="text-center text-black font-black text-xs -mt-2">
-                DA-MUL-LANG-50DAYS
-              </p>
-            </div>
+      <DamulModal
+        isOpen={receiptId > 0 && !isLoadingReceipt && isOpenOverlay}
+        onOpenChange={() => {
+          if (isOpenOverlay) {
+            history.back();
+          }
+        }}
+        title={"스마트 영수증"}
+        titleStyle="text-normal-500"
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-black text-end line-clamp-1 break-all">
+            매장명 : {receiptData?.storeName}
+          </p>
+          <div className="h-44 overflow-y-auto">
+            {receiptData?.receiptDetails.map((item, index) => (
+              <ReceiptItem key={index} {...item} />
+            ))}
           </div>
-        </DamulModal>
-      )}
+          <p className="text-end font-black text-base">
+            총 지출금액 :{" "}
+            <span className="text-negative-400">
+              {receiptData?.totalPrice.toLocaleString()}
+            </span>
+            원
+          </p>
+          <div>
+            <div className="flex justify-center gap-1">
+              <BarCodeIcon className="size-12" />
+              <BarCodeIcon className="size-12" />
+              <BarCodeIcon className="size-12" />
+            </div>
+            <p className="text-center text-black font-black text-xs -mt-2">
+              DA-MUL-LANG-50DAYS
+            </p>
+          </div>
+        </div>
+      </DamulModal>
     </div>
   );
 };

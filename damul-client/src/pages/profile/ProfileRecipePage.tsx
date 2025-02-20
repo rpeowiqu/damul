@@ -104,7 +104,7 @@ const ProfileRecipePage = () => {
         )}
         noContent={
           <p className="text-center text-normal-200">
-            작성한 레피시가 없습니다.
+            작성한 레시피가 없습니다.
             <br />
             자신만의 노하우가 담긴 레시피를 작성하고 공유해보세요!
           </p>

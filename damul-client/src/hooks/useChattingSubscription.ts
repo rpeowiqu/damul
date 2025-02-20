@@ -47,7 +47,7 @@ export const useChattingSubscription = ({
 
         stompClient.subscribe(`/sub/chat/room/${roomId}`, (message) => {
           const receivedMessage = JSON.parse(message.body);
-          // console.log("📩 메시지 수신:", receivedMessage);
+          console.log("📩 메시지 수신:", receivedMessage);
           if (onMessageReceived) {
             onMessageReceived(receivedMessage);
           }
@@ -55,7 +55,7 @@ export const useChattingSubscription = ({
 
         stompClient.subscribe(`/sub/chat/room/${roomId}/read`, (message) => {
           const receivedMessage = JSON.parse(message.body);
-          // console.log("📩 메시지 수신:", receivedMessage);
+          console.log("📩 메시지 수신:", receivedMessage);
           if (onMessageReceived) {
             onMessageReceived(receivedMessage);
           }

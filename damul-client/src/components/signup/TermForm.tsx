@@ -11,6 +11,7 @@ import DamulButton from "../common/DamulButton";
 import DamulModal from "../common/DamulModal";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { Term } from "@/pages/signup/SignUpPage";
+import useOverlayStore from "@/stores/overlayStore";
 
 export interface TermsFormProps {
   selectBit: number;
@@ -26,8 +27,11 @@ const TermsForm = ({
   onNext,
 }: TermsFormProps) => {
   const [infoText, setInfoText] = useState<string>("");
-  const [isOpen, setIsOpen] = useCloseOnBack();
-  const [termContent, setTermContent] = useState<string>("");
+  const [termIndex, setTermIndex] = useState<number>(0);
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("TermsForm");
+
+  useCloseOnBack("TermsForm");
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -66,8 +70,8 @@ const TermsForm = ({
   };
 
   useEffect(() => {
-    setIsOpen(termContent ? true : false);
-  }, [termContent]);
+    openOverlay("TermForm");
+  }, [termIndex]);
 
   useEffect(() => {
     checkRequired();
@@ -117,7 +121,7 @@ const TermsForm = ({
                     </Label>
                     <p
                       className="text-sm sm:text-base text-normal-300 cursor-pointer"
-                      onClick={() => setTermContent(terms[index].content)}
+                      onClick={() => setTermIndex(index)}
                     >
                       보기
                     </p>
@@ -144,17 +148,17 @@ const TermsForm = ({
       </p>
 
       <DamulModal
-        isOpen={isOpen}
+        isOpen={isOpenOverlay}
         onOpenChange={() => {
-          if (isOpen) {
-            setTermContent("");
+          if (isOpenOverlay) {
+            history.back();
           }
         }}
         contentStyle="max-w-96"
         title="이용약관"
       >
         <div className="w-full h-52 px-5 overflow-y-auto whitespace-pre-wrap">
-          {termContent}
+          {terms[termIndex].content}
         </div>
       </DamulModal>
     </div>

@@ -5,6 +5,7 @@ import BadgeIcon from "../svg/BadgeIcon";
 import { getTimeAgo } from "@/utils/date";
 import useAuth from "@/hooks/useAuth";
 import { useAlarmSubscription } from "@/hooks/useAlarmSubscription";
+import { useAlarmStore } from "@/stores/alarmStore";
 
 interface Alarm {
   id: number;
@@ -38,7 +39,11 @@ const AlarmItem = ({
   useEffect(() => {
     switch (type) {
       case "COMMENT":
-        setLink(`/community/${postType}/${targetUrl}`);
+        if (postType === "recipe") {
+          setLink(`/community/recipe/${targetUrl}`);
+        } else {
+          setLink(`/community/market/${targetUrl}`);
+        }
         break;
       case "LIKE":
         if (postType === "recipe") {
@@ -56,12 +61,18 @@ const AlarmItem = ({
     }
   }, [id]);
 
-  const { readMessage } = useAlarmSubscription({ userId });
+  const { readAlarm } = useAlarmSubscription({ userId });
+  const { alarmCnt, setAlarmCnt } = useAlarmStore();
 
   return (
     <div
       className="h-full text-center space-y-2 border-b"
-      onClick={() => readMessage({ alarmId: id })}
+      onClick={() => {
+        readAlarm({ alarmId: id });
+        if (!read) {
+          setAlarmCnt(alarmCnt - 1);
+        }
+      }}
     >
       <Link to={link}>
         <div className="flex items-center justify-between px-7 cursor-pointer">

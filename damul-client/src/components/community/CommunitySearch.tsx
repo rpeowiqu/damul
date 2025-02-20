@@ -70,6 +70,10 @@ const CommunitySearch = ({ placeholder, type }: CommunitySearchProps) => {
             <DamulSearchBox
               placeholder={placeholder}
               onButtonClick={(content) => {
+                if (content.trim() === "") {
+                  alert("앗! 검색어가 비어있어요. 검색어를 입력해 주세요. ✏️");
+                  return;
+                }
                 handleAddSearch(content);
                 navigate(
                   `/community/${type}/search/result?keyword=${encodeURIComponent(content)}&searchType=${searchType}`,
