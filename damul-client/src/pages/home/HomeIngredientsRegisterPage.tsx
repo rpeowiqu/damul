@@ -163,23 +163,22 @@ const HomeIngredientsRegisterPage = () => {
           if (response.type === "PROCESSING_STARTED") {
             console.log("🔄 이미지 분석이 시작됨");
             setIsLoading(true);
-            return;
           }
 
           if (response.type === "PROCESSING_COMPLETED") {
             console.log("✅ 이미지 분석 완료");
             setIsLoading(false);
-            return;
           }
 
           if (response.type === "PROCESSING_COMPLETED") {
             const updatedData = response.data.data;
+            console.log(updatedData);
             if (updatedData.length > 0) {
               setIngredientRegisterData((prevData) => {
                 const newIngredientRegisterData =
                   prevData[0].ingredientName.length > 0 ? [...prevData] : [];
 
-                updatedData.forEach((ingredient: responseData) => {
+                updatedData.map((ingredient: responseData) => {
                   newIngredientRegisterData.push({
                     id: Math.floor(Math.random() * 10000),
                     ingredientName: ingredient.ingredientName,
@@ -192,9 +191,6 @@ const HomeIngredientsRegisterPage = () => {
                         : ingredient.ingredientStorage,
                   });
                 });
-
-                setPurchaseAt(updatedData.purchaseAt);
-                setStoreName(updatedData.storeName);
 
                 return newIngredientRegisterData;
               });
@@ -230,12 +226,16 @@ const HomeIngredientsRegisterPage = () => {
     };
   }, [data]);
 
+  useEffect(() => {
+    console.log("📢 상태 변경 감지:", ingredientRegisterData);
+  }, [ingredientRegisterData]);
+
   return (
     <div className="flex flex-col p-5 relative">
       {isLoading && (
         <Loading
           message={`영수증 등록 중 입니다. 잠시만 기다려주세요`}
-          purpose=""
+          purpose="OCR"
         />
       )}
 
