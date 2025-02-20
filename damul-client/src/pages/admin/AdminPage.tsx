@@ -1,4 +1,6 @@
 import Header from "@/components/admin/Header";
+import Loading from "@/components/common/Loading";
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 
 const AdminPage = () => {
@@ -7,7 +9,9 @@ const AdminPage = () => {
       <Header />
 
       <main className="flex-1">
-        <Outlet />
+        <Suspense fallback={<Loading />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );

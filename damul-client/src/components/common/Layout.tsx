@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Outlet, useMatches } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
+import OcrLoading from "./Loading";
 
 interface RouteHandle {
   header?: boolean;
@@ -19,7 +20,7 @@ const Layout = () => {
       {HeaderComponent}
 
       <main className="flex flex-col flex-1 pt-14 pb-16">
-        <Suspense fallback={<div></div>}>
+        <Suspense fallback={<OcrLoading />}>
           <Outlet />
         </Suspense>
       </main>

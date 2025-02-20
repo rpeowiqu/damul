@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import DamulTab from "@/components/common/DamulTab";
 import { Suspense } from "react";
+import Loading from "@/components/common/Loading";
 
 const tabItems = [
   {
@@ -17,7 +18,7 @@ const CommunityPage = () => {
   return (
     <main className="flex flex-col">
       <DamulTab tabList={tabItems} />
-      <Suspense fallback={<div></div>}>
+      <Suspense fallback={<Loading />}>
         <Outlet />
       </Suspense>
     </main>

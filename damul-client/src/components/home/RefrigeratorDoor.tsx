@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 import doorImage from "@/assets/door.png";
 
-const RefrigeratorDoor = () => {
+const RefrigeratorDoor = ({ storage }: { storage: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
 
@@ -35,7 +35,9 @@ const RefrigeratorDoor = () => {
       }}
     >
       <div className="relative w-full h-full overflow-hidden rounded-xl">
-        <div className="rounded-xl shine-effect absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-gray-200/40 to-transparent opacity-40 animate-shine z-30"></div>
+        <div
+          className={`absolute -top-32 right-[80%] w-96 h-96 bg-gradient-to-r from-transparent ${storage === "freezer" ? "via-sky-100/50" : "via-gray-200/60"}  to-transparent animate-shine z-30`}
+        ></div>
         <img
           src={doorImage}
           className="w-full h-full rounded-xl z-30"
