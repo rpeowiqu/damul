@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 import doorImage from "@/assets/door.png";
@@ -7,9 +7,23 @@ const RefrigeratorDoor = ({ storage }: { storage: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
 
+  useEffect(() => {
+    const doorOpened = localStorage.getItem(`doorOpened_${storage}`);
+    if (doorOpened === "true") {
+      setIsHidden(true);
+    }
+  }, [storage]);
+
+  const handleDoorClick = () => {
+    if (!isOpen) {
+      setIsOpen(true);
+      localStorage.setItem(`doorOpened_${storage}`, "true");
+    }
+  };
+
   return (
     <motion.div
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={handleDoorClick}
       className={`rounded-xl absolute cursor-pointer w-full h-full z-30 shadow-lg active:translate-y-1 active:shadow-sm transition border-2 border-normal-100 ${
         isHidden ? "hidden" : "block"
       }`}
