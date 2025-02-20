@@ -156,6 +156,10 @@ const HomeIngredientsRegisterPage = () => {
         retryAttempt = 0;
       };
 
+      eventSource.addEventListener("message", (event) => {
+        console.log(event.data);
+      });
+
       eventSource.onmessage = (event) => {
         console.log(event.data);
         try {
