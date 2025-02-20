@@ -101,5 +101,5 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     // deleted되지 않은 post 조회
     Optional<Post> findByPostIdAndStatusNot(int postId, PostStatus postStatus);
 
-    int countByUser_IdAndStatus(Integer userId, String status);
+    int countByUser_IdAndStatus(Integer userId, PostStatus status);
 }

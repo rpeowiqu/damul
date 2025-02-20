@@ -91,7 +91,7 @@ public class PriceBatchService {
 
         try {
             locked = redisTemplate.opsForValue()
-                    .setIfAbsent(lockKey, lockValue, Duration.ofHours(1));
+                    .setIfAbsent(lockKey, lockValue, Duration.ofMinutes(10));
 
             if (!locked) {
                 log.info("[{}] 카테고리 배치 작업이 이미 실행 중입니다.", category.getName());
