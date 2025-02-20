@@ -137,29 +137,23 @@ public class SseService {
         SseEmitter emitter = localEmitters.get(userId);
         if (emitter != null) {
             try {
-                // Object를 JSON 문자열로 변환
-                String jsonData;
+                // 이미 JSON 문자열인 경우는 변환하지 않음
                 if (data instanceof String) {
-                    jsonData = (String) data;
+                    emitter.send(SseEmitter.event()
+                            .name("image")
+                            .data(data));
                 } else {
-                    try {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        jsonData = objectMapper.writeValueAsString(data);
-                    } catch (JsonProcessingException e) {
-                        log.error("JSON 변환 실패 - userId: {}", userId, e);
-                        jsonData = "{\"error\":\"데이터 변환 실패\"}";
-                    }
+                    // JSON 변환 필요한 경우
+                    emitter.send(SseEmitter.event()
+                            .name("image")
+                            .data(data)); // 여기서 변환하지 않고 Spring이 알아서 변환하도록 함
                 }
 
-                emitter.send(SseEmitter.event()
-                        .name("image")
-                        .data(jsonData));
-                log.info("OCR 결과 전송 성공 - userId: {}", userId);
-
+                log.info("데이터 전송 성공 - userId: {}", userId);
                 // TTL 갱신
                 redisTemplate.expire(redisKey, TIMEOUT, TimeUnit.MILLISECONDS);
             } catch (IOException e) {
-                log.error("OCR 결과 전송 실패 - userId: {}", userId, e);
+                log.error("데이터 전송 실패 - userId: {}", userId, e);
                 emitter.complete();
                 removeEmitter(userId);
             }
