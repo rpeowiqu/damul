@@ -90,7 +90,7 @@ const ChattingRoomPage = () => {
       const response = await getChattingContents({
         roomId: roomId,
         cursor: pageParam,
-        size: 10,
+        size: 50,
       });
 
       console.log(response?.data);
