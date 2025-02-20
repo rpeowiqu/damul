@@ -42,7 +42,7 @@ const ProfileInfoPage = () => {
           setProfileInfo(response.data);
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       } finally {
         setIsFetched(true);
       }
@@ -59,7 +59,7 @@ const ProfileInfoPage = () => {
         nav(`/chatting/${chatId}`);
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -79,7 +79,7 @@ const ProfileInfoPage = () => {
         });
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 

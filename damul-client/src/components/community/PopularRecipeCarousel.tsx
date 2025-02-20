@@ -37,10 +37,10 @@ const PopularRecipeCarousel = () => {
     const fetchData = async () => {
       try {
         const response = await getPoppularRecipes();
-        console.log(response.data);
+        // console.log(response.data);
         setsuggestedRecipe(response.data);
       } catch (err: any) {
-        console.log("레시피 데이터를 받아오지 못했습니다.");
+        // console.log("레시피 데이터를 받아오지 못했습니다.");
       }
     };
     fetchData();

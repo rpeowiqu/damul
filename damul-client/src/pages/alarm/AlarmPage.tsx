@@ -26,9 +26,9 @@ const AlarmPage = () => {
     try {
       const response = await getAlarms();
       setAlarms(response.data.notifications);
-      console.log(response.data.notifications);
+      // console.log(response.data.notifications);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -36,9 +36,9 @@ const AlarmPage = () => {
     try {
       const response = await getUnreadAlarmCnt();
       setAlarmCnt(response.data.unReadMessageNum);
-      console.log(response);
+      // console.log(response);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 

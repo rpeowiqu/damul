@@ -128,7 +128,7 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
               {selectedBadge.description}
             </p>
             <p className="text-sm text-positive-400">
-              상위 {selectedBadge.rank}%가 이 뱃지를 획득했어요.
+              상위 {selectedBadge.rank.toFixed(2)}%가 이 뱃지를 획득했어요.
             </p>
           </div>
 

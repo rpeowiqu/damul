@@ -38,7 +38,7 @@ const AdminReportPage = () => {
         setReportList(data.content);
         setTotalPage(data.pageInfo.totalPages);
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       } finally {
         setIsLoading(false);
       }

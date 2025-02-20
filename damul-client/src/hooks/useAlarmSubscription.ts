@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { getUnreadAlarmCnt } from "@/service/alarm";
+import { useChatAlarmStore } from "@/stores/alarmStore";
 
 interface ExtendedOptions extends SockJS.Options {
   withCredentials: boolean;
@@ -22,6 +23,7 @@ export const useAlarmSubscription = ({
 }: AlarmSubscription) => {
   const wsUrl = import.meta.env.VITE_WS_BASE_URL;
   const stompClientRef = useRef<Client | null>(null);
+  const { chatCnt, setChatCnt } = useChatAlarmStore();
 
   const fetchUnreadAlarmCnt = async () => {
     try {
@@ -30,7 +32,7 @@ export const useAlarmSubscription = ({
         setAlarmCnt(response.data.unReadMessageNum);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -44,30 +46,31 @@ export const useAlarmSubscription = ({
           withCredentials: true,
         } as ExtendedOptions),
       onConnect: (frame) => {
-        console.log("Alarm Connected: " + frame);
+        // console.log("Alarm Connected: " + frame);
 
         fetchUnreadAlarmCnt();
 
         stompClient.subscribe(`/sub/notification/${userId}`, (message) => {
           const notification = JSON.parse(message.body);
-          console.log("알림 수신:", notification);
+          // console.log("알림 수신:", notification);
           if (onAlarmReceived) {
             onAlarmReceived(notification);
           }
         });
         stompClient.subscribe(`/sub/chat/${userId}/count`, (message) => {
           const notification = message;
-          console.log("채팅수:", notification.body);
+          // console.log("채팅수:", notification.body);
+          setChatCnt(notification.body);
           if (onChatCntReceived) {
             onChatCntReceived(notification.body);
           }
         });
       },
       onStompError: (frame) => {
-        console.error("STOMP 알림 에러:", frame.headers["message"], frame.body);
+        // console.error("STOMP 알림 에러:", frame.headers["message"], frame.body);
       },
       onWebSocketError: (event) => {
-        console.error("WebSocket 알림 에러:", event);
+        // console.error("WebSocket 알림 에러:", event);
       },
     });
 
@@ -85,7 +88,7 @@ export const useAlarmSubscription = ({
       return;
     }
 
-    console.log("📤 알람 읽음:", alarmId);
+    // console.log("📤 알람 읽음:", alarmId);
     stompClientRef.current.publish({
       destination: `/pub/notification/read/${alarmId}`,
     });

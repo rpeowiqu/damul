@@ -40,10 +40,10 @@ const CommunityRecipeDetailPage = () => {
     try {
       setIsLoading(true);
       const response = await getRecipeDetail(recipeId);
-      console.log(response);
+      // console.log(response);
       setData(response?.data);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     } finally {
       setIsLoading(false);
     }

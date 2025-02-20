@@ -78,23 +78,23 @@ const CommunityRecipePostPage = () => {
     });
 
     try {
-      console.log("데이터", recipeData);
+      // console.log("데이터", recipeData);
       const response = await (location.pathname.endsWith("edit")
         ? putRecipe({ formData, recipeId })
         : postRecipe(formData));
 
-      console.log("결과", response?.data);
+      // console.log("결과", response?.data);
       alert("레시피가 등록되었습니다");
       navigate("/community/recipe");
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
   const fetchRecipeDetail = async () => {
     try {
       const response = await getRecipeDetail(recipeId);
-      console.log(response.data);
+      // console.log(response.data);
       setTitle(response.data.title);
       setTempTitle(response.data.title);
       setImage(response.data.contentImageUrl);
@@ -106,9 +106,9 @@ const CommunityRecipePostPage = () => {
       setTempIngredients(response.data.ingredients);
       setOrders(response.data.cookingOrders);
       setTempOrders(response.data.cookingOrders);
-      console.log(response.data.cookingOrders);
+      // console.log(response.data.cookingOrders);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 

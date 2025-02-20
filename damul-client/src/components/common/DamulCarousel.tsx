@@ -53,7 +53,7 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
           setsuggestedRecipe(response.data.suggestedRecipes);
         }
       } catch (error: any) {
-        console.log("레시피 정보를 받지 못했습니다.");
+        // console.log("레시피 정보를 받지 못했습니다.");
       }
     };
     fetchRecipeData();

@@ -48,6 +48,7 @@ const ChattingRoomInfiniteScroll = <T,>({
   }, [inView]);
 
   const hasData = data?.pages?.some((page) => page.data.length > 0);
+  const reversedArr = data ? [...data.pages].reverse() : [];
 
   return (
     <>
@@ -55,7 +56,7 @@ const ChattingRoomInfiniteScroll = <T,>({
         <div className={className}>
           {isFetchingNextPage ? skeleton : <div ref={ref}></div>}
 
-          {data?.pages.map((page, pageIndex) =>
+          {reversedArr.map((page, pageIndex) =>
             page.data.map((item, index) =>
               renderItems(item, index + pageIndex * page.data.length),
             ),

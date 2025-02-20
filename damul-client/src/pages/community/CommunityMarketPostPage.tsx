@@ -58,11 +58,11 @@ const CommunityMarketPostPage = () => {
       const response = await (location.pathname.endsWith("edit")
         ? putPost({ formData, postId })
         : postPost(formData));
-      console.log(response?.data);
+      // console.log(response?.data);
       alert("게시글이 등록되었습니다");
       navigate("/community/market");
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -79,7 +79,7 @@ const CommunityMarketPostPage = () => {
       setChatSize(response.data.chatSize);
       setTempChatSize(response.data.chatSize);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 

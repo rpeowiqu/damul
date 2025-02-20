@@ -28,8 +28,8 @@ const CommentItem = ({
 
   const deleteComment = async (commentId: number) => {
     const isConfirmed = window.confirm("정말로 댓글을 삭제하시겠습니까?");
-    console.log("CommentItem id 값:", id);
-    // console.log("CommentItem type 값:", type);
+    // console.log("CommentItem id 값:", id);
+    // // console.log("CommentItem type 값:", type);
 
     if (!isConfirmed) {
       return;
@@ -41,10 +41,10 @@ const CommentItem = ({
           ? await deleteRecipeComment({ recipeId: id, commentId })
           : await deletePostComment({ postId: id, commentId });
 
-      console.log(response);
+      // console.log(response);
       fetchDetailData();
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 

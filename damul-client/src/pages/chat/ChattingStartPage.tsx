@@ -27,12 +27,12 @@ const ChattingStartPage = () => {
         cursor: pageParam,
         size: 10,
       });
-      console.log(response?.data);
+      // console.log(response?.data);
       return response?.status === 204
         ? { data: [], meta: { nextCursor: null, hasNext: false } }
         : response?.data;
     } catch (error) {
-      console.error("Failed to fetch followings:", error);
+      // console.error("Failed to fetch followings:", error);
       return { data: [], meta: { nextCursor: null, hasNext: false } };
     }
   };
@@ -60,7 +60,7 @@ const ChattingStartPage = () => {
       const chatRoomId = response.data.id;
       navigate(`/chatting/${chatRoomId}`);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -70,7 +70,7 @@ const ChattingStartPage = () => {
       const chatRoomId = response.data.id;
       navigate(`/chatting/${chatRoomId}`);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 

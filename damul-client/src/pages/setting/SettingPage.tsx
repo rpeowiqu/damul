@@ -85,7 +85,7 @@ const SettingPage = () => {
           });
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       } finally {
         setIsFetched(true);
       }
@@ -122,7 +122,7 @@ const SettingPage = () => {
       }
       setStatus(newStatus!);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -152,7 +152,7 @@ const SettingPage = () => {
       const newStatus = await checkNickname();
       setStatus(newStatus!);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -187,7 +187,7 @@ const SettingPage = () => {
           return "duplicate";
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     }
   };

@@ -76,12 +76,12 @@ const CommentInput = forwardRef<HTMLInputElement, CommentInputProps>(
                 parentId,
               });
 
-        console.log(response);
+        // console.log(response);
         setReplyingTo(null);
         setComment("");
         fetchDetailData();
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
 

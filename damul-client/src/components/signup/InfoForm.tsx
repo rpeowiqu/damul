@@ -54,7 +54,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
       }
       setStatus(newStatus!);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -86,7 +86,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
       setStatus(newStatus!);
       setIsCheck(true);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -103,7 +103,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
           return "duplicate";
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     }
   };

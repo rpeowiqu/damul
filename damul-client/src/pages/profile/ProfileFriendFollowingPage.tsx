@@ -22,7 +22,7 @@ const ProfileFriendFollowingPage = () => {
         nav(`/chatting/${chatId}`);
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -39,7 +39,7 @@ const ProfileFriendFollowingPage = () => {
 
       return response?.data;
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -59,7 +59,7 @@ const ProfileFriendFollowingPage = () => {
         setCheckSet((prev) => new Set(prev).add(userId));
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 

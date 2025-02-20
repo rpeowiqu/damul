@@ -90,10 +90,10 @@ const ChattingRoomPage = () => {
       const response = await getChattingContents({
         roomId: roomId,
         cursor: pageParam,
-        size: 100,
+        size: 50,
       });
 
-      console.log(response?.data);
+      // console.log(response?.data);
       if (response?.data && typeof response.data === "object") {
         setChatData({
           messages: response.data.data || [],
@@ -108,7 +108,7 @@ const ChattingRoomPage = () => {
 
       return response?.data;
     } catch (error) {
-      console.error("채팅 데이터 불러오기 실패:", error);
+      // console.error("채팅 데이터 불러오기 실패:", error);
     }
   };
 
@@ -184,7 +184,7 @@ const ChattingRoomPage = () => {
 
     try {
       const response = await postImageInRoom({ roomId, formData });
-      console.log(response);
+      // console.log(response);
 
       const newImageMessage: ChatMessage = {
         id: Date.now(),
@@ -203,7 +203,7 @@ const ChattingRoomPage = () => {
       setImage(null);
       setPrevImage(null);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -212,6 +212,8 @@ const ChattingRoomPage = () => {
     if (!chatData.messages.length || !roomId || !data?.data.id) return;
 
     const lastMessage = chatData.messages[chatData.messages.length - 1];
+
+    // console.log("sdsd", lastMessage);
 
     readMessage({
       userId: data?.data.id,
@@ -228,12 +230,14 @@ const ChattingRoomPage = () => {
         </p>
         <ChattingMenuButton roomId={roomId} postId={chatData.postId} />
       </div>
-      <div className="flex-1 justify-end overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
         <ChattingRoomInfiniteScroll
           key={chatData.messages.length}
           queryKey={["chats"]}
           fetchFn={fetchItems}
-          renderItems={(msg: ChatMessage) => <ChattingBubble msg={msg} />}
+          renderItems={(msg: ChatMessage) => (
+            <ChattingBubble key={msg.id} msg={msg} />
+          )}
           skeleton={
             <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
           }

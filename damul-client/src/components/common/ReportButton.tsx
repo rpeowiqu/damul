@@ -57,9 +57,9 @@ const ReportButton = ({
         targetId,
         description: reportForm.description,
       });
-      console.log(response);
+      // console.log(response);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     } finally {
       alert("신고 처리 되었습니다.");
       history.back();
@@ -69,7 +69,7 @@ const ReportButton = ({
   const onChangeReportData = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    console.log(e.target.name, e.target.value);
+    // console.log(e.target.name, e.target.value);
     setReportForm({ ...reportForm, [e.target.name]: e.target.value });
   };
 
@@ -78,7 +78,7 @@ const ReportButton = ({
       <div
         className={className}
         onClick={() => {
-          console.log(`key: ${overlayKey}`);
+          // console.log(`key: ${overlayKey}`);
           openOverlay(overlayKey);
         }}
       >

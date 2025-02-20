@@ -103,10 +103,10 @@ export const postRecipeComment = async ({
 
   if (parentId) {
     CommentCreate.parentId = parentId;
-    console.log(parentId);
+    // console.log(parentId);
   }
 
-  console.log(CommentCreate);
+  // console.log(CommentCreate);
 
   return apiClient.post(`recipes/${recipeId}/comments`, CommentCreate);
 };
@@ -119,6 +119,6 @@ export const deleteRecipeComment = async ({
   recipeId: string;
   commentId: number;
 }) => {
-  console.log(recipeId);
+  // console.log(recipeId);
   return apiClient.delete(`/recipes/${recipeId}/comments/${commentId}`);
 };

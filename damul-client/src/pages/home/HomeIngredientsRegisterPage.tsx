@@ -132,7 +132,7 @@ const HomeIngredientsRegisterPage = () => {
       await postUserIndegredient(data);
       navigate("/home");
     } catch (error: any) {
-      console.log("식자재를 등록하지 못했습니다.");
+      // console.log("식자재를 등록하지 못했습니다.");
       alert("식자재를 등록하지 못했습니다.");
     } finally {
       setIsLoading(false);
@@ -152,7 +152,7 @@ const HomeIngredientsRegisterPage = () => {
       });
 
       eventSource.onopen = () => {
-        console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
+        // console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
         retryAttempt = 0;
       };
 
@@ -161,12 +161,12 @@ const HomeIngredientsRegisterPage = () => {
           const response = JSON.parse(event.data);
 
           if (response.type === "PROCESSING_STARTED") {
-            console.log("🔄 이미지 분석이 시작됨");
+            // console.log("🔄 이미지 분석이 시작됨");
             setIsLoading(true);
           }
 
           if (response.type === "PROCESSING_COMPLETED") {
-            console.log("✅ 이미지 분석 완료");
+            // console.log("✅ 이미지 분석 완료");
           }
 
           if (response.type === "PROCESSING_COMPLETED") {
@@ -196,19 +196,19 @@ const HomeIngredientsRegisterPage = () => {
             setIsLoading(false);
           }
         } catch (error) {
-          console.error("데이터 처리 중 오류가 발생했습니다.", error);
+          // console.error("데이터 처리 중 오류가 발생했습니다.", error);
         }
       });
 
       eventSource.onerror = (error) => {
-        console.error("❌ SSE 연결 오류 발생", error);
+        // console.error("❌ SSE 연결 오류 발생", error);
         eventSource?.close();
 
         if (retryAttempt < MAX_RETRY_ATTEMPTS) {
           const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryAttempt);
           retryTimeout = setTimeout(connectSSE, retryDelay);
           retryAttempt += 1;
-          console.log(
+          // console.log(
             `⏳ ${retryDelay / 1000}초 후 SSE 재연결 시도... (시도 ${retryAttempt}/${MAX_RETRY_ATTEMPTS})`,
           );
         } else {

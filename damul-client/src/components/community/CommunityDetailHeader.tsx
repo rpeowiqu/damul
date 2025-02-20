@@ -38,14 +38,14 @@ const CommunityDetailHeader = ({
   const bookmarkRecipe = async () => {
     try {
       const response = await postRecipeBookMark({ recipeId: id });
-      console.log(response?.data);
+      // console.log(response?.data);
       if (response?.data) {
         setIsBookmarked(true);
       } else {
         setIsBookmarked(false);
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -57,10 +57,10 @@ const CommunityDetailHeader = ({
     }
     try {
       const response = await putPostStatusChange({ postId: id });
-      console.log(response?.data);
+      // console.log(response?.data);
       setIsStatusActive("COMPLETED");
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 

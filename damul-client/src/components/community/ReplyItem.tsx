@@ -37,10 +37,10 @@ const ReplyItem = ({
           ? await deleteRecipeComment({ recipeId: id, commentId })
           : await deletePostComment({ postId: id, commentId });
 
-      console.log(response);
+      // console.log(response);
       fetchDetailData();
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 

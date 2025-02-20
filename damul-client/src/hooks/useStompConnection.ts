@@ -28,22 +28,22 @@ export const useStompConnection = ({
           withCredentials: true,
         } as ExtendedOptions),
       onConnect: (frame) => {
-        console.log("🔗 STOMP 연결 성공:", frame);
+        // console.log("🔗 STOMP 연결 성공:", frame);
 
         // 주어진 모든 토픽을 구독
         subscribeTopics.forEach((topic) => {
           stompClient.subscribe(topic, (message) => {
             const receivedMessage = JSON.parse(message.body);
-            console.log(`📩 메시지 수신 [${topic}]:`, receivedMessage);
+            // console.log(`📩 메시지 수신 [${topic}]:`, receivedMessage);
             onMessageReceived(topic, receivedMessage);
           });
         });
       },
       onStompError: (frame) => {
-        console.error("🚨 STOMP 에러:", frame.headers["message"], frame.body);
+        // console.error("🚨 STOMP 에러:", frame.headers["message"], frame.body);
       },
       onWebSocketError: (event) => {
-        console.error("⚠️ WebSocket 에러:", event);
+        // console.error("⚠️ WebSocket 에러:", event);
       },
     });
 
@@ -51,7 +51,7 @@ export const useStompConnection = ({
     stompClientRef.current = stompClient;
 
     return () => {
-      stompClient.deactivate().then(() => console.log("⛔ STOMP 연결 종료"));
+      stompClient.deactivate().then(() => // console.log("⛔ STOMP 연결 종료"));
     };
   }, [subscribeTopics]);
 

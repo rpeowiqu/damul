@@ -52,7 +52,7 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
       setAdminId(response?.data.adminId);
       return response?.data;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -63,10 +63,10 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
   const handleExitRoom = async () => {
     try {
       const response = await deleteFromRoom({ roomId: roomId });
-      console.log(response);
+      // console.log(response);
       navigate("/chatting");
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -81,7 +81,7 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
       });
       fetchItems();
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
