@@ -233,7 +233,6 @@ public class HomeServiceImpl implements HomeService {
             log.info("서비스: 이미지 처리 시작 - userId: {}", userId);
             log.info("SSE 연결 상태 확인 - userId: {}, 연결됨: {}", userId,
                     redisTemplate.hasKey(SSE_KEY_PREFIX + userId));
-            sseService.sendToClient(userId, "OCR 요청을 시작합니다");
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
