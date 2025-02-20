@@ -171,8 +171,6 @@ const HomeIngredientsRegisterPage = () => {
 
           if (response.type === "PROCESSING_COMPLETED") {
             const updatedData = response.data.data;
-            console.log(response.data.data);
-            console.log(response.data);
             if (updatedData.length > 0) {
               setIngredientRegisterData((prevData) => {
                 const newIngredientRegisterData =
@@ -196,7 +194,6 @@ const HomeIngredientsRegisterPage = () => {
               });
             }
             setIsLoading(false);
-            console.log("데이터");
           }
         } catch (error) {
           console.error("데이터 처리 중 오류가 발생했습니다.", error);
@@ -227,10 +224,6 @@ const HomeIngredientsRegisterPage = () => {
       clearTimeout(retryTimeout);
     };
   }, [data]);
-
-  useEffect(() => {
-    console.log("📢 상태 변경 감지:", ingredientRegisterData);
-  }, [ingredientRegisterData]);
 
   return (
     <div className="flex flex-col p-5 relative">
