@@ -45,8 +45,8 @@ const HomeIngredientsEditPage = () => {
       <div className="flex flex-col gap-10 items-center">
         {ingredients.length === 0 && (
           <div className="flex w-full flex-col h-60 items-center gap-5 justify-center">
-            <p>편집할 식자재가 없습니다.</p>
-            <DamulButton onClick={() => navigate("/home")}>
+            <p className="text-normal-300">편집할 식자재가 없습니다.</p>
+            <DamulButton variant="positive" onClick={() => navigate("/home")}>
               홈으로 이동
             </DamulButton>
           </div>
@@ -56,7 +56,7 @@ const HomeIngredientsEditPage = () => {
             <>
               <div
                 key={ingredient.userIngredientId}
-                className="border-4 w-full max-w-96 rounded-3xl border-positive-300"
+                className="border-4 w-full max-w-88 rounded-3xl border-positive-300"
               >
                 <IngredientDetail
                   selectedIngredient={ingredient}

@@ -129,9 +129,10 @@ const HomePage = () => {
 
           return (
             <div className="relative w-full" key={`${storage}${Math.random()}`}>
-              {(storage === "freezer" || storage === "fridge") && (
-                <RefrigeratorDoor storage={storage} />
-              )}
+              {(storage === "freezer" || storage === "fridge") &&
+                !localStorage.getItem(`doorOpened_${storage}`) && (
+                  <RefrigeratorDoor storage={storage} />
+                )}
               <IngredientStorageContainer
                 title={storage as keyof IngredientData}
                 items={
