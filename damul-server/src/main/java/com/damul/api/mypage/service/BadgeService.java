@@ -70,7 +70,7 @@ public class BadgeService {
      */
     @Async
 //    @Scheduled(cron = "0 0 17 * * *")  // UTC 17:00 = KST 02:00
-    @Scheduled(cron = "0 30 20 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 30 12 * * *")
     public void checkAndAwardBadges() {
         // Redis 분산 락 설정
         String lockKey = String.format(BATCH_LOCK_KEY, "daily");
