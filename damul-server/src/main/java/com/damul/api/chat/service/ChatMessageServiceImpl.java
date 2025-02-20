@@ -26,12 +26,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -105,6 +107,7 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         }
 
         int lastReadMessageId = chatRoomMemberRepository.findLastReadMessageIdByUserIdAndRoomId(userId, roomId);
+        log.info("유저의 해당 방 lastReadMessageId: {}", lastReadMessageId);
         List<ChatMessage> messages = fetchMessages(roomId, cursor, size, lastReadMessageId);
 
         if (messages.isEmpty()) {
@@ -116,40 +119,43 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
                 .map(this::convertToChatMessageResponse)
                 .collect(Collectors.toList());
 
-        // ✨ 현재 채팅방의 가장 최신 메시지 ID 조회
-        ChatMessage latestMessage = chatMessageRepository
-                .findFirstByRoomIdOrderByCreatedAtDesc(roomId)
-                .orElse(null);
+        if(cursor == 0) {
+            // ✨ 현재 채팅방의 가장 최신 메시지 ID 조회
+            ChatMessage latestMessage = chatMessageRepository
+                    .findFirstByRoomIdOrderByCreatedAtDesc(roomId)
+                    .orElse(null);
+            log.info("마지막 메세지: {}", latestMessage.getId());
 
-        // 최신 메시지가 있다면 사용자의 lastReadMessageId 업데이트
-        if (latestMessage != null) {
-            // 이전에 읽지 않은 메시지 수 계산
-            Integer unreadCount = chatMessageRepository.countUnreadMessagesInRoom(
-                    roomId,
-                    lastReadMessageId,
-                    latestMessage.getId()
-            );
-            unreadCount = unreadCount == null ? 0 : unreadCount;
-
-            // Redis의 안 읽은 메시지 수 감소
-            if (unreadCount > 0 && latestMessage.getSender().getId() != userId) {
-                unreadMessageService.decrementUnreadCount(userId, unreadCount);
-
-                // 업데이트된 전체 안 읽은 메시지 수 전송
-                int totalUnread = unreadMessageService.getUnreadCount(userId);
-                messagingTemplate.convertAndSend(
-                        "/sub/chat/" + userId + "/count",
-                        totalUnread
+            // 최신 메시지가 있다면 사용자의 lastReadMessageId 업데이트
+            if (latestMessage != null && lastReadMessageId != latestMessage.getId()) {
+                // 이전에 읽지 않은 메시지 수 계산
+                Integer unreadCount = chatMessageRepository.countUnreadMessagesInRoom(
+                        roomId,
+                        lastReadMessageId,
+                        latestMessage.getId()
                 );
-            }
+                unreadCount = unreadCount == null ? 0 : unreadCount;
 
-            chatRoomMemberRepository.updateLastReadMessageId(
-                    userId,
-                    roomId,
-                    latestMessage.getId()
-            );
-            log.info("서비스: 사용자의 마지막 읽은 메시지 ID 업데이트 - userId: {}, roomId: {}, messageId: {}",
-                    userId, roomId, latestMessage.getId());
+                // Redis의 안 읽은 메시지 수 감소
+                if (unreadCount > 0 && latestMessage.getSender().getId() != userId) {
+                    unreadMessageService.decrementUnreadCount(userId, unreadCount);
+
+                    // 업데이트된 전체 안 읽은 메시지 수 전송
+                    int totalUnread = unreadMessageService.getUnreadCount(userId);
+                    messagingTemplate.convertAndSend(
+                            "/sub/chat/" + userId + "/count",
+                            totalUnread
+                    );
+                }
+
+                chatRoomMemberRepository.updateLastReadMessageId(
+                        userId,
+                        roomId,
+                        latestMessage.getId()
+                );
+                log.info("서비스: 사용자의 마지막 읽은 메시지 ID 업데이트 - userId: {}, roomId: {}, messageId: {}",
+                        userId, roomId, latestMessage.getId());
+            }
         }
 
         Post post = chatRoom.getPost();
@@ -263,10 +269,9 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         Pageable pageable = PageRequest.of(0, size + 1);
 
         if (cursor == 0) { // 초기 로딩
-            return chatMessageRepository.findInitialMessages(
+            return chatMessageRepository.findLatestMessages(
                     roomId,
-                    lastReadMessageId,
-                    pageable
+                    PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"))
             );
         } else { // 스크롤 시 이전 메시지 로딩
             return chatMessageRepository.findPreviousMessages(

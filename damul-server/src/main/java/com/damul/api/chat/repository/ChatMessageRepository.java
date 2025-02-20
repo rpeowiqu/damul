@@ -40,12 +40,9 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
 
     // 첫 로딩을 위한 쿼리
     @Query("SELECT cm FROM ChatMessage cm WHERE cm.room.id = :roomId " +
-            "AND ((cm.id >= :lastReadId) OR " +
-            "(cm.id < :lastReadId)) " +
             "ORDER BY cm.id DESC")
-    List<ChatMessage> findInitialMessages(
+    List<ChatMessage> findLatestMessages(
             @Param("roomId") int roomId,
-            @Param("lastReadId") int lastReadId,
             Pageable pageable
     );
 
@@ -85,4 +82,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
             @Param("currentReadId") int currentReadId
     );
 
+    @Query("SELECT cm FROM ChatMessage cm WHERE cm.room.id = :roomId ORDER BY cm.id DESC LIMIT 1")
+    ChatMessage findLastMessageIdByRoomId(@Param("roomId") int roomId);
 }
