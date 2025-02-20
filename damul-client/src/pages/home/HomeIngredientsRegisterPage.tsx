@@ -172,31 +172,33 @@ const HomeIngredientsRegisterPage = () => {
             return;
           }
 
-          const updatedData = response.data.data;
-          if (updatedData.length > 0) {
-            setIngredientRegisterData((prevData) => {
-              const newIngredientRegisterData =
-                prevData[0].ingredientName.length > 0 ? [...prevData] : [];
+          if (response.type === "PROCESSING_COMPLETED") {
+            const updatedData = response.data.data;
+            if (updatedData.length > 0) {
+              setIngredientRegisterData((prevData) => {
+                const newIngredientRegisterData =
+                  prevData[0].ingredientName.length > 0 ? [...prevData] : [];
 
-              updatedData.forEach((ingredient: responseData) => {
-                newIngredientRegisterData.push({
-                  id: Math.floor(Math.random() * 10000),
-                  ingredientName: ingredient.ingredientName,
-                  categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
-                  productPrice: ingredient.productPrice,
-                  expirationDate: ingredient.expiration_date,
-                  ingredientStorage:
-                    ingredient.ingredientStorage === "ROOMTEMP"
-                      ? "ROOM_TEMPERATURE"
-                      : ingredient.ingredientStorage,
+                updatedData.forEach((ingredient: responseData) => {
+                  newIngredientRegisterData.push({
+                    id: Math.floor(Math.random() * 10000),
+                    ingredientName: ingredient.ingredientName,
+                    categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
+                    productPrice: ingredient.productPrice,
+                    expirationDate: ingredient.expiration_date,
+                    ingredientStorage:
+                      ingredient.ingredientStorage === "ROOMTEMP"
+                        ? "ROOM_TEMPERATURE"
+                        : ingredient.ingredientStorage,
+                  });
                 });
+
+                setPurchaseAt(updatedData.purchaseAt);
+                setStoreName(updatedData.storeName);
+
+                return newIngredientRegisterData;
               });
-
-              setPurchaseAt(updatedData.purchaseAt);
-              setStoreName(updatedData.storeName);
-
-              return newIngredientRegisterData;
-            });
+            }
           }
         } catch (error) {
           console.error("데이터 처리 중 오류가 발생했습니다.", error);
