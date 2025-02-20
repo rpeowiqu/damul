@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import ChattingListInfo from "@/components/chat/ChattingListInfo";
@@ -8,8 +7,12 @@ import ChattingListInfiniteScroll from "@/components/chat/ChattingListInfiniteSc
 import ChattingListItem from "@/components/chat/ChattingListItem";
 import { ChattingItem } from "@/types/chatting";
 import { getKSTISOString } from "@/utils/date";
+import { useChatAlarmStore } from "@/stores/alarmStore";
+import { useEffect } from "react";
+import queryClient from "@/utils/queryClient";
 
 const ChattingMainPage = () => {
+  const { chatCnt } = useChatAlarmStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const filterType = searchParams.get("filter") || "";
 
@@ -36,6 +39,13 @@ const ChattingMainPage = () => {
       console.error("Error fetching chat list:", error);
     }
   };
+
+  useEffect(() => {
+    console.log("sds");
+    queryClient.refetchQueries({
+      queryKey: ["chattRooms", filterType],
+    });
+  }, [chatCnt]);
 
   return (
     <div className="h-full text-center py-6 space-y-2">
