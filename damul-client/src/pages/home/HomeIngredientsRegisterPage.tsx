@@ -149,10 +149,11 @@ const HomeIngredientsRegisterPage = () => {
       },
     );
 
-    // 메시지 수신
-    eventSource.onmessage = (event) => {
+    eventSource.addEventListener("image", (event) => {
       console.log(event.data);
-    };
+      console.log(event.source);
+      console.log(event.origin);
+    });
 
     // 에러 처리
     eventSource.onerror = (error) => {
@@ -264,7 +265,7 @@ const HomeIngredientsRegisterPage = () => {
       {isLoading && (
         <Loading
           message={`영수증 등록 중 입니다. 잠시만 기다려주세요`}
-          purpose=""
+          purpose="OCR"
         />
       )}
 
