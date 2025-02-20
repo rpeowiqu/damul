@@ -16,7 +16,7 @@ const useOverlayStore = create<OverlayStore>()((set, get) => ({
       newSet.add(key);
       const newStack = [...state.keyStack, key];
       history.pushState(null, "", window.location.pathname);
-      console.log("pushState", key);
+
       return { overlaySet: newSet, keyStack: newStack };
     }),
   closeOverlay: (key: string, onClose?: () => void) =>
@@ -28,9 +28,7 @@ const useOverlayStore = create<OverlayStore>()((set, get) => ({
 
       const newSet = new Set(state.overlaySet);
       newSet.delete(key);
-      console.log("deleteKey", key);
       const newStack = state.keyStack.slice(0, -1);
-      console.log(onClose);
       onClose?.();
 
       return { overlaySet: newSet, keyStack: newStack };

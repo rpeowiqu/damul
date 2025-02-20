@@ -274,46 +274,44 @@ const StatisticsHistoryPage = () => {
         </div>
       </div>
 
-      {receiptId > 0 && !isLoadingReceipt && (
-        <DamulModal
-          isOpen={isOpenOverlay}
-          onOpenChange={() => {
-            if (isOpenOverlay) {
-              history.back();
-            }
-          }}
-          title={"스마트 영수증"}
-          titleStyle="text-normal-500"
-        >
-          <div className="flex flex-col gap-4">
-            <p className="text-black text-end line-clamp-1 break-all">
-              매장명 : {receiptData?.storeName}
-            </p>
-            <div className="h-44 overflow-y-auto">
-              {receiptData?.receiptDetails.map((item, index) => (
-                <ReceiptItem key={index} {...item} />
-              ))}
-            </div>
-            <p className="text-end font-black text-base">
-              총 지출금액 :{" "}
-              <span className="text-negative-400">
-                {receiptData?.totalPrice.toLocaleString()}
-              </span>
-              원
-            </p>
-            <div>
-              <div className="flex justify-center gap-1">
-                <BarCodeIcon className="size-12" />
-                <BarCodeIcon className="size-12" />
-                <BarCodeIcon className="size-12" />
-              </div>
-              <p className="text-center text-black font-black text-xs -mt-2">
-                DA-MUL-LANG-50DAYS
-              </p>
-            </div>
+      <DamulModal
+        isOpen={receiptId > 0 && !isLoadingReceipt && isOpenOverlay}
+        onOpenChange={() => {
+          if (isOpenOverlay) {
+            history.back();
+          }
+        }}
+        title={"스마트 영수증"}
+        titleStyle="text-normal-500"
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-black text-end line-clamp-1 break-all">
+            매장명 : {receiptData?.storeName}
+          </p>
+          <div className="h-44 overflow-y-auto">
+            {receiptData?.receiptDetails.map((item, index) => (
+              <ReceiptItem key={index} {...item} />
+            ))}
           </div>
-        </DamulModal>
-      )}
+          <p className="text-end font-black text-base">
+            총 지출금액 :{" "}
+            <span className="text-negative-400">
+              {receiptData?.totalPrice.toLocaleString()}
+            </span>
+            원
+          </p>
+          <div>
+            <div className="flex justify-center gap-1">
+              <BarCodeIcon className="size-12" />
+              <BarCodeIcon className="size-12" />
+              <BarCodeIcon className="size-12" />
+            </div>
+            <p className="text-center text-black font-black text-xs -mt-2">
+              DA-MUL-LANG-50DAYS
+            </p>
+          </div>
+        </div>
+      </DamulModal>
     </div>
   );
 };
