@@ -157,6 +157,7 @@ const HomeIngredientsRegisterPage = () => {
       };
 
       eventSource.onmessage = (event) => {
+        console.log(event.data);
         try {
           const response = JSON.parse(event.data);
 
