@@ -55,7 +55,7 @@ public class HomeServiceImpl implements HomeService {
 
     private final ObjectMapper objectMapper;
     private final SseService sseService;
-    private final RedisTemplate<Object, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     @Value("${fastapi.server.url}")
     private String fastApiServerUrl;
     private static final String SSE_KEY_PREFIX = "sse:emitter:";
