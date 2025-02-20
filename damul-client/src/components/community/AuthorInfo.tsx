@@ -79,7 +79,7 @@ const AuthorInfo = ({
     }
   };
 
-  if (isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="flex flex-col h-auto p-2">
         <div className="flex justify-between items-center gap-2">
@@ -95,6 +95,8 @@ const AuthorInfo = ({
       </div>
     );
   }
+
+  console.log(authorId + " " + authorName + "ㅇㅇ");
 
   return (
     <div className="flex flex-col h-auto p-2">
@@ -159,7 +161,9 @@ const AuthorInfo = ({
         ) : (
           <div className="flex items-center gap-0.5 cursor-pointer">
             <ReportButton
+              overlayKey={"AuthorInfo"}
               contentId={parseInt(id)}
+              targetNickname={authorName}
               targetId={authorId}
               className="flex items-center gap-0.5 cursor-pointer"
             >

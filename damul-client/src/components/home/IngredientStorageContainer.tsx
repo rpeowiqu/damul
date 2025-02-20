@@ -18,6 +18,7 @@ interface IngredientStorageContainerProps {
   title: keyof typeof STORAGE_TYPE | keyof typeof ITEM_STATUS;
   items: Ingredient[];
   onEdit?: boolean;
+  readOnly?: boolean;
   setExpiringSoonItems?: React.Dispatch<React.SetStateAction<Ingredient[]>>;
   setIngredientData?: React.Dispatch<React.SetStateAction<IngredientData>>;
 }
@@ -33,6 +34,7 @@ const IngredientStorageContainer = ({
   title,
   items,
   onEdit,
+  readOnly,
   setExpiringSoonItems,
   setIngredientData,
 }: IngredientStorageContainerProps) => {
@@ -121,7 +123,7 @@ const IngredientStorageContainer = ({
       return { ...prevData, [storage]: newData };
     });
 
-    if (deletedIngredient.expirationDate < 7) {
+    if (deletedIngredient.expirationDate <= EXPIRINGSOON_DAY) {
       setExpiringSoonItems?.((prevItems) =>
         prevItems?.filter(
           (item) =>
@@ -163,8 +165,8 @@ const IngredientStorageContainer = ({
         </p>
       </div>
       {ingredients.length === 0 ? (
-        <div className="flex h-10 w-full items-center justify-center">
-          식자재가 없습니다.
+        <div className="flex h-10 w-full items-center justify-center text-normal-200">
+          등록된 식자재가 없습니다.
         </div>
       ) : (
         <>
@@ -213,6 +215,7 @@ const IngredientStorageContainer = ({
                 deleteIngredient={deleteIngredient}
                 setIsOpen={setIsOpen}
                 updateIngredient={updateIngredient}
+                readOnly={readOnly}
               />
             )}
           </DamulModal>

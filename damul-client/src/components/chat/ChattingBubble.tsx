@@ -33,16 +33,20 @@ const ChattingBubble = ({ msg }: ChattingBubbleProps) => {
                   minute: "2-digit",
                 })}
               </div>
-              <div className="rounded-md text-start text-sm flex-1 bg-neutral-100 p-3 whitespace-pre-wrap break-words break-all">
-                {msg.messageType === "TEXT" && <p>{msg.content}</p>}
-                {msg.messageType === "IMAGE" && (
+              {msg.messageType === "TEXT" && (
+                <div className="rounded-md text-start text-sm flex-1 bg-neutral-100 p-3 whitespace-pre-wrap break-words break-all">
+                  <p>{msg.content}</p>
+                </div>
+              )}
+              {msg.messageType === "IMAGE" && (
+                <div className="flex-1 p-3">
                   <Image
-                    src={msg.image}
+                    src={msg.fileUrl}
                     alt="sent image"
                     className="w-auto h-40 rounded-lg"
                   />
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -67,16 +71,20 @@ const ChattingBubble = ({ msg }: ChattingBubbleProps) => {
             </p>
           </Link>
           <div className="flex items-end space-x-2">
-            <div className="rounded-md text-start text-sm flex-1 bg-positive-100 p-3 whitespace-pre-wrap break-words break-all">
-              {msg.messageType === "TEXT" && <p>{msg.content}</p>}
-              {msg.messageType === "IMAGE" && (
+            {msg.messageType === "TEXT" && (
+              <div className="rounded-md text-start text-sm flex-1 bg-neutral-100 p-3 whitespace-pre-wrap break-words break-all">
+                <p>{msg.content}</p>
+              </div>
+            )}
+            {msg.messageType === "IMAGE" && (
+              <div className="flex-1 px-3">
                 <Image
-                  src={msg.image}
+                  src={msg.fileUrl}
                   alt="sent image"
                   className="w-auto h-40 rounded-lg"
                 />
-              )}
-            </div>
+              </div>
+            )}
             <div className="w-auto text-xs text-gray-500 text-right self-end">
               {new Date(msg.createdAt).toLocaleTimeString([], {
                 hour: "2-digit",

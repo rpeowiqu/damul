@@ -7,6 +7,9 @@ import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
 import { useEffect, useState } from "react";
 import useAuth from "@/hooks/useAuth";
 import DamulButton from "../common/DamulButton";
+import CancelIcon from "../svg/CancelIcon";
+import AlertCircleIcon from "../svg/AlertCircleIcon";
+import { EXPIRINGSOON_DAY } from "@/constants/itemStatus";
 
 interface IngredientDetailProps {
   selectedIngredient: Ingredient;
@@ -14,23 +17,38 @@ interface IngredientDetailProps {
   deleteIngredient?: (deletedIngredient: Ingredient) => void;
   setIsDeleteOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  readOnly?: boolean;
 }
 
-const InfoRow = ({ label, value }: { label: string; value: string }) => (
+const InfoRow = ({
+  label,
+  labelStyle,
+  value,
+  valueStyle,
+}: {
+  label: string;
+  labelStyle?: string;
+  value: string;
+  valueStyle?: string;
+}) => (
   <div className="flex flex-col text-sm font-bold w-full">
-    <div className="text-positive-300">{label}</div>
-    <div>{value}</div>
+    <div className={`text-positive-300 ${labelStyle}`}>{label}</div>
+    <div className={valueStyle}>{value}</div>
   </div>
 );
 
-const getExpirationDate = (
-  purchaseDate: string,
-  expirationDate: number,
-): string => {
-  const purchase = new Date(purchaseDate);
-  purchase.setDate(purchase.getDate() + expirationDate);
+const getExpirationDate = (expirationDate: number): string => {
+  const expiration = new Date();
+  expiration.setDate(expiration.getDate() + expirationDate);
 
-  return purchase.toISOString().split("T")[0];
+  return expiration
+    .toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+    .replace(/\. /g, "-")
+    .replace(".", "");
 };
 
 const IngredientDetail = ({
@@ -39,6 +57,7 @@ const IngredientDetail = ({
   deleteIngredient,
   setIsDeleteOpen,
   setIsOpen,
+  readOnly,
 }: IngredientDetailProps) => {
   const IconComponent = CATEGORY_ICON_MAPPER[selectedIngredient.categoryId];
   const [ingredient, setIngredient] = useState<Ingredient>(selectedIngredient);
@@ -49,12 +68,14 @@ const IngredientDetail = ({
   }
 
   const handleQuantityChange = (value: number[]) => {
-    setIngredient((prev) => {
-      return {
-        ...prev,
-        ingredientQuantity: value[0],
-      };
-    });
+    if (!readOnly) {
+      setIngredient((prev) => {
+        return {
+          ...prev,
+          ingredientQuantity: value[0],
+        };
+      });
+    }
   };
 
   const handleDeleteClick = async () => {
@@ -66,7 +87,7 @@ const IngredientDetail = ({
           ingredient.userIngredientId,
           data?.data.warningEnabled ? 1 : 0,
         );
-        refetch(); // 삭제 재확인 정보를 새로 불러옴
+        refetch();
         deleteIngredient?.(ingredient);
       } catch (error) {
         console.log("식자재 정보를 삭제 하지 못했습니다.");
@@ -93,13 +114,20 @@ const IngredientDetail = ({
 
   return (
     <div className="flex flex-col items-center w-full gap-4 p-5">
-      <p className="w-full pb-3 text-xl font-bold text-center border-b-2 text-positive-300 border-b-normal-50">
+      <p className="w-full pb-3 text-xl font-bold text-center border-2der-b-2 text-positive-300 border-b-normal-50">
         식자재 상세보기
       </p>
 
       <div className="flex items-center justify-center w-full gap-4">
-        <div className="flex items-center justify-center w-full border-2 p-6 rounded-full border-normal-50">
-          <IconComponent className="w-full h-full max-h-40" />
+        <div className="relative flex items-center justify-center w-full h-full rounded-full border-2 border-normal-50">
+          {selectedIngredient.expirationDate >= 0 &&
+            selectedIngredient.expirationDate <= EXPIRINGSOON_DAY && (
+              <AlertCircleIcon className="animate-pulse absolute size-12 top-0 left-0 stroke-negative-500" />
+            )}
+          {selectedIngredient.expirationDate < 0 && (
+            <CancelIcon className="fill-negative-500 animate-pulse absolute size-12 top-0 left-0" />
+          )}
+          <IconComponent className="size-32 p-6 max-h-40" />
         </div>
 
         <div className="flex flex-col w-full gap-3">
@@ -107,10 +135,8 @@ const IngredientDetail = ({
           <InfoRow label="구매일" value={selectedIngredient.purchaseDate} />
           <InfoRow
             label="소비기한"
-            value={getExpirationDate(
-              selectedIngredient.purchaseDate,
-              selectedIngredient.expirationDate,
-            )}
+            value={getExpirationDate(selectedIngredient.expirationDate)}
+            valueStyle={`${selectedIngredient.expirationDate <= EXPIRINGSOON_DAY && "text-negative-500 font-extrabold"}`}
           />
         </div>
       </div>
@@ -137,25 +163,26 @@ const IngredientDetail = ({
           남았어요
         </p>
       </div>
-
-      <div className="flex justify-between w-full gap-2">
-        <DamulButton
-          variant="negative"
-          className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
-          onClick={handleDeleteClick}
-        >
-          <DeleteIcon />
-          <p className="text-xs pc:text-sm text-white">제거</p>
-        </DamulButton>
-        <DamulButton
-          variant="positive"
-          onClick={handleSaveClick}
-          className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
-        >
-          <SaveIcon />
-          <p className="text-xs pc:text-sm text-white">저장</p>
-        </DamulButton>
-      </div>
+      {!readOnly && (
+        <div className="flex justify-between w-full gap-2">
+          <DamulButton
+            variant="negative"
+            className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
+            onClick={handleDeleteClick}
+          >
+            <DeleteIcon />
+            <p className="text-xs pc:text-sm text-white">제거</p>
+          </DamulButton>
+          <DamulButton
+            variant="positive"
+            onClick={handleSaveClick}
+            className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
+          >
+            <SaveIcon />
+            <p className="text-xs pc:text-sm text-white">저장</p>
+          </DamulButton>
+        </div>
+      )}
     </div>
   );
 };

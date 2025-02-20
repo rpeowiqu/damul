@@ -14,7 +14,8 @@ import { postUserIndegredient } from "@/service/home";
 import { RegisterIngredient } from "@/types/Ingredient";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import OcrLoading from "@/components/common/OcrLoading";
+import OcrLoading from "@/components/common/Loading";
+import Loading from "@/components/common/Loading";
 
 interface responseData {
   ingredientName: string;
@@ -26,8 +27,8 @@ interface responseData {
 
 const LIMIT_ADD_COUNT = 50;
 const API_URL = import.meta.env.VITE_API_BASE_URL;
-const MAX_RETRY_ATTEMPTS = 5; // 최대 재시도 횟수
-const INITIAL_RETRY_DELAY = 5000; // 최초 재시도 대기 시간 (5초)
+const MAX_RETRY_ATTEMPTS = 5;
+const INITIAL_RETRY_DELAY = 5000;
 
 const HomeIngredientsRegisterPage = () => {
   const [ingredientRegisterData, setIngredientRegisterData] = useState<
@@ -153,7 +154,7 @@ const HomeIngredientsRegisterPage = () => {
 
       eventSource.onopen = () => {
         console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
-        retryAttempt = 0; // 연결 성공 시 재시도 횟수 초기화
+        retryAttempt = 0;
       };
 
       eventSource.onmessage = (event) => {
@@ -195,7 +196,7 @@ const HomeIngredientsRegisterPage = () => {
         eventSource?.close();
 
         if (retryAttempt < MAX_RETRY_ATTEMPTS) {
-          const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryAttempt); // 5초 → 10초 → 20초 → 40초
+          const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryAttempt);
           retryTimeout = setTimeout(connectSSE, retryDelay);
           retryAttempt += 1;
           console.log(
@@ -218,11 +219,10 @@ const HomeIngredientsRegisterPage = () => {
   return (
     <div className="flex flex-col p-5 relative">
       {isLoading && (
-        <div className=" mx-auto fixed w-full pc:w-[600px] inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-[9999999999]">
-          <p className="text-lg text-white">영수증 등록 중입니다</p>
-          <p className="text-lg text-white">잠시만 기다려주세요</p>
-          <OcrLoading />
-        </div>
+        <Loading
+          message={`영수증 등록 중 입니다. 잠시만 기다려주세요`}
+          purpose="OCR"
+        />
       )}
 
       <div className="flex w-full gap-6 items-center text-xl font-bold">
@@ -237,9 +237,9 @@ const HomeIngredientsRegisterPage = () => {
       <div className="flex justify-between pt-2">
         <DamulButton
           onClick={handleResetData}
-          className="flex bg-white items-center border justify-end text-normal-300 text-sm gap-1 hover:bg-normal-200/50 transition ease-in-out duration-150 active:scale-75"
+          className="flex bg-positive-300 items-center border justify-end text-white text-sm gap-1 hover:bg-normal-200/50 transition ease-in-out duration-150 active:scale-75"
         >
-          <ResetIcon className="stroke-2 stroke-normal-200" />
+          <ResetIcon className="stroke-2 stroke-white" />
           <p>초기화</p>
         </DamulButton>
         <div className="flex justify-center items-center gap-1">
@@ -303,18 +303,18 @@ const HomeIngredientsRegisterPage = () => {
         </div>
       </div>
 
-      <div className="flex justify-between px-6 pb-6">
+      <div className="flex justify-between px-6 pb-5 pt-2">
         <button
           type="button"
           className="active:bg-positive-200 w-6 h-6 rounded-full transition ease-in-out duration-150 active:scale-90"
           onClick={addIngredient}
         >
-          <PlusIcon className="w-full fill-positive-300" />
+          <PlusIcon className="w-full fill-blue-500" />
         </button>
 
-        <div className="flex justify-end items-center gap-2 font-bold">
-          총 구매 금액:
-          <span className="text-negative-500">
+        <div className="flex justify-end items-center font-bold">
+          총 구매 금액 :
+          <span className="text-negative-500 px-1">
             {totalAmount.toLocaleString()}
           </span>
           원

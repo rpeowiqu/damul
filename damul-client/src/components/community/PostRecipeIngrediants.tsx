@@ -4,6 +4,7 @@ import PostRecipeIngrediantForm from "@/components/community/PostRecipeIngredian
 import SubmitButton from "./SubmitButton";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import DamulDrawer from "@/components/common/DamulDrawer";
+import useOverlayStore from "@/stores/overlayStore";
 
 interface PostRecipeIngrediantsProps {
   setTempIngredients: Dispatch<SetStateAction<Ingredient[]>>;
@@ -17,7 +18,10 @@ const PostRecipeIngrediants = ({
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [unit, setUnit] = useState("");
-  const [isOpen, setIsOpen] = useCloseOnBack();
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("PostRecipeIngrediants");
+
+  useCloseOnBack("PostRecipeIngrediants");
 
   // 재료 삭제
   const handleRemoveIngredient = (id: number) => {
@@ -116,9 +120,9 @@ const PostRecipeIngrediants = ({
         </tbody>
       </table>
       <DamulDrawer
-        isOpen={isOpen}
+        isOpen={isOpenOverlay}
         onOpenChange={() => {
-          if (isOpen) {
+          if (isOpenOverlay) {
             history.back();
           }
         }}
@@ -139,7 +143,7 @@ const PostRecipeIngrediants = ({
         }
         footerContent={<SubmitButton />}
         onFooterClick={handleSubmit}
-        onTriggerClick={() => setIsOpen(true)}
+        onTriggerClick={() => openOverlay("PostRecipeIngrediants")}
       />
     </div>
   );

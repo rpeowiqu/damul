@@ -8,6 +8,8 @@ import {
 } from "@/components/svg";
 import HomeIcon from "@/components/svg/HomeIcon";
 import ProfileIcon from "@/components/svg/ProfileIcon";
+import DamulButton from "@/components/common/DamulButton";
+import logo from "../../../public/logo.svg";
 
 const NotFoundPage = () => {
   const [isJumping, setIsJumping] = useState(false);
@@ -111,13 +113,19 @@ const NotFoundPage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-2xl font-bold mb-4">페이지를 찾을 수 없습니다</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen w-[600px] border-x-1 border-neutral-100 m-auto bg-white">
+      <img src={logo} className="w-24 mb-20" />
+      <h1 className="text-xl font-bold mb-4">
+        찾으시는 페이지가 없어요... 혹시 다른 길을 함께 찾아볼까요?
+      </h1>
       <p className="text-gray-700 mb-4">
-        🥕 식재료를 피하고 냉장고를 찾아가세요! (스페이스바로 점프)
+        🥕 식재료를 피하고 냉장고를 찾아가세요! (점프: SPACE)
       </p>
 
-      <div className="relative w-[400px] h-[200px] bg-white border border-positive-300 overflow-hidden">
+      <div
+        className="relative w-[400px] h-[200px] bg-white border border-positive-300 overflow-hidden"
+        onClick={jump} // 클릭 이벤트 추가
+      >
         <div
           ref={characterRef}
           className="absolute bottom-0 left-10 w-10 h-10 items-center flex justify-center rounded-full bg-positive-300"
@@ -140,28 +148,30 @@ const NotFoundPage = () => {
       </div>
 
       {gameOver ? (
-        <p className="text-red-600 mt-4">💥 게임 오버! 당신의 점수: {score}</p>
+        <p className="text-red-600 mt-4">💥 냉장고에 도착하지 못했어요 </p>
       ) : (
-        <p className="mt-4">현재 점수: {score}</p>
+        <p className="mt-4">냉장고 앞까지: {5 - score}m</p>
       )}
-      <div className="flex gap-3">
-        <button
+      <div className="flex gap-3 mt-4">
+        <DamulButton
           onClick={() => {
             setGameOver(false);
             setScore(0);
           }}
-          className="mt-4 px-4 py-2 bg-positive-300 text-white rounded"
+          variant="positive"
+          className="px-4 py-2"
         >
           다시하기
-        </button>
-        <button
+        </DamulButton>
+        <DamulButton
           onClick={() => {
             navigate("/home");
           }}
-          className="mt-4 px-4 py-2 border-2 border-positive-300 text-positive-300 rounded"
+          variant="negative"
+          className="px-4 py-2"
         >
           바로 홈으로 이동하기
-        </button>
+        </DamulButton>
       </div>
     </div>
   );
