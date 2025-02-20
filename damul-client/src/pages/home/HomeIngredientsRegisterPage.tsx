@@ -167,12 +167,12 @@ const HomeIngredientsRegisterPage = () => {
 
           if (response.type === "PROCESSING_COMPLETED") {
             console.log("✅ 이미지 분석 완료");
-            setIsLoading(false);
           }
 
           if (response.type === "PROCESSING_COMPLETED") {
             const updatedData = response.data.data;
-            console.log(updatedData);
+            console.log(response.data.data);
+            console.log(response.data);
             if (updatedData.length > 0) {
               setIngredientRegisterData((prevData) => {
                 const newIngredientRegisterData =
@@ -195,6 +195,8 @@ const HomeIngredientsRegisterPage = () => {
                 return newIngredientRegisterData;
               });
             }
+            setIsLoading(false);
+            console.log("데이터");
           }
         } catch (error) {
           console.error("데이터 처리 중 오류가 발생했습니다.", error);
