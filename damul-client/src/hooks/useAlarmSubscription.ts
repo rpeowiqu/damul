@@ -79,17 +79,17 @@ export const useAlarmSubscription = ({
     };
   }, [userId]);
 
-  const readMessage = ({ alarmId }: { alarmId: number }) => {
+  const readAlarm = ({ alarmId }: { alarmId: number }) => {
     if (!stompClientRef.current || !stompClientRef.current.connected) {
       console.warn("🚨 STOMP 클라이언트가 연결되지 않음");
       return;
     }
 
-    console.log("📤 메시지 읽음:", alarmId);
+    console.log("📤 알람 읽음:", alarmId);
     stompClientRef.current.publish({
       destination: `/pub/notification/read/${alarmId}`,
     });
   };
 
-  return { readMessage };
+  return { readAlarm };
 };

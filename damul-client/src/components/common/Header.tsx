@@ -1,20 +1,17 @@
 import AlarmIcon from "@/components/svg/AlarmIcon";
 import OptionIcon from "@/components/svg/OptionIcon";
 import { Link } from "react-router-dom";
-import useAuth from "@/hooks/useAuth";
+import { useAlarmStore } from "@/stores/alarmStore";
 import { useAlarmSubscription } from "@/hooks/useAlarmSubscription";
-import { useState } from "react";
+import useAuth from "@/hooks/useAuth";
 
 const Header = () => {
   const { data, isLoading } = useAuth();
-  const userId = data?.data.id;
-  const [alarmCnt, setAlarmCnt] = useState(0);
+  const { alarmCnt, setAlarmCnt, increaseAlarmCnt } = useAlarmStore();
 
-  const {} = useAlarmSubscription({
-    userId,
-    onAlarmReceived: () => {
-      setAlarmCnt((prev) => prev + 1);
-    },
+  useAlarmSubscription({
+    userId: data?.data.id,
+    onAlarmReceived: increaseAlarmCnt,
     setAlarmCnt,
   });
 

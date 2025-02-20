@@ -100,3 +100,18 @@ export const postIntoPrivateRoom = async ({ userId }: { userId: number }) => {
 export const postIntoGroupRoom = async ({ users }: { users: Friend[] }) => {
   return apiClient.post(`chats/rooms`, { users });
 };
+
+// 이미지 전송
+export const postImageInRoom = async ({
+  roomId,
+  formData,
+}: {
+  roomId: string | undefined;
+  formData: FormData;
+}) => {
+  return apiClient.post(`/chats/rooms/${roomId}/image`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
