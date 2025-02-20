@@ -51,11 +51,11 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
 
     // 스크롤을 위한 이전 메시지 조회
     @Query("SELECT cm FROM ChatMessage cm " +
-            "WHERE cm.room.id = :roomId AND cm.id < :cursorId " +
+            "WHERE cm.room.id = :roomId AND cm.id < :cursor " +
             "ORDER BY cm.id DESC")
     List<ChatMessage> findPreviousMessages(
             @Param("roomId") int roomId,
-            @Param("cursorId") int cursorId,
+            @Param("cursor") int cursorId,
             Pageable pageable
     );
 

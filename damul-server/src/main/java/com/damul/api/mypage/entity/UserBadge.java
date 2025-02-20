@@ -43,6 +43,10 @@ public class UserBadge {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void updateRank(double percentileRank) {
+        this.rank = percentileRank;
+    }
+
     @Builder
     public UserBadge(Badge badge, User user) {
         this.badge = badge;

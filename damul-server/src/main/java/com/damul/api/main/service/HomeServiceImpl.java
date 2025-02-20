@@ -5,6 +5,7 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.sse.service.SseService;
 import com.damul.api.common.util.IngredientNormalizerUtil;
 import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.dto.OcrDto;
@@ -29,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,8 +54,11 @@ import java.util.stream.Collectors;
 public class HomeServiceImpl implements HomeService {
 
     private final ObjectMapper objectMapper;
+    private final SseService sseService;
+    private final RedisTemplate<Object, Object> redisTemplate;
     @Value("${fastapi.server.url}")
     private String fastApiServerUrl;
+    private static final String SSE_KEY_PREFIX = "sse:emitter:";
 
     private final RecipeRepository recipeRepository;
     private final UserIngredientRepository userIngredientRepository;
@@ -226,6 +231,9 @@ public class HomeServiceImpl implements HomeService {
     public OcrList processImage(MultipartFile file, int userId) {
         try {
             log.info("서비스: 이미지 처리 시작 - userId: {}", userId);
+            log.info("SSE 연결 상태 확인 - userId: {}, 연결됨: {}", userId,
+                    redisTemplate.hasKey(SSE_KEY_PREFIX + userId));
+            sseService.sendToClient(userId, "OCR 요청을 시작합니다");
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -259,6 +267,8 @@ public class HomeServiceImpl implements HomeService {
                     new TypeReference<List<OcrDto>>() {}
             );
 
+            log.info("SSE 연결 상태 확인 - userId: {}, 연결됨: {}", userId,
+                    redisTemplate.hasKey(SSE_KEY_PREFIX + userId));
             log.info("서비스: 이미지 처리 완료 - userId: {}", userId);
             return new OcrList(ocrResults);
 

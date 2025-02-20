@@ -144,15 +144,54 @@ public class HomeController {
         log.info("컨트롤러: 이미지 업로드 시작 - userId: {}", userId);
 
         try {
+            // 1. 처리 시작 이벤트를 SSE로 전송
+            sseService.sendToClient(userId, Map.of(
+                    "type", "PROCESSING_STARTED",
+                    "message", "이미지 분석을 시작합니다"
+            ));
+
+            // 2. 이미지 처리 진행
             OcrList ocrResult = homeService.processImage(image, userId);
-            sseService.sendToClient(userId, ocrResult);
+
+            log.info("이미지 분석 결과 - userId: {}, 결과 개수: {}", userId, ocrResult.getData().size());
+            ocrResult.getData().forEach(item ->
+                    log.info("분석 항목: 이름={}, 카테고리={}, 가격={}, 유통기한={}, 보관방법={}",
+                            item.getIngredientName(),
+                            item.getCategory(),
+                            item.getProductPrice(),
+                            item.getExpiration_date(),
+                            item.getIngredientStorage())
+            );
+
+            // 3. 처리 완료 이벤트와 결과를 SSE로 전송
+            sseService.sendToClient(userId, Map.of(
+                    "type", "PROCESSING_COMPLETED",
+                    "data", ocrResult
+            ));
 
             log.info("컨트롤러: 이미지 업로드 완료 - userId: {}", userId);
-            return ResponseEntity.ok().body(Map.of("result", ocrResult));
+
+            // 4. HTTP 응답으로는 업로드 성공 메시지만 반환
+            return ResponseEntity.ok().body(Map.of(
+                    "status", "success",
+                    "message", "이미지가 성공적으로 업로드되었습니다. 결과는 이벤트 스트림으로 전송됩니다."
+            ));
         } catch (Exception e) {
             log.error("이미지 처리 중 에러 발생 - userId: {}", userId, e);
-            sseService.sendToClient(userId, new BusinessException(ErrorCode.BAD_REQUEST, "이미지 처리 중 오류가 발생했습니다"));
-            throw e;
+
+            // 오류 정보를 SSE로 전송
+            sseService.sendToClient(userId, Map.of(
+                    "type", "ERROR",
+                    "errorCode", ErrorCode.BAD_REQUEST.name(),
+                    "message", "이미지 처리 중 오류가 발생했습니다"
+            ));
+
+            // HTTP 응답으로 오류 반환
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", "이미지 처리 중 오류가 발생했습니다",
+                    "errorCode", ErrorCode.BAD_REQUEST.name()
+            ));
         }
     }
 
