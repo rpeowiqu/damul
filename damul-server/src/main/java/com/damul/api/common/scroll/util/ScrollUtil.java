@@ -2,6 +2,7 @@ package com.damul.api.common.scroll.util;
 
 import com.damul.api.chat.dto.response.ChatMessageResponse;
 import com.damul.api.chat.dto.response.ChatScrollResponse;
+import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.common.scroll.dto.response.CursorPageMetaInfo;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class ScrollUtil {
         return new ScrollResponse<>(resultItems, new CursorPageMetaInfo(lastItemId, hasNext));
     }
 
-    public ChatScrollResponse<ChatMessageResponse> createChatScrollResponse(
+    public static ChatScrollResponse<ChatMessageResponse> createChatScrollResponse(
             List<ChatMessageResponse> messages,
             int cursor,
             int size,
