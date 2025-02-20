@@ -11,6 +11,8 @@ const QrCodePage = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [isSuccessed, setIsSuccessed] = useState(false);
+
   const { userId } = useParams();
 
   const handleClick = () => {
@@ -23,7 +25,13 @@ const QrCodePage = () => {
     const userIdNumber = userId ? Number(userId) : 0;
     setIsLoading(true);
     try {
-      await postReceiptForQR(userIdNumber, formData);
+      const response = await postReceiptForQR(userIdNumber, formData);
+
+      if (response.data) {
+        if (response.data.status === "success") {
+          setIsSuccessed(true);
+        }
+      }
     } catch (error: any) {
       console.log("영수증 입력이 실패하였습니다.");
       alert("영수증 등록에 실패하였습니다.");
@@ -60,16 +68,28 @@ const QrCodePage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-96">
-      <h1 className="text-xl font-bold mb-4">영수증 사진을 등록해주세요.</h1>
-      <DamulButton onClick={handleClick}>등록</DamulButton>
-      <input
-        type="file"
-        accept="image/*"
-        className="hidden"
-        multiple={false}
-        ref={inputRef}
-        onChange={handleChange}
-      />
+      {isSuccessed ? (
+        <>
+          <h1 className="text-xl font-bold mb-4">
+            영수증 정보가 전송되었습니다.
+          </h1>
+        </>
+      ) : (
+        <>
+          <h1 className="text-xl font-bold mb-4">
+            영수증 사진을 등록해주세요.
+          </h1>
+          <DamulButton onClick={handleClick}>등록</DamulButton>
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            multiple={false}
+            ref={inputRef}
+            onChange={handleChange}
+          />
+        </>
+      )}
     </div>
   );
 };
