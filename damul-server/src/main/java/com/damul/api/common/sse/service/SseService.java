@@ -32,6 +32,8 @@ public class SseService {
 
     public SseEmitter createEmitter(int userId) {
         String redisKey = SSE_KEY_PREFIX + userId;
+        removeEmitter(userId);
+
         SseEmitter emitter = new SseEmitter(TIMEOUT);
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
@@ -112,6 +114,20 @@ public class SseService {
 
     public void sendToClient(int userId, Object data) {
         String redisKey = SSE_KEY_PREFIX + userId;
+
+        // Redis와 로컬 emitter 둘 다 확인
+        boolean redisKeyExists = redisTemplate.hasKey(redisKey);
+        boolean localEmitterExists = localEmitters.containsKey(userId);
+
+        log.info("메시지 전송 시도 - userId: {}, Redis 키 존재: {}, 로컬 Emitter 존재: {}",
+                userId, redisKeyExists, localEmitterExists);
+
+        // 상태 불일치 감지 및 처리
+        if (redisKeyExists && !localEmitterExists) {
+            log.warn("상태 불일치 감지: Redis 키는 있지만 로컬 Emitter 없음 - 키 정리");
+            redisTemplate.delete(redisKey);
+            return;
+        }
 
         // Redis에서 연결 정보 확인
         EmitterInfo emitterInfo = (EmitterInfo) redisTemplate.opsForValue().get(redisKey);
