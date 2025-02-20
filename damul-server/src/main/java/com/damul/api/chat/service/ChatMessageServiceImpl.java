@@ -201,6 +201,7 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
             log.info("서비스: S3 이미지 업로드 완료 - path: {}", imagePath);
 
             // 채팅 메시지 생성 및 저장
+            if(content == null) content = "사진을 보냈습니다.";
             ChatMessage message = createImageMessage(room, user, content, imagePath);
             chatMessageRepository.save(message);
 
@@ -294,15 +295,13 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
             int memberNum,
             Integer postId
     ) {
-        // ScrollUtil 사용
-        ScrollResponse<ChatMessageResponse> scrollResponse = ScrollUtil.createScrollResponse(messages, cursor, size);
 
-        return new ChatScrollResponse<>(
-                scrollResponse.getData(),
-                scrollResponse.getMeta(),
+        return ScrollUtil.createChatScrollResponse(
+                messages,
+                cursor,
+                size,
                 roomName,
                 memberNum,
-                postId
-        );
+                postId);
     }
 }
