@@ -209,10 +209,10 @@ const HomeIngredientsRegisterPage = () => {
           retryTimeout = setTimeout(connectSSE, retryDelay);
           retryAttempt += 1;
           // console.log(
-            `⏳ ${retryDelay / 1000}초 후 SSE 재연결 시도... (시도 ${retryAttempt}/${MAX_RETRY_ATTEMPTS})`,
-          );
+          //   `⏳ ${retryDelay / 1000}초 후 SSE 재연결 시도... (시도 ${retryAttempt}/${MAX_RETRY_ATTEMPTS})`,
+          // );
         } else {
-          console.warn("🚨 최대 재시도 횟수를 초과하여 SSE 재연결 중단");
+          // console.warn("🚨 최대 재시도 횟수를 초과하여 SSE 재연결 중단");
         }
       };
     };
