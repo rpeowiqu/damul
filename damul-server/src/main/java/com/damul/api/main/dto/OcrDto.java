@@ -17,7 +17,7 @@ public class OcrDto {
 
     int productPrice;
 
-    LocalDate expiration_date;
+    String expiration_date;
 
     String ingredientStorage;
 
