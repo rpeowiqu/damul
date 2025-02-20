@@ -132,7 +132,7 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
             unreadCount = unreadCount == null ? 0 : unreadCount;
 
             // Redis의 안 읽은 메시지 수 감소
-            if (unreadCount > 0) {
+            if (unreadCount > 0 && latestMessage.getSender().getId() != userId) {
                 unreadMessageService.decrementUnreadCount(userId, unreadCount);
 
                 // 업데이트된 전체 안 읽은 메시지 수 전송
