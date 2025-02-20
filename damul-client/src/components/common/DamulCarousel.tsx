@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/carousel";
 import { SuggestedRecipe } from "@/types/recipe";
 import { useNavigate } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
 
 interface DamulCarouselProps {
   fetchFn: () => Promise<AxiosResponse>;
@@ -66,23 +67,28 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
       className="relative w-full"
     >
       <CarouselContent>
-        {suggestedRecipe.length > 0 &&
-          suggestedRecipe.map((recipe, idx) => (
-            <CarouselItem
-              key={`${idx}-${recipe.recipeId}`}
-              className="h-36 cursor-pointer"
-              onClick={() => handleCarouselItemClick(idx)}
-            >
-              <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
-                <div className="font-bold text-2xl">{recipe.title}</div>
-              </div>
-              <img
-                src={recipe.thumbnailUrl}
-                className="object-cover w-full h-full"
-                alt="캐러셀이미지"
-              />
-            </CarouselItem>
-          ))}
+        {suggestedRecipe === null || suggestedRecipe.length === 0
+          ? Array.from({ length: 3 }).map((_, idx) => (
+              <CarouselItem key={idx} className="h-36">
+                <Skeleton className="w-full h-full" />
+              </CarouselItem>
+            ))
+          : suggestedRecipe.map((recipe, idx) => (
+              <CarouselItem
+                key={`${idx}-${recipe.recipeId}`}
+                className="h-36 cursor-pointer"
+                onClick={() => handleCarouselItemClick(idx)}
+              >
+                <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
+                  <div className="font-bold text-2xl">{recipe.title}</div>
+                </div>
+                <img
+                  src={recipe.thumbnailUrl}
+                  className="object-cover w-full h-full"
+                  alt="캐러셀이미지"
+                />
+              </CarouselItem>
+            ))}
       </CarouselContent>
       <div className="absolute flex items-center px-2 py-1 space-x-2 text-sm text-white bottom-2 right-2">
         <CarouselPrevious className="bg-transparent border-2 border-white" />
