@@ -90,7 +90,7 @@ const ChattingRoomPage = () => {
       const response = await getChattingContents({
         roomId: roomId,
         cursor: pageParam,
-        size: 100,
+        size: 10,
       });
 
       console.log(response?.data);
@@ -213,6 +213,8 @@ const ChattingRoomPage = () => {
 
     const lastMessage = chatData.messages[chatData.messages.length - 1];
 
+    console.log("sdsd", lastMessage);
+
     readMessage({
       userId: data?.data.id,
       roomId: roomId,
@@ -228,12 +230,14 @@ const ChattingRoomPage = () => {
         </p>
         <ChattingMenuButton roomId={roomId} postId={chatData.postId} />
       </div>
-      <div className="flex-1 justify-end overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
         <ChattingRoomInfiniteScroll
           key={chatData.messages.length}
           queryKey={["chats"]}
           fetchFn={fetchItems}
-          renderItems={(msg: ChatMessage) => <ChattingBubble msg={msg} />}
+          renderItems={(msg: ChatMessage) => (
+            <ChattingBubble key={msg.id} msg={msg} />
+          )}
           skeleton={
             <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
           }

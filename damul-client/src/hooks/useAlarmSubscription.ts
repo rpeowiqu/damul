@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { getUnreadAlarmCnt } from "@/service/alarm";
+import { useChatAlarmStore } from "@/stores/alarmStore";
 
 interface ExtendedOptions extends SockJS.Options {
   withCredentials: boolean;
@@ -22,6 +23,7 @@ export const useAlarmSubscription = ({
 }: AlarmSubscription) => {
   const wsUrl = import.meta.env.VITE_WS_BASE_URL;
   const stompClientRef = useRef<Client | null>(null);
+  const { chatCnt, setChatCnt } = useChatAlarmStore();
 
   const fetchUnreadAlarmCnt = async () => {
     try {
@@ -58,6 +60,7 @@ export const useAlarmSubscription = ({
         stompClient.subscribe(`/sub/chat/${userId}/count`, (message) => {
           const notification = message;
           console.log("채팅수:", notification.body);
+          setChatCnt(notification.body);
           if (onChatCntReceived) {
             onChatCntReceived(notification.body);
           }

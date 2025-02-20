@@ -11,3 +11,13 @@ export const useAlarmStore = create<AlarmState>((set) => ({
   setAlarmCnt: (count) => set({ alarmCnt: count }),
   increaseAlarmCnt: () => set((state) => ({ alarmCnt: state.alarmCnt + 1 })),
 }));
+
+interface ChatAlarmState {
+  chatCnt: string;
+  setChatCnt: (count: string) => void;
+}
+
+export const useChatAlarmStore = create<ChatAlarmState>((set) => ({
+  chatCnt: "",
+  setChatCnt: (count) => set({ chatCnt: count }),
+}));

@@ -72,7 +72,7 @@ const ChattingBubble = ({ msg }: ChattingBubbleProps) => {
           </Link>
           <div className="flex items-end space-x-2">
             {msg.messageType === "TEXT" && (
-              <div className="rounded-md text-start text-sm flex-1 bg-neutral-100 p-3 whitespace-pre-wrap break-words break-all">
+              <div className="rounded-md text-start text-sm flex-1 bg-positive-100 p-3 whitespace-pre-wrap break-words break-all">
                 <p>{msg.content}</p>
               </div>
             )}

@@ -26,7 +26,7 @@ export const getTimeAgo = (timeStamp: string) => {
 
 export const getKSTISOString = () => {
   const date = new Date();
-  date.setHours(date.getHours() + 9); // UTC → KST 변환
+  date.setHours(date.getHours() + 18); // UTC → KST 변환
 
   // YYYY-MM-DDTHH:MM:SS 형식으로 변환
   return (
