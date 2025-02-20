@@ -14,7 +14,6 @@ import { postUserIndegredient } from "@/service/home";
 import { RegisterIngredient } from "@/types/Ingredient";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import OcrLoading from "@/components/common/Loading";
 import Loading from "@/components/common/Loading";
 
 interface responseData {
@@ -159,26 +158,39 @@ const HomeIngredientsRegisterPage = () => {
 
       eventSource.onmessage = (event) => {
         try {
-          const updatedData = JSON.parse(event.data);
-          console.log(updatedData);
-          if (updatedData.userIngredients.length > 0) {
+          const response = JSON.parse(event.data);
+
+          if (response.type === "PROCESSING_STARTED") {
+            console.log("🔄 이미지 분석이 시작됨");
+            setIsLoading(true);
+            return;
+          }
+
+          if (response.type === "PROCESSING_COMPLETED") {
+            console.log("✅ 이미지 분석 완료");
+            setIsLoading(false);
+            return;
+          }
+
+          const updatedData = response.data.data;
+          if (updatedData.length > 0) {
             setIngredientRegisterData((prevData) => {
-              const newIngredientRegisterData = [...prevData];
-              updatedData.userIngredients.forEach(
-                (ingredient: responseData) => {
-                  newIngredientRegisterData.push({
-                    id: Math.floor(Math.random() * 10000),
-                    ingredientName: ingredient.ingredientName,
-                    categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
-                    productPrice: ingredient.productPrice,
-                    expirationDate: ingredient.expiration_date,
-                    ingredientStorage:
-                      ingredient.ingredientStorage === "ROOMTEMP"
-                        ? "ROOM_TEMPERATURE"
-                        : ingredient.ingredientStorage,
-                  });
-                },
-              );
+              const newIngredientRegisterData =
+                prevData[0].ingredientName.length > 0 ? [...prevData] : [];
+
+              updatedData.forEach((ingredient: responseData) => {
+                newIngredientRegisterData.push({
+                  id: Math.floor(Math.random() * 10000),
+                  ingredientName: ingredient.ingredientName,
+                  categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
+                  productPrice: ingredient.productPrice,
+                  expirationDate: ingredient.expiration_date,
+                  ingredientStorage:
+                    ingredient.ingredientStorage === "ROOMTEMP"
+                      ? "ROOM_TEMPERATURE"
+                      : ingredient.ingredientStorage,
+                });
+              });
 
               setPurchaseAt(updatedData.purchaseAt);
               setStoreName(updatedData.storeName);
@@ -221,7 +233,7 @@ const HomeIngredientsRegisterPage = () => {
       {isLoading && (
         <Loading
           message={`영수증 등록 중 입니다. 잠시만 기다려주세요`}
-          purpose="OCR"
+          purpose=""
         />
       )}
 

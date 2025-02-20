@@ -1,12 +1,16 @@
 import DamulButton from "@/components/common/DamulButton";
+import Loading from "@/components/common/Loading";
 import { postReceiptForQR } from "@/service/home";
-import { ChangeEvent, useRef } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const QrCodePage = () => {
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const { userId } = useParams();
 
   const handleClick = () => {
@@ -17,11 +21,14 @@ const QrCodePage = () => {
 
   const fetchData = async (formData: FormData) => {
     const userIdNumber = userId ? Number(userId) : 0;
+    setIsLoading(true);
     try {
       await postReceiptForQR(userIdNumber, formData);
     } catch (error: any) {
       console.log("영수증 입력이 실패하였습니다.");
       alert("영수증 등록에 실패하였습니다.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -46,6 +53,11 @@ const QrCodePage = () => {
       }
     }
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-96">
       <h1 className="text-xl font-bold mb-4">영수증 사진을 등록해주세요.</h1>
