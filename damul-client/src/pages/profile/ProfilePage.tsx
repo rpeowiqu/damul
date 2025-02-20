@@ -5,6 +5,7 @@ import ProfileBanner from "@/components/profile/ProfileBanner";
 import { ProfileHeader } from "@/types/profile";
 import { getProfileHeader } from "@/service/profile";
 import useAuth from "@/hooks/useAuth";
+import Loading from "@/components/common/Loading";
 
 const ProfilePage = () => {
   const { userId } = useParams();
@@ -80,7 +81,7 @@ const ProfilePage = () => {
       />
       <DamulTab tabList={tabItems} />
       <div className="flex-1 bg-normal-50">
-        <Suspense fallback={<div></div>}>
+        <Suspense fallback={<Loading />}>
           <Outlet context={{ user: header }} />
         </Suspense>
       </div>

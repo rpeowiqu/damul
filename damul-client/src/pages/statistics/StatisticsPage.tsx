@@ -1,5 +1,7 @@
 import { Outlet } from "react-router-dom";
 import DamulTab from "@/components/common/DamulTab";
+import { Suspense } from "react";
+import Loading from "@/components/common/Loading";
 
 const tabItems = [
   {
@@ -18,7 +20,9 @@ const StatisticsPage = () => {
   return (
     <div className="flex-1 bg-normal-50">
       <DamulTab tabList={tabItems} />
-      <Outlet />
+      <Suspense fallback={<Loading />}>
+        <Outlet />
+      </Suspense>
     </div>
   );
 };
