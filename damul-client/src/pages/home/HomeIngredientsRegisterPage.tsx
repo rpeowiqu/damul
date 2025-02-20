@@ -142,130 +142,98 @@ const HomeIngredientsRegisterPage = () => {
   useEffect(() => {
     if (!data?.data?.id) return;
 
-    const eventSource = new EventSource(
-      `${API_URL}sse/connect/${data.data.id}`,
-      {
+    let eventSource: EventSource | null = null;
+    let retryAttempt = 0;
+    let retryTimeout: NodeJS.Timeout;
+
+    const connectSSE = () => {
+      eventSource = new EventSource(`${API_URL}sse/connect/${data.data.id}`, {
         withCredentials: true,
-      },
-    );
+      });
 
-    eventSource.addEventListener("image", (event) => {
-      console.log(event.data);
-      console.log(event.source);
-      console.log(event.origin);
-    });
+      eventSource.onopen = () => {
+        console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
+        retryAttempt = 0;
+      };
 
-    // 에러 처리
-    eventSource.onerror = (error) => {
-      console.error("SSE 연결 오류:", error);
-      eventSource.close(); // 연결을 종료합니다.
+      eventSource.addEventListener("image", (event) => {
+        try {
+          const response = JSON.parse(event.data);
+
+          if (response.type === "PROCESSING_STARTED") {
+            console.log("🔄 이미지 분석이 시작됨");
+            setIsLoading(true);
+            return;
+          }
+
+          if (response.type === "PROCESSING_COMPLETED") {
+            console.log("✅ 이미지 분석 완료");
+            setIsLoading(false);
+            return;
+          }
+
+          const updatedData = response.data.data;
+          if (updatedData.length > 0) {
+            setIngredientRegisterData((prevData) => {
+              const newIngredientRegisterData =
+                prevData[0].ingredientName.length > 0 ? [...prevData] : [];
+
+              updatedData.forEach((ingredient: responseData) => {
+                newIngredientRegisterData.push({
+                  id: Math.floor(Math.random() * 10000),
+                  ingredientName: ingredient.ingredientName,
+                  categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
+                  productPrice: ingredient.productPrice,
+                  expirationDate: ingredient.expiration_date,
+                  ingredientStorage:
+                    ingredient.ingredientStorage === "ROOMTEMP"
+                      ? "ROOM_TEMPERATURE"
+                      : ingredient.ingredientStorage,
+                });
+              });
+
+              setPurchaseAt(updatedData.purchaseAt);
+              setStoreName(updatedData.storeName);
+
+              return newIngredientRegisterData;
+            });
+          }
+        } catch (error) {
+          console.error("데이터 처리 중 오류가 발생했습니다.", error);
+        }
+      });
+
+      eventSource.onerror = (error) => {
+        console.error("❌ SSE 연결 오류 발생", error);
+        eventSource?.close();
+
+        if (retryAttempt < MAX_RETRY_ATTEMPTS) {
+          const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryAttempt);
+          retryTimeout = setTimeout(connectSSE, retryDelay);
+          retryAttempt += 1;
+          console.log(
+            `⏳ ${retryDelay / 1000}초 후 SSE 재연결 시도... (시도 ${retryAttempt}/${MAX_RETRY_ATTEMPTS})`,
+          );
+        } else {
+          console.warn("🚨 최대 재시도 횟수를 초과하여 SSE 재연결 중단");
+        }
+      };
     };
 
-    // 컴포넌트가 언마운트될 때 SSE 연결 종료
+    connectSSE();
+
     return () => {
-      eventSource.close();
+      eventSource?.close();
+      clearTimeout(retryTimeout);
     };
   }, [data]);
-
-  // useEffect(() => {
-  //   if (!data?.data?.id) return;
-
-  //   let eventSource: EventSource | null = null;
-  //   let retryAttempt = 0;
-  //   let retryTimeout: NodeJS.Timeout;
-
-  //     eventSource = new EventSource(`${API_URL}sse/connect/${data.data.id}`, {
-  //       withCredentials: true,
-  //     });
-
-  //     eventSource.onopen = () => {
-  //       console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
-  //       retryAttempt = 0;
-  //     };
-
-  //     eventSource.addEventListener("message", (event) => {
-  //       console.log(event.data);
-  //     });
-
-  //     e
-
-  //     eventSource.onmessage = (event) => {
-  //       console.log(event.data);
-  //       try {
-  //         const response = JSON.parse(event.data);
-
-  //         if (response.type === "PROCESSING_STARTED") {
-  //           console.log("🔄 이미지 분석이 시작됨");
-  //           setIsLoading(true);
-  //           return;
-  //         }
-
-  //         if (response.type === "PROCESSING_COMPLETED") {
-  //           console.log("✅ 이미지 분석 완료");
-  //           setIsLoading(false);
-  //           return;
-  //         }
-
-  //         const updatedData = response.data.data;
-  //         if (updatedData.length > 0) {
-  //           setIngredientRegisterData((prevData) => {
-  //             const newIngredientRegisterData =
-  //               prevData[0].ingredientName.length > 0 ? [...prevData] : [];
-
-  //             updatedData.forEach((ingredient: responseData) => {
-  //               newIngredientRegisterData.push({
-  //                 id: Math.floor(Math.random() * 10000),
-  //                 ingredientName: ingredient.ingredientName,
-  //                 categoryId: CATEGORY_ID_MAPPER[ingredient.category] || 10,
-  //                 productPrice: ingredient.productPrice,
-  //                 expirationDate: ingredient.expiration_date,
-  //                 ingredientStorage:
-  //                   ingredient.ingredientStorage === "ROOMTEMP"
-  //                     ? "ROOM_TEMPERATURE"
-  //                     : ingredient.ingredientStorage,
-  //               });
-  //             });
-
-  //             setPurchaseAt(updatedData.purchaseAt);
-  //             setStoreName(updatedData.storeName);
-
-  //             return newIngredientRegisterData;
-  //           });
-  //         }
-  //       } catch (error) {
-  //         console.error("데이터 처리 중 오류가 발생했습니다.", error);
-  //       }
-  //     };
-
-  //     eventSource.onerror = (error) => {
-  //       console.error("❌ SSE 연결 오류 발생", error);
-  //       eventSource?.close();
-
-  //       if (retryAttempt < MAX_RETRY_ATTEMPTS) {
-  //         const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryAttempt);
-  //         retryTimeout = setTimeout(connectSSE, retryDelay);
-  //         retryAttempt += 1;
-  //         console.log(
-  //           `⏳ ${retryDelay / 1000}초 후 SSE 재연결 시도... (시도 ${retryAttempt}/${MAX_RETRY_ATTEMPTS})`,
-  //         );
-  //       } else {
-  //         console.warn("🚨 최대 재시도 횟수를 초과하여 SSE 재연결 중단");
-  //       }
-  //     };
-  //   };
-
-  //   return () => {
-  //     eventSource?.close();
-  //     clearTimeout(retryTimeout);
-  //   };
-  // }, [data]);
 
   return (
     <div className="flex flex-col p-5 relative">
       {isLoading && (
         <Loading
           message={`영수증 등록 중 입니다. 잠시만 기다려주세요`}
-          purpose="OCR"
+          purpose=""
         />
       )}
 
