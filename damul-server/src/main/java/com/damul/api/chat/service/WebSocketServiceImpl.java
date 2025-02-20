@@ -154,8 +154,9 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Transactional
     public void handleMessageRead(ChatReadRequest readRequest) {
         ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(readRequest.getRoomId(), readRequest.getUserId()).get();
+        int lastReadMessageId = chatRoomMemberRepository.findLastReadMessageIdByUserIdAndRoomId(readRequest.getUserId(), readRequest.getRoomId());
 
-        member.updateLastReadMessageId(readRequest.getMessageId());
+        member.updateLastReadMessageId(lastReadMessageId);
         chatRoomMemberRepository.save(member);
     }
 
