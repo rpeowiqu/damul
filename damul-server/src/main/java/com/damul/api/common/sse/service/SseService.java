@@ -36,10 +36,7 @@ public class SseService {
 
         SseEmitter emitter = new SseEmitter(TIMEOUT);
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-
         try {
-            SecurityContextHolder.setContext(securityContext);
             emitter.send(SseEmitter.event()
                     .name("connect")
                     .data("")

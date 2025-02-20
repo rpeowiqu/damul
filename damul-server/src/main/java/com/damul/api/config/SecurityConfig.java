@@ -99,7 +99,7 @@ public class SecurityConfig {
                                     ).permitAll() // 누구나 접근 가능
                             .requestMatchers("/api/v1/auth/**").permitAll() // 인증은 누구나 접근 OK
                             .requestMatchers("/ws/**").authenticated()
-                            .requestMatchers("/api/v1/sse/**").authenticated()
+                            .requestMatchers("/api/v1/sse/**").permitAll()
                             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")              // ADMIN 역할만 접근 가능
                             .anyRequest().authenticated();                              // 나머지는 인증 필요
                 })
