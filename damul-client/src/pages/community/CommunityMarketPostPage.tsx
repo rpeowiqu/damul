@@ -87,12 +87,13 @@ const CommunityMarketPostPage = () => {
 
   return (
     <main className="flex flex-col px-7 py-4 pc:p-6 gap-5">
-      <div
-        className="p-4 space-x-5 font-semibold cursor-pointer"
-        onClick={() => window.history.back()}
-      >
-        <span>{"<"}</span>
-        <span className="space-y-4">공구/나눔 게시글 작성</span>
+      <div className="flex gap-5">
+        <button className="font-black" onClick={() => history.back()}>
+          &lt;
+        </button>
+        <h1 className="text-lg sm:text-xl font-black text-normal-700">
+          공구/나눔 게시글 작성
+        </h1>
       </div>
       <div className="flex flex-col gap-5">
         <DamulDrawer
@@ -105,7 +106,7 @@ const CommunityMarketPostPage = () => {
           triggerContent={
             <PostCard
               title="제목"
-              description="제목을 입력해주세요"
+              description="제목을 입력해 주세요."
               isEmpty={!title}
             />
           }
@@ -132,7 +133,7 @@ const CommunityMarketPostPage = () => {
           triggerContent={
             <PostCard
               title="사진"
-              description="사진을 업로드해주세요"
+              description="사진을 업로드해 주세요."
               isEmpty={!image}
             />
           }
@@ -159,7 +160,7 @@ const CommunityMarketPostPage = () => {
           triggerContent={
             <PostCard
               title="내용"
-              description="내용을 입력해주세요"
+              description="내용을 입력해 주세요."
               isEmpty={!content}
             />
           }
@@ -185,7 +186,7 @@ const CommunityMarketPostPage = () => {
           triggerContent={
             <PostCard
               title="인원수"
-              description="참여 인원수를 입력해주세요"
+              description="참여 인원수를 입력해 주세요."
               isEmpty={chatSize === 0}
             />
           }
@@ -203,17 +204,15 @@ const CommunityMarketPostPage = () => {
         />
       </div>
       {title && image && content && chatSize > 0 && (
-        <div className="w-full">
-          <DamulButton
-            variant="positive-outline"
-            className="w-full"
-            onClick={() => {
-              submitPost();
-            }}
-          >
-            공구/나눔 게시글 작성하기
-          </DamulButton>
-        </div>
+        <DamulButton
+          variant="positive"
+          className="w-full"
+          onClick={() => {
+            submitPost();
+          }}
+        >
+          공구/나눔 게시글 작성하기
+        </DamulButton>
       )}
     </main>
   );

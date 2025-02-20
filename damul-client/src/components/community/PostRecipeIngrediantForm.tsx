@@ -19,7 +19,7 @@ const PostRecipeIngrediantForm = ({
 }: PostRecipeIngrediantFormProps) => {
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="py-6 text-xl text-neutral-800">
+      <h3 className="py-6 text-xl text-neutral-800 text-center">
         재료의 수량과 단위를 정해주세요
       </h3>
       <p className="text-start">재료명</p>

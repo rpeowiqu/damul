@@ -25,36 +25,10 @@ const CommunityRecipePostPage = () => {
   const [preImage, setPreImage] = useState("");
   const [content, setContent] = useState<string>("");
   const [tempContent, setTempContent] = useState<string>("");
-  const [ingredients, setIngredients] = useState<Ingredient[]>([
-    {
-      id: 0,
-      name: "",
-      amount: "",
-      unit: "",
-    },
-  ]);
-  const [tempIngredients, setTempIngredients] = useState<Ingredient[]>([
-    {
-      id: 0,
-      name: "",
-      amount: "",
-      unit: "",
-    },
-  ]);
-  const [orders, setOrders] = useState<OrderProps[]>([
-    {
-      id: 0,
-      content: "",
-      imageUrl: null,
-    },
-  ]);
-  const [tempOrders, setTempOrders] = useState<OrderProps[]>([
-    {
-      id: 0,
-      content: "",
-      imageUrl: null,
-    },
-  ]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [tempIngredients, setTempIngredients] = useState<Ingredient[]>([]);
+  const [orders, setOrders] = useState<OrderProps[]>([]);
+  const [tempOrders, setTempOrders] = useState<OrderProps[]>([]);
   const [currentDrawerIndex, setCurrentDrawerIndex] = useState<number>(-1);
   const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentDrawerIndex(-1));
 
@@ -142,12 +116,13 @@ const CommunityRecipePostPage = () => {
 
   return (
     <div className="flex flex-col justify-between px-7 py-4 pc:p-6 gap-5">
-      <div
-        className="p-4 space-x-5 font-semibold cursor-pointer"
-        onClick={() => window.history.back()}
-      >
-        <span>{"<"}</span>
-        <span className="space-y-4">나만의 레시피 작성</span>
+      <div className="flex gap-5">
+        <button className="font-black" onClick={() => history.back()}>
+          &lt;
+        </button>
+        <h1 className="text-lg sm:text-xl font-black text-normal-700">
+          나만의 레시피 작성
+        </h1>
       </div>
       <div className="flex flex-col gap-5">
         <DamulDrawer
@@ -160,7 +135,7 @@ const CommunityRecipePostPage = () => {
           triggerContent={
             <PostCard
               title="제목"
-              description="제목을 입력해주세요"
+              description="제목을 입력해 주세요."
               isEmpty={!title}
             />
           }
@@ -190,7 +165,7 @@ const CommunityRecipePostPage = () => {
           triggerContent={
             <PostCard
               title="사진"
-              description="사진을 업로드해주세요"
+              description="사진을 업로드해 주세요."
               isEmpty={!image}
             />
           }
@@ -217,7 +192,7 @@ const CommunityRecipePostPage = () => {
           triggerContent={
             <PostCard
               title="소개"
-              description="소개글을 입력해주세요"
+              description="소개글을 입력해 주세요."
               isEmpty={!content}
             />
           }
@@ -247,8 +222,8 @@ const CommunityRecipePostPage = () => {
           triggerContent={
             <PostCard
               title="재료"
-              description="재료를 입력해주세요"
-              isEmpty={!ingredients[0].name}
+              description="재료를 입력해 주세요."
+              isEmpty={ingredients.length === 0 || !ingredients[0].name}
             />
           }
           headerContent={
@@ -273,8 +248,8 @@ const CommunityRecipePostPage = () => {
           triggerContent={
             <PostCard
               title="조리순서"
-              description="조리순서를 입력해주세요"
-              isEmpty={!orders[0].content}
+              description="조리순서를 입력해 주세요."
+              isEmpty={orders.length === 0 || !orders[0].content}
             />
           }
           headerContent={
@@ -293,21 +268,21 @@ const CommunityRecipePostPage = () => {
       {title &&
         image &&
         content &&
+        ingredients.length > 0 &&
         ingredients[0].name &&
+        orders.length > 0 &&
         orders[0].content && (
-          <div className="w-full">
-            <DamulButton
-              variant="positive-outline"
-              className="w-full"
-              onClick={() => {
-                submitRecipe();
-              }}
-            >
-              {location.pathname.endsWith("edit")
-                ? "레시피 수정하기"
-                : "레시피 작성하기"}
-            </DamulButton>
-          </div>
+          <DamulButton
+            variant="positive"
+            className="w-full"
+            onClick={() => {
+              submitRecipe();
+            }}
+          >
+            {location.pathname.endsWith("edit")
+              ? "레시피 수정하기"
+              : "레시피 작성하기"}
+          </DamulButton>
         )}
     </div>
   );

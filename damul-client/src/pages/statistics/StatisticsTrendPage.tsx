@@ -299,7 +299,7 @@ const StatisticsTrendPage = () => {
               <p className="text-positive-300 font-bold text-xxs sm:text-xs text-center">
                 열심히 가격 정보를 가져오고 있어요.
                 <br />
-                잠시만 기달려 주세요!
+                잠시만 기다려 주세요!
               </p>
             </div>
           )}
