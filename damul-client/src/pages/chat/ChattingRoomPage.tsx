@@ -93,7 +93,7 @@ const ChattingRoomPage = () => {
         size: 50,
       });
 
-      console.log(response?.data);
+      // console.log(response?.data);
       if (response?.data && typeof response.data === "object") {
         setChatData({
           messages: response.data.data || [],
@@ -108,7 +108,7 @@ const ChattingRoomPage = () => {
 
       return response?.data;
     } catch (error) {
-      console.error("채팅 데이터 불러오기 실패:", error);
+      // console.error("채팅 데이터 불러오기 실패:", error);
     }
   };
 
@@ -184,7 +184,7 @@ const ChattingRoomPage = () => {
 
     try {
       const response = await postImageInRoom({ roomId, formData });
-      console.log(response);
+      // console.log(response);
 
       const newImageMessage: ChatMessage = {
         id: Date.now(),
@@ -203,7 +203,7 @@ const ChattingRoomPage = () => {
       setImage(null);
       setPrevImage(null);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -213,7 +213,7 @@ const ChattingRoomPage = () => {
 
     const lastMessage = chatData.messages[chatData.messages.length - 1];
 
-    console.log("sdsd", lastMessage);
+    // console.log("sdsd", lastMessage);
 
     readMessage({
       userId: data?.data.id,

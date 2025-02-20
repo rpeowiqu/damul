@@ -13,11 +13,11 @@ const useCloseOnBack = (key: string, onClose?: () => void) => {
     const handlePopState = () => {
       closeOverlay(key, onClose);
     };
-    console.log("AddEventListner", key);
+    // console.log("AddEventListner", key);
     window.addEventListener("popstate", handlePopState);
 
     return () => {
-      console.log("removeEventListener", key);
+      // console.log("removeEventListener", key);
       window.removeEventListener("popstate", handlePopState);
     };
   }, []);

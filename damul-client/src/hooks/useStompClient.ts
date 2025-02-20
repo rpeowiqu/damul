@@ -26,20 +26,20 @@ export const useStompClient = ({
           withCredentials: true,
         } as ExtendedOptions),
       onConnect: (frame) => {
-        console.log("Connected: " + frame);
+        // console.log("Connected: " + frame);
         stompClient.subscribe(`/sub/chat/room/${roomId}`, (message) => {
           const receivedMessage = JSON.parse(message.body);
-          console.log("📩 메시지 수신:", receivedMessage);
+          // console.log("📩 메시지 수신:", receivedMessage);
           if (onMessageReceived) {
             onMessageReceived(receivedMessage);
           }
         });
       },
       onStompError: (frame) => {
-        console.error("🚨 STOMP 에러:", frame.headers["message"], frame.body);
+        // console.error("🚨 STOMP 에러:", frame.headers["message"], frame.body);
       },
       onWebSocketError: (event) => {
-        console.error("⚠️ WebSocket 에러:", event);
+        // console.error("⚠️ WebSocket 에러:", event);
       },
     });
 
@@ -52,7 +52,7 @@ export const useStompClient = ({
     return () => {
       stompClientRef.current
         ?.deactivate()
-        .then(() => console.log("STOMP 연결 종료"));
+        .then(() => // console.log("STOMP 연결 종료"));
     };
   }, [roomId]);
 
@@ -80,7 +80,7 @@ export const useStompClient = ({
       room: { id: roomId },
     };
 
-    console.log("📤 메시지 전송:", message);
+    // console.log("📤 메시지 전송:", message);
     stompClientRef.current.publish({
       destination: `/pub/chat/room/${roomId}/message`,
       body: JSON.stringify(message),
@@ -94,7 +94,7 @@ export const useStompClient = ({
     }
 
     const enterMessage = { userId, roomId };
-    console.log("🚪 채팅방 입장 요청:", enterMessage);
+    // console.log("🚪 채팅방 입장 요청:", enterMessage);
 
     stompClientRef.current.publish({
       destination: `/pub/chat/room/${roomId}/enter/${userId}`,

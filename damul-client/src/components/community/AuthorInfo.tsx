@@ -49,7 +49,7 @@ const AuthorInfo = ({
   const likeRecipe = async () => {
     try {
       const response = await postRecipeLike(id);
-      console.log(response?.data);
+      // console.log(response?.data);
       if (response?.data) {
         setIsLiked(true);
         setLikesCount((prev) => prev + 1);
@@ -58,7 +58,7 @@ const AuthorInfo = ({
         setLikesCount((prev) => Math.max(0, prev - 1));
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -73,9 +73,9 @@ const AuthorInfo = ({
           : await deletePost({ postId: id });
 
       navigate(`/community/${type}`);
-      console.log(response);
+      // console.log(response);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -96,7 +96,7 @@ const AuthorInfo = ({
     );
   }
 
-  console.log(authorId + " " + authorName + "ㅇㅇ");
+  // console.log(authorId + " " + authorName + "ㅇㅇ");
 
   return (
     <div className="flex flex-col h-auto p-2">

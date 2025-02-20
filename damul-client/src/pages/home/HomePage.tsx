@@ -56,7 +56,7 @@ const HomePage = () => {
           });
         setExpiringSoonItems(expiringSoonData);
       } catch (err: any) {
-        console.log("식자재 정보를 받지 못했습니다.");
+        // console.log("식자재 정보를 받지 못했습니다.");
       }
     };
 

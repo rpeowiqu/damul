@@ -29,7 +29,7 @@ const ProfileBadgePage = () => {
           setBadgeList(response.data.list);
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       } finally {
         setIsFetched(true);
       }

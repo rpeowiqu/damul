@@ -90,7 +90,7 @@ const IngredientDetail = ({
         refetch();
         deleteIngredient?.(ingredient);
       } catch (error) {
-        console.log("식자재 정보를 삭제 하지 못했습니다.");
+        // console.log("식자재 정보를 삭제 하지 못했습니다.");
       }
     }
     setIsOpen?.(false);
@@ -103,7 +103,7 @@ const IngredientDetail = ({
       });
       updateIngredient?.(ingredient);
     } catch (error: any) {
-      console.error("식자재 정보를 수정하지 못했습니다.");
+      // console.error("식자재 정보를 수정하지 못했습니다.");
     }
     setIsOpen?.(false);
   };

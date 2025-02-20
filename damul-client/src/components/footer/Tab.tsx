@@ -32,14 +32,14 @@ const Tab = ({
       const response = await getUnreads();
       setChatCnt(response.data.unReadMessageNum);
     } catch (error) {
-      console.error("Failed to fetch unread messages:", error);
+      // console.error("Failed to fetch unread messages:", error);
     }
   };
 
   useEffect(() => {
     fetchUnreads();
 
-    console.log("뭐여ㅑ", chatCnt);
+    // console.log("뭐여ㅑ", chatCnt);
   }, []);
 
   return (

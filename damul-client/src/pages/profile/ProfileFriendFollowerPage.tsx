@@ -21,7 +21,7 @@ const ProfileFriendFollowerPage = () => {
         nav(`/chatting/${chatId}`);
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -38,7 +38,7 @@ const ProfileFriendFollowerPage = () => {
 
       return response?.data;
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -49,7 +49,7 @@ const ProfileFriendFollowerPage = () => {
         queryKey: ["follower", userId, searchKeyword],
       });
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 

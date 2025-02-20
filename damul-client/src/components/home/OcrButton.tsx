@@ -71,7 +71,7 @@ const OcrButton = ({
         });
       }
     } catch (error: any) {
-      console.log("영수증 입력이 실패하였습니다.");
+      // console.log("영수증 입력이 실패하였습니다.");
       alert("영수증 등록에 실패하였습니다.");
     } finally {
       setIsLoading(false);

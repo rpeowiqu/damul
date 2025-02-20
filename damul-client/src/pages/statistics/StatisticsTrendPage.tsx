@@ -66,7 +66,7 @@ const StatisticsTrendPage = () => {
           const response = await getKamisIngredients();
           return response.data.ingredientsProductNameLists;
         } catch (error) {
-          console.error(error);
+          // console.error(error);
         }
       },
       staleTime: 1000 * 60 * 60,
@@ -110,7 +110,7 @@ const StatisticsTrendPage = () => {
         return response.data.priceDataList;
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
 
     return [];

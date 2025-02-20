@@ -32,7 +32,7 @@ const CommunitySearch = ({ placeholder, type }: CommunitySearchProps) => {
   const [searchType, setSearchType] = useState("content");
 
   useEffect(() => {
-    console.log(searchType);
+    // console.log(searchType);
   }, [searchType]);
 
   return (

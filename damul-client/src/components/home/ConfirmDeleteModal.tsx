@@ -33,7 +33,7 @@ const ConfirmDeleteModal = ({
       refetch();
       deleteIngredient(ingredient);
     } catch (error) {
-      console.log("식자재 정보를 삭제 하지 못했습니다.");
+      // console.log("식자재 정보를 삭제 하지 못했습니다.");
     }
     setIsDeleteOpen(data?.data.warningEnabled);
   };

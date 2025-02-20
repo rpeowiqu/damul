@@ -51,7 +51,7 @@ const ProfilePage = () => {
           setHeader(response.data);
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       } finally {
         setIsFetched(true);
       }

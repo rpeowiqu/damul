@@ -41,14 +41,14 @@ const ProfileRecipePage = () => {
         size: 10,
         sortType,
       });
-      console.log(response.data);
+      // console.log(response.data);
       if (response?.status === 204) {
         return { data: [], meta: { nextCursor: null, hasNext: false } };
       }
 
       return response?.data;
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 

@@ -25,13 +25,13 @@ export const useStompSubscription = () => {
           withCredentials: true,
         } as ExtendedOptions),
       onConnect: () => {
-        console.log("✅ WebSocket 연결 성공");
+        // console.log("✅ WebSocket 연결 성공");
       },
       onStompError: (frame) => {
-        console.error("❌ STOMP 오류:", frame.headers["message"], frame.body);
+        // console.error("❌ STOMP 오류:", frame.headers["message"], frame.body);
       },
       onWebSocketError: (event) => {
-        console.error("⚠ WebSocket 에러:", event);
+        // console.error("⚠ WebSocket 에러:", event);
       },
     });
 
@@ -39,7 +39,7 @@ export const useStompSubscription = () => {
     stompClientRef.current = stompClient;
 
     // return () => {
-    //   stompClient.deactivate().then(() => console.log("🔌 STOMP 연결 해제"));
+    //   stompClient.deactivate().then(() => // console.log("🔌 STOMP 연결 해제"));
     // };
   }, [data?.data.id]);
 

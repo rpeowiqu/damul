@@ -31,7 +31,7 @@ const ChattingSearchResultPage = () => {
       setResultCnt(response?.data.count);
       return response?.data;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 

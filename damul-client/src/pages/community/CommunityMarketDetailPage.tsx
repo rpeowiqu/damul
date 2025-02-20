@@ -39,9 +39,9 @@ const CommunityMarketDetailPage = () => {
       setIsLoading(true);
       const response = await getPostDetail(postId);
       setData(response?.data as PostDetail);
-      console.log(response?.data);
+      // console.log(response?.data);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     } finally {
       setIsLoading(false);
     }

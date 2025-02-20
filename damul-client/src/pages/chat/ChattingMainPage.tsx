@@ -30,18 +30,18 @@ const ChattingMainPage = () => {
         filter: filterType,
       });
 
-      console.log(response?.data);
+      // console.log(response?.data);
       if (response.status === 204) {
         return { data: [], meta: { nextCursor: 0, hasNext: 0 } };
       }
       return response?.data;
     } catch (error) {
-      console.error("Error fetching chat list:", error);
+      // console.error("Error fetching chat list:", error);
     }
   };
 
   useEffect(() => {
-    console.log("sds");
+    // console.log("sds");
     queryClient.refetchQueries({
       queryKey: ["chattRooms", filterType],
     });
