@@ -157,6 +157,7 @@ public class SseService {
                 emitter.complete();
                 removeEmitter(userId);
             }
+
         }
     }
 
