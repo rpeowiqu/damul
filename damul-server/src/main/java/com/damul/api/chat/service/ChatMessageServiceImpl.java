@@ -207,7 +207,7 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
             log.info("서비스: S3 이미지 업로드 완료 - path: {}", imagePath);
 
             // 채팅 메시지 생성 및 저장
-            if(content == null) content = "사진을 보냈습니다.";
+            if(content.equals("")) content = "사진을 보냈습니다.";
             ChatMessage message = createImageMessage(room, user, content, imagePath);
             chatMessageRepository.save(message);
 
@@ -241,10 +241,20 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
     }
 
     private void updateUnreadCount(ChatMessage message) {
-        // 채팅방의 모든 멤버를 조회하고 발신자를 제외한 모든 멤버의 안 읽은 메시지 수 증가
-        chatRoomMemberRepository.findAllByRoomId(message.getRoom().getId()).stream()
-                .filter(member -> member.getUser().getId() != message.getSender().getId())
-                .forEach(member -> unreadMessageService.incrementUnreadCount(member.getUser().getId()));
+        List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(message.getRoom().getId());
+        for (ChatRoomMember member : members) {
+            if (member.getUser().getId() != message.getSender().getId()) {
+                // Redis에 안 읽은 메시지 수 증가
+                unreadMessageService.incrementUnreadCount(member.getUser().getId());
+
+                // 웹소켓으로 업데이트된 카운트 전송
+                int unreadCount = unreadMessageService.getUnreadCount(member.getUser().getId());
+                messagingTemplate.convertAndSend(
+                        "/sub/chat/" + member.getUser().getId() + "/count",
+                        unreadCount
+                );
+            }
+        }
     }
 
     private void validateImage(Object image) {
