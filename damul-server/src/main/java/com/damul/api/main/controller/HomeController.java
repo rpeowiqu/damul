@@ -153,6 +153,16 @@ public class HomeController {
             // 2. 이미지 처리 진행
             OcrList ocrResult = homeService.processImage(image, userId);
 
+            log.info("이미지 분석 결과 - userId: {}, 결과 개수: {}", userId, ocrResult.getData().size());
+            ocrResult.getData().forEach(item ->
+                    log.info("분석 항목: 이름={}, 카테고리={}, 가격={}, 유통기한={}, 보관방법={}",
+                            item.getIngredientName(),
+                            item.getCategory(),
+                            item.getProductPrice(),
+                            item.getExpiration_date(),
+                            item.getIngredientStorage())
+            );
+
             // 3. 처리 완료 이벤트와 결과를 SSE로 전송
             sseService.sendToClient(userId, Map.of(
                     "type", "PROCESSING_COMPLETED",
