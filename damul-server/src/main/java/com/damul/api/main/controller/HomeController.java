@@ -35,6 +35,14 @@ public class HomeController {
     private final UserReceiptService userReceiptService;
     private final SseService sseService;
 
+    @PostMapping("/normalize")
+    public ResponseEntity<String> normalizeIngredient(@RequestBody String originalName) {
+        String normalizedName = homeService.normalizeIngredient(originalName);
+        return ResponseEntity.ok(normalizedName);
+    }
+
+
+
     @GetMapping
     public ResponseEntity<?> getUserIngredients(@CurrentUser UserInfo user) {
         log.info("컨트롤러: 유저 식자재 목록 조회 시작 - userId: {}", user.getId());
@@ -95,10 +103,11 @@ public class HomeController {
     @PatchMapping("/ingredients/{userIngredientId}")
     public ResponseEntity<?> updateUserIngredient(
             @PathVariable int userIngredientId,
-            @RequestBody UserIngredientUpdate userIngredientUpdate
+            @RequestBody UserIngredientUpdate userIngredientUpdate,
+            @CurrentUser UserInfo user
             ) {
         log.info("유저 식자재양 수정 시작 userIngredientId: {}, userIngredientUpdate: {}", userIngredientId, userIngredientUpdate.getIngredientQuantity());
-        homeService.updateQuantity(userIngredientId, userIngredientUpdate);
+        homeService.updateQuantity(userIngredientId, userIngredientUpdate, user);
         log.info("유저 식자재양 수정 성공");
         return ResponseEntity.ok().build();
     }
@@ -146,5 +155,7 @@ public class HomeController {
             throw e;
         }
     }
+
+
 
 }

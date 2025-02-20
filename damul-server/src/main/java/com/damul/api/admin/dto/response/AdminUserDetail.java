@@ -15,5 +15,6 @@ public class AdminUserDetail {
     private String profileImageUrl;
     private String nickname;
     private String selfIntroduction;
+    private int reportCount;
     private boolean active;
 }

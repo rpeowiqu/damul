@@ -61,6 +61,7 @@ public class AuthController {
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
             authService.logout(request, response);
+
             return ResponseEntity.ok()
                     .body(Map.of(
                             "success", true,

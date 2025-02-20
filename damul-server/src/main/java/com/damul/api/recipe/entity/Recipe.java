@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name="recipes")
@@ -47,11 +48,13 @@ public class Recipe {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;
+
+    @OneToMany(mappedBy = "recipe")
+    private List<RecipeIngredient> recipeIngredients;
 
     public void updateCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;

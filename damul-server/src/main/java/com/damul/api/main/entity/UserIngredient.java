@@ -16,7 +16,7 @@ public class UserIngredient {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receipt_id", referencedColumnName = "id")
-    private UserReceipt userReciept;  // int userId → User 객체로 변경
+    private UserReceipt userReceipt;  // int userId → User 객체로 변경
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,12 +48,16 @@ public class UserIngredient {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;  // 삭제 상태 필드 추가
 
+    @Column(name = "normalized_ingredient_name")
+    private String normalizedIngredientName;
+
     @Builder
-    public UserIngredient(UserReceipt userReciept, int userIngredientId, int categoryId,
+    public UserIngredient(UserReceipt userReceipt, int userIngredientId, int categoryId,
                           int ingredientQuantity, LocalDateTime ingredientUp,
                           String ingredientName, LocalDateTime expirationDate,
-                          IngredientStorage ingredientStorage, int price) {
-        this.userReciept = userReciept;
+                          IngredientStorage ingredientStorage, int price,
+                          String normalizedIngredientName) {
+        this.userReceipt = userReceipt;
         this.userIngredientId = userIngredientId;
         this.categoryId = categoryId;
         this.ingredientQuantity = ingredientQuantity;
@@ -63,6 +67,7 @@ public class UserIngredient {
         this.ingredientStorage = ingredientStorage;
         this.price = price;
         this.isDeleted = false;
+        this.normalizedIngredientName = normalizedIngredientName;
     }
 
     // 논리적 삭제를 위한 메서드

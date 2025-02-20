@@ -11,6 +11,11 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "리프레시 토큰을 찾을 수 없습니다."),
 
+    // API 관련 에러코드 추가
+    API_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API 서버 오류가 발생했습니다."),
+    API_REQUEST_ERROR(HttpStatus.BAD_REQUEST, "API 요청 중 오류가 발생했습니다."),
+    API_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API 응답 처리 중 오류가 발생했습니다."),
+
 
     // 유효성 검증
     INVALID_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자 ID가 포함되어 있습니다."),
@@ -101,7 +106,10 @@ public enum ErrorCode {
     PROFILE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "프로필 접근 권한이 없습니다."),
     BOOKMARK_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 북마크입니다." ),
 
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, "올바르지 않은 요처입니다.");
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "올바르지 않은 요청입니다."),
+    REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 신고입니다."),
+    INVALID_REPORT_STATUS(HttpStatus.BAD_REQUEST, "올바르지 않은 신고 설정입니다."),
+    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "이미지가 올바르지 않습니다.");
 
 
     private final HttpStatus status;

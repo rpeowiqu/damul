@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface UserIngredientRepository extends JpaRepository<UserIngredient, Integer> {
 
     @Query("SELECT ui FROM UserIngredient ui " +
-            "WHERE ui.userReciept.user.id = :userId " +
+            "WHERE ui.userReceipt.user.id = :userId " +
             "AND ui.isDeleted = false")
     List<UserIngredient> findAllByUserId(@Param("userId") int userId);
 
@@ -25,7 +25,7 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
     Optional<UserIngredient> findByIdAndNotDeleted(@Param("id") int userIngredientId);
 
     @Query("SELECT ui FROM UserIngredient ui " +
-            "WHERE ui.userReciept.user.id = :userId " +
+            "WHERE ui.userReceipt.user.id = :userId " +
             "AND ui.ingredientName LIKE %:keyword% " +
             "AND ui.isDeleted = false")
     List<UserIngredient> findByUserIdAndIngredientNameContaining(
@@ -42,22 +42,26 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
             "WHERE ui.userIngredientId = :ingredientId " +
             "AND ui.isDeleted = false")
     HomeIngredientDetail findHomeIngredientDetailById(@Param("ingredientId") int ingredientId);
+//
+//    @Query("""
+//        SELECT DISTINCT r FROM Recipe r
+//        LEFT JOIN FETCH RecipeTag rt ON rt.recipe.id = r.id
+//        JOIN RecipeIngredient ri ON ri.recipe.id = r.id
+//        LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
+//            AND ui.userReceipt.user.id = :userId
+//            AND ui.isDeleted = false
+//        WHERE r.deleted = false
+//        GROUP BY r.id
+//        HAVING COUNT(DISTINCT ui.userIngredientId) > 0
+//        ORDER BY COUNT(DISTINCT ui.userIngredientId) * 1.0 / COUNT(DISTINCT ri.id) DESC,
+//                 r.likeCnt * 0.3 DESC
+//    """)
+//    List<RecipeList> findRecommandedRecipes(@Param("userId") int userId);
 
-    @Query("""
-        SELECT DISTINCT r FROM Recipe r
-        LEFT JOIN FETCH RecipeTag rt ON rt.recipe.id = r.id
-        JOIN RecipeIngredient ri ON ri.recipe.id = r.id
-        LEFT JOIN UserIngredient ui ON ri.ingredientName = ui.ingredientName
-            AND ui.userReciept.user.id = :userId
-            AND ui.isDeleted = false
-        WHERE r.deleted = false
-        GROUP BY r.id
-        HAVING COUNT(DISTINCT ui.userIngredientId) > 0
-        ORDER BY COUNT(DISTINCT ui.userIngredientId) * 1.0 / COUNT(DISTINCT ri.id) DESC,
-                 r.likeCnt * 0.3 DESC
-    """)
-    List<RecipeList> findRecommandedRecipes(@Param("userId") int userId);
+    Integer countByCategoryIdAndUserReceipt_User_Id(Integer categoryId, Integer userId);
 
-    int countByCategoryIdAndUserReciept_User_Id(Integer categoryId, Integer userId);
+    List<UserIngredient> findByUserReceipt_User_IdAndIsDeletedFalse(int userId);
 
+    @Query("SELECT ui.userReceipt.user.id FROM UserIngredient ui WHERE ui.userIngredientId = :userIngredientId")
+    Integer findUserIdByUserIngredientId(@Param("userIngredientId") Integer userIngredientId);
 }

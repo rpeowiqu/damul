@@ -41,7 +41,7 @@ public interface UserReceiptRepository extends JpaRepository<UserReceipt, Intege
             FROM UserIngredient ui 
             JOIN FoodCategory fc
             ON fc.id = ui.categoryId
-            AND ui.userReciept.id = :receiptId
+            AND ui.userReceipt.id = :receiptId
             """)
     List<ReceiptDetail> findReceiptDetailsByReceiptId(int receiptId);
 

@@ -75,6 +75,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     public void createCommentNotification(User receiver, User sender, Integer postId, String type) {
         log.info("알림 생성 타입: {}", type);
+        if(receiver.getId() == sender.getId()) return;
         Notification notification = Notification.create(
                 receiver,
                 sender,
@@ -108,6 +109,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void createLikeNotification(User receiver, User sender, Integer postId, String type) {
+        if(receiver.getId() == sender.getId()) return;
         Notification notification = Notification.create(
                 receiver,
                 sender,

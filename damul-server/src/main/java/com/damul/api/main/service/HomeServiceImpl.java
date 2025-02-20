@@ -5,6 +5,7 @@ import com.damul.api.auth.entity.User;
 import com.damul.api.auth.entity.type.AccessRange;
 import com.damul.api.common.exception.BusinessException;
 import com.damul.api.common.exception.ErrorCode;
+import com.damul.api.common.util.IngredientNormalizerUtil;
 import com.damul.api.main.dto.IngredientStorage;
 import com.damul.api.main.dto.OcrDto;
 import com.damul.api.main.dto.OcrList;
@@ -12,10 +13,10 @@ import com.damul.api.main.dto.request.UserIngredientUpdate;
 import com.damul.api.main.dto.response.*;
 import com.damul.api.main.entity.UserIngredient;
 import com.damul.api.main.repository.UserIngredientRepository;
-import com.damul.api.receipt.dto.request.UserIngredientPost;
 import com.damul.api.recipe.dto.response.RecipeList;
 import com.damul.api.recipe.entity.Recipe;
-import com.damul.api.recipe.entity.RecipeTag;
+import com.damul.api.recipe.entity.RecipeIngredient;
+import com.damul.api.recipe.repository.RecipeIngredientRepository;
 import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.recipe.repository.RecipeTagRepository;
 import com.damul.api.user.repository.FollowRepository;
@@ -23,7 +24,6 @@ import com.damul.api.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +43,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,12 +55,19 @@ public class HomeServiceImpl implements HomeService {
     @Value("${fastapi.server.url}")
     private String fastApiServerUrl;
 
-    private final UserIngredientRepository userIngredientRepository;
     private final RecipeRepository recipeRepository;
+    private final UserIngredientRepository userIngredientRepository;
+    private final RecipeIngredientRepository recipeIngredientRepository;
     private final RecipeTagRepository recipeTagRepository;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final RestTemplate restTemplate;
+    private final IngredientNormalizerUtil ingredientNormalizerUtil;
+
+
+    public String normalizeIngredient(String originalName) {
+        return ingredientNormalizerUtil.normalize(originalName);
+    }
 
     @Override
     public IngredientResponse getUserIngredientList(int targetId, int userId) {
@@ -110,8 +118,9 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     @Transactional
-    public void updateQuantity(int ingredientId, UserIngredientUpdate update) {
+    public void updateQuantity(int ingredientId, UserIngredientUpdate update, UserInfo user) {
         validateIngredientQuantity(update.getIngredientQuantity());
+        validateUpdateUser(user, ingredientId);
 
         UserIngredient ingredient = userIngredientRepository.findById(ingredientId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INGREDIENT_NOT_FOUND));
@@ -141,7 +150,7 @@ public class HomeServiceImpl implements HomeService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.INGREDIENT_NOT_FOUND));
 
         // 권한 검증
-        if (ingredient.getUserReciept().getUser().getId() != userId) {
+        if (ingredient.getUserReceipt().getUser().getId() != userId) {
             throw new BusinessException(ErrorCode.INGREDIENT_ACCESS_DENIED);
         }
 
@@ -159,28 +168,59 @@ public class HomeServiceImpl implements HomeService {
     public HomeSuggestedResponse getRecommendedRecipes(int userId) {
         log.info("서비스: 레시피 추천 시작 - userId: {}", userId);
 
-        List<RecipeList> recommendedRecipes = new ArrayList<>();
 
-        // 1. 재료 유사도 기반으로 레시피 조회
-        List<RecipeList> similarRecipes = recipeRepository.findRecipesByIngredientSimilarity(userId);
-        recommendedRecipes.addAll(similarRecipes);
+        // 1. 사용자가 보유한 식재료 조회 (삭제되지 않은 것만)
+        List<UserIngredient> userIngredients = userIngredientRepository.findByUserReceipt_User_IdAndIsDeletedFalse(userId);
 
-        // 2. 5개가 안되면 인기있는 레시피로 채우기
-        if (recommendedRecipes.size() < 5) {
-            List<RecipeList> popularRecipes = recipeRepository.findPopularRecipes().stream()
-                    .filter(recipe -> recommendedRecipes.stream()
-                            .noneMatch(r -> r.getId() == recipe.getId()))
-                    .limit(5 - recommendedRecipes.size())
-                    .collect(Collectors.toList());
-            recommendedRecipes.addAll(popularRecipes);
+        if (userIngredients.isEmpty()) {
+            log.info("사용자의 보유 식재료가 없습니다. 좋아요 순으로 레시피를 추천합니다.");
+            return new HomeSuggestedResponse(getTopLikedRecipes());
         }
 
-        List<SuggestedRecipeList> suggestedRecipes = recommendedRecipes.stream()
-                .limit(5)
-                .map(this::convertToSuggestedRecipeList)
+        // 2. 사용자의 정규화된 식재료 이름들
+        Set<String> userNormalizedIngredients = userIngredients.stream()
+                .map(UserIngredient::getNormalizedIngredientName)
+                .collect(Collectors.toSet());
+
+        log.info("사용자 보유 식재료 수: {}", userNormalizedIngredients.size());
+
+        // 3. 사용자의 식재료를 포함하는 레시피 조회 (DB에서 필터링)
+        List<Recipe> matchingRecipes = recipeRepository.findRecipesContainingIngredients(userNormalizedIngredients);
+        log.info("매칭되는 레시피 수: {}", matchingRecipes.size());
+
+        // 매칭되는 레시피가 없는 경우 인기 레시피 반환
+        if (matchingRecipes.isEmpty()) {
+            log.info("매칭되는 레시피가 없습니다. 인기 레시피를 추천합니다.");
+            return new HomeSuggestedResponse(getTopLikedRecipes());
+        }
+
+        List<SuggestedRecipeList> suggestedRecipes = matchingRecipes.stream()
+                .map(recipe -> SuggestedRecipeList.builder()
+                        .recipeId(recipe.getId())
+                        .title(recipe.getTitle())
+                        .thumbnailUrl(recipe.getThumbnailUrl())
+                        .build())
                 .collect(Collectors.toList());
 
+        // 4. 랜덤으로 섞어서 다양한 추천 제공
+        Collections.shuffle(suggestedRecipes);
+
+        log.info("레시피 추천 완료 - 추천된 레시피 수: {}", suggestedRecipes.size());
+
         return new HomeSuggestedResponse(suggestedRecipes);
+    }
+
+    private List<SuggestedRecipeList> getTopLikedRecipes() {
+        // 좋아요 순으로 상위 레시피 조회
+        List<Recipe> topRecipes = recipeRepository.findTopByOrderByLikeCntDesc();
+
+        return topRecipes.stream()
+                .map(recipe -> SuggestedRecipeList.builder()
+                        .recipeId(recipe.getId())
+                        .title(recipe.getTitle())
+                        .thumbnailUrl(recipe.getThumbnailUrl())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public OcrList processImage(MultipartFile file, int userId) {
@@ -284,19 +324,19 @@ public class HomeServiceImpl implements HomeService {
                 .collect(Collectors.toList());
     }
 
-    private SuggestedRecipeList convertToSuggestedRecipeList(RecipeList recipe) {
-        return SuggestedRecipeList.builder()
-                .recipeId(recipe.getId())
-                .title(recipe.getTitle())
-                .thumbnailUrl(recipe.getThumbnailUrl())
-                .recipeTags(recipeTagRepository.findByRecipeId(recipe.getId()).stream()
-                        .map(recipeTag -> new RecipeTagList(
-                                recipeTag.getTag().getId(),
-                                recipeTag.getTag().getTagName()
-                        ))
-                        .collect(Collectors.toList()))
-                .build();
-    }
+//    private SuggestedRecipeList convertToSuggestedRecipeList(RecipeList recipe) {
+//        return SuggestedRecipeList.builder()
+//                .recipeId(recipe.getId())
+//                .title(recipe.getTitle())
+//                .thumbnailUrl(recipe.getThumbnailUrl())
+//                .recipeTags(recipeTagRepository.findByRecipeId(recipe.getId()).stream()
+//                        .map(recipeTag -> new RecipeTagList(
+//                                recipeTag.getTag().getId(),
+//                                recipeTag.getTag().getTagName()
+//                        ))
+//                        .collect(Collectors.toList()))
+//                .build();
+//    }
 
     private int calculateDaysUntilExpiration(LocalDateTime expirationDate) {
         return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), expirationDate);
@@ -350,6 +390,11 @@ public class HomeServiceImpl implements HomeService {
             case "date" -> "expirationDate";
             default -> "ingredientName";
         };
+    }
+
+    private void validateUpdateUser(UserInfo user, int ingredientId) {
+        int targetUserId = userIngredientRepository.findUserIdByUserIngredientId(ingredientId);
+        if(user.getId() != targetUserId) throw new BusinessException(ErrorCode.INVALID_ID, "다른 유저의 식자재를 수정할 수 없습니다.");
     }
 
 }

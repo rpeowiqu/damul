@@ -9,6 +9,7 @@ import com.damul.api.common.exception.ErrorCode;
 import com.damul.api.common.dto.response.CreateResponse;
 import com.damul.api.common.scroll.dto.response.ScrollResponse;
 import com.damul.api.common.scroll.util.ScrollUtil;
+import com.damul.api.common.util.IngredientNormalizerUtil;
 import com.damul.api.config.service.S3Service;
 import com.damul.api.main.dto.response.HomeSuggestedResponse;
 import com.damul.api.main.dto.response.RecipeTagList;
@@ -33,7 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -51,6 +51,7 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeBookmarkRepository bookmarkRepository;
     private final RecipeLikeRepository likeRepository;
     private final S3Service s3Service;
+    private final IngredientNormalizerUtil ingredientNormalizerUtil;
 
     private static final String VIEW_COUNT_KEY = "recipe:view";
     private static final long REDIS_DATA_EXPIRE_TIME = 60 * 60 * 24; // 24시간
@@ -172,7 +173,6 @@ public class RecipeServiceImpl implements RecipeService {
                             .recipeId(recipe.getRecipeId())
                             .title(recipe.getTitle())
                             .thumbnailUrl(recipe.getThumbnailUrl())
-                            .recipeTags(recipeTags)
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -347,9 +347,27 @@ public class RecipeServiceImpl implements RecipeService {
             recipeStepRepository.saveAll(steps);
             log.info("레시피 스텝 저장 완료 - 총 {}개", steps.size());
 
-            // 레시피 재료 처리
-            log.info("레시피 재료 저장 시작");
-            List<RecipeIngredient> ingredients = createRecipeIngredients(recipe, recipeRequest.getIngredients());
+            // 레시피 재료 처리 및 정규화
+            log.info("레시피 재료 정규화 및 저장 시작");
+            List<RecipeIngredient> ingredients = new ArrayList<>();
+
+            for (IngredientList ingredientList : recipeRequest.getIngredients()) {
+                // 재료명 정규화
+                String normalizedName = ingredientNormalizerUtil.normalize(ingredientList.getName());
+                log.info("재료 정규화 결과 - 원본: {}, 정규화: {}", ingredientList.getName(), normalizedName);
+
+                // RecipeIngredient 생성 부분 수정
+                RecipeIngredient ingredient = RecipeIngredient.builder()
+                        .recipe(recipe)
+                        .ingredientName(ingredientList.getName())
+                        .amount(ingredientList.getAmount())
+                        .unit(ingredientList.getUnit())
+                        .normalizedIngredientName(normalizedName)  // 정규화된 이름 추가
+                        .build();
+
+                ingredients.add(ingredient);
+            }
+
             recipeIngredientRepository.saveAll(ingredients);
             log.info("레시피 재료 저장 완료 - 총 {}개", ingredients.size());
 

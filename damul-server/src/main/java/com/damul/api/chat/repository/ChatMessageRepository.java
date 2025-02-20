@@ -1,6 +1,7 @@
 package com.damul.api.chat.repository;
 
 import com.damul.api.chat.entity.ChatMessage;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -39,21 +40,23 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
 
     // 첫 로딩을 위한 쿼리
     @Query("SELECT cm FROM ChatMessage cm WHERE cm.room.id = :roomId " +
-            "AND ((cm.id >= :lastReadId) OR " +  // 마지막 읽은 메시지부터 최신까지
-            "(cm.id < :lastReadId AND cm.id >= :lastReadId - 10)) " + // 이전 메시지 10개
+            "AND ((cm.id >= :lastReadId) OR " +
+            "(cm.id < :lastReadId)) " +
             "ORDER BY cm.id DESC")
     List<ChatMessage> findInitialMessages(
             @Param("roomId") int roomId,
-            @Param("lastReadId") int lastReadId
+            @Param("lastReadId") int lastReadId,
+            Pageable pageable
     );
 
     // 스크롤을 위한 이전 메시지 조회
     @Query("SELECT cm FROM ChatMessage cm " +
             "WHERE cm.room.id = :roomId AND cm.id < :cursorId " +
-            "ORDER BY cm.id DESC ")
+            "ORDER BY cm.id DESC")
     List<ChatMessage> findPreviousMessages(
             @Param("roomId") int roomId,
-            @Param("cursorId") int cursorId
+            @Param("cursorId") int cursorId,
+            Pageable pageable
     );
 
     // 안 읽은 메세지 수 전체 조회
@@ -61,7 +64,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
             "FROM ChatMessage cm " +
             "JOIN ChatRoomMember crm ON cm.room = crm.room " +
             "WHERE crm.user.id = :userId")
-    int countAllUnreadMessages(@Param("userId") int userId);
+    Integer countAllUnreadMessages(@Param("userId") int userId);
 
     @Query(value = """
         SELECT created_at 
@@ -71,5 +74,15 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
         LIMIT 1
         """, nativeQuery = true)
     LocalDateTime findLastMessageTimeByRoomId(@Param("roomId") int roomId);
+
+    @Query("SELECT COUNT(m) FROM ChatMessage m " +
+            "WHERE m.room.id = :roomId " +
+            "AND m.id > :lastReadId " +
+            "AND m.id <= :currentReadId")
+    Integer countUnreadMessagesInRoom(
+            @Param("roomId") int roomId,
+            @Param("lastReadId") int lastReadId,
+            @Param("currentReadId") int currentReadId
+    );
 
 }

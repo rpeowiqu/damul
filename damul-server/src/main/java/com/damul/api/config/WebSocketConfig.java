@@ -5,6 +5,7 @@ import com.damul.api.common.socket.WebSocketAuthHandshakeInterceptor;
 import com.damul.api.common.user.resolver.CurrentUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -24,6 +25,9 @@ import java.util.List;
 @Slf4j
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    @Value("${socket.server.url}")
+    private String serverUrl;
+
     private final WebSocketAuthHandshakeInterceptor handshakeInterceptor;
     private final StompHandler stompHandler;
 
@@ -38,7 +42,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .addInterceptors(handshakeInterceptor)
-                .setAllowedOriginPatterns("https://i12a306.p.ssafy.io") // 실제 운영 환경에서는 구체적인 도메인 지정 필요
+                .setAllowedOriginPatterns(serverUrl) // 실제 운영 환경에서는 구체적인 도메인 지정 필요
                 .withSockJS()
                 .setStreamBytesLimit(512 * 1024) // 512KB
                 .setHttpMessageCacheSize(1000)

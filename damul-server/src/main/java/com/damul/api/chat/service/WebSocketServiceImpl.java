@@ -45,77 +45,45 @@ public class WebSocketServiceImpl implements WebSocketService {
     private final S3Service s3Service;
     private final UserRepository userRepository;
     private final TimeZoneConverter timeZoneConverter;
+    private final UnreadMessageService unreadMessageService;
 
     @Override
     @Transactional
     public void handleMessage(int roomId, ChatMessageCreate messageRequest) {
         ChatRoom room = getChatRoom(roomId);
         User user = userRepository.findById(messageRequest.getUserId()).get();
-        ChatMessage message;
 
-        // 이미지가 포함된 메시지인 경우
-        if (messageRequest.getImage() != null && !messageRequest.getImage().isEmpty()) {
-            // Base64 디코딩 및 MultipartFile 변환
-            String[] parts = messageRequest.getImage().split(",");
-            byte[] imageBytes = Base64.getDecoder().decode(parts[1]);
-
-// Content-Type 추출 (Base64 문자열의 헤더에서)
-            String contentType = parts[0].split(":")[1].split(";")[0];
-
-            MultipartFile multipartFile = new Base64MultipartFile(
-                    imageBytes,
-                    "image." + getExtensionFromContentType(contentType),  // 확장자 추출
-                    contentType
-            );
-
-            String imagePath = s3Service.uploadFile(multipartFile);
-            message = ChatMessage.createFileMessage(room, user, messageRequest.getContent(), imagePath);
-        }
-        // 일반 텍스트 메시지인 경우
-        else {
-            message = ChatMessage.createMessage(
-                    room,
-                    user,
-                    messageRequest.getContent(),
-                    messageRequest.getMessageType() != null ? messageRequest.getMessageType() : MessageType.TEXT
-            );
-        }
+        ChatMessage message = ChatMessage.createMessage(
+                room,
+                user,
+                messageRequest.getContent(),
+                messageRequest.getMessageType() != null ? messageRequest.getMessageType() : MessageType.TEXT
+        );
         message.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         chatMessageRepository.save(message);
         int unReadCount = chatMessageRepository.countUnreadMessages(roomId, message.getId());
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, ChatMessageResponse.from(message, unReadCount));
+        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId,
+                ChatMessageResponse.from(message, unReadCount));
         updateUnreadCount(message);
-
     }
 
     @Override
     @Transactional
-    public void handleImageMessage(int roomId, ChatMessageCreate imageRequest) {
+    public void handleImageMessage(int roomId, int userId, String content, String imagePath) {
         ChatRoom room = getChatRoom(roomId);
-        User user = userRepository.findById(imageRequest.getUserId()).get();
+        User user = userRepository.findById(userId).get();
 
-        // Base64 디코딩 및 MultipartFile 변환
-        String[] parts = imageRequest.getImage().split(",");
-        byte[] imageBytes = Base64.getDecoder().decode(parts[1]);
-        User currentUser = userRepository.findById(user.getId()).get();
-
-// Content-Type 추출 (Base64 문자열의 헤더에서)
-        String contentType = parts[0].split(":")[1].split(";")[0];
-
-        MultipartFile multipartFile = new Base64MultipartFile(
-                imageBytes,
-                "image." + getExtensionFromContentType(contentType),  // 확장자 추출
-                contentType
-        );
-
-        String imagePath = s3Service.uploadFile(multipartFile);
-        ChatMessage message = ChatMessage.createFileMessage(room, currentUser, imageRequest.getContent(), imagePath);
+        // 이미지 메시지 생성
+        ChatMessage message = ChatMessage.createFileMessage(room, user, content, imagePath);
         message.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         chatMessageRepository.save(message);
         int unReadCount = chatMessageRepository.countUnreadMessages(roomId, message.getId());
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, ChatMessageResponse.from(message, unReadCount));
+
+        // 웹소켓으로 메시지 전송
+        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId,
+                ChatMessageResponse.from(message, unReadCount));
         updateUnreadCount(message);
     }
 
@@ -189,9 +157,6 @@ public class WebSocketServiceImpl implements WebSocketService {
 
         member.updateLastReadMessageId(readRequest.getMessageId());
         chatRoomMemberRepository.save(member);
-
-        messagingTemplate.convertAndSend("/sub/chat/room/" + readRequest.getRoomId(),
-                new ReadStatus(readRequest.getRoomId(), readRequest.getUserId(), readRequest.getMessageId()));
     }
 
     private ChatRoom getChatRoom(int roomId) {
@@ -203,12 +168,13 @@ public class WebSocketServiceImpl implements WebSocketService {
         List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(message.getRoom().getId());
         for (ChatRoomMember member : members) {
             if (member.getUser().getId() != message.getSender().getId()) {
-                int unreadCount = chatMessageRepository.countUnreadMessages(
-                        message.getRoom().getId(),
-                        member.getLastReadMessageId()
-                );
+                // Redis에 안 읽은 메시지 수 증가
+                unreadMessageService.incrementUnreadCount(member.getUser().getId());
+
+                // 웹소켓으로 업데이트된 카운트 전송
+                int unreadCount = unreadMessageService.getUnreadCount(member.getUser().getId());
                 messagingTemplate.convertAndSend(
-                        "/sub/chat/unread/" + member.getUser().getId(),
+                        "/sub/chat/" + member.getUser().getId() + "/count",
                         unreadCount
                 );
             }
