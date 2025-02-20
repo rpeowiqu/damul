@@ -130,7 +130,7 @@ const HomePage = () => {
           return (
             <div className="relative w-full" key={`${storage}${Math.random()}`}>
               {(storage === "freezer" || storage === "fridge") && (
-                <RefrigeratorDoor />
+                <RefrigeratorDoor storage={storage} />
               )}
               <IngredientStorageContainer
                 title={storage as keyof IngredientData}
