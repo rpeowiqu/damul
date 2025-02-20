@@ -15,26 +15,10 @@ import {
 } from "@/constants/initialData";
 import { EXPIRINGSOON_DAY } from "@/constants/itemStatus";
 import RefrigeratorDoor from "@/components/home/RefrigeratorDoor";
-import { useQuery } from "@tanstack/react-query";
 
 const HomePage = () => {
-  // const [ingredientData, setIngredientData] =
-  //   useState<IngredientData>(initialIngrdientData);
-
-  const {
-    data: ingredientData = initialIngrdientEmptyData,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: ["ingredientData"],
-    queryFn: async () => {
-      const response = await getUserIndegredient();
-      if (response.status === 204) return initialIngrdientEmptyData;
-      return response.data;
-    },
-    staleTime: 1000 * 60 * 5,
-  });
+  const [ingredientData, setIngredientData] =
+    useState<IngredientData>(initialIngrdientData);
 
   const [expiringSoonItems, setExpiringSoonItems] = useState<Ingredient[]>(
     initialIngrdientItems,
@@ -51,33 +35,33 @@ const HomePage = () => {
     setIsEditMode((prev) => !prev);
   };
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await getUserIndegredient();
-  //       if (response.status === 204) {
-  //         setIngredientData(initialIngrdientEmptyData);
-  //       } else {
-  //         setIngredientData(response.data);
-  //       }
-  //       const expiringSoonData: Ingredient[] = Object.values(
-  //         response.data as IngredientData,
-  //       )
-  //         .flat()
-  //         .filter((ingredient: Ingredient) => {
-  //           return (
-  //             ingredient.expirationDate <= EXPIRINGSOON_DAY &&
-  //             ingredient.expirationDate >= 0
-  //           );
-  //         });
-  //       setExpiringSoonItems(expiringSoonData);
-  //     } catch (err: any) {
-  //       console.log("식자재 정보를 받지 못했습니다.");
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getUserIndegredient();
+        if (response.status === 204) {
+          setIngredientData(initialIngrdientEmptyData);
+        } else {
+          setIngredientData(response.data);
+        }
+        const expiringSoonData: Ingredient[] = Object.values(
+          response.data as IngredientData,
+        )
+          .flat()
+          .filter((ingredient: Ingredient) => {
+            return (
+              ingredient.expirationDate <= EXPIRINGSOON_DAY &&
+              ingredient.expirationDate >= 0
+            );
+          });
+        setExpiringSoonItems(expiringSoonData);
+      } catch (err: any) {
+        console.log("식자재 정보를 받지 못했습니다.");
+      }
+    };
 
-  //   fetchData();
-  // }, []);
+    fetchData();
+  }, []);
 
   useEffect(() => {
     let filteredData = { ...ingredientData };
@@ -135,7 +119,7 @@ const HomePage = () => {
             title="expiringSoon"
             items={expiringSoonItems}
             onEdit={isEditMode}
-            // setIngredientData={setIngredientData}
+            setIngredientData={setIngredientData}
             setExpiringSoonItems={setExpiringSoonItems}
           />
         )}
@@ -155,7 +139,7 @@ const HomePage = () => {
                 }
                 onEdit={isEditMode}
                 setExpiringSoonItems={setExpiringSoonItems}
-                // setIngredientData={setIngredientData}
+                setIngredientData={setIngredientData}
               />
             </div>
           );
