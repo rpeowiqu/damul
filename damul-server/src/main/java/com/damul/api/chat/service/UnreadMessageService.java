@@ -40,7 +40,10 @@ public class UnreadMessageService {
         if (currentCount == null) {
             initializeUnreadCount(userId);
         } else {
-            redisTemplate.opsForValue().decrement(key, decrementCount);
+            int currentValue = Integer.parseInt(currentCount);
+            // 음수가 되지 않도록 방지
+            int newValue = Math.max(0, currentValue - decrementCount);
+            redisTemplate.opsForValue().set(key, String.valueOf(newValue));
         }
     }
 
