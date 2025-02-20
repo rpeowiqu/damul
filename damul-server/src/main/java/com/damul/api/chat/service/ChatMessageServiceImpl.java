@@ -108,7 +108,7 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
 
         int lastReadMessageId = chatRoomMemberRepository.findLastReadMessageIdByUserIdAndRoomId(userId, roomId);
         log.info("유저의 해당 방 lastReadMessageId: {}", lastReadMessageId);
-        List<ChatMessage> messages = fetchMessages(roomId, cursor, size, lastReadMessageId);
+        List<ChatMessage> messages = fetchMessages(roomId, cursor, size);
 
         if (messages.isEmpty()) {
             return createEmptyResponse();
@@ -265,7 +265,7 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         );
     }
 
-    private List<ChatMessage> fetchMessages(int roomId, int cursor, int size, int lastReadMessageId) {
+    private List<ChatMessage> fetchMessages(int roomId, int cursor, int size) {
         Pageable pageable = PageRequest.of(0, size + 1);
 
         if (cursor == 0) { // 초기 로딩
