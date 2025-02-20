@@ -32,34 +32,11 @@ module.exports = {
           "75%": { transform: "rotate(2deg)" },
           "100%": { transform: "rotate(0deg)" },
         },
-        shine: {
-          "0%": {
-            transform: "translate(120%, 120%) rotate(45deg)",
-            opacity: "0.1",
-          },
-          "25%": {
-            transform: "translate(60%, 60%) rotate(15deg)",
-            opacity: "0.3",
-          },
-          "50%": {
-            transform: "translate(30%, 30%) rotate(0deg)",
-            opacity: "0.7",
-          },
-          "75%": {
-            transform: "translate(10%, 10%) rotate(-15deg)",
-            opacity: "0.5",
-          },
-          "100%": {
-            transform: "translate(0%, 0%) rotate(-45deg)",
-            opacity: "0.1",
-          },
-        },
       },
       animation: {
         shiver: "shiver 0.2s infinite",
         wind: "wind 3s infinite",
         wave: "wave 0.5s infinite ease-in-out",
-        shine: "shine 1s ease-in-out infinite",
       },
       borderRadius: {
         lg: "var(--radius)",

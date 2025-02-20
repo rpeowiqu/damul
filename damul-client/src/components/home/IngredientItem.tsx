@@ -73,7 +73,7 @@ const IngredientItem = ({
   }, [ingredientData]);
 
   return (
-    <div className="flex border-1 p-4 rounded-lg gap-5 w-full">
+    <div className="flex border-1 p-4 rounded-lg gap-5 w-full h-60">
       <div className="flex justify-center items-center px-2">
         <button
           type="button"

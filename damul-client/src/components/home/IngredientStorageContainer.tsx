@@ -165,8 +165,8 @@ const IngredientStorageContainer = ({
         </p>
       </div>
       {ingredients.length === 0 ? (
-        <div className="flex h-10 w-full items-center justify-center">
-          식자재가 없습니다.
+        <div className="flex h-10 w-full items-center justify-center text-normal-200">
+          등록된 식자재가 없습니다.
         </div>
       ) : (
         <>

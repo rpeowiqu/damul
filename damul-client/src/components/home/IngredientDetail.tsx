@@ -39,7 +39,6 @@ const InfoRow = ({
 
 const getExpirationDate = (expirationDate: number): string => {
   const expiration = new Date();
-  console.log(expiration);
   expiration.setDate(expiration.getDate() + expirationDate);
 
   return expiration
@@ -120,17 +119,15 @@ const IngredientDetail = ({
       </p>
 
       <div className="flex items-center justify-center w-full gap-4">
-        <div
-          className={`relative flex items-center justify-center w-full h-full rounded-full border-2 border-normal-50 ${selectedIngredient.expirationDate < 0 && "border-negative-500"}`}
-        >
+        <div className="relative flex items-center justify-center w-full h-full rounded-full border-2 border-normal-50">
           {selectedIngredient.expirationDate >= 0 &&
             selectedIngredient.expirationDate <= EXPIRINGSOON_DAY && (
-              <AlertCircleIcon className="animate-pulse absolute size-14 top-0 left-0 stroke-negative-500" />
+              <AlertCircleIcon className="animate-pulse absolute size-12 top-0 left-0 stroke-negative-500" />
             )}
           {selectedIngredient.expirationDate < 0 && (
-            <CancelIcon className="fill-negative-500 animate-pulse absolute size-14 top-0 left-0" />
+            <CancelIcon className="fill-negative-500 animate-pulse absolute size-12 top-0 left-0" />
           )}
-          <IconComponent className="size-40 p-6 max-h-40" />
+          <IconComponent className="size-32 p-6 max-h-40" />
         </div>
 
         <div className="flex flex-col w-full gap-3">
