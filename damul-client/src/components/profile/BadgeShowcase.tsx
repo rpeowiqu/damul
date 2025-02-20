@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 
 import Badge from "./Badge";
 import DamulModal from "../common/DamulModal";
@@ -7,6 +7,7 @@ import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getBadge } from "@/service/profile";
+import useOverlayStore from "@/stores/overlayStore";
 
 interface BadgeShowcaseProps {
   list: BadgeBasic[];
@@ -16,7 +17,10 @@ interface BadgeShowcaseProps {
 const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
   const { userId } = useParams();
   const [currentBadgeIndex, setCurrentBadgeIndex] = useState(-1);
-  const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentBadgeIndex(-1));
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("BadgeShowcase");
+
+  useCloseOnBack("BadgeShowcase");
 
   const sortedList = useMemo(() => {
     return [...list].sort((a, b) => {
@@ -35,7 +39,6 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
     const badge = sortedList[currentBadgeIndex];
     return list.findIndex((b) => b.badgeId === badge.badgeId);
   }, [currentBadgeIndex, sortedList, list]);
-
   const badgeId = originalIndex > -1 ? list[originalIndex].badgeId : null;
   const { data, isLoading } = useQuery<BadgeDetail>({
     queryKey: ["badge", userId, badgeId],
@@ -50,10 +53,6 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
     refetchOnWindowFocus: false,
     enabled: !!badgeId,
   });
-
-  useEffect(() => {
-    setIsOpen(currentBadgeIndex > -1 ? true : false);
-  }, [currentBadgeIndex]);
 
   const selectedBadge = data ?? {
     id: 0,
@@ -77,6 +76,7 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
               {...badge}
               onClick={() => {
                 setCurrentBadgeIndex(index);
+                openOverlay("BadgeShowcase");
               }}
             />
           ))}
@@ -89,56 +89,54 @@ const BadgeShowcase = ({ list, sortType }: BadgeShowcaseProps) => {
         </p>
       )}
 
-      {currentBadgeIndex > -1 && !isLoading && (
-        <DamulModal
-          isOpen={isOpen}
-          onOpenChange={() => {
-            if (isOpen) {
-              history.back();
-            }
-          }}
-          title={"뱃지 상세보기"}
-          contentStyle="pc:max-w-80"
-        >
-          <div className="flex flex-col justify-center gap-5 px-3">
-            <div className="flex items-center gap-3">
-              <div className="flex justify-center items-center w-20 h-20 pt-2 rounded-full border-2 border-normal-100">
-                <Badge badgeLevel={selectedBadge.level} />
-              </div>
-
-              <div className="flex flex-col gap-2 flex-1">
-                <div>
-                  <p className="text-xs text-positive-400">뱃지명</p>
-                  <p className="text-sm text-normal-600 font-bold">
-                    {selectedBadge.title} (Lv.{selectedBadge.level})
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-positive-400">획득일</p>
-                  <p className="text-sm text-normal-600 font-bold">
-                    {new Date(selectedBadge.createdAt).toLocaleDateString(
-                      "ko-KR",
-                    )}
-                  </p>
-                </div>
-              </div>
+      <DamulModal
+        isOpen={!isLoading && isOpenOverlay}
+        onOpenChange={() => {
+          if (isOpenOverlay) {
+            history.back();
+          }
+        }}
+        title={"뱃지 상세보기"}
+        contentStyle="pc:max-w-80"
+      >
+        <div className="flex flex-col justify-center gap-5 px-3">
+          <div className="flex items-center gap-3">
+            <div className="flex justify-center items-center w-20 h-20 pt-2 rounded-full border-2 border-normal-100">
+              <Badge badgeLevel={selectedBadge.level} />
             </div>
 
-            <div className="text-center">
-              <p className="text-base text-normal-600 font-black">
-                {selectedBadge.description}
-              </p>
-              <p className="text-sm text-positive-400">
-                상위 {selectedBadge.rank}%가 이 뱃지를 획득했어요.
-              </p>
+            <div className="flex flex-col gap-2 flex-1">
+              <div>
+                <p className="text-xs text-positive-400">뱃지명</p>
+                <p className="text-sm text-normal-600 font-bold">
+                  {selectedBadge.title} (Lv.{selectedBadge.level})
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-positive-400">획득일</p>
+                <p className="text-sm text-normal-600 font-bold">
+                  {new Date(selectedBadge.createdAt).toLocaleDateString(
+                    "ko-KR",
+                  )}
+                </p>
+              </div>
             </div>
+          </div>
 
-            <p className="text-center text-sm text-normal-300">
-              “{selectedBadge.catchPhrase}”
+          <div className="text-center">
+            <p className="text-base text-normal-600 font-black">
+              {selectedBadge.description}
+            </p>
+            <p className="text-sm text-positive-400">
+              상위 {selectedBadge.rank}%가 이 뱃지를 획득했어요.
             </p>
           </div>
-        </DamulModal>
-      )}
+
+          <p className="text-center text-sm text-normal-300">
+            “{selectedBadge.catchPhrase}”
+          </p>
+        </div>
+      </DamulModal>
     </div>
   );
 };

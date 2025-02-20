@@ -30,9 +30,8 @@ const CommentsSection = ({
 }: CommentsSectionProps) => {
   // 최상위 댓글(대댓글이 아닌 댓글)만 필터링
   const topLevelComments = comments.filter((c) => !c.parentId);
-  const { data, isLoading: authLoading } = useAuth();
+  const { data, isLoading } = useAuth();
   const { sendEnterRoom } = useStompClient({ roomId: chatRoomId ?? 0 });
-
   const navigate = useNavigate();
 
   const handleEnterRoom = () => {
@@ -68,6 +67,10 @@ const CommentsSection = ({
       );
     }
   };
+
+  if (isLoading) {
+    return;
+  }
 
   return (
     <div className="py-3 text-start">

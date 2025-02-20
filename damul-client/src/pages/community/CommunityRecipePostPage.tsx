@@ -12,6 +12,7 @@ import DamulButton from "@/components/common/DamulButton";
 import { Ingredient, OrderProps } from "@/types/community";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { postRecipe, putRecipe, getRecipeDetail } from "@/service/recipe";
+import useOverlayStore from "@/stores/overlayStore";
 
 const CommunityRecipePostPage = () => {
   const navigate = useNavigate();
@@ -30,11 +31,14 @@ const CommunityRecipePostPage = () => {
   const [orders, setOrders] = useState<OrderProps[]>([]);
   const [tempOrders, setTempOrders] = useState<OrderProps[]>([]);
   const [currentDrawerIndex, setCurrentDrawerIndex] = useState<number>(-1);
-  const [isOpen, setIsOpen] = useCloseOnBack(() => setCurrentDrawerIndex(-1));
+  const { overlaySet, openOverlay } = useOverlayStore();
+  const isOpenOverlay = overlaySet.has("CommunityRecipePostPage");
+
+  useCloseOnBack("CommunityRecipePostPage", () => setCurrentDrawerIndex(-1));
 
   useEffect(() => {
     if (currentDrawerIndex > -1) {
-      setIsOpen(true);
+      openOverlay("CommunityRecipePostPage");
     }
   }, [currentDrawerIndex]);
 
@@ -126,9 +130,9 @@ const CommunityRecipePostPage = () => {
       </div>
       <div className="flex flex-col gap-5">
         <DamulDrawer
-          isOpen={currentDrawerIndex === 0}
+          isOpen={isOpenOverlay && currentDrawerIndex === 0}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
@@ -156,9 +160,9 @@ const CommunityRecipePostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(0)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 1}
+          isOpen={isOpenOverlay && currentDrawerIndex === 1}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
@@ -183,9 +187,9 @@ const CommunityRecipePostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(1)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 2}
+          isOpen={isOpenOverlay && currentDrawerIndex === 2}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
@@ -213,9 +217,9 @@ const CommunityRecipePostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(2)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 3}
+          isOpen={isOpenOverlay && currentDrawerIndex === 3}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}
@@ -239,9 +243,9 @@ const CommunityRecipePostPage = () => {
           onTriggerClick={() => setCurrentDrawerIndex(3)}
         />
         <DamulDrawer
-          isOpen={currentDrawerIndex === 4}
+          isOpen={isOpenOverlay && currentDrawerIndex === 4}
           onOpenChange={() => {
-            if (isOpen) {
+            if (isOpenOverlay) {
               history.back();
             }
           }}

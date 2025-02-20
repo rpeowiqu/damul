@@ -92,7 +92,9 @@ const CommunityRecipeMainPage = () => {
       <DamulInfiniteScrollList
         queryKey={["recipes", orderType]}
         fetchFn={fetchItems}
-        renderItems={(item: RecipeItem) => <RecipeFeedCard {...item} />}
+        renderItems={(item: RecipeItem) => (
+          <RecipeFeedCard key={item.id} {...item} />
+        )}
         skeleton={
           <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
         }
