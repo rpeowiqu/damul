@@ -8,6 +8,7 @@ import com.damul.api.mypage.entity.UserBadge;
 import com.damul.api.mypage.repository.BadgeRepository;
 import com.damul.api.mypage.repository.FoodPreferenceRepository;
 import com.damul.api.mypage.repository.UserBadgeRepository;
+import com.damul.api.post.dto.PostStatus;
 import com.damul.api.post.repository.PostRepository;
 import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.user.repository.FollowRepository;
@@ -69,8 +70,8 @@ public class BadgeService {
      * 2. DB 부하를 고려하여 PriceBatchService 실행 시간과 겹치지 않게 조정 필요
      */
     @Async
-    @Scheduled(cron = "0 0 17 * * *")  // UTC 17:00 = KST 02:00
-//    @Scheduled(cron = "0 0 7 * * *")  // UTC 06:55 = KST 15:55
+    @Scheduled(cron = "0 15 16 * * *")  // UTC 17:00 = KST 02:00
+//    @Scheduled(cron = "0 30 12 * * *")
     public void checkAndAwardBadges() {
         // Redis 분산 락 설정
         String lockKey = String.format(BATCH_LOCK_KEY, "daily");
@@ -191,7 +192,7 @@ public class BadgeService {
             }
 
             // 게시글 수
-            Integer postCount = postRepository.countByUser_IdAndStatus(user.getId(), "ACTIVE");
+            Integer postCount = postRepository.countByUser_IdAndStatus(user.getId(), PostStatus.ACTIVE);
             badgeTypeUserAchievements.get("Divider").put(user.getId(), postCount);
 
             // 레시피 수
@@ -304,6 +305,8 @@ public class BadgeService {
                 UserBadge userBadge = sameLevelBadges.get(i);
                 // 상위 퍼센트 계산 (0~100 범위, 낮을수록 상위)
                 double percentileRank = (double) i / totalUsersWithLevel * 100.0;
+                // 소숫점 둘째자리까지 반올림
+                percentileRank = Math.round(percentileRank * 100.0) / 100.0;
                 userBadge.updateRank(percentileRank);
             }
 
@@ -356,7 +359,7 @@ public class BadgeService {
     }
 
     private void checkPostBadges(User user, Map<Integer, Integer> userAchievements) {
-        Integer sharePostCount = postRepository.countByUser_IdAndStatus(user.getId(), "ACTIVE");
+        Integer sharePostCount = postRepository.countByUser_IdAndStatus(user.getId(), PostStatus.ACTIVE);
 
         short[] standards = {1, 10, 50, 100, 500};
         for (short standard : standards) {

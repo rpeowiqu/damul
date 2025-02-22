@@ -14,11 +14,11 @@ spring:
     redis:
       time-to-live: 86400000  # 24시간(밀리초 단위)
       cache-null-values: false
-    task:
-      scheduling:
-        pool:
-          size: 5  # 스케줄링 스레드 풀 크기
-        thread-name-prefix: schedule-task-  # 스케줄링 스레드 이름 접두사
+  task:
+    scheduling:
+      pool:
+        size: 5  # 스케줄링 스레드 풀 크기
+      thread-name-prefix: schedule-task-  # 스케줄링 스레드 이름 접두사
 
   batch:
     jdbc:

@@ -32,12 +32,11 @@ public class SseService {
 
     public SseEmitter createEmitter(int userId) {
         String redisKey = SSE_KEY_PREFIX + userId;
+        removeEmitter(userId);
+
         SseEmitter emitter = new SseEmitter(TIMEOUT);
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-
         try {
-            SecurityContextHolder.setContext(securityContext);
             emitter.send(SseEmitter.event()
                     .name("connect")
                     .data("")
@@ -113,6 +112,20 @@ public class SseService {
     public void sendToClient(int userId, Object data) {
         String redisKey = SSE_KEY_PREFIX + userId;
 
+        // Redis와 로컬 emitter 둘 다 확인
+        boolean redisKeyExists = redisTemplate.hasKey(redisKey);
+        boolean localEmitterExists = localEmitters.containsKey(userId);
+
+        log.info("메시지 전송 시도 - userId: {}, Redis 키 존재: {}, 로컬 Emitter 존재: {}",
+                userId, redisKeyExists, localEmitterExists);
+
+        // 상태 불일치 감지 및 처리
+        if (redisKeyExists && !localEmitterExists) {
+            log.warn("상태 불일치 감지: Redis 키는 있지만 로컬 Emitter 없음 - 키 정리");
+            redisTemplate.delete(redisKey);
+            return;
+        }
+
         // Redis에서 연결 정보 확인
         EmitterInfo emitterInfo = (EmitterInfo) redisTemplate.opsForValue().get(redisKey);
         if (emitterInfo == null) {
@@ -124,32 +137,27 @@ public class SseService {
         SseEmitter emitter = localEmitters.get(userId);
         if (emitter != null) {
             try {
-                // Object를 JSON 문자열로 변환
-                String jsonData;
+                // 이미 JSON 문자열인 경우는 변환하지 않음
                 if (data instanceof String) {
-                    jsonData = (String) data;
+                    emitter.send(SseEmitter.event()
+                            .name("image")
+                            .data(data));
                 } else {
-                    try {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        jsonData = objectMapper.writeValueAsString(data);
-                    } catch (JsonProcessingException e) {
-                        log.error("JSON 변환 실패 - userId: {}", userId, e);
-                        jsonData = "{\"error\":\"데이터 변환 실패\"}";
-                    }
+                    // JSON 변환 필요한 경우
+                    emitter.send(SseEmitter.event()
+                            .name("image")
+                            .data(data)); // 여기서 변환하지 않고 Spring이 알아서 변환하도록 함
                 }
 
-                emitter.send(SseEmitter.event()
-                        .name("image")
-                        .data(jsonData));
-                log.info("OCR 결과 전송 성공 - userId: {}", userId);
-
+                log.info("데이터 전송 성공 - userId: {}", userId);
                 // TTL 갱신
                 redisTemplate.expire(redisKey, TIMEOUT, TimeUnit.MILLISECONDS);
             } catch (IOException e) {
-                log.error("OCR 결과 전송 실패 - userId: {}", userId, e);
+                log.error("데이터 전송 실패 - userId: {}", userId, e);
                 emitter.complete();
                 removeEmitter(userId);
             }
+
         }
     }
 
