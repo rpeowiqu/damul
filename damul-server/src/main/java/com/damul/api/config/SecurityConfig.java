@@ -7,6 +7,7 @@ import com.damul.api.auth.oauth2.handler.OAuth2FailureHandler;
 import com.damul.api.auth.oauth2.handler.OAuth2SuccessHandler;
 import com.damul.api.auth.oauth2.service.CustomOAuth2UserService;
 import com.damul.api.auth.util.CookieUtil;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -144,6 +146,11 @@ public class SecurityConfig {
         return source;
     }
 
+    @PostConstruct
+    public void enableSecurityContextPropagation() {
+        // 비동기 스레드에서 SecurityContext 상속 가능하도록 설정
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+    }
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {

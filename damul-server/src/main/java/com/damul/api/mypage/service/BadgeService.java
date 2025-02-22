@@ -26,9 +26,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -92,6 +91,9 @@ public class BadgeService {
             log.info("배지 배치 업데이트 시작");
             List<User> users = userRepository.findAll();
 
+            // 각 뱃지 타입별 사용자 달성 데이터 수집
+            Map<String, Map<Integer, Integer>> badgeTypeUserAchievements = collectUserAchievements(users);
+
             // 사용자 목록을 BATCH_SIZE 단위로 분할하여 처리
             // 메모리 사용량 제어 및 DB 부하 분산
             for (int i = 0; i < users.size(); i += BATCH_SIZE) {
@@ -102,7 +104,7 @@ public class BadgeService {
                 // 한 사용자의 실패가 다른 사용자 처리에 영향을 주지 않도록 예외 처리
                 for (User user : batchUsers) {
                     try {
-                        processUserBadges(user);
+                        processUserBadges(user, badgeTypeUserAchievements);
                     } catch (Exception e) {
                         log.error("사용자({}) 배지 업데이트 실패: {}", user.getId(), e.getMessage());
                     }
@@ -122,6 +124,9 @@ public class BadgeService {
                 }
             }
 
+            // 랭크 업데이트 - 모든 배지 타입에 대해 수행
+            updateAllBadgeRanks();
+
             log.info("배지 배치 업데이트 완료");
         } catch (Exception e) {
             log.error("배지 배치 처리 실패: {}", e.getMessage());
@@ -134,16 +139,84 @@ public class BadgeService {
     }
 
     /**
+     * 모든 사용자의 달성 데이터를 수집하여 배지 타입별로 맵에 저장
+     * 이 데이터는 랭크 계산에 사용됨
+     */
+    private Map<String, Map<Integer, Integer>> collectUserAchievements(List<User> users) {
+        Map<String, Map<Integer, Integer>> badgeTypeUserAchievements = new HashMap<>();
+
+        // 초기화: 모든 배지 타입에 대한 맵 생성
+        badgeTypeUserAchievements.put("다믈랭과의 인연", new HashMap<>());
+        badgeTypeUserAchievements.put("넌 부화할 수 없다", new HashMap<>());
+        badgeTypeUserAchievements.put("목표키 2m", new HashMap<>());
+        badgeTypeUserAchievements.put("과즙팡팡", new HashMap<>());
+        badgeTypeUserAchievements.put("육식 공룡", new HashMap<>());
+        badgeTypeUserAchievements.put("나는 자연인이다", new HashMap<>());
+        badgeTypeUserAchievements.put("포세이돈", new HashMap<>());
+        badgeTypeUserAchievements.put("간장공장공장장", new HashMap<>());
+        badgeTypeUserAchievements.put("미끄러짐 주의", new HashMap<>());
+        badgeTypeUserAchievements.put("농부의 피땀을 아는 자", new HashMap<>());
+        badgeTypeUserAchievements.put("줏대없는 자취생", new HashMap<>());
+        badgeTypeUserAchievements.put("Divider", new HashMap<>());
+        badgeTypeUserAchievements.put("레시퍼", new HashMap<>());
+        badgeTypeUserAchievements.put("인싸의 길", new HashMap<>());
+
+        // 각 사용자별로 달성 데이터 수집
+        for (User user : users) {
+            // 가입일 기준
+            long daysSinceJoin = ChronoUnit.DAYS.between(user.getCreatedAt().toLocalDate(), LocalDate.now());
+            badgeTypeUserAchievements.get("다믈랭과의 인연").put(user.getId(), (int) daysSinceJoin);
+
+            // 식재료 카테고리별
+            Map<Integer, String> categoryBadges = Map.of(
+                    6, "넌 부화할 수 없다",  // 달걀류
+                    4, "목표키 2m",        // 유제품
+                    3, "과즙팡팡",         // 과일
+                    5, "육식 공룡",        // 육류
+                    2, "나는 자연인이다",   // 채소
+                    7, "포세이돈",         // 수산물
+                    9, "간장공장공장장",    // 양념
+                    8, "미끄러짐 주의",     // 기름
+                    1, "농부의 피땀을 아는 자", // 곡물
+                    10, "줏대없는 자취생"    // 기타
+            );
+
+            for (Map.Entry<Integer, String> entry : categoryBadges.entrySet()) {
+                Optional<com.damul.api.mypage.entity.FoodPreference> preference =
+                        foodPreferenceRepository.findByUserIdAndCategoryId(user.getId(), entry.getKey());
+                if (preference.isPresent()) {
+                    badgeTypeUserAchievements.get(entry.getValue())
+                            .put(user.getId(), preference.get().getCategoryPreference());
+                }
+            }
+
+            // 게시글 수
+            Integer postCount = postRepository.countByUser_IdAndStatus(user.getId(), "ACTIVE");
+            badgeTypeUserAchievements.get("Divider").put(user.getId(), postCount);
+
+            // 레시피 수
+            Integer recipeCount = recipeRepository.countByUser_IdAndDeletedFalse(user.getId());
+            badgeTypeUserAchievements.get("레시퍼").put(user.getId(), recipeCount);
+
+            // 팔로워 수
+            Integer followerCount = followRepository.countByFollowingId(user.getId());
+            badgeTypeUserAchievements.get("인싸의 길").put(user.getId(), followerCount);
+        }
+
+        return badgeTypeUserAchievements;
+    }
+
+    /**
      * 단일 사용자에 대한 모든 종류의 배지 검사 및 수여
      * 각 배지 타입별로 독립적으로 처리되어 한 배지 처리 실패가
      * 다른 배지 처리에 영향을 주지 않음
      */
-    private void processUserBadges(User user) {
-        checkJoinDayBadge(user);          // 가입일 기준 배지
-        checkIngredientCategoryBadges(user); // 식재료 카테고리별 배지
-        checkPostBadges(user);            // 게시글 수 기준 배지
-        checkRecipeBadges(user);          // 레시피 수 기준 배지
-        checkFollowerBadge(user);         // 팔로워 수 기준 배지
+    private void processUserBadges(User user, Map<String, Map<Integer, Integer>> badgeTypeUserAchievements) {
+        checkJoinDayBadge(user, badgeTypeUserAchievements.get("다믈랭과의 인연"));
+        checkIngredientCategoryBadges(user, badgeTypeUserAchievements);
+        checkPostBadges(user, badgeTypeUserAchievements.get("Divider"));
+        checkRecipeBadges(user, badgeTypeUserAchievements.get("레시퍼"));
+        checkFollowerBadge(user, badgeTypeUserAchievements.get("인싸의 길"));
     }
 
     /**
@@ -182,7 +255,64 @@ public class BadgeService {
         }
     }
 
-    private void checkJoinDayBadge(User user) {
+    /**
+     * 모든 배지 타입에 대해 랭크 업데이트 수행
+     */
+    private void updateAllBadgeRanks() {
+        log.info("배지 랭크 업데이트 시작");
+
+        // 모든 뱃지 타입 목록 가져오기
+        List<String> badgeTitles = badgeRepository.findDistinctTitles();
+
+        for (String badgeTitle : badgeTitles) {
+            try {
+                updateBadgeRanks(badgeTitle);
+            } catch (Exception e) {
+                log.error("배지 {} 랭크 업데이트 실패: {}", badgeTitle, e.getMessage());
+            }
+        }
+
+        log.info("배지 랭크 업데이트 완료");
+    }
+
+    /**
+     * 특정 배지 타입에 대한 랭크 업데이트
+     * 각 사용자의 상위 퍼센트 계산 및 저장
+     */
+    private void updateBadgeRanks(String badgeTitle) {
+        // 해당 배지를 가진 모든 사용자의 배지 조회
+        List<UserBadge> userBadges = userBadgeRepository.findAllByBadge_Title(badgeTitle);
+        if (userBadges.isEmpty()) {
+            return;
+        }
+
+        // 배지 레벨별로 그룹화
+        Map<Integer, List<UserBadge>> badgesByLevel = userBadges.stream()
+                .collect(Collectors.groupingBy(ub -> ub.getBadge().getLevel()));
+
+        // 각 레벨별로 랭크 계산 및 업데이트
+        for (Map.Entry<Integer, List<UserBadge>> entry : badgesByLevel.entrySet()) {
+            int level = entry.getKey();
+            List<UserBadge> sameLevelBadges = entry.getValue();
+            int totalUsersWithLevel = sameLevelBadges.size();
+
+            // 획득 시간 기준 정렬 (빠를수록 높은 랭크)
+            sameLevelBadges.sort(Comparator.comparing(UserBadge::getCreatedAt));
+
+            // 각 사용자의 랭크 계산 및 업데이트
+            for (int i = 0; i < totalUsersWithLevel; i++) {
+                UserBadge userBadge = sameLevelBadges.get(i);
+                // 상위 퍼센트 계산 (0~100 범위, 낮을수록 상위)
+                double percentileRank = (double) i / totalUsersWithLevel * 100.0;
+                userBadge.updateRank(percentileRank);
+            }
+
+            log.info("배지 {} 레벨 {} 랭크 업데이트 완료 (총 {} 명)",
+                    badgeTitle, level, totalUsersWithLevel);
+        }
+    }
+
+    private void checkJoinDayBadge(User user, Map<Integer, Integer> userAchievements) {
         long daysSinceJoin = ChronoUnit.DAYS.between(user.getCreatedAt().toLocalDate(), LocalDate.now());
 
         short[] standards = {1, 10, 50, 100, 500};
@@ -193,7 +323,7 @@ public class BadgeService {
         }
     }
 
-    private void checkIngredientCategoryBadges(User user) {
+    private void checkIngredientCategoryBadges(User user, Map<String, Map<Integer, Integer>> badgeTypeUserAchievements) {
         Map<Integer, String> categoryBadges = Map.of(
                 6, "넌 부화할 수 없다",  // 달걀류
                 4, "목표키 2m",        // 유제품
@@ -208,22 +338,24 @@ public class BadgeService {
         );
 
         for (Map.Entry<Integer, String> entry : categoryBadges.entrySet()) {
-            Integer count = foodPreferenceRepository.findByUserIdAndCategoryId(
-                    user.getId(),
-                    entry.getKey())
-                    .get()
-                    .getCategoryPreference();
+            Optional<com.damul.api.mypage.entity.FoodPreference> preference =
+                    foodPreferenceRepository.findByUserIdAndCategoryId(
+                            user.getId(),
+                            entry.getKey());
 
-            short[] standards = {1, 10, 50, 100, 500};
-            for (short standard : standards) {
-                if (count >= standard) {
-                    awardBadge(user, entry.getValue(), standard);
+            if (preference.isPresent()) {
+                Integer count = preference.get().getCategoryPreference();
+                short[] standards = {1, 10, 50, 100, 500};
+                for (short standard : standards) {
+                    if (count >= standard) {
+                        awardBadge(user, entry.getValue(), standard);
+                    }
                 }
             }
         }
     }
 
-    private void checkPostBadges(User user) {
+    private void checkPostBadges(User user, Map<Integer, Integer> userAchievements) {
         Integer sharePostCount = postRepository.countByUser_IdAndStatus(user.getId(), "ACTIVE");
 
         short[] standards = {1, 10, 50, 100, 500};
@@ -234,7 +366,7 @@ public class BadgeService {
         }
     }
 
-    private void checkRecipeBadges(User user) {
+    private void checkRecipeBadges(User user, Map<Integer, Integer> userAchievements) {
         Integer recipeCount = recipeRepository.countByUser_IdAndDeletedFalse(user.getId());
 
         short[] standards = {1, 10, 50, 100, 500};
@@ -245,7 +377,7 @@ public class BadgeService {
         }
     }
 
-    private void checkFollowerBadge(User user) {
+    private void checkFollowerBadge(User user, Map<Integer, Integer> userAchievements) {
         Integer followerCount = followRepository.countByFollowingId(user.getId());
 
         short[] standards = {1, 10, 50, 100, 500};
