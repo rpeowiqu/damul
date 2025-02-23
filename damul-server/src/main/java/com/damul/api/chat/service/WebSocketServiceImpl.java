@@ -2,10 +2,7 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
-import com.damul.api.chat.dto.MemberRole;
-import com.damul.api.chat.dto.MessageType;
-import com.damul.api.chat.dto.ReadStatus;
-import com.damul.api.chat.dto.TypingStatus;
+import com.damul.api.chat.dto.*;
 import com.damul.api.chat.dto.request.ChatMessageCreate;
 import com.damul.api.chat.dto.request.ChatReadRequest;
 import com.damul.api.chat.dto.request.ChatTypingMessage;
@@ -24,12 +21,15 @@ import com.damul.api.config.service.S3Service;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -46,6 +46,9 @@ public class WebSocketServiceImpl implements WebSocketService {
     private final UserRepository userRepository;
     private final TimeZoneConverter timeZoneConverter;
     private final UnreadMessageService unreadMessageService;
+    private final RedisTemplate<String, ChatMessageRedisDTO> redisTemplate;
+
+    private static final String CHAT_MESSAGE_KEY = "chat:messages";
 
     @Override
     @Transactional
@@ -61,10 +64,20 @@ public class WebSocketServiceImpl implements WebSocketService {
         );
         message.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
-        chatMessageRepository.save(message);
-        int unReadCount = chatMessageRepository.countUnreadMessages(roomId, message.getId());
+        long startRedis = System.currentTimeMillis();
+        ChatMessageRedisDTO messageDTO = ChatMessageRedisDTO.from(message);
+        Long result = redisTemplate.opsForList().rightPush(CHAT_MESSAGE_KEY, messageDTO);
+        log.info("Redis Save Result: {}", result);
+        log.info("Message DTO: {}", messageDTO);  // 실제 저장하려는 데이터 확인
+        long endRedis = System.currentTimeMillis();
+        log.info("Redis Operation Time: {}ms", endRedis - startRedis);
+
+        int unReadCount = chatRoomMemberRepository.countMembersByRoomId(roomId) - 1;
+        long startWs = System.currentTimeMillis();
         messagingTemplate.convertAndSend("/sub/chat/room/" + roomId,
-                ChatMessageResponse.from(message, unReadCount));
+                messageDTO.toResponse(unReadCount));
+        long endWs = System.currentTimeMillis();
+        log.info("WebSocket Send Time: {}ms", endWs - startWs);
         updateUnreadCount(message);
     }
 
@@ -79,7 +92,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         message.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         chatMessageRepository.save(message);
-        int unReadCount = chatMessageRepository.countUnreadMessages(roomId, message.getId());
+        int unReadCount = chatRoomMemberRepository.countMembersByRoomId(roomId) - 1;
 
         // 웹소켓으로 메시지 전송
         messagingTemplate.convertAndSend("/sub/chat/room/" + roomId,
@@ -158,6 +171,30 @@ public class WebSocketServiceImpl implements WebSocketService {
 
         member.updateLastReadMessageId(lastReadMessageId);
         chatRoomMemberRepository.save(member);
+    }
+
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    public void saveMessagesFromRedis() {
+        List<ChatMessage> messages = new ArrayList<>();
+
+        while (true) {
+            ChatMessageRedisDTO messageDTO = (ChatMessageRedisDTO) redisTemplate.opsForList().leftPop(CHAT_MESSAGE_KEY);
+            if (messageDTO == null) break;
+            log.info("레디스에 저장된 메세지 저장");
+
+            // DTO를 엔티티로 변환
+            ChatRoom room = getChatRoom(messageDTO.getRoomId());
+            User sender = messageDTO.getSenderId() != null ?
+                    userRepository.getReferenceById(messageDTO.getSenderId()) : null;
+
+            ChatMessage message = messageDTO.toEntity(room, sender);
+            messages.add(message);
+        }
+
+        if (!messages.isEmpty()) {
+            chatMessageRepository.saveAll(messages);
+        }
     }
 
     private ChatRoom getChatRoom(int roomId) {
