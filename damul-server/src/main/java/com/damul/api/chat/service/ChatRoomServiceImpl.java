@@ -2,13 +2,9 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
 import com.damul.api.chat.dto.MemberRole;
-import com.damul.api.chat.dto.response.ChatCursorPageMetaInfo;
+import com.damul.api.chat.dto.response.*;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.MultiChatRoomCreate;
-import com.damul.api.chat.dto.response.ChatMember;
-import com.damul.api.chat.dto.response.ChatMembersResponse;
-import com.damul.api.chat.dto.response.ChatRoomLimitResponse;
-import com.damul.api.chat.dto.response.ChatRoomList;
 import com.damul.api.chat.entity.ChatMessage;
 import com.damul.api.chat.entity.ChatRoom;
 import com.damul.api.chat.entity.ChatRoomMember;
@@ -28,6 +24,7 @@ import com.damul.api.post.repository.PostRepository;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +49,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
     private final PostRepository postRepository;
     private final NotificationService notificationService;
     private final TimeZoneConverter timeZoneConverter;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     @Transactional(readOnly = true)
@@ -166,6 +164,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
 
         validateRoomId(roomId);
         validateUserId(userId);
+        User user = userRepository.findById(userId).get();
 
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND, "채팅방이 존재하지 않습니다."));
@@ -186,6 +185,14 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                     .map(ChatRoomMember::getNickname)
                     .collect(Collectors.joining(", "));
             chatRoom.updateRoomName(roomName);
+        }
+
+        if(chatRoom.getRoomType() != ChatRoom.RoomType.PRIVATE) {
+            ChatMessage leaveMessage = ChatMessage.createLeaveMessage(chatRoom, user);
+            leaveMessage.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
+            chatMessageRepository.save(leaveMessage);
+            int unReadCount = chatMessageRepository.countUnreadMessages(roomId, leaveMessage.getId());
+            messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, ChatMessageResponse.from(leaveMessage, unReadCount));
         }
 
         log.info("서비스: 채팅방 삭제 완료 - roomId: {}", roomId);
