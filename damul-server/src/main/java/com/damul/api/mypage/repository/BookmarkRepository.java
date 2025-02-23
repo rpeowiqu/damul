@@ -2,13 +2,11 @@ package com.damul.api.mypage.repository;
 
 import com.damul.api.mypage.dto.response.MyBookmarkList;
 import com.damul.api.mypage.entity.Bookmark;
-import com.damul.api.recipe.dto.response.RecipeList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
