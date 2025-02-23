@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class MyBookmarkList implements ScrollCursor  {
     @JsonIgnore
     private int bookmarkId;
-    private int recipeId;
+    private int id;
     private String title;
     private String thumbnailUrl;
     private String content;

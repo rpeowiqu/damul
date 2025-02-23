@@ -4,7 +4,7 @@ spring:
       - optional:classpath:.env[.properties]
       - optional:file:.env[.properties]
     profiles:
-      active: prod
+      active: local
 
   application:
     name: damul-server
@@ -123,8 +123,8 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     hikari:
-      maximum-pool-size: 2
-      minimum-idle: 1
+      maximum-pool-size: 10
+      minimum-idle: 5
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000

@@ -1,6 +1,8 @@
 package com.damul.api.config;
 
 
+import com.damul.api.chat.dto.ChatMessageRedisDTO;
+import com.damul.api.chat.entity.ChatMessage;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -102,6 +104,29 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(serializer);
         redisTemplate.setValueSerializer(serializer);
         redisTemplate.setHashKeySerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
+
+        return redisTemplate;
+    }
+
+    @Bean
+    public RedisTemplate<String, ChatMessageRedisDTO> chatMessageRedisTemplate() {
+        RedisTemplate<String, ChatMessageRedisDTO> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.activateDefaultTyping(
+                objectMapper.getPolymorphicTypeValidator(),
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+        );
+
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(serializer);
 
         return redisTemplate;

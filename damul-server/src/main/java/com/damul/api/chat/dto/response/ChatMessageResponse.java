@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatMessageResponse implements ScrollCursor {
 
-    private int id;                // 메시지 ID
-    private int roomId;           // 채팅방 ID
+    private Integer id;                // 메시지 ID
+    private Integer roomId;           // 채팅방 ID
     private Integer senderId;         // 발신자 ID
     private String profileImageUrl; // 프로필 이미지
     private String nickname;        // 발신자 닉네임
@@ -25,11 +25,11 @@ public class ChatMessageResponse implements ScrollCursor {
     private String content;         // 메시지 내용
     private String fileUrl;         // 파일 URL (있는 경우)
     private LocalDateTime createdAt; // 생성 시간
-    private int unReadCount;        // 안 읽은 사용자 수
+    private Integer unReadCount;        // 안 읽은 사용자 수
 
     public static ChatMessageResponse from(ChatMessage message, int unReadCount) {
         ChatMessageResponse.ChatMessageResponseBuilder builder = ChatMessageResponse.builder()
-                .id(message.getId())
+                .id(message.getId() == null ? 0 : message.getId())
                 .roomId(message.getRoom().getId())
                 .messageType(message.getMessageType())
                 .content(message.getContent())
