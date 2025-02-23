@@ -13,6 +13,7 @@ import { Ingredient, OrderProps } from "@/types/community";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { postRecipe, putRecipe, getRecipeDetail } from "@/service/recipe";
 import useOverlayStore from "@/stores/overlayStore";
+import DamulSection from "@/components/common/DamulSection";
 
 const CommunityRecipePostPage = () => {
   const navigate = useNavigate();
@@ -119,15 +120,16 @@ const CommunityRecipePostPage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col justify-between px-7 py-4 pc:p-6 gap-5">
-      <div className="flex gap-5">
-        <button className="font-black" onClick={() => history.back()}>
-          &lt;
-        </button>
-        <h1 className="text-lg sm:text-xl font-black text-normal-700">
-          나만의 레시피 작성
-        </h1>
-      </div>
+    <DamulSection
+      title={
+        <div className="flex items-center gap-3">
+          <button className="font-black" onClick={() => history.back()}>
+            &lt;
+          </button>
+          <h1>나만의 레시피 작성</h1>
+        </div>
+      }
+    >
       <div className="flex flex-col gap-5">
         <DamulDrawer
           isOpen={isOpenOverlay && currentDrawerIndex === 0}
@@ -288,7 +290,7 @@ const CommunityRecipePostPage = () => {
               : "레시피 작성하기"}
           </DamulButton>
         )}
-    </div>
+    </DamulSection>
   );
 };
 

@@ -34,6 +34,7 @@ const SignUpPage = () => {
     const fetchSignUpInfo = async () => {
       try {
         const response = await consent();
+
         if (response) {
           setEmail(response.data.email);
           setUserInfo({ ...userInfo, nickname: response.data.nickname });
@@ -76,7 +77,7 @@ const SignUpPage = () => {
     return null;
   }
 
-  return <div className="px-6 sm:px-10 py-8">{currentForm()}</div>;
+  return currentForm();
 };
 
 export default SignUpPage;

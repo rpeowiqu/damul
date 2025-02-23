@@ -10,6 +10,8 @@ import { getKSTISOString } from "@/utils/date";
 import { useChatAlarmStore } from "@/stores/alarmStore";
 import { useEffect } from "react";
 import queryClient from "@/utils/queryClient";
+import DamulSection from "@/components/common/DamulSection";
+import WriteIcon from "@/components/svg/WriteIcon";
 
 const ChattingMainPage = () => {
   const { chatCnt } = useChatAlarmStore();
@@ -48,8 +50,8 @@ const ChattingMainPage = () => {
   }, [chatCnt]);
 
   return (
-    <div className="h-full text-center py-6 space-y-2">
-      <div className="px-4 pc:px-6 space-y-2">
+    <div>
+      <DamulSection>
         <DamulSearchBox
           placeholder="채팅방 검색"
           onInputClick={() => {
@@ -58,20 +60,27 @@ const ChattingMainPage = () => {
           className="cursor-pointer"
         />
         <ChattingListInfo />
-        <PostButton to="/chatting/create" icon={"+"} />
-      </div>
-      <ChattingListInfiniteScroll
-        queryKey={["chattRooms", filterType]}
-        fetchFn={fetchItems}
-        renderItems={(item: ChattingItem) => <ChattingListItem {...item} />}
-        skeleton={
-          <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
-        }
-        noContent={
-          <p className="text-center text-normal-200">
-            참여중인 채팅방이 없습니다.
-          </p>
-        }
+
+        <ChattingListInfiniteScroll
+          queryKey={["chattRooms", filterType]}
+          fetchFn={fetchItems}
+          renderItems={(item: ChattingItem) => (
+            <ChattingListItem key={item.id} {...item} />
+          )}
+          skeleton={
+            <div className="h-12 mb-2 animate-pulse bg-normal-100 rounded" />
+          }
+          noContent={
+            <p className="text-center text-normal-200">
+              참여중인 채팅방이 없습니다.
+            </p>
+          }
+        />
+      </DamulSection>
+
+      <PostButton
+        to="/chatting/create"
+        icon=<WriteIcon className="scale-150 fill-positive-300" />
       />
     </div>
   );

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { getMyRecipes } from "@/service/profile";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
+import DamulSection from "@/components/common/DamulSection";
 
 interface RecipeItem {
   id: number;
@@ -53,14 +54,10 @@ const ProfileRecipePage = () => {
   };
 
   return (
-    <div className="flex flex-col gap-2 p-5 bg-white">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-lg font-bold">{user.nickname}님이 작성한 레시피</h1>
-        <p className="text-normal-600">
-          회원님이 직접 만들고 공유한 레시피들이에요.
-        </p>
-      </div>
-
+    <DamulSection
+      title={`${user.nickname}님이 작성한 레시피`}
+      description={"회원님이 직접 만들고 공유한 레시피들이에요."}
+    >
       <div className="flex justify-end">
         <Select
           value={sortType}
@@ -109,8 +106,9 @@ const ProfileRecipePage = () => {
             자신만의 노하우가 담긴 레시피를 작성하고 공유해보세요!
           </p>
         }
+        className="flex flex-col gap-2"
       />
-    </div>
+    </DamulSection>
   );
 };
 

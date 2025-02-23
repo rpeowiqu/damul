@@ -13,6 +13,7 @@ import RecipeFeedCard from "@/components/common/RecipeFeedCard";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import { getRecipes } from "@/service/recipe";
 import { RecipeItem } from "@/types/community";
+import DamulSection from "@/components/common/DamulSection";
 
 const CommunityRecipeSearchResultPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -58,7 +59,7 @@ const CommunityRecipeSearchResultPage = () => {
   };
 
   return (
-    <main className="h-full px-4 py-6 pc:px-6 space-y-2">
+    <DamulSection>
       <div className="flex-grow">
         <DamulSearchBox
           placeholder={keyword}
@@ -106,8 +107,9 @@ const CommunityRecipeSearchResultPage = () => {
         noContent={
           <p className="text-center text-normal-200">검색 결과가 없습니다.</p>
         }
+        className="flex flex-col gap-2"
       />
-    </main>
+    </DamulSection>
   );
 };
 

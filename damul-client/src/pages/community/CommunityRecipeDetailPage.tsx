@@ -9,6 +9,7 @@ import CommentsSection from "@/components/community/CommentsSection";
 import FixedCommentInfo from "@/components/community/FixedCommentInfo";
 import { getRecipeDetail } from "@/service/recipe";
 import { RecipeDetail, Comment } from "@/types/community";
+import DamulSection from "@/components/common/DamulSection";
 
 const CommunityRecipeDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
@@ -58,12 +59,8 @@ const CommunityRecipeDetailPage = () => {
   };
 
   return (
-    <div className="flex">
-      <main
-        className={`relative flex flex-col justify-center w-full text-center p-6 ${
-          replyingTo ? "pc:pb-24" : "pc:pb-6"
-        } mb-8`}
-      >
+    <div className={`flex flex-col gap-3 ${replyingTo ? "pb-28" : "pb-14"}`}>
+      <DamulSection>
         <CommunityDetailHeader
           title={data.title}
           createdAt={data.createdAt}
@@ -97,6 +94,8 @@ const CommunityRecipeDetailPage = () => {
           cookingOrders={data.cookingOrders}
           isLoading={isLoading}
         />
+      </DamulSection>
+      <DamulSection>
         <CommentsSection
           id={data.recipeId}
           comments={data.comments}
@@ -104,7 +103,7 @@ const CommunityRecipeDetailPage = () => {
           type="recipe"
           fetchDetailData={fetchRecipeDetail}
         />
-      </main>
+      </DamulSection>
       <FixedCommentInfo
         id={recipeId || ""}
         replyingTo={replyingTo}

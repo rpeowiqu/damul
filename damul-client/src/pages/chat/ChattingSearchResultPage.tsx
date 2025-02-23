@@ -7,6 +7,7 @@ import { getSearchedChattingList } from "@/service/chatting";
 import ChattingListInfiniteScroll from "@/components/chat/ChattingListInfiniteScroll";
 import ChattingListItem from "@/components/chat/ChattingListItem";
 import { ChattingItem } from "@/types/chatting";
+import DamulSection from "@/components/common/DamulSection";
 
 const ChattingSearchResultPage = () => {
   const navigate = useNavigate();
@@ -36,8 +37,8 @@ const ChattingSearchResultPage = () => {
   };
 
   return (
-    <main className="h-full text-center py-6 space-y-2">
-      <div className="px-4 space-y-4">
+    <div>
+      <DamulSection>
         <DamulSearchBox
           placeholder={keyword}
           onInputClick={() => {
@@ -52,22 +53,26 @@ const ChattingSearchResultPage = () => {
             {resultCnt}개의 검색 결과
           </div>
         </div>
-      </div>
-      <ChattingListInfiniteScroll
-        queryKey={["chattRooms"]}
-        fetchFn={fetchItems}
-        renderItems={(item: ChattingItem) => (
-          <ChattingListItem {...item} keyword={keyword} />
-        )}
-        skeleton={
-          <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
-        }
-        noContent={
-          <p className="text-center text-normal-200">검색 결과가 없습니다. </p>
-        }
-      />
+
+        <ChattingListInfiniteScroll
+          queryKey={["chattRooms"]}
+          fetchFn={fetchItems}
+          renderItems={(item: ChattingItem) => (
+            <ChattingListItem {...item} keyword={keyword} />
+          )}
+          skeleton={
+            <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
+          }
+          noContent={
+            <p className="text-center text-normal-200">
+              검색 결과가 없습니다.{" "}
+            </p>
+          }
+        />
+      </DamulSection>
+
       <PostButton to="/chatting/create" icon={<PlusIcon />} />
-    </main>
+    </div>
   );
 };
 

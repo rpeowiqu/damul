@@ -167,7 +167,7 @@ const IngredientDetail = ({
         <div className="flex justify-between w-full gap-2">
           <DamulButton
             variant="negative"
-            className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
+            className="w-full active:scale-95"
             onClick={handleDeleteClick}
           >
             <DeleteIcon />
@@ -176,7 +176,7 @@ const IngredientDetail = ({
           <DamulButton
             variant="positive"
             onClick={handleSaveClick}
-            className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
+            className="w-full active:scale-95"
           >
             <SaveIcon />
             <p className="text-xs pc:text-sm text-white">저장</p>

@@ -34,7 +34,7 @@ const RecipeFeedCard = ({
 
   return (
     <div
-      className="flex relative h-24 my-3 border border-normal-200 rounded-lg hover:border-positive-300 cursor-pointer"
+      className="flex relative h-24 border border-normal-200 rounded-lg hover:border-positive-300 cursor-pointer"
       onClick={() => {
         navigate(`/community/recipe/${id}`);
       }}

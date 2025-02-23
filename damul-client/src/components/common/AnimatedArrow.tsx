@@ -30,7 +30,7 @@ const arrowVariants = {
     hidden: { color: "#fd6c6c" },
     visible: {
       opacity: [0, 1, 0],
-      y: [10, 0],
+      y: [12, 7],
       transition: {
         duration: 1.5,
         repeat: Infinity,
@@ -42,7 +42,7 @@ const arrowVariants = {
     hidden: { color: "#60a5fa" },
     visible: {
       opacity: [0, 1, 0],
-      y: [0, 10],
+      y: [7, 12],
       transition: {
         duration: 1.5,
         repeat: Infinity,

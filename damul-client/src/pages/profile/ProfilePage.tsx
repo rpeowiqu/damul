@@ -80,7 +80,7 @@ const ProfilePage = () => {
         bgImageUrl={header.profileBackgroundImageUrl}
       />
       <DamulTab tabList={tabItems} />
-      <div className="flex-1 bg-normal-50">
+      <div className="flex-1">
         <Suspense fallback={<Loading />}>
           <Outlet context={{ user: header }} />
         </Suspense>

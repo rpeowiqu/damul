@@ -25,7 +25,7 @@ const IntroContent = () => {
   };
 
   return (
-    <div className="relative flex flex-col justify-center items-center flex-1 -mt-14 -mb-16">
+    <div className="relative flex flex-col justify-center items-center flex-1 bg-white">
       <img
         src={ingredientImage}
         className="absolute left-0 top-0 w-full object-cover mask-gradient opacity-20"

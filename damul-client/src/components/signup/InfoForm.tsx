@@ -18,6 +18,7 @@ import { UserInfo } from "@/pages/signup/SignUpPage";
 import GoogleIcon from "../svg/GoogleIcon";
 import KakaoIcon from "../svg/KakaoIcon";
 import NaverIcon from "../svg/NaverIcon";
+import DamulSection from "../common/DamulSection";
 
 interface InfoFormProps {
   email: string;
@@ -134,17 +135,18 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
   };
 
   return (
-    <div className="pt-10">
-      <div className="flex gap-5">
-        <button className="font-black" onClick={() => onPrev()}>
-          &lt;
-        </button>
-        <h1 className="text-lg sm:text-xl font-black text-normal-700">
-          회원 정보를 입력해 주세요.
-        </h1>
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-10 mt-10">
+    <DamulSection
+      title={
+        <div className="flex items-center gap-3">
+          <button className="font-black" onClick={() => onPrev()}>
+            &lt;
+          </button>
+          <h1>회원 정보를 입력해 주세요.</h1>
+        </div>
+      }
+      className="flex-1 pt-28"
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-8 pt-10">
         <div>
           <p className="text-sm text-positive-400 font-bold">
             연동된 이메일 계정
@@ -223,7 +225,7 @@ const InfoForm = ({ email, userInfo, setUserInfo, onPrev }: InfoFormProps) => {
           가입하기
         </DamulButton>
       </form>
-    </div>
+    </DamulSection>
   );
 };
 

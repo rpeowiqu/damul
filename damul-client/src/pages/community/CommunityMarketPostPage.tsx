@@ -11,6 +11,7 @@ import DamulButton from "@/components/common/DamulButton";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { postPost, putPost, getPostDetail } from "@/service/market";
 import useOverlayStore from "@/stores/overlayStore";
+import DamulSection from "@/components/common/DamulSection";
 
 const CommunityMarketPostPage = () => {
   const navigate = useNavigate();
@@ -90,15 +91,16 @@ const CommunityMarketPostPage = () => {
   }, []);
 
   return (
-    <main className="flex flex-col px-7 py-4 pc:p-6 gap-5">
-      <div className="flex gap-5">
-        <button className="font-black" onClick={() => history.back()}>
-          &lt;
-        </button>
-        <h1 className="text-lg sm:text-xl font-black text-normal-700">
-          공구/나눔 게시글 작성
-        </h1>
-      </div>
+    <DamulSection
+      title={
+        <div className="flex items-center gap-3">
+          <button className="font-black" onClick={() => history.back()}>
+            &lt;
+          </button>
+          <h1>공구/나눔 게시글 작성</h1>
+        </div>
+      }
+    >
       <div className="flex flex-col gap-5">
         <DamulDrawer
           isOpen={currentDrawerIndex === 0}
@@ -218,7 +220,7 @@ const CommunityMarketPostPage = () => {
           공구/나눔 게시글 작성하기
         </DamulButton>
       )}
-    </main>
+    </DamulSection>
   );
 };
 

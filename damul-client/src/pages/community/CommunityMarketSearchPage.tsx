@@ -1,18 +1,23 @@
 import CommunitySearch from "@/components/community/CommunitySearch";
-import DamulCarousel from "@/components/common/DamulCarousel";
 import PostButton from "@/components/community/PostButton";
 import WriteIcon from "@/components/svg/WriteIcon";
+import DamulSection from "@/components/common/DamulSection";
 
 const CommunityMarketSearchPage = () => {
   return (
-    <main className="h-full px-4 py-6 pc:px-6 space-y-6">
-      <CommunitySearch
-        placeholder="원하는 식자재를 검색해보세요."
-        type="market"
+    <div>
+      <DamulSection>
+        <CommunitySearch
+          placeholder="원하는 식자재를 검색해보세요."
+          type="market"
+        />
+      </DamulSection>
+
+      <PostButton
+        to="/community/market/post"
+        icon={<WriteIcon className="scale-150 fill-positive-300" />}
       />
-      <DamulCarousel />
-      <PostButton to="/community/market/post" icon={<WriteIcon/>}/>
-    </main>
+    </div>
   );
 };
 

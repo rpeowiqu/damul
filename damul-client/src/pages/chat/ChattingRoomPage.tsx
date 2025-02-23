@@ -16,6 +16,7 @@ import ChattingRoomInfiniteScroll from "@/components/chat/ChattingRoomInfiniteSc
 import { useChattingSubscription } from "@/hooks/useChattingSubscription";
 import useAuth from "@/hooks/useAuth";
 import { postImageInRoom } from "@/service/chatting";
+import DamulSection from "@/components/common/DamulSection";
 
 interface ChatData {
   messages: ChatMessage[];
@@ -55,7 +56,7 @@ const ChattingRoomPage = () => {
         };
       });
     },
-    [[data?.data.id]],
+    [data?.data.id],
   );
 
   // STOMP 클라이언트 초기화
@@ -92,7 +93,6 @@ const ChattingRoomPage = () => {
         cursor: pageParam,
         size: 50,
       });
-
       // console.log(response?.data);
       if (response?.data && typeof response.data === "object") {
         setChatData({
@@ -222,15 +222,20 @@ const ChattingRoomPage = () => {
     });
   }, [chatData.messages]);
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
-    <main className="h-full text-center py-6 space-y-2">
-      <div className="fixed flex top-14 p-5 items-center justify-between border-b-1 border-neutral-200 bg-white font-semibold text-start h-12 pc:h-16 w-full pc:w-[598px]">
+    <div className="flex flex-col flex-1">
+      <div className="fixed flex top-14 px-5 items-center justify-between border-b border-neutral-200 bg-white font-semibold text-start h-12 w-full pc:w-[598px]">
         <p>
           {chatData.roomName}({chatData.memberNum})
         </p>
         <ChattingMenuButton roomId={roomId} postId={chatData.postId} />
       </div>
-      <div className="flex-1 overflow-y-auto p-4 py-10 pc:py-14 space-y-4">
+
+      <DamulSection className="flex-1 text-center py-16">
         <ChattingRoomInfiniteScroll
           key={chatData.messages.length}
           queryKey={["chats"]}
@@ -243,58 +248,61 @@ const ChattingRoomPage = () => {
           }
         />
         <div ref={messagesEndRef} />
-      </div>
-      <div className="fixed w-full pc:w-[598px] bottom-16 p-2 pc:p-4 border-t bg-white flex items-end">
-        <label
-          htmlFor="image-upload"
-          className="bg-neutral-200 p-1 pc:p-2 rounded-full cursor-pointer mr-2"
-        >
-          <div className="flex w-5 h-5 pc:w-6 pc:h-6 items-center justify-center">
-            +
-          </div>
-        </label>
-        <input
-          type="file"
-          id="image-upload"
-          className="hidden"
-          accept="image/*"
-          onChange={handleImageUpload}
-        />
-        {prevImage ? (
-          <div className="flex-1 border-1 p-3 rounded-lg relative">
-            <div className="relative h-24 w-24">
-              <img
-                src={prevImage}
-                alt="Preview"
-                className="h-24 object-cover rounded-lg"
-              />
-              <button
-                onClick={handleImageRemove}
-                className="absolute flex top-1 right-1 w-6 h-6 text-white bg-positive-300 p-1 rounded-full text-sm items-center justify-center"
-              >
-                X
-              </button>
+      </DamulSection>
+
+      <div>
+        <div className="fixed w-full pc:w-[598px] bottom-16 p-2 pc:p-4 border-t bg-white flex items-end">
+          <label
+            htmlFor="image-upload"
+            className="bg-neutral-200 p-1 pc:p-2 rounded-full cursor-pointer mr-2"
+          >
+            <div className="flex w-5 h-5 pc:w-6 pc:h-6 items-center justify-center">
+              +
             </div>
-          </div>
-        ) : (
-          <textarea
-            ref={messageInputRef}
-            value={message}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            className="flex-1 border rounded-md px-5 py-2 focus:outline-none text-sm resize-none min-h-[2.5rem] max-h-[10rem]"
-            placeholder="메시지 입력"
-            rows={1}
+          </label>
+          <input
+            type="file"
+            id="image-upload"
+            className="hidden"
+            accept="image/*"
+            onChange={handleImageUpload}
           />
-        )}
-        <button
-          onClick={handleSendMessage}
-          className="self-end ml-2 border-2 border-positive-300 text-white p-1 pc:p-2 rounded-full"
-        >
-          <SendIcon className="w-5 h-5 pc:w-6 pc:h-6 fill-positive-400" />
-        </button>
+          {prevImage ? (
+            <div className="flex-1 border-1 p-3 rounded-lg relative">
+              <div className="relative h-24 w-24">
+                <img
+                  src={prevImage}
+                  alt="Preview"
+                  className="h-24 object-cover rounded-lg"
+                />
+                <button
+                  onClick={handleImageRemove}
+                  className="absolute flex top-1 right-1 w-6 h-6 text-white bg-positive-300 p-1 rounded-full text-sm items-center justify-center"
+                >
+                  X
+                </button>
+              </div>
+            </div>
+          ) : (
+            <textarea
+              ref={messageInputRef}
+              value={message}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              className="flex-1 border rounded-md px-5 py-2 focus:outline-none text-sm resize-none min-h-[2.5rem] max-h-[10rem]"
+              placeholder="메시지 입력"
+              rows={1}
+            />
+          )}
+          <button
+            onClick={handleSendMessage}
+            className="self-end ml-2 border-2 border-positive-300 text-white p-1 pc:p-2 rounded-full"
+          >
+            <SendIcon className="w-5 h-5 pc:w-6 pc:h-6 fill-positive-400" />
+          </button>
+        </div>
       </div>
-    </main>
+    </div>
   );
 };
 

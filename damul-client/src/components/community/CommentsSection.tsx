@@ -48,20 +48,20 @@ const CommentsSection = ({
   const StatusMarker = () => {
     if (entered === true) {
       return (
-        <div className="content-center bg-neutral-300 px-3 rounded-full cursor-pointer">
+        <div className="text-sm content-center bg-normal-100 px-3 rounded-full cursor-pointer">
           채팅방 참여중 {currentChatNum}/{chatSize}
         </div>
       );
     } else {
       return status === "ACTIVE" ? (
         <div
-          className="content-center bg-positive-200 px-3 rounded-full cursor-pointer"
+          className="text-sm content-center bg-positive-200 hover:bg-positive-300 px-3 rounded-full cursor-pointer"
           onClick={handleEnterRoom}
         >
           채팅방 참여하기 {currentChatNum}/{chatSize}
         </div>
       ) : (
-        <div className="content-center bg-neutral-300 px-3 rounded-full cursor-pointer">
+        <div className="text-sm content-center bg-normal-100 px-3 rounded-full cursor-pointer">
           채팅방 모집완료 {currentChatNum}/{chatSize}
         </div>
       );
@@ -73,8 +73,8 @@ const CommentsSection = ({
   }
 
   return (
-    <div className="py-3 text-start">
-      <div className="flex flex-row p-3 border-b border-neutral-300 justify-between">
+    <div className="text-start">
+      <div className="flex flex-row border-b border-neutral-300 justify-between pb-2">
         <h3 className="text-md pc:text-lg font-semibold">
           댓글({comments.length})
         </h3>

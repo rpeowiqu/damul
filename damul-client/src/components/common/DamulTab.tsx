@@ -33,7 +33,7 @@ const DamulTab = ({ tabList }: { tabList: DamulTabProps[] }) => {
         return resolvedPath === location.pathname;
       }
 
-      return path === location.pathname;
+      return location.pathname.startsWith(path);
     });
 
     setActiveIndex(index !== -1 ? index : 0);
@@ -59,7 +59,7 @@ const DamulTab = ({ tabList }: { tabList: DamulTabProps[] }) => {
           width: `${100 / tabList.length}%`,
           transform: `translateX(${100 * activeIndex}%)`,
         }}
-      ></div>
+      />
     </div>
   );
 };

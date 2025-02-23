@@ -6,6 +6,7 @@ import { postRecipeBookMark } from "@/service/recipe";
 import { formatDate } from "@/utils/date";
 import { putPostStatusChange } from "@/service/market";
 import useAuth from "@/hooks/useAuth";
+import DamulSection from "../common/DamulSection";
 
 interface RecipeHeaderProps {
   title: string;
@@ -66,18 +67,18 @@ const CommunityDetailHeader = ({
 
   const StatusMarker = () => {
     return status === "COMPLETED" || isStatusActive === "COMPLETED" ? (
-      <div className="flex content-center bg-neutral-300 text-xs py-0.5 px-2 rounded-full">
-        모집완료
+      <div className="flex content-center bg-normal-100 text-xs py-0.5 px-2 rounded-full">
+        모집 완료
       </div>
     ) : data?.data.id === authorId ? (
       <div
-        className="flex content-center bg-negative-200 text-xs py-0.5 px-2 rounded-full cursor-pointer"
+        className="flex content-center bg-negative-300 text-xs py-0.5 px-2 rounded-full cursor-pointer text-white"
         onClick={changeStatus}
       >
         모집 완료하기
       </div>
     ) : (
-      <div className="flex content-center bg-positive-200 text-xs py-0.5 px-2 rounded-full">
+      <div className="flex content-center bg-positive-300 text-xs py-0.5 px-2 rounded-full text-white">
         모집중
       </div>
     );
@@ -85,21 +86,23 @@ const CommunityDetailHeader = ({
 
   if (isLoading || authLoading) {
     return (
-      <div className="flex justify-between p-2 border-b border-neutral-300">
-        <div className="text-start">
-          <Skeleton width={100} height={14} />
-          <Skeleton width={200} height={20} />
+      <DamulSection>
+        <div className="flex justify-between border-b border-neutral-300">
+          <div className="text-start">
+            <Skeleton width={100} height={14} />
+            <Skeleton width={200} height={20} />
+          </div>
+          <div className="flex flex-col justify-between items-end">
+            <Skeleton width={30} height={20} />
+            <Skeleton width={100} height={20} />
+          </div>
         </div>
-        <div className="flex flex-col justify-between items-end">
-          <Skeleton width={30} height={20} />
-          <Skeleton width={100} height={20} />
-        </div>
-      </div>
+      </DamulSection>
     );
   }
 
   return (
-    <div className="flex justify-between p-2 border-b border-neutral-300">
+    <div className="flex justify-between border-b border-neutral-300 bg-white">
       <div className="text-start">
         {type === "recipe" ? (
           <Link to="/community/recipe">

@@ -10,6 +10,7 @@ import { FriendItemProps } from "@/components/profile/FriendItem";
 import { postIntoPrivateRoom, postIntoGroupRoom } from "@/service/chatting";
 import DamulButton from "@/components/common/DamulButton";
 import { Friend } from "@/types/chatting";
+import DamulSection from "@/components/common/DamulSection";
 
 const ChattingStartPage = () => {
   const [inputValue, setInputValue] = useState("");
@@ -88,8 +89,8 @@ const ChattingStartPage = () => {
   };
 
   return (
-    <main className="h-full px-4 py-6 pc:px-6 space-y-2">
-      <div className="flex justify-between items-center px-2">
+    <DamulSection>
+      <div className="flex justify-between items-center">
         <div>{selectedFriends.length}명 선택</div>
         <DamulButton
           onClick={onClickStartChat}
@@ -131,36 +132,34 @@ const ChattingStartPage = () => {
         </button>
       </div>
 
-      <div className="space-y-2 mt-8">
-        <DamulInfiniteScrollList
-          queryKey={["following"]}
-          fetchFn={fetchFollowings}
-          renderItems={(item: FriendItemProps) => (
-            <div
-              key={item.userId}
-              className="flex items-center justify-between p-2 pc:p-3 rounded-lg cursor-pointer hover:bg-neutral-100"
-              onClick={() => toggleSelection(item.userId, item.nickname)}
-            >
-              <div className="flex items-center gap-3">
-                <Image
-                  src={item.profileImageUrl}
-                  className="w-12 h-12 rounded-full"
-                />
-                <p className="text-normal-700">{item.nickname}</p>
-              </div>
-              <input
-                type="radio"
-                readOnly
-                checked={selectedFriends.some(
-                  (friend) => friend.id === item.userId,
-                )}
-                className="w-4 h-4 pc:w-5 pc:h-5 text-primary-500 cursor-pointer"
+      <DamulInfiniteScrollList
+        queryKey={["following"]}
+        fetchFn={fetchFollowings}
+        renderItems={(item: FriendItemProps) => (
+          <div
+            key={item.userId}
+            className="flex items-center justify-between p-2 pc:p-3 rounded-lg cursor-pointer hover:bg-neutral-100"
+            onClick={() => toggleSelection(item.userId, item.nickname)}
+          >
+            <div className="flex items-center gap-3">
+              <Image
+                src={item.profileImageUrl}
+                className="w-12 h-12 rounded-full border border-normal-50"
               />
+              <p className="text-normal-700">{item.nickname}</p>
             </div>
-          )}
-        />
-      </div>
-    </main>
+            <input
+              type="radio"
+              checked={selectedFriends.some(
+                (friend) => friend.id === item.userId,
+              )}
+              className="size-4 pc:size-5 accent-lime-600 outline-none focus:ring-0"
+              readOnly
+            />
+          </div>
+        )}
+      />
+    </DamulSection>
   );
 };
 
