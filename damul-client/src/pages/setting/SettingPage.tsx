@@ -238,7 +238,9 @@ const SettingPage = () => {
         <button className="font-black" onClick={() => nav(-1)}>
           &lt;
         </button>
-        <h1 className="text-lg sm:text-xl font-black text-normal-700">설정</h1>
+        <h1 className="text-base sm:text-lg font-black text-normal-700">
+          설정
+        </h1>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-10 mt-3">
@@ -260,9 +262,9 @@ const SettingPage = () => {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="absolute bottom-2 right-2 bg-white hover:bg-normal-100 border border-normal-100 rounded-full p-1"
+                      className="absolute bottom-2 right-2 bg-white hover:bg-positive-50 border border-positive-300 rounded-full p-1"
                     >
-                      <EditIcon className="size-4 fill-positive-400" />
+                      <EditIcon className="size-4 fill-positive-300" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -273,10 +275,14 @@ const SettingPage = () => {
                         handleBackgroundImageChange(true);
                         onReset();
                       }}
+                      className="data-[highlighted]:bg-positive-50"
                     >
                       기본 배경으로 변경
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={onEdit}>
+                    <DropdownMenuItem
+                      onSelect={onEdit}
+                      className="data-[highlighted]:bg-positive-50"
+                    >
                       이 기기에서 찾기
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -296,7 +302,7 @@ const SettingPage = () => {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="absolute bottom-3 right-5 bg-white hover:bg-normal-100 border border-normal-100 rounded-full p-1"
+                      className="absolute bottom-3 right-5 bg-white hover:bg-positive-50 border border-positive-300 rounded-full p-1"
                     >
                       <EditIcon className="size-4 fill-positive-400" />
                     </button>
@@ -311,10 +317,14 @@ const SettingPage = () => {
                         handleProfileImageChange(true);
                         onReset();
                       }}
+                      className="data-[highlighted]:bg-positive-50"
                     >
                       기본 이미지로 변경
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={onEdit}>
+                    <DropdownMenuItem
+                      onSelect={onEdit}
+                      className="data-[highlighted]:bg-positive-50"
+                    >
                       이 기기에서 찾기
                     </DropdownMenuItem>
                   </DropdownMenuContent>
