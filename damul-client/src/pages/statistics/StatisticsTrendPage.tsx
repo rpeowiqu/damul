@@ -45,7 +45,7 @@ import clsx from "clsx";
 
 const StatisticsTrendPage = () => {
   const [searchKeyword, setSearchKeyword] = useState<string>("");
-  const [periodText, setPeriodText] = useState<string>("");
+  const [periodText, setPeriodText] = useState<string>("최근 1개월");
   const [period, setPeriod] = useState<"monthly" | "recent">("recent");
   const [categoryBit, setCategoryBit] = useState<number>(
     (1 << CATEGORY_COUNT) - 1,
