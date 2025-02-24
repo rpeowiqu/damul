@@ -277,6 +277,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 MemberRole.MEMBER,
                 lastMessageId
         );
+        newMember.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         chatRoomMemberRepository.save(newMember);
 
