@@ -20,6 +20,7 @@ import com.damul.api.recipe.entity.RecipeIngredient;
 import com.damul.api.recipe.repository.RecipeIngredientRepository;
 import com.damul.api.recipe.repository.RecipeRepository;
 import com.damul.api.recipe.repository.RecipeTagRepository;
+import com.damul.api.recipe.service.RecipeService;
 import com.damul.api.user.repository.FollowRepository;
 import com.damul.api.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -61,6 +62,7 @@ public class HomeServiceImpl implements HomeService {
     private String fastApiServerUrl;
     private static final String SSE_KEY_PREFIX = "sse:emitter:";
 
+    private final RecipeService recipeService;
     private final RecipeRepository recipeRepository;
     private final UserIngredientRepository userIngredientRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
@@ -184,7 +186,7 @@ public class HomeServiceImpl implements HomeService {
 
         if (userIngredients.isEmpty()) {
             log.info("사용자의 보유 식재료가 없습니다. 좋아요 순으로 레시피를 추천합니다.");
-            return new HomeSuggestedResponse(getTopLikedRecipes());
+            return recipeService.getFamousRecipe();
         }
 
         // 2. 사용자의 정규화된 식재료 이름들
@@ -216,7 +218,7 @@ public class HomeServiceImpl implements HomeService {
 
         // 만약 매칭된 레시피가 원하는 수보다 적다면, 인기 레시피로 나머지를 채우기
         if (suggestedRecipes.size() < DESIRED_RECIPE_COUNT) {
-            List<SuggestedRecipeList> topRecipes = getTopLikedRecipes();
+            List<SuggestedRecipeList> topRecipes = recipeService.getFamousRecipe().getSuggestedRecipes();
 
             // 이미 추천된 레시피는 제외
             Set<Integer> existingRecipeIds = suggestedRecipes.stream()

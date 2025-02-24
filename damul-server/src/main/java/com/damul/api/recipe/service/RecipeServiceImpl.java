@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -154,7 +155,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public HomeSuggestedResponse getFamousRecipe() {
         log.info("인기 급상승 조회 시작");
-        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime endDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         LocalDateTime startDate = endDate.minusDays(3);
         log.info("시작일 - startDate: {}", startDate);
         log.info("종료일 - endDate: {}", endDate);
@@ -176,9 +177,6 @@ public class RecipeServiceImpl implements RecipeService {
                             .build();
                 })
                 .collect(Collectors.toList());
-
-
-
         return new HomeSuggestedResponse(recipesWithTags);
     }
 
