@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Loading from "@/components/common/Loading";
 import DamulSection from "@/components/common/DamulSection";
+import queryClient from "@/utils/queryClient";
 
 interface responseData {
   ingredientName: string;
@@ -131,6 +132,10 @@ const HomeIngredientsRegisterPage = () => {
 
     try {
       await postUserIndegredient(data);
+      queryClient.refetchQueries({
+        queryKey: ["ingredientData"],
+        type: "all",
+      });
       navigate("/home");
     } catch (error: any) {
       // console.log("식자재를 등록하지 못했습니다.");
@@ -153,7 +158,7 @@ const HomeIngredientsRegisterPage = () => {
       });
 
       eventSource.onopen = () => {
-        // console.log("✅ SSE 연결이 성공적으로 열렸습니다.");
+        // console.log("SSE 연결이 성공적으로 열렸습니다.");
         retryAttempt = 0;
       };
 
@@ -162,12 +167,12 @@ const HomeIngredientsRegisterPage = () => {
           const response = JSON.parse(event.data);
 
           if (response.type === "PROCESSING_STARTED") {
-            // console.log("🔄 이미지 분석이 시작됨");
+            // console.log("이미지 분석이 시작됨");
             setIsLoading(true);
           }
 
           if (response.type === "PROCESSING_COMPLETED") {
-            // console.log("✅ 이미지 분석 완료");
+            // console.log("이미지 분석 완료");
           }
 
           if (response.type === "PROCESSING_COMPLETED") {
