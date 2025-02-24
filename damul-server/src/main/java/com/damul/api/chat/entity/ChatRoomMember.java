@@ -55,6 +55,7 @@ public class ChatRoomMember {
         member.user = user;
         member.nickname = nickname;
         member.role = role;
+        member.joinedAt = LocalDateTime.now();
         member.lastReadMessageId = lastReadMessageId;
         return member;
     }
