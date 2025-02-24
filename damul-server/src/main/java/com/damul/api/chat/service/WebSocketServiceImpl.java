@@ -2,7 +2,10 @@ package com.damul.api.chat.service;
 
 import com.damul.api.auth.dto.response.UserInfo;
 import com.damul.api.auth.entity.User;
-import com.damul.api.chat.dto.*;
+import com.damul.api.chat.dto.MemberRole;
+import com.damul.api.chat.dto.MessageType;
+import com.damul.api.chat.dto.ReadStatus;
+import com.damul.api.chat.dto.TypingStatus;
 import com.damul.api.chat.dto.request.ChatMessageCreate;
 import com.damul.api.chat.dto.request.ChatReadRequest;
 import com.damul.api.chat.dto.request.ChatTypingMessage;
@@ -21,18 +24,14 @@ import com.damul.api.config.service.S3Service;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -47,10 +46,6 @@ public class WebSocketServiceImpl implements WebSocketService {
     private final UserRepository userRepository;
     private final TimeZoneConverter timeZoneConverter;
     private final UnreadMessageService unreadMessageService;
-    private final RedisTemplate<String, ChatMessageRedisDTO> redisTemplate;
-    private final RedisTemplate<String, String> stringRedisTemplate;
-
-    private static final String CHAT_MESSAGE_KEY = "chat:messages";
 
     @Override
     @Transactional
@@ -66,13 +61,10 @@ public class WebSocketServiceImpl implements WebSocketService {
         );
         message.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
-        ChatMessageRedisDTO messageDTO = ChatMessageRedisDTO.from(message);
-        String roomKey = CHAT_MESSAGE_KEY + roomId;
-        redisTemplate.opsForList().rightPush(roomKey, messageDTO);
-
-        int unReadCount = chatRoomMemberRepository.countMembersByRoomId(roomId) - 1;
+        chatMessageRepository.save(message);
+        int unReadCount = chatMessageRepository.countUnreadMessages(roomId, message.getId());
         messagingTemplate.convertAndSend("/sub/chat/room/" + roomId,
-                messageDTO.toResponse(unReadCount));
+                ChatMessageResponse.from(message, unReadCount));
         updateUnreadCount(message);
     }
 
@@ -87,7 +79,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         message.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         chatMessageRepository.save(message);
-        int unReadCount = chatRoomMemberRepository.countMembersByRoomId(roomId) - 1;
+        int unReadCount = chatMessageRepository.countUnreadMessages(roomId, message.getId());
 
         // 웹소켓으로 메시지 전송
         messagingTemplate.convertAndSend("/sub/chat/room/" + roomId,
@@ -168,42 +160,6 @@ public class WebSocketServiceImpl implements WebSocketService {
         chatRoomMemberRepository.save(member);
     }
 
-    @Scheduled(fixedRate = 300000)
-    @Transactional
-    public void saveMessagesFromRedis() {
-        String lockKey = "chat:sync:lock";
-        Boolean acquired = stringRedisTemplate.opsForValue().setIfAbsent(lockKey, "locked", 4, TimeUnit.MINUTES);
-
-        if (acquired != null && acquired) {
-            try {
-                // 한 번에 처리할 양을 제한
-                int batchSize = 1000;
-                List<ChatMessage> messages = new ArrayList<>();
-
-                List<ChatMessageRedisDTO> messageDTOs = redisTemplate.opsForList()
-                        .range(CHAT_MESSAGE_KEY, 0, batchSize - 1);
-
-                if (messageDTOs != null && !messageDTOs.isEmpty()) {
-                    for (ChatMessageRedisDTO messageDTO : messageDTOs) {
-                        ChatRoom room = getChatRoom(messageDTO.getRoomId());
-                        User sender = messageDTO.getSenderId() != null ?
-                                userRepository.getReferenceById(messageDTO.getSenderId()) : null;
-
-                        messages.add(messageDTO.toEntity(room, sender));
-                    }
-
-                    // DB 저장
-                    chatMessageRepository.saveAll(messages);
-
-                    // 저장된 만큼만 Redis에서 제거
-                    redisTemplate.opsForList().trim(CHAT_MESSAGE_KEY, messageDTOs.size(), -1);
-                }
-            } finally {
-                redisTemplate.delete(lockKey);
-            }
-        }
-    }
-
     private ChatRoom getChatRoom(int roomId) {
         return chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_NOT_FOUND, "존재하지 않는 채팅방입니다."));
@@ -212,7 +168,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     private void updateUnreadCount(ChatMessage message) {
         List<ChatRoomMember> members = chatRoomMemberRepository.findAllByRoomId(message.getRoom().getId());
         for (ChatRoomMember member : members) {
-            if (!member.getUser().getId().equals(message.getSender().getId())) {
+            if (member.getUser().getId() != message.getSender().getId()) {
                 // Redis에 안 읽은 메시지 수 증가
                 unreadMessageService.incrementUnreadCount(member.getUser().getId());
 

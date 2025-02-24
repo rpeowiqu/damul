@@ -1,9 +1,7 @@
 package com.damul.api.chat.service;
 
 import com.damul.api.auth.entity.User;
-import com.damul.api.chat.dto.ChatMessageRedisDTO;
 import com.damul.api.chat.dto.MemberRole;
-import com.damul.api.chat.dto.MessageType;
 import com.damul.api.chat.dto.response.*;
 import com.damul.api.chat.dto.request.ChatRoomEntryExitCreate;
 import com.damul.api.chat.dto.request.MultiChatRoomCreate;
@@ -26,8 +24,6 @@ import com.damul.api.post.repository.PostRepository;
 import com.damul.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,14 +46,8 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
-    private final NotificationService notificationService;
     private final TimeZoneConverter timeZoneConverter;
     private final SimpMessagingTemplate messagingTemplate;
-    private final RedisTemplate<Object, Object> redisTemplate;
-
-    private static final String CHAT_MESSAGE_KEY = "chat:message:";
-    private final RedisTemplate<String, ChatMessageRedisDTO> chatMessageRedisTemplate;
 
     @Override
     @Transactional(readOnly = true)
@@ -75,33 +67,14 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         }
 
         List<ChatRoomList> chatRoomLists = rooms.stream()
-                .map(room -> {
-                    // Redis에서 해당 채팅방의 최신 메시지 조회
-                    String roomKey = CHAT_MESSAGE_KEY + room.getId();
-                    ChatMessageRedisDTO redisMessage = chatMessageRedisTemplate.opsForList()
-                            .index(roomKey, -1); // 가장 최근 메시지
-
-                    if (redisMessage != null) {
-                        return convertToChatRoomListWithRedis(room, userId, redisMessage);
-                    } else {
-                        return convertToChatRoomList(room, userId);
-                    }
-                })
+                .map(room -> convertToChatRoomList(room, userId))
                 .collect(Collectors.toList());
 
         ChatRoom lastRoom = rooms.get(rooms.size() - 1);
-        String lastRoomKey = CHAT_MESSAGE_KEY + lastRoom.getId();
-        ChatMessageRedisDTO lastRedisMessage = chatMessageRedisTemplate.opsForList()
-                .index(lastRoomKey, -1);
+        LocalDateTime lastMessageTime = chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId());
 
-        LocalDateTime lastMessageTime;
-        if (lastRedisMessage != null) {
-            lastMessageTime = lastRedisMessage.getCreatedAt();
-        } else {
-            lastMessageTime = chatMessageRepository.findLastMessageTimeByRoomId(lastRoom.getId());
-            if (lastMessageTime == null) {
-                lastMessageTime = lastRoom.getCreatedAt();
-            }
+        if (lastMessageTime == null) {
+            lastMessageTime = lastRoom.getCreatedAt();  // 메시지가 없는 경우 채팅방 생성 시간 사용
         }
 
         return new ScrollResponse<>(
@@ -622,32 +595,6 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 .lastMessage(lastMessage != null ? lastMessage.getContent() : "")
                 .lastMessageTime(lastMessage != null ? lastMessage.getCreatedAt().toString() : "")
                 .unReadNum(unreadCount)
-                .build();
-    }
-
-    private ChatRoomList convertToChatRoomListWithRedis(ChatRoom room, int userId, ChatMessageRedisDTO redisMessage) {
-        int memberCount = chatRoomMemberRepository.countMembersByRoomId(room.getId());
-        ChatRoomMember member = chatRoomMemberRepository.findByRoomIdAndUserId(room.getId(), userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND));
-
-        // Redis에서 해당 채팅방의 읽지 않은 메시지 수 계산
-        String roomKey = CHAT_MESSAGE_KEY + room.getId();
-        Long redisMessageCount = chatMessageRedisTemplate.opsForList().size(roomKey);
-        int redisUnreadCount = (redisMessageCount != null) ? redisMessageCount.intValue() : 0;
-
-        // DB의 읽지 않은 메시지 수와 합산
-        int dbUnreadCount = chatMessageRepository.countUnreadMessages(room.getId(), member.getLastReadMessageId());
-        int totalUnreadCount = dbUnreadCount + redisUnreadCount;
-
-        return ChatRoomList.builder()
-                .id(room.getId())
-                .title(room.getRoomName())
-                .thumbnailUrl(room.getPost() != null ? room.getPost().getThumbnailUrl() : null)
-                .memberNum(memberCount)
-                .lastMessage(redisMessage.getMessageType() == MessageType.IMAGE ?
-                        "사진을 보냈습니다." : redisMessage.getContent())
-                .lastMessageTime(redisMessage.getCreatedAt().toString())
-                .unReadNum(totalUnreadCount)
                 .build();
     }
 
