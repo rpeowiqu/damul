@@ -171,6 +171,7 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
                 Claims claims = jwtTokenProvider.getClaims(refreshToken);
                 Authentication authentication = createAuthenticationFromClaims(claims);
 
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 log.info("새로운 토큰 쌍 생성 시작 (RTR 적용)");
                 // RTR 적용하여 새로운 토큰 쌍 발급
@@ -210,6 +211,9 @@ public class JwtTokenRefreshFilter extends OncePerRequestFilter {
                 log.info("Refresh Token 검증 성공 - 새로운 토큰 쌍 생성");
                 Claims claims = jwtTokenProvider.getClaims(refreshToken);
                 Authentication authentication = createAuthenticationFromClaims(claims);
+
+                // SecurityContext 설정 추가
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 Map<String, String> tokens = tokenService.generateTokenPair(authentication);
 
