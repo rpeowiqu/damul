@@ -4,10 +4,10 @@ spring:
       - optional:classpath:.env[.properties]
       - optional:file:.env[.properties]
     profiles:
-      active: local
+      active: prod
 
-  profiles:
-    active: local
+#  profiles:
+#    active: local
 
   application:
     name: damul-server

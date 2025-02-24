@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,4 +71,6 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
 
     @Query("SELECT ui.userReceipt.user.id FROM UserIngredient ui WHERE ui.userIngredientId IN :ingredientIds")
     List<Integer> findUserIdsByUserIngredientIds(@Param("ingredientIds") List<Integer> ingredientIds);
+
+    List<UserIngredient> findByUserReceipt_User_IdAndIsDeletedFalseAndExpirationDateGreaterThan(int userId, LocalDateTime now);
 }
