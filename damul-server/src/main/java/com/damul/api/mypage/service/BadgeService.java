@@ -328,14 +328,14 @@ public class BadgeService {
 
     private void checkIngredientCategoryBadges(User user, Map<String, Map<Integer, Integer>> badgeTypeUserAchievements) {
         Map<Integer, String> categoryBadges = Map.of(
-                6, "넌 부화할 수 없다",  // 달걀류
-                4, "목표키 2m",        // 유제품
-                3, "과즙팡팡",         // 과일
-                5, "육식 공룡",        // 육류
-                2, "나는 자연인이다",   // 채소
-                7, "포세이돈",         // 수산물
-                9, "간장공장공장장",    // 양념
-                8, "미끄러짐 주의",     // 기름
+                4, "넌 부화할 수 없다",  // 달걀류
+                7, "목표키 2m",        // 유제품
+                2, "과즙팡팡",         // 과일
+                8, "육식 공룡",        // 육류
+                9, "나는 자연인이다",   // 채소
+                5, "포세이돈",         // 수산물
+                6, "간장공장공장장",    // 양념
+                3, "미끄러짐 주의",     // 기름
                 1, "농부의 피땀을 아는 자", // 곡물
                 10, "줏대없는 자취생"    // 기타
         );
