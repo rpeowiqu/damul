@@ -267,6 +267,7 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         ChatMessage lastMessage = chatMessageRepository
                 .findFirstByRoomIdOrderByCreatedAtDesc(roomId)
                 .orElse(null);
+        log.info("lastMessageId: {}", lastMessage.getId());
 
         int lastMessageId = lastMessage != null ? lastMessage.getId() : 0;
 
@@ -280,6 +281,9 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
         newMember.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
 
         chatRoomMemberRepository.save(newMember);
+        String systemMessage = String.format("%s님이 ", newMember.getNickname()) +
+                "입장하셨습니다.";
+        createSystemMessage(chatRoom, systemMessage);
 
         log.info("서비스: 채팅방 입장 완료 - roomId: {}, userId: {}", roomId, request.getId());
 
@@ -585,8 +589,10 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
                 .findByRoomIdAndUserId(room.getId(), userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND, "채팅방 멤버가 아닙니다."));
 
+        log.info("멤버의 lastReadMessageId: {}", member.getLastReadMessageId());
         int unreadCount = chatMessageRepository
                 .countUnreadMessages(room.getId(), member.getLastReadMessageId());
+        log.info("챗룸리스트로 변환: {}", unreadCount);
 
         return ChatRoomList.builder()
                 .id(room.getId())
