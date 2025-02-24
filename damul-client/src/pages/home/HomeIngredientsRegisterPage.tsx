@@ -206,7 +206,7 @@ const HomeIngredientsRegisterPage = () => {
         }
       });
 
-      eventSource.onerror = (error) => {
+      eventSource.onerror = () => {
         // console.error("❌ SSE 연결 오류 발생", error);
         eventSource?.close();
 

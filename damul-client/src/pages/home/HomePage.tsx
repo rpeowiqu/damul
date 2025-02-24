@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DamulCarousel from "@/components/common/DamulCarousel";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import MenuButton from "@/components/home/MenuButton";
@@ -10,7 +10,6 @@ import { getRecommandedRecipe, getUserIndegredient } from "@/service/home";
 import {
   initialIngrdientData,
   initialIngrdientEmptyData,
-  initialIngrdientItems,
 } from "@/constants/initialData";
 import { EXPIRINGSOON_DAY } from "@/constants/itemStatus";
 import RefrigeratorDoor from "@/components/home/RefrigeratorDoor";
