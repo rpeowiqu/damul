@@ -42,5 +42,7 @@ public interface UserBadgeRepository extends JpaRepository<UserBadge, Integer> {
     List<UserBadge> findByUser(User user);
 
     List<UserBadge> findAllByBadge_Title(String title);
+
+    List<UserBadge> findAllByUserAndBadge_Title(User user, String title);
 }
 

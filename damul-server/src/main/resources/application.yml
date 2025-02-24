@@ -6,6 +6,9 @@ spring:
     profiles:
       active: prod
 
+#  profiles:
+#    active: local
+
   application:
     name: damul-server
 

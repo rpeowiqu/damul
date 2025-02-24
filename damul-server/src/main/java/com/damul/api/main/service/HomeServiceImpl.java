@@ -41,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -173,9 +174,13 @@ public class HomeServiceImpl implements HomeService {
     public HomeSuggestedResponse getRecommendedRecipes(int userId) {
         log.info("서비스: 레시피 추천 시작 - userId: {}", userId);
 
+        final int DESIRED_RECIPE_COUNT = 5; // 원하는 총 레시피 수를 상수로 정의
 
-        // 1. 사용자가 보유한 식재료 조회 (삭제되지 않은 것만)
-        List<UserIngredient> userIngredients = userIngredientRepository.findByUserReceipt_User_IdAndIsDeletedFalse(userId);
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        // 1. 사용자가 보유한 유효한 식재료 조회 (삭제되지 않고, 유통기한이 지나지 않은 것만)
+        List<UserIngredient> userIngredients = userIngredientRepository
+                .findByUserReceipt_User_IdAndIsDeletedFalseAndExpirationDateGreaterThan(userId, now);
 
         if (userIngredients.isEmpty()) {
             log.info("사용자의 보유 식재료가 없습니다. 좋아요 순으로 레시피를 추천합니다.");
@@ -193,24 +198,41 @@ public class HomeServiceImpl implements HomeService {
         List<Recipe> matchingRecipes = recipeRepository.findRecipesContainingIngredients(userNormalizedIngredients);
         log.info("매칭되는 레시피 수: {}", matchingRecipes.size());
 
-        // 매칭되는 레시피가 없는 경우 인기 레시피 반환
-        if (matchingRecipes.isEmpty()) {
-            log.info("매칭되는 레시피가 없습니다. 인기 레시피를 추천합니다.");
-            return new HomeSuggestedResponse(getTopLikedRecipes());
+        List<SuggestedRecipeList> suggestedRecipes = new ArrayList<>();
+
+        // 매칭되는 레시피 추가
+        if (!matchingRecipes.isEmpty()) {
+            List<SuggestedRecipeList> matchingSuggestions = matchingRecipes.stream()
+                    .map(recipe -> SuggestedRecipeList.builder()
+                            .recipeId(recipe.getId())
+                            .title(recipe.getTitle())
+                            .thumbnailUrl(recipe.getThumbnailUrl())
+                            .build())
+                    .collect(Collectors.toList());
+
+            Collections.shuffle(matchingSuggestions); // 매칭된 레시피들을 랜덤으로 섞기
+            suggestedRecipes.addAll(matchingSuggestions);
         }
 
-        List<SuggestedRecipeList> suggestedRecipes = matchingRecipes.stream()
-                .map(recipe -> SuggestedRecipeList.builder()
-                        .recipeId(recipe.getId())
-                        .title(recipe.getTitle())
-                        .thumbnailUrl(recipe.getThumbnailUrl())
-                        .build())
-                .collect(Collectors.toList());
+        // 만약 매칭된 레시피가 원하는 수보다 적다면, 인기 레시피로 나머지를 채우기
+        if (suggestedRecipes.size() < DESIRED_RECIPE_COUNT) {
+            List<SuggestedRecipeList> topRecipes = getTopLikedRecipes();
 
-        // 4. 랜덤으로 섞어서 다양한 추천 제공
-        Collections.shuffle(suggestedRecipes);
+            // 이미 추천된 레시피는 제외
+            Set<Integer> existingRecipeIds = suggestedRecipes.stream()
+                    .map(SuggestedRecipeList::getRecipeId)
+                    .collect(Collectors.toSet());
 
-        log.info("레시피 추천 완료 - 추천된 레시피 수: {}", suggestedRecipes.size());
+            List<SuggestedRecipeList> remainingTopRecipes = topRecipes.stream()
+                    .filter(recipe -> !existingRecipeIds.contains(recipe.getRecipeId()))
+                    .limit(DESIRED_RECIPE_COUNT - suggestedRecipes.size())
+                    .collect(Collectors.toList());
+
+            suggestedRecipes.addAll(remainingTopRecipes);
+        }
+
+        log.info("레시피 추천 완료 - 매칭된 레시피 수: {}, 총 추천 레시피 수: {}",
+                matchingRecipes.size(), suggestedRecipes.size());
 
         return new HomeSuggestedResponse(suggestedRecipes);
     }
@@ -226,6 +248,37 @@ public class HomeServiceImpl implements HomeService {
                         .thumbnailUrl(recipe.getThumbnailUrl())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteBulkIngredients(List<Integer> userIngredientIds, int userId, Integer warningEnable) {
+        if (userIngredientIds == null || userIngredientIds.isEmpty()) {
+            throw new BusinessException(ErrorCode.EMPTY_INGREDIENT_LIST);
+        }
+
+        // 모든 식자재가 현재 사용자의 것인지 확인
+        List<Integer> ownerIds = userIngredientRepository.findUserIdsByUserIngredientIds(userIngredientIds);
+        boolean hasUnauthorizedAccess = ownerIds.stream().anyMatch(ownerId -> ownerId != userId);
+
+        if (hasUnauthorizedAccess) {
+            throw new BusinessException(ErrorCode.INGREDIENT_ACCESS_DENIED);
+        }
+
+        List<UserIngredient> ingredients = userIngredientRepository.findAllByIdsAndNotDeleted(userIngredientIds);
+
+        if (ingredients.isEmpty()) {
+            throw new BusinessException(ErrorCode.INGREDIENT_NOT_FOUND);
+        }
+
+        if (warningEnable != null && warningEnable == 0) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
+            user.updateWarningEnabled(false);
+        }
+
+        // 모든 식자재 삭제 처리
+        ingredients.forEach(UserIngredient::delete);
     }
 
     public OcrList processImage(MultipartFile file, int userId) {

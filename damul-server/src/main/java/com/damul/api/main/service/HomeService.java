@@ -31,4 +31,7 @@ public interface HomeService {
     OcrList processImage(MultipartFile file, int userId);
 
     String normalizeIngredient(String originalName);
+
+    void deleteBulkIngredients(List<Integer> userIngredientIds, int userId, Integer warningEnable);
+
 }
