@@ -228,6 +228,37 @@ public class HomeServiceImpl implements HomeService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional
+    public void deleteBulkIngredients(List<Integer> userIngredientIds, int userId, Integer warningEnable) {
+        if (userIngredientIds == null || userIngredientIds.isEmpty()) {
+            throw new BusinessException(ErrorCode.EMPTY_INGREDIENT_LIST);
+        }
+
+        // 모든 식자재가 현재 사용자의 것인지 확인
+        List<Integer> ownerIds = userIngredientRepository.findUserIdsByUserIngredientIds(userIngredientIds);
+        boolean hasUnauthorizedAccess = ownerIds.stream().anyMatch(ownerId -> ownerId != userId);
+
+        if (hasUnauthorizedAccess) {
+            throw new BusinessException(ErrorCode.INGREDIENT_ACCESS_DENIED);
+        }
+
+        List<UserIngredient> ingredients = userIngredientRepository.findAllByIdsAndNotDeleted(userIngredientIds);
+
+        if (ingredients.isEmpty()) {
+            throw new BusinessException(ErrorCode.INGREDIENT_NOT_FOUND);
+        }
+
+        if (warningEnable != null && warningEnable == 0) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_FORBIDDEN));
+            user.updateWarningEnabled(false);
+        }
+
+        // 모든 식자재 삭제 처리
+        ingredients.forEach(UserIngredient::delete);
+    }
+
     public OcrList processImage(MultipartFile file, int userId) {
         try {
             log.info("서비스: 이미지 처리 시작 - userId: {}", userId);

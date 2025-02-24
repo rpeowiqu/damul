@@ -64,4 +64,10 @@ public interface UserIngredientRepository extends JpaRepository<UserIngredient, 
 
     @Query("SELECT ui.userReceipt.user.id FROM UserIngredient ui WHERE ui.userIngredientId = :userIngredientId")
     Integer findUserIdByUserIngredientId(@Param("userIngredientId") Integer userIngredientId);
+
+    @Query("SELECT ui FROM UserIngredient ui WHERE ui.userIngredientId IN :ids AND ui.isDeleted = false")
+    List<UserIngredient> findAllByIdsAndNotDeleted(@Param("ids") List<Integer> ids);
+
+    @Query("SELECT ui.userReceipt.user.id FROM UserIngredient ui WHERE ui.userIngredientId IN :ingredientIds")
+    List<Integer> findUserIdsByUserIngredientIds(@Param("ingredientIds") List<Integer> ingredientIds);
 }

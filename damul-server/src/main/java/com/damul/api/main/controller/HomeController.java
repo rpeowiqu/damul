@@ -136,6 +136,17 @@ public class HomeController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/ingredients/batch")
+    public ResponseEntity<?> deleteBulkUserIngredients(
+            @RequestBody List<Integer> userIngredientIds,
+            @RequestParam(required = false) Integer warningEnable,
+            @CurrentUser UserInfo user) {
+        log.info("유저 식자재 일괄 삭제 시작 - userIngredientIds: {}, warningEnable: {}", userIngredientIds, warningEnable);
+        homeService.deleteBulkIngredients(userIngredientIds, user.getId(), warningEnable);
+        log.info("유저 식자재 일괄 삭제 성공");
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/upload/{userId}")
     public ResponseEntity<?> handleImageUpload(
             @RequestParam("image") MultipartFile image,
@@ -194,7 +205,5 @@ public class HomeController {
             ));
         }
     }
-
-
 
 }
