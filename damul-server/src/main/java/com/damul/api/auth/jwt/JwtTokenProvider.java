@@ -73,14 +73,16 @@ public class JwtTokenProvider {
      * 주어진 claims와 만료 시간으로 JWT 토큰을 생성
      */
     private String generateToken(Map<String, Object> claims, long expiration) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expiration);
+
         return Jwts.builder()
                 .setClaims(claims)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
                 .signWith(jwtSecretKey, SignatureAlgorithm.HS512)
                 .compact();
     }
-
 
     /**
      * Authentication 객체로부터 Claims 생성
@@ -155,8 +157,10 @@ public class JwtTokenProvider {
     public boolean isTokenExpired(String token) {
         try {
             Date expiration = getClaims(token).getExpiration();
-            return expiration.before(new Date());
+            Date now = new Date();
+            return expiration.before(now);
         } catch (ExpiredJwtException e) {
+            log.info("ExpiredJwtException 발생");
             return true;
         } catch (Exception e) {
             log.error("토큰 만료 확인 중 에러 발생", e);
