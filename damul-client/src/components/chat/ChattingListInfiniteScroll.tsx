@@ -59,7 +59,7 @@ const ChattingListInfiniteScroll = <T,>({
     if (inView && hasNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage]);
+  }, [inView]);
 
   const hasData = data?.pages?.some((page) => page.data.length > 0);
 

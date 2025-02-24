@@ -2,6 +2,7 @@ import AlarmItem from "@/components/alarm/AlarmItem";
 import { getAlarms, getUnreadAlarmCnt } from "@/service/alarm";
 import { useEffect, useState } from "react";
 import { useAlarmStore } from "@/stores/alarmStore";
+import DamulSection from "@/components/common/DamulSection";
 
 interface Alarm {
   id: number;
@@ -48,14 +49,11 @@ const AlarmPage = () => {
   }, [alarmCnt]);
 
   return (
-    <div className="h-full text-center">
-      <div className="text-start px-7 py-3 border-b">
-        읽지 않은 알림 {alarmCnt}개
-      </div>
+    <DamulSection title={`읽지 않은 알림 ${alarmCnt}개`}>
       <div>
         {alarms?.map((alarm) => <AlarmItem key={alarm.id} {...alarm} />)}
       </div>
-    </div>
+    </DamulSection>
   );
 };
 

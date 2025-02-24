@@ -34,8 +34,9 @@ const ChattingMainPage = () => {
 
       // console.log(response?.data);
       if (response.status === 204) {
-        return { data: [], meta: { nextCursor: 0, hasNext: 0 } };
+        return { data: [], meta: { nextCursor: null, hasNext: false } };
       }
+
       return response?.data;
     } catch (error) {
       // console.error("Error fetching chat list:", error);

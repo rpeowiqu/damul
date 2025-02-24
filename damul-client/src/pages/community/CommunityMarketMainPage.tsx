@@ -121,7 +121,9 @@ const CommunityMarketMainPage = () => {
         <DamulInfiniteScrollList
           queryKey={["posts", orderType, statusType]}
           fetchFn={fetchItems}
-          renderItems={(item: PostItem) => <PostFeedCard {...item} />}
+          renderItems={(item: PostItem) => (
+            <PostFeedCard key={item.id} {...item} />
+          )}
           skeleton={
             <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
           }
