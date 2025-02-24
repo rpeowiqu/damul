@@ -46,8 +46,6 @@ public class ChatRoomServiceImpl extends ChatValidation implements ChatRoomServi
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
-    private final NotificationService notificationService;
     private final TimeZoneConverter timeZoneConverter;
     private final SimpMessagingTemplate messagingTemplate;
 
