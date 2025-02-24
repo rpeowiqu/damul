@@ -35,8 +35,10 @@ public class IngredientNormalizerUtil {
                 .stream()
                 .filter(token -> {
                     String pos = token.pos().toString();
-                    return pos.equals(KoreanPosJava.Noun.toString()) ||
-                            pos.equals(KoreanPosJava.ProperNoun.toString());
+                    String text = token.text();
+                    return (pos.equals(KoreanPosJava.Noun.toString()) ||
+                            pos.equals(KoreanPosJava.ProperNoun.toString()))
+                            && !isUnitNoun(text);
                 })
                 .map(token -> token.text())
                 .collect(Collectors.toList());
@@ -44,6 +46,8 @@ public class IngredientNormalizerUtil {
         // 마지막 명사 반환 (일반적으로 한국어에서 마지막 명사가 주요 식재료)
         return nouns.isEmpty() ? "" : nouns.get(nouns.size() - 1);
     }
+
+
 
     private String preprocess(String text) {
         // 1. 괄호와 내용 제거
@@ -65,5 +69,11 @@ public class IngredientNormalizerUtil {
         cleaned = cleaned.replaceAll("\\s+", " ");
 
         return cleaned.trim();
+    }
+
+
+    private boolean isUnitNoun(String text) {
+        // 자주 나오는 단위 패턴을 정규식으로 체크
+        return text.matches(".*(리터|미리|그램|키로|개|봉|팩|박스|세트)$");
     }
 }
