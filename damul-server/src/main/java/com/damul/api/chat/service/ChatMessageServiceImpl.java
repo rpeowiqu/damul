@@ -71,7 +71,7 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
         Optional<ChatRoomMember> member = chatRoomMemberRepository.findByRoomIdAndUserId(roomId, userId);
 
         // ✨ 멤버십 확인 및 신규 멤버 처리 로직 추가
-        if (member.isEmpty()) {
+        if (chatRoom.getPost() == null && member.isEmpty()) {
             if (chatRoom.getStatus() == ChatRoom.Status.INACTIVE) {
                 throw new BusinessException(ErrorCode.CHATROOM_INACTIVE, "비활성화된 채팅방입니다.");
             }
