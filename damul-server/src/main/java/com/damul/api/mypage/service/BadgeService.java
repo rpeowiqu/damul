@@ -225,21 +225,39 @@ public class BadgeService {
      * 트랜잭션 처리가 되어있어 배지 저장 실패 시 자동 롤백
      */
     private void awardBadge(User user, String badgeTitle, short achieved) {
-        // 달성 기준에 해당하는 배지 조회
         Optional<Badge> newBadge = badgeRepository.findByTitleAndStandard(badgeTitle, achieved);
         if (newBadge.isEmpty()) {
             return;
         }
 
-        // 사용자의 현재 최고 레벨 배지 조회
-        Optional<UserBadge> existingBadge = userBadgeRepository
-                .findTopByUserAndBadge_TitleOrderByBadge_LevelDesc(user, badgeTitle);
+        // 사용자의 해당 타입의 모든 배지 조회
+        List<UserBadge> existingBadges = userBadgeRepository
+                .findAllByUserAndBadge_Title(user, badgeTitle);
 
-        if (existingBadge.isPresent()) {
-            // 기존 배지가 있는 경우 레벨 업그레이드 필요 여부 확인
-            Badge currentBadge = existingBadge.get().getBadge();
-            if (newBadge.get().getLevel() > currentBadge.getLevel()) {
-                existingBadge.get().updateBadge(newBadge.get());
+        if (!existingBadges.isEmpty()) {
+            // 가장 높은 레벨의 배지들 찾기
+            int maxLevel = existingBadges.stream()
+                    .mapToInt(ub -> ub.getBadge().getLevel())
+                    .max()
+                    .getAsInt();
+
+            List<UserBadge> highestLevelBadges = existingBadges.stream()
+                    .filter(ub -> ub.getBadge().getLevel() == maxLevel)
+                    .collect(Collectors.toList());
+
+            // 가장 높은 레벨의 배지가 여러 개라면, 가장 오래된 것 하나만 남기고 나머지 삭제
+            UserBadge keepBadge = highestLevelBadges.stream()
+                    .min(Comparator.comparing(UserBadge::getCreatedAt))
+                    .get();
+
+            // 남길 배지를 제외한 모든 배지 삭제
+            existingBadges.stream()
+                    .filter(ub -> !ub.equals(keepBadge))
+                    .forEach(userBadgeRepository::delete);
+
+            // 레벨 업그레이드 필요 여부 확인
+            if (newBadge.get().getLevel() > keepBadge.getBadge().getLevel()) {
+                keepBadge.updateBadge(newBadge.get());
                 log.info("사용자 {} 배지 {} 레벨 {} 업데이트 완료",
                         user.getId(), badgeTitle, newBadge.get().getLevel());
             }
