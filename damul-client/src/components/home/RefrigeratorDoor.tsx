@@ -8,7 +8,7 @@ const RefrigeratorDoor = ({ storage }: { storage: string }) => {
   const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
-    const doorOpened = localStorage.getItem(`doorOpened_${storage}`);
+    const doorOpened = sessionStorage.getItem(`doorOpened_${storage}`);
     if (doorOpened === "true") {
       setIsHidden(true);
     }
@@ -17,7 +17,7 @@ const RefrigeratorDoor = ({ storage }: { storage: string }) => {
   const handleDoorClick = () => {
     if (!isOpen) {
       setIsOpen(true);
-      localStorage.setItem(`doorOpened_${storage}`, "true");
+      sessionStorage.setItem(`doorOpened_${storage}`, "true");
     }
   };
 

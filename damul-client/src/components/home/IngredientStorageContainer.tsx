@@ -7,12 +7,13 @@ import {
   ITEM_STATUS,
   ITEM_STATUS_ICON,
 } from "@/constants/itemStatus";
-import { Ingredient, IngredientData } from "@/types/Ingredient";
+import { Ingredient } from "@/types/Ingredient";
 import DamulModal from "../common/DamulModal";
 import IngredientDetail from "./IngredientDetail";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { useIngredientStore } from "@/stores/ingredientStore";
 import { initialIngrdientItem } from "@/constants/initialData";
+import queryClient from "@/utils/queryClient";
 
 interface IngredientStorageContainerProps {
   title: keyof typeof STORAGE_TYPE | keyof typeof ITEM_STATUS;
@@ -20,7 +21,6 @@ interface IngredientStorageContainerProps {
   onEdit?: boolean;
   readOnly?: boolean;
   setExpiringSoonItems?: React.Dispatch<React.SetStateAction<Ingredient[]>>;
-  setIngredientData?: React.Dispatch<React.SetStateAction<IngredientData>>;
 }
 
 const COLUMN_SIZE = {
@@ -36,7 +36,6 @@ const IngredientStorageContainer = ({
   onEdit,
   readOnly,
   setExpiringSoonItems,
-  setIngredientData,
 }: IngredientStorageContainerProps) => {
   const IconComponent =
     title === "expiringSoon" ? ITEM_STATUS_ICON[title] : STORAGE_ICON[title];
@@ -77,19 +76,9 @@ const IngredientStorageContainer = ({
       ),
     );
 
-    setIngredientData?.((prevData) => {
-      const storage = updatedIngredient.storage as
-        | "freezer"
-        | "fridge"
-        | "roomTemp";
-
-      const newData = prevData[storage].map((item) => {
-        return item.userIngredientId === updatedIngredient.userIngredientId
-          ? updatedIngredient
-          : item;
-      });
-
-      return { ...prevData, [storage]: newData };
+    queryClient.refetchQueries({
+      queryKey: ["ingredientData"],
+      type: "all",
     });
 
     if (updatedIngredient.expirationDate <= EXPIRINGSOON_DAY) {
@@ -110,17 +99,9 @@ const IngredientStorageContainer = ({
       ),
     );
 
-    setIngredientData?.((prevData) => {
-      const storage = deletedIngredient.storage as
-        | "freezer"
-        | "fridge"
-        | "roomTemp";
-
-      const newData = prevData[storage].filter((item) => {
-        return item.userIngredientId !== deletedIngredient.userIngredientId;
-      });
-
-      return { ...prevData, [storage]: newData };
+    queryClient.refetchQueries({
+      queryKey: ["ingredientData"],
+      type: "all",
     });
 
     if (deletedIngredient.expirationDate <= EXPIRINGSOON_DAY) {

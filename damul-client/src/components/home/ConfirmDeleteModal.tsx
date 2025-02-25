@@ -5,6 +5,7 @@ import useAuth from "@/hooks/useAuth";
 import { useState } from "react";
 import DamulButton from "../common/DamulButton";
 import { Input } from "../ui/input";
+import queryClient from "@/utils/queryClient";
 
 interface ConfirmDeleteModalProps {
   setIsDeleteOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -31,6 +32,10 @@ const ConfirmDeleteModal = ({
         warningEnabled ? 1 : 0,
       );
       refetch();
+      queryClient.resetQueries({
+        queryKey: ["ingredientData"],
+        type: "all",
+      });
       deleteIngredient(ingredient);
     } catch (error) {
       // console.log("식자재 정보를 삭제 하지 못했습니다.");
