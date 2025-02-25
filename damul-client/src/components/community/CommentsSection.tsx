@@ -40,9 +40,9 @@ const CommentsSection = ({
       return;
     }
     if (chatRoomId) {
-      sendEnterRoom(chatRoomId, data?.data.id);
+      // sendEnterRoom(chatRoomId, data?.data.id);
+      navigate(`/chatting/${chatRoomId}`);
     }
-    navigate(`/chatting/${chatRoomId}`);
   };
 
   const StatusMarker = () => {

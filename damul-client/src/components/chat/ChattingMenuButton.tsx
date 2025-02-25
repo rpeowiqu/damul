@@ -64,7 +64,7 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
     try {
       const response = await deleteFromRoom({ roomId: roomId });
       // console.log(response);
-      navigate("/chatting");
+      navigate("/chatting", { replace: true });
     } catch (error) {
       // console.log(error);
     }
@@ -139,8 +139,10 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
               )}
             </div>
           ) : (
-            <div className="flex justify-end" onClick={handleExitRoom}>
-              <ExitIcon className="w-5 h-5 stroke-neutral-500 cursor-pointer" />
+            <div className="flex justify-end">
+              <div onClick={handleExitRoom}>
+                <ExitIcon className="w-5 h-5 stroke-neutral-500 cursor-pointer" />
+              </div>
             </div>
           )}
         </div>
