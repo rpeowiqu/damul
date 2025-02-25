@@ -32,7 +32,7 @@ export interface PurchaseHistory {
 
 export interface ReceiptDetail {
   productName: string;
-  category_name: string;
+  categoryName: string;
   price: number;
 }
 

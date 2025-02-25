@@ -17,7 +17,6 @@ const ChattingMainPage = () => {
   const { chatCnt } = useChatAlarmStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const filterType = searchParams.get("filter") || "";
-
   const navigate = useNavigate();
 
   const fetchItems = async (pageParam: {
@@ -44,7 +43,6 @@ const ChattingMainPage = () => {
   };
 
   useEffect(() => {
-    // console.log("sds");
     queryClient.refetchQueries({
       queryKey: ["chattRooms", filterType],
     });

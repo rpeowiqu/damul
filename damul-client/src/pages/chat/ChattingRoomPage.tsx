@@ -115,21 +115,25 @@ const ChattingRoomPage = () => {
         cursor: pageParam,
         size: 50,
       });
-
-      console.log(response?.data);
-      if (response?.data && typeof response.data === "object") {
+      console.log(response.data);
+      if (response.data) {
         setChatData({
           messages: response.data.data || [],
           memberNum: response.data.memberNum || 0,
           roomName: response.data.roomName || "",
           postId: response.data.postId || 0,
         });
+        return response.data;
       } else {
-        console.warn("예상과 다른 데이터 구조:", response?.data);
         setChatData({ messages: [], memberNum: 0, roomName: "", postId: 0 });
+        return {
+          data: [],
+          meta: { nextCursor: 0, hasNext: false },
+          memberNumber: 0,
+          roomName: 0,
+          postID: 0,
+        };
       }
-
-      return response?.data;
     } catch (error) {
       // console.error("채팅 데이터 불러오기 실패:", error);
     }
