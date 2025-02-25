@@ -46,7 +46,11 @@ const HomePage = () => {
 
   const expiringSoonItems: Ingredient[] = Object.values(ingredientData)
     .flat()
-    .filter((ingredient) => ingredient.expirationDate <= EXPIRINGSOON_DAY);
+    .filter(
+      (ingredient) =>
+        ingredient.expirationDate <= EXPIRINGSOON_DAY &&
+        ingredient.expirationDate >= 0,
+    );
 
   let filteredIngredientData: IngredientData = ingredientData;
 
