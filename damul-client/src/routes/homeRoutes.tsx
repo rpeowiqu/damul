@@ -1,3 +1,4 @@
+import Loading from "@/components/common/Loading";
 import { lazy, Suspense } from "react";
 
 const HomePage = lazy(() => import("@/pages/home/HomePage"));
@@ -17,7 +18,7 @@ const homeRoutes = [
     path: "home/register",
 
     element: (
-      <Suspense fallback={<div></div>}>
+      <Suspense fallback={<Loading />}>
         <HomeIngredientsRegisterPage />
       </Suspense>
     ),

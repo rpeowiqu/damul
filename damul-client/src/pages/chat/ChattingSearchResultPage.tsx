@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
 import PostButton from "@/components/community/PostButton";
-import PlusIcon from "@/components/svg/PlusIcon";
 import { getSearchedChattingList } from "@/service/chatting";
 import ChattingListInfiniteScroll from "@/components/chat/ChattingListInfiniteScroll";
 import ChattingListItem from "@/components/chat/ChattingListItem";
 import { ChattingItem } from "@/types/chatting";
 import DamulSection from "@/components/common/DamulSection";
+import WriteIcon from "@/components/svg/WriteIcon";
 
 const ChattingSearchResultPage = () => {
   const navigate = useNavigate();
@@ -71,7 +71,10 @@ const ChattingSearchResultPage = () => {
         />
       </DamulSection>
 
-      <PostButton to="/chatting/create" icon={<PlusIcon />} />
+      <PostButton
+        to="/chatting/create"
+        icon={<WriteIcon className="scale-150 fill-positive-300" />}
+      />
     </div>
   );
 };

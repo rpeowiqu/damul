@@ -79,7 +79,9 @@ const QrCodePage = () => {
           <h1 className="text-xl font-bold mb-4">
             영수증 사진을 등록해주세요.
           </h1>
-          <DamulButton onClick={handleClick}>등록</DamulButton>
+          <DamulButton variant="positive" onClick={handleClick}>
+            등록
+          </DamulButton>
           <input
             type="file"
             accept="image/*"
