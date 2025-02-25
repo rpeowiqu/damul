@@ -6,7 +6,7 @@ import {
   useEffect,
   KeyboardEvent,
 } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ChattingBubble from "@/components/chat/ChattingBubble";
 import SendIcon from "@/components/svg/SendIcon";
 import ChattingMenuButton from "@/components/chat/ChattingMenuButton";
@@ -39,6 +39,7 @@ interface QueryData {
 }
 
 const ChattingRoomPage = () => {
+  const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const messageInputRef = useRef<HTMLTextAreaElement | null>(null);
   const { roomId } = useParams();
@@ -115,7 +116,8 @@ const ChattingRoomPage = () => {
         cursor: pageParam,
         size: 50,
       });
-      console.log(response.data);
+
+      // console.log(response.data);
       if (response.data) {
         setChatData({
           messages: response.data.data || [],
@@ -135,6 +137,7 @@ const ChattingRoomPage = () => {
         };
       }
     } catch (error) {
+      navigate("/notFound");
       // console.error("채팅 데이터 불러오기 실패:", error);
     }
   };
