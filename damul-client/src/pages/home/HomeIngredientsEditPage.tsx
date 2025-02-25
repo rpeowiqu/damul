@@ -100,9 +100,9 @@ const HomeIngredientsEditPage = () => {
 
   return (
     <DamulSection
-      className={`${isSelectMode && "pb-40"}`}
+      className={`${isSelectMode && "pb-40 px-0"}`}
       title={
-        <div className="flex items-center gap-3">
+        <div className={`flex items-center gap-3 ${isSelectMode && "px-4"}`}>
           <button onClick={() => navigate("/home")} type="button">
             {"<"}
           </button>
@@ -110,7 +110,9 @@ const HomeIngredientsEditPage = () => {
         </div>
       }
     >
-      <div className="flex justify-between items-center py-2">
+      <div
+        className={`flex justify-between items-center py-2 ${isSelectMode && "px-4"}`}
+      >
         <DamulButton
           variant="negative"
           className="w-20"
@@ -121,7 +123,9 @@ const HomeIngredientsEditPage = () => {
         <p className="text-end text-sm">총 {ingredients.length}개의 항목</p>
       </div>
 
-      <div className="flex flex-col gap-8 items-center">
+      <div
+        className={`flex flex-col gap-8 items-center ${isSelectMode && "px-4"}`}
+      >
         {ingredients.length === 0 && (
           <div className="flex w-full flex-col h-60 items-center gap-5 justify-center">
             <p className="text-normal-300">편집할 식자재가 없습니다.</p>
@@ -138,7 +142,7 @@ const HomeIngredientsEditPage = () => {
           return (
             <div
               key={ingredient.userIngredientId}
-              className="flex items-center gap-5 w-full relative justify-center"
+              className="flex items-center gap-2 w-full relative justify-center"
             >
               {isSelectMode && (
                 <>
@@ -149,11 +153,11 @@ const HomeIngredientsEditPage = () => {
                   <div className="flex-1 flex justify-center items-center">
                     <input
                       type="checkbox"
-                      className={`w-8 h-8 appearance-none rounded border-2 border-positive-400 
+                      className={`w-5 h-5 appearance-none rounded border-2 border-positive-400 
                             bg-white checked:bg-positive-500  checked:border-positive-600 
                             cursor-pointer transition-all 
                             flex items-center justify-center
-                            before:content-['✓'] before:text-white before:text-3xl before:hidden 
+                            before:content-['✓'] before:text-white before:text-xl before:hidden 
                             checked:before:block z-50`}
                       checked={isSelected}
                       onChange={() =>
