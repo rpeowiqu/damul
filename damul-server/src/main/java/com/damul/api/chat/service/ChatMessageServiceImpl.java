@@ -102,6 +102,7 @@ public class ChatMessageServiceImpl extends ChatValidation implements ChatMessag
                     chatRoom,
                     String.format("%s님이 입장하셨습니다.", user.getNickname())
             );
+            systemMessage.updateCreatedAt(timeZoneConverter.convertUtcToSeoul(LocalDateTime.now()));
             chatMessageRepository.save(systemMessage);
             log.info("서비스: 새로운 멤버 추가 완료 - roomId: {}, userId: {}", roomId, userId);
         }
