@@ -20,8 +20,8 @@ const CookingOrdersSection = ({
     );
   }
   return (
-    <div className="py-3 text-start">
-      <h3 className="p-3 text-md pc:text-lg font-semibold">조리 순서</h3>
+    <div className="text-start">
+      <h3 className="text-md pc:text-lg font-semibold">조리 순서</h3>
       <div className="flex flex-col gap-3">
         {cookingOrders?.map((order) => (
           <div

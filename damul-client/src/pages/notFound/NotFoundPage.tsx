@@ -9,7 +9,6 @@ import {
 import HomeIcon from "@/components/svg/HomeIcon";
 import ProfileIcon from "@/components/svg/ProfileIcon";
 import DamulButton from "@/components/common/DamulButton";
-import logo from "../../../public/logo.svg";
 
 const NotFoundPage = () => {
   const [isJumping, setIsJumping] = useState(false);
@@ -114,7 +113,7 @@ const NotFoundPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-[600px] border-x-1 border-neutral-100 m-auto bg-white">
-      <img src={logo} className="w-24 mb-20" />
+      <img src="/logo.svg" className="w-24 mb-20" />
       <h1 className="text-xl font-bold mb-4">
         찾으시는 페이지가 없어요... 혹시 다른 길을 함께 찾아볼까요?
       </h1>

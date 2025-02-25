@@ -13,28 +13,23 @@ const ChattingStartPage = lazy(() => import("@/pages/chat/ChattingStartPage"));
 const chatRoutes = [
   {
     path: "chatting",
-    children: [
-      {
-        index: true,
-        element: <ChattingMainPage />,
-      },
-      {
-        path: ":roomId",
-        element: <ChattingRoomPage />,
-      },
-      {
-        path: "search",
-        element: <ChattingSearchPage />,
-      },
-      {
-        path: "search/:keyword",
-        element: <ChattingSearchResultPage />,
-      },
-      {
-        path: "create",
-        element: <ChattingStartPage />,
-      },
-    ],
+    element: <ChattingMainPage />,
+  },
+  {
+    path: "chatting/:roomId",
+    element: <ChattingRoomPage />,
+  },
+  {
+    path: "chatting/search",
+    element: <ChattingSearchPage />,
+  },
+  {
+    path: "chatting/search/:keyword",
+    element: <ChattingSearchResultPage />,
+  },
+  {
+    path: "chatting/create",
+    element: <ChattingStartPage />,
   },
 ];
 

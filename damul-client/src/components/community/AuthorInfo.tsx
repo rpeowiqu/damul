@@ -81,7 +81,7 @@ const AuthorInfo = ({
 
   if (authLoading || isLoading) {
     return (
-      <div className="flex flex-col h-auto p-2">
+      <div className="flex flex-col h-auto">
         <div className="flex justify-between items-center gap-2">
           <div className="flex items-center gap-2">
             <Skeleton circle width={35} height={35} />
@@ -96,10 +96,8 @@ const AuthorInfo = ({
     );
   }
 
-  // console.log(authorId + " " + authorName + "ㅇㅇ");
-
   return (
-    <div className="flex flex-col h-auto p-2">
+    <div className="flex flex-col h-auto">
       <div className="flex justify-between items-center">
         <Link to={`/profile/${authorId}/info`}>
           <div className="flex items-center">

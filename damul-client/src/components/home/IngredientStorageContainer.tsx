@@ -7,12 +7,13 @@ import {
   ITEM_STATUS,
   ITEM_STATUS_ICON,
 } from "@/constants/itemStatus";
-import { Ingredient, IngredientData } from "@/types/Ingredient";
+import { Ingredient } from "@/types/Ingredient";
 import DamulModal from "../common/DamulModal";
 import IngredientDetail from "./IngredientDetail";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { useIngredientStore } from "@/stores/ingredientStore";
 import { initialIngrdientItem } from "@/constants/initialData";
+import queryClient from "@/utils/queryClient";
 
 interface IngredientStorageContainerProps {
   title: keyof typeof STORAGE_TYPE | keyof typeof ITEM_STATUS;
@@ -20,7 +21,6 @@ interface IngredientStorageContainerProps {
   onEdit?: boolean;
   readOnly?: boolean;
   setExpiringSoonItems?: React.Dispatch<React.SetStateAction<Ingredient[]>>;
-  setIngredientData?: React.Dispatch<React.SetStateAction<IngredientData>>;
 }
 
 const COLUMN_SIZE = {
@@ -36,7 +36,6 @@ const IngredientStorageContainer = ({
   onEdit,
   readOnly,
   setExpiringSoonItems,
-  setIngredientData,
 }: IngredientStorageContainerProps) => {
   const IconComponent =
     title === "expiringSoon" ? ITEM_STATUS_ICON[title] : STORAGE_ICON[title];
@@ -77,19 +76,9 @@ const IngredientStorageContainer = ({
       ),
     );
 
-    setIngredientData?.((prevData) => {
-      const storage = updatedIngredient.storage as
-        | "freezer"
-        | "fridge"
-        | "roomTemp";
-
-      const newData = prevData[storage].map((item) => {
-        return item.userIngredientId === updatedIngredient.userIngredientId
-          ? updatedIngredient
-          : item;
-      });
-
-      return { ...prevData, [storage]: newData };
+    queryClient.refetchQueries({
+      queryKey: ["ingredientData"],
+      type: "all",
     });
 
     if (updatedIngredient.expirationDate <= EXPIRINGSOON_DAY) {
@@ -110,17 +99,9 @@ const IngredientStorageContainer = ({
       ),
     );
 
-    setIngredientData?.((prevData) => {
-      const storage = deletedIngredient.storage as
-        | "freezer"
-        | "fridge"
-        | "roomTemp";
-
-      const newData = prevData[storage].filter((item) => {
-        return item.userIngredientId !== deletedIngredient.userIngredientId;
-      });
-
-      return { ...prevData, [storage]: newData };
+    queryClient.refetchQueries({
+      queryKey: ["ingredientData"],
+      type: "all",
     });
 
     if (deletedIngredient.expirationDate <= EXPIRINGSOON_DAY) {
@@ -153,9 +134,7 @@ const IngredientStorageContainer = ({
   }, []);
 
   return (
-    <div
-      className={`pt-[10px] my-3 border border-normal-100 rounded-xl min-h-[100px]`}
-    >
+    <div className={`pt-2 border border-normal-100 rounded-xl min-h-[100px]`}>
       <div className="flex items-center gap-1 px-2 text-sm">
         <IconComponent />
         <p
@@ -193,7 +172,7 @@ const IngredientStorageContainer = ({
           <button
             onClick={handleOnClick}
             className={`${isOverColumnLimit ? "block" : "hidden"}
-      flex items-center justify-center w-full h-full p-4 mt-2 bg-normal-100/50 rounded-b-xl`}
+      flex items-center justify-center w-full h-full p-2.5 mt-2 bg-normal-100/50 rounded-b-xl`}
           >
             {isExpanded ? (
               <div className="h-2 leading-3 text-xs text-normal-300">접기</div>

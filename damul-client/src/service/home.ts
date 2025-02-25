@@ -25,6 +25,16 @@ export const deleteUserIndegredient = async (
   );
 };
 
+export const deleteUserIndegredients = async (
+  data: number[],
+  warningEnable: number,
+) => {
+  return apiClient.delete(
+    `/home/ingredients/batch?warningEnable=${warningEnable}`,
+    { data },
+  );
+};
+
 export const postUserIndegredient = async (data: RegisterIngredientData) => {
   return apiClient.post(`/home/ingredients/register`, data);
 };

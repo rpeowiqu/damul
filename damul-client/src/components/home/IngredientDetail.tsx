@@ -4,17 +4,19 @@ import SaveIcon from "../svg/SaveIcon";
 import { Slider } from "../ui/slider";
 import { CATEGORY_ICON_MAPPER } from "@/constants/category";
 import { deleteUserIndegredient, patchUserIndegredient } from "@/service/home";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useAuth from "@/hooks/useAuth";
 import DamulButton from "../common/DamulButton";
 import CancelIcon from "../svg/CancelIcon";
 import AlertCircleIcon from "../svg/AlertCircleIcon";
 import { EXPIRINGSOON_DAY } from "@/constants/itemStatus";
+import queryClient from "@/utils/queryClient";
 
 interface IngredientDetailProps {
   selectedIngredient: Ingredient;
   updateIngredient?: (ingredient: Ingredient) => void;
   deleteIngredient?: (deletedIngredient: Ingredient) => void;
+  setIngredients?: React.Dispatch<React.SetStateAction<Ingredient[]>>;
   setIsDeleteOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   readOnly?: boolean;
@@ -55,6 +57,7 @@ const IngredientDetail = ({
   selectedIngredient,
   updateIngredient,
   deleteIngredient,
+  setIngredients,
   setIsDeleteOpen,
   setIsOpen,
   readOnly,
@@ -70,10 +73,20 @@ const IngredientDetail = ({
   const handleQuantityChange = (value: number[]) => {
     if (!readOnly) {
       setIngredient((prev) => {
-        return {
+        const updatedIngredient = {
           ...prev,
           ingredientQuantity: value[0],
         };
+
+        setIngredients?.((prevItems) =>
+          prevItems.map((item) =>
+            item.userIngredientId === prev.userIngredientId
+              ? updatedIngredient
+              : item,
+          ),
+        );
+
+        return updatedIngredient;
       });
     }
   };
@@ -88,6 +101,10 @@ const IngredientDetail = ({
           data?.data.warningEnabled ? 1 : 0,
         );
         refetch();
+        queryClient.refetchQueries({
+          queryKey: ["ingredientData"],
+          type: "all",
+        });
         deleteIngredient?.(ingredient);
       } catch (error) {
         // console.log("식자재 정보를 삭제 하지 못했습니다.");
@@ -101,16 +118,13 @@ const IngredientDetail = ({
       await patchUserIndegredient(ingredient.userIngredientId, {
         ingredientQuantity: ingredient.ingredientQuantity,
       });
+      queryClient.refetchQueries({ queryKey: ["ingredientData"], type: "all" });
       updateIngredient?.(ingredient);
     } catch (error: any) {
       // console.error("식자재 정보를 수정하지 못했습니다.");
     }
     setIsOpen?.(false);
   };
-
-  useEffect(() => {
-    setIngredient(selectedIngredient);
-  }, [selectedIngredient]);
 
   return (
     <div className="flex flex-col items-center w-full gap-4 p-5">
@@ -167,7 +181,7 @@ const IngredientDetail = ({
         <div className="flex justify-between w-full gap-2">
           <DamulButton
             variant="negative"
-            className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
+            className="w-full active:scale-95"
             onClick={handleDeleteClick}
           >
             <DeleteIcon />
@@ -176,7 +190,7 @@ const IngredientDetail = ({
           <DamulButton
             variant="positive"
             onClick={handleSaveClick}
-            className="w-full shadow-md transition ease-in-out duration-150 active:scale-75"
+            className="w-full active:scale-95"
           >
             <SaveIcon />
             <p className="text-xs pc:text-sm text-white">저장</p>

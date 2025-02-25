@@ -34,7 +34,9 @@ const FixedCommentInfo = ({
         <div className="mb-2 p-2 flex justify-between items-center text-start">
           <div>
             <p className="text-sm font-bold">{replyingTo.nickname}</p>
-            <p className="text-sm">{replyingTo.comment}</p>
+            <p className="text-sm whitespace-pre-wrap break-words break-all line-clamp-1">
+              {replyingTo.comment}
+            </p>
           </div>
           <div
             onClick={cancelReply}

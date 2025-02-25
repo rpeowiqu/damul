@@ -7,6 +7,7 @@ import CommentsSection from "@/components/community/CommentsSection";
 import FixedCommentInfo from "@/components/community/FixedCommentInfo";
 import { getPostDetail } from "@/service/market";
 import { Comment, PostDetail } from "@/types/community";
+import DamulSection from "@/components/common/DamulSection";
 
 const CommunityMarketDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
@@ -56,47 +57,47 @@ const CommunityMarketDetailPage = () => {
   };
 
   return (
-    <main
-      className={`relative flex flex-col justify-center w-full text-center p-6 ${
-        replyingTo ? "pc:pb-24" : "pc:pb-6"
-      } mb-8`}
-    >
-      <CommunityDetailHeader
-        title={data.title}
-        createdAt={data.createdAt}
-        status={data.status}
-        id={data.id}
-        authorId={data.authorId}
-        isLoading={isLoading}
-        type="market"
-      />
-      <AuthorInfo
-        profileImageUrl={data.profileImageUrl}
-        authorName={data.authorName}
-        authorId={data.authorId}
-        viewCnt={data.viewCnt}
-        id={data.id}
-        isLoading={isLoading}
-        type="market"
-      />
-      <ContentSection
-        contentImageUrl={data.contentImageUrl}
-        content={data.content}
-        isLoading={isLoading}
-        type="market"
-      />
-      <CommentsSection
-        id={data.id}
-        comments={data.comments}
-        onReply={(comment) => setReplyingTo(comment)}
-        currentChatNum={data.currentChatNum}
-        chatSize={data.chatSize}
-        fetchDetailData={fetchPostDetail}
-        entered={data.entered}
-        chatRoomId={data.chatRoomId}
-        status={data.status}
-        type="market"
-      />
+    <div className={`flex flex-col gap-3 ${replyingTo ? "pb-28" : "pb-14"}`}>
+      <DamulSection>
+        <CommunityDetailHeader
+          title={data.title}
+          createdAt={data.createdAt}
+          status={data.status}
+          id={data.id}
+          authorId={data.authorId}
+          isLoading={isLoading}
+          type="market"
+        />
+        <AuthorInfo
+          profileImageUrl={data.profileImageUrl}
+          authorName={data.authorName}
+          authorId={data.authorId}
+          viewCnt={data.viewCnt}
+          id={data.id}
+          isLoading={isLoading}
+          type="market"
+        />
+        <ContentSection
+          contentImageUrl={data.contentImageUrl}
+          content={data.content}
+          isLoading={isLoading}
+          type="market"
+        />
+      </DamulSection>
+      <DamulSection>
+        <CommentsSection
+          id={data.id}
+          comments={data.comments}
+          onReply={(comment) => setReplyingTo(comment)}
+          currentChatNum={data.currentChatNum}
+          chatSize={data.chatSize}
+          fetchDetailData={fetchPostDetail}
+          entered={data.entered}
+          chatRoomId={data.chatRoomId}
+          status={data.status}
+          type="market"
+        />
+      </DamulSection>
       <FixedCommentInfo
         id={postId || ""}
         replyingTo={replyingTo}
@@ -107,7 +108,7 @@ const CommunityMarketDetailPage = () => {
         fetchDetailData={fetchPostDetail}
         type="market"
       />
-    </main>
+    </div>
   );
 };
 

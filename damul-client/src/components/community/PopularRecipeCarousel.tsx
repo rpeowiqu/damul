@@ -9,7 +9,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { UserRecipes } from "@/types/recipe";
+import { SuggestedRecipe } from "@/types/recipe";
 import { useNavigate } from "react-router-dom";
 import { getPoppularRecipes } from "@/service/recipe";
 
@@ -17,61 +17,68 @@ const PopularRecipeCarousel = () => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
-
-  const [suggestedRecipe, setsuggestedRecipe] = useState<UserRecipes>();
+  const [suggestedRecipes, setsuggestedRecipes] = useState<SuggestedRecipe[]>(
+    [],
+  );
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!api) {
-      return;
-    }
-    setCount(suggestedRecipe ? suggestedRecipe.suggestedRecipes.length : 0);
-    setCurrent(api.selectedScrollSnap() + 1);
-
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api, suggestedRecipe?.suggestedRecipes.length]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getPoppularRecipes();
         // console.log(response.data);
-        setsuggestedRecipe(response.data);
+        setsuggestedRecipes(response.data.suggestedRecipes);
       } catch (err: any) {
         // console.log("레시피 데이터를 받아오지 못했습니다.");
       }
     };
+
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCount(suggestedRecipes ? suggestedRecipes.length : 0);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api, suggestedRecipes.length]);
+
   return (
     <Carousel
-      plugins={[Autoplay({ delay: 2000 })]}
+      plugins={[Autoplay({ delay: 3000 })]}
       setApi={setApi}
       opts={{ loop: true }}
       className="relative w-full"
     >
       <CarouselContent>
-        {suggestedRecipe?.suggestedRecipes.map((recipe, idx) => (
-          <CarouselItem
-            key={`${idx}-${recipe.recipeId}`}
-            className="h-36 cursor-pointer"
-            onClick={() => {
-              navigate("/community/recipe/1");
-            }}
-          >
-            <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
-              <div className="font-bold text-2xl">{recipe.title}</div>
-            </div>
-            <img
-              src={recipe.thumbnailUrl}
-              className="object-cover w-full h-full"
-              alt="캐러셀이미지"
-            />
-          </CarouselItem>
-        ))}
+        {suggestedRecipes &&
+          suggestedRecipes.map((recipe) => (
+            <CarouselItem
+              key={recipe.recipeId}
+              className="h-36 cursor-pointer"
+              onClick={() => navigate(`/community/recipe/${recipe.recipeId}`)}
+            >
+              <div className="absolute w-full h-full p-6 bg-gradient-to-r from-black/65 text-white">
+                <p className="text-xs sm:text-sm text-positive-200 font-bold">
+                  이런 메뉴는 어떠세요?
+                </p>
+                <p className="text-lg sm:text-xl font-extrabold">
+                  {recipe.title}
+                </p>
+              </div>
+              <img
+                src={recipe.thumbnailUrl}
+                className="object-cover w-full h-full"
+                alt="캐러셀 이미지"
+              />
+            </CarouselItem>
+          ))}
       </CarouselContent>
       <div className="absolute flex items-center px-2 py-1 space-x-2 text-sm text-white bottom-2 right-2">
         <CarouselPrevious className="bg-transparent border-2 border-white" />

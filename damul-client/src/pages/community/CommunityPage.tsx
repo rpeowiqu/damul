@@ -16,12 +16,12 @@ const tabItems = [
 
 const CommunityPage = () => {
   return (
-    <main className="flex flex-col">
+    <div className="flex flex-col h-full">
       <DamulTab tabList={tabItems} />
       <Suspense fallback={<Loading />}>
         <Outlet />
       </Suspense>
-    </main>
+    </div>
   );
 };
 

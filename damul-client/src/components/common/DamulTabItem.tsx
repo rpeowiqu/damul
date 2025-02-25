@@ -42,8 +42,8 @@ const DamulTabItem = ({
     <NavLink
       className={({ isActive }) =>
         isActive
-          ? "text-positive-400 flex-1 text-center font-bold"
-          : "flex-1 text-center text-normal-200 font-bold"
+          ? "flex-1 text-center text-positive-400 font-bold text-sm sm:text-base"
+          : "flex-1 text-center text-normal-200 font-bold text-sm sm:text-base"
       }
       to={getPath()}
       onClick={onClick}

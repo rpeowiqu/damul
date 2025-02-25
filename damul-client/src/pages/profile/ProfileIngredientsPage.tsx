@@ -47,10 +47,12 @@ const ProfileIngredientsPage = () => {
   return (
     <div className="flex flex-col gap-2 p-5 bg-white">
       <div className="flex flex-col gap-2">
-        <h1 className="text-lg font-bold">
+        <h1 className="text-base sm:text-lg font-black text-normal-700">
           {user.nickname}님의 보유중인 식자재
         </h1>
-        <p className="text-normal-600">어떤 식자재가 있는지 살펴보세요.</p>
+        <p className="text-sm sm:text-base text-normal-500 ">
+          어떤 식자재가 있는지 살펴볼까요?
+        </p>
       </div>
       {ingredientData?.isPrivate ? (
         <div className="flex justify-center gap-2 items-center py-5 text-center text-normal-200">

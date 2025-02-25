@@ -61,7 +61,7 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
 
   return (
     <Carousel
-      plugins={[Autoplay({ delay: 2000 })]}
+      plugins={[Autoplay({ delay: 3000 })]}
       setApi={setApi}
       opts={{ loop: true }}
       className="relative w-full"
@@ -79,20 +79,26 @@ const DamulCarousel = ({ fetchFn }: DamulCarouselProps) => {
                 className="h-36 cursor-pointer"
                 onClick={() => handleCarouselItemClick(idx)}
               >
-                <div className="absolute w-full h-full p-6 bg-normal-600 bg-opacity-30 text-white">
-                  <div className="font-bold text-2xl">{recipe.title}</div>
+                <div className="absolute w-full h-full p-6 bg-gradient-to-r from-black/65 text-white">
+                  <p className="text-xs sm:text-sm text-positive-200 font-bold">
+                    이런 메뉴는 어떠세요?
+                  </p>
+                  <p className="text-lg sm:text-xl font-extrabold">
+                    {recipe.title}
+                  </p>
                 </div>
                 <img
                   src={recipe.thumbnailUrl}
                   className="object-cover w-full h-full"
-                  alt="캐러셀이미지"
+                  alt="캐러셀 이미지"
                 />
               </CarouselItem>
             ))}
       </CarouselContent>
-      <div className="absolute flex items-center px-2 py-1 space-x-2 text-sm text-white bottom-2 right-2">
+
+      <div className="absolute w-28 flex justify-center items-center text-center text-sm text-white font-bold bottom-3 right-3">
         <CarouselPrevious className="bg-transparent border-2 border-white" />
-        <div>{`${current} / ${count}`}</div>
+        <div className="flex-1">{`${current} / ${count}`}</div>
         <CarouselNext className="bg-transparent border-2 border-white" />
       </div>
     </Carousel>
