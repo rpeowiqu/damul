@@ -142,7 +142,7 @@ const HomeIngredientsEditPage = () => {
           return (
             <div
               key={ingredient.userIngredientId}
-              className="flex items-center gap-2 w-full relative justify-center"
+              className="border-4 w-full max-w-88 rounded-3xl border-positive-300 relative"
             >
               {isSelectMode && (
                 <>
@@ -150,36 +150,29 @@ const HomeIngredientsEditPage = () => {
                     onClick={() => handleClick(ingredient.userIngredientId)}
                     className={`absolute z-40 w-full h-full ${isSelected ? "bg-positive-100/20" : "bg-transparent"} cursor-pointer`}
                   ></div>
-                  <div className="flex-1 flex justify-center items-center">
-                    <input
-                      type="checkbox"
-                      className={`w-5 h-5 appearance-none rounded border-2 border-positive-400 
+                  <input
+                    type="checkbox"
+                    className={`w-6 h-6 absolute -right-2 -top-2 appearance-none rounded border-2 border-positive-400 
                             bg-white checked:bg-positive-500  checked:border-positive-600 
                             cursor-pointer transition-all 
                             flex items-center justify-center
                             before:content-['✓'] before:text-white before:text-xl before:hidden 
                             checked:before:block z-50`}
-                      checked={isSelected}
-                      onChange={() =>
-                        handleCheckboxChange(ingredient.userIngredientId)
-                      }
-                    />
-                  </div>
+                    checked={isSelected}
+                    onChange={() =>
+                      handleCheckboxChange(ingredient.userIngredientId)
+                    }
+                  />
                 </>
               )}
 
-              <div
-                key={ingredient.userIngredientId}
-                className="border-4 w-full max-w-88 rounded-3xl border-positive-300"
-              >
-                <IngredientDetail
-                  selectedIngredient={ingredient}
-                  setIngredients={setIngredients}
-                  setIsDeleteOpen={() => setIsDeleteOpen(true)}
-                  updateIngredient={updateIngredient}
-                  deleteIngredient={updateIngredient}
-                />
-              </div>
+              <IngredientDetail
+                selectedIngredient={ingredient}
+                setIngredients={setIngredients}
+                setIsDeleteOpen={() => setIsDeleteOpen(true)}
+                updateIngredient={updateIngredient}
+                deleteIngredient={updateIngredient}
+              />
               <DamulModal
                 isOpen={isDeleteOpen}
                 onOpenChange={() => setIsDeleteOpen(false)}
