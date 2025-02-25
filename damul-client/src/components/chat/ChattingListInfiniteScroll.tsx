@@ -59,7 +59,7 @@ const ChattingListInfiniteScroll = <T,>({
     if (inView && hasNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage]);
+  }, [inView]);
 
   const hasData = data?.pages?.some((page) => page.data.length > 0);
 
@@ -72,7 +72,7 @@ const ChattingListInfiniteScroll = <T,>({
               renderItems(item, index + pageIndex * page.data.length),
             ),
           )}
-          {isFetchingNextPage ? skeleton : <div ref={ref} className="h-10" />}
+          {isFetchingNextPage ? skeleton : <div ref={ref} />}
         </div>
       ) : (
         noContent

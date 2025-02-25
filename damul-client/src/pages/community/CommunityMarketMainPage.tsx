@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import WriteIcon from "@/components/svg/WriteIcon";
 import { getPosts } from "@/service/market";
 import { PostItem } from "@/types/community";
+import DamulSection from "@/components/common/DamulSection";
 
 const CommunityMarketMainPage = () => {
   const [filterActive, setFlterActive] = useState(false);
@@ -69,68 +70,79 @@ const CommunityMarketMainPage = () => {
   };
 
   return (
-    <main className="h-full text-center px-4 py-6 pc:px-6 space-y-2">
-      <DamulSearchBox
-        placeholder="원하는 식자재를 검색해보세요."
-        onInputClick={() => {
-          navigate("/community/market/search");
-        }}
-        className="cursor-pointer"
-      />
-      <div className="flex justify-between">
-        <div className="flex items-center gap-3">
-          <Switch
-            id="warning"
-            checked={filterActive}
-            onCheckedChange={handleFilterChange}
-            className="data-[state=checked]:bg-positive-200"
-          />
-          <p
-            className={`text-sm ${filterActive ? "text-positive-400" : "text-normal-400"}`}
-          >
-            {filterActive ? "진행중인 공구/나눔만 보기" : "모든 공구/나눔 보기"}
-          </p>
+    <div>
+      <DamulSection>
+        <DamulSearchBox
+          placeholder="원하는 식자재를 검색해보세요."
+          onInputClick={() => {
+            navigate("/community/market/search");
+          }}
+          className="cursor-pointer"
+        />
+        <div className="flex justify-between">
+          <div className="flex items-center gap-3">
+            <Switch
+              id="warning"
+              checked={filterActive}
+              onCheckedChange={handleFilterChange}
+              className="data-[state=checked]:bg-positive-200"
+            />
+            <p
+              className={`text-sm ${filterActive ? "text-positive-400" : "text-normal-400"}`}
+            >
+              {filterActive
+                ? "진행중인 공구/나눔만 보기"
+                : "모든 공구/나눔 보기"}
+            </p>
+          </div>
+          <Select value={orderType} onValueChange={handleSortChange}>
+            <SelectTrigger className="w-28">
+              <SelectValue placeholder="정렬 방식" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>정렬 조건</SelectLabel>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="latest"
+                >
+                  최신순
+                </SelectItem>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="views"
+                >
+                  조회수순
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={orderType} onValueChange={handleSortChange}>
-          <SelectTrigger className="w-28">
-            <SelectValue placeholder="정렬 방식" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>정렬 조건</SelectLabel>
-              <SelectItem
-                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="latest"
-              >
-                최신순
-              </SelectItem>
-              <SelectItem
-                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="views"
-              >
-                조회수순
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-      <DamulInfiniteScrollList
-        queryKey={["posts", orderType, statusType]}
-        fetchFn={fetchItems}
-        renderItems={(item: PostItem) => <PostFeedCard {...item} />}
-        skeleton={
-          <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
-        }
-        noContent={
-          <p className="text-center text-normal-200">
-            등록된 레시피가 없습니다.
-            <br />
-            자신만의 노하우가 담긴 레시피를 작성하고 공유해보세요!
-          </p>
-        }
+        <DamulInfiniteScrollList
+          queryKey={["posts", orderType, statusType]}
+          fetchFn={fetchItems}
+          renderItems={(item: PostItem) => (
+            <PostFeedCard key={item.id} {...item} />
+          )}
+          skeleton={
+            <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
+          }
+          noContent={
+            <p className="text-center text-normal-200">
+              등록된 레시피가 없습니다.
+              <br />
+              자신만의 노하우가 담긴 레시피를 작성하고 공유해보세요!
+            </p>
+          }
+          className="flex flex-col gap-2"
+        />
+      </DamulSection>
+
+      <PostButton
+        to="/community/market/post"
+        icon={<WriteIcon className="scale-150 fill-positive-300" />}
       />
-      <PostButton to="/community/market/post" icon={<WriteIcon />} />
-    </main>
+    </div>
   );
 };
 

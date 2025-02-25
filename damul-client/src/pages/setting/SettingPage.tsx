@@ -37,6 +37,7 @@ import GoogleIcon from "@/components/svg/GoogleIcon";
 import KakaoIcon from "@/components/svg/KakaoIcon";
 import NaverIcon from "@/components/svg/NaverIcon";
 import useAuth from "@/hooks/useAuth";
+import DamulSection from "@/components/common/DamulSection";
 
 interface UserSetting {
   nickname: string;
@@ -216,11 +217,11 @@ const SettingPage = () => {
 
   const getEmailIcon = () => {
     if (userSetting.email.endsWith("gmail.com")) {
-      return <GoogleIcon className="size-5" />;
+      return <GoogleIcon className="size-4" />;
     } else if (userSetting.email.endsWith("kakao.com")) {
-      return <KakaoIcon className="size-5" />;
+      return <KakaoIcon className="size-4" />;
     } else if (userSetting.email.endsWith("naver.com")) {
-      return <NaverIcon className="size-5" />;
+      return <NaverIcon className="size-4" />;
     }
   };
 
@@ -233,15 +234,17 @@ const SettingPage = () => {
   }
 
   return (
-    <div className="px-6 sm:px-10 py-8">
-      <div className="flex gap-5">
-        <button className="font-black" onClick={() => nav(-1)}>
-          &lt;
-        </button>
-        <h1 className="text-lg sm:text-xl font-black text-normal-700">설정</h1>
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-10 mt-3">
+    <DamulSection
+      title={
+        <div className="flex items-center gap-3">
+          <button className="font-black" onClick={() => nav(-1)}>
+            &lt;
+          </button>
+          <h1>설정</h1>
+        </div>
+      }
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-8">
         <div>
           <p className="text-sm text-positive-400 font-bold">
             프로필 및 배경 이미지
@@ -260,9 +263,9 @@ const SettingPage = () => {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="absolute bottom-2 right-2 bg-white hover:bg-normal-100 border border-normal-100 rounded-full p-1"
+                      className="absolute bottom-2 right-2 bg-white hover:bg-positive-50 border border-positive-300 rounded-full p-1"
                     >
-                      <EditIcon className="size-4 fill-positive-400" />
+                      <EditIcon className="size-4 fill-positive-300" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -273,10 +276,14 @@ const SettingPage = () => {
                         handleBackgroundImageChange(true);
                         onReset();
                       }}
+                      className="data-[highlighted]:bg-positive-50"
                     >
                       기본 배경으로 변경
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={onEdit}>
+                    <DropdownMenuItem
+                      onSelect={onEdit}
+                      className="data-[highlighted]:bg-positive-50"
+                    >
                       이 기기에서 찾기
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -296,7 +303,7 @@ const SettingPage = () => {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="absolute bottom-3 right-5 bg-white hover:bg-normal-100 border border-normal-100 rounded-full p-1"
+                      className="absolute bottom-3 right-5 bg-white hover:bg-positive-50 border border-positive-300 rounded-full p-1"
                     >
                       <EditIcon className="size-4 fill-positive-400" />
                     </button>
@@ -311,10 +318,14 @@ const SettingPage = () => {
                         handleProfileImageChange(true);
                         onReset();
                       }}
+                      className="data-[highlighted]:bg-positive-50"
                     >
                       기본 이미지로 변경
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={onEdit}>
+                    <DropdownMenuItem
+                      onSelect={onEdit}
+                      className="data-[highlighted]:bg-positive-50"
+                    >
                       이 기기에서 찾기
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -330,7 +341,7 @@ const SettingPage = () => {
           </p>
           <div className="flex items-center gap-2">
             {getEmailIcon()}
-            <p>{userSetting.email}</p>
+            <p className="text-sm">{userSetting.email}</p>
           </div>
         </div>
 
@@ -482,7 +493,7 @@ const SettingPage = () => {
           수정하기
         </DamulButton>
       </form>
-    </div>
+    </DamulSection>
   );
 };
 

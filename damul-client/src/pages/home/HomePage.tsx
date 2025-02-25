@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import DamulCarousel from "@/components/common/DamulCarousel";
 import DamulSearchBox from "@/components/common/DamulSearchBox";
-import UserGreeting from "@/components/home/UserGreeting";
 import MenuButton from "@/components/home/MenuButton";
 import IngredientStorageContainer from "@/components/home/IngredientStorageContainer";
 import IngredientCategoryFilter from "@/components/home/IngredientCategoryFilter";
@@ -15,8 +14,12 @@ import {
 } from "@/constants/initialData";
 import { EXPIRINGSOON_DAY } from "@/constants/itemStatus";
 import RefrigeratorDoor from "@/components/home/RefrigeratorDoor";
+import useAuth from "@/hooks/useAuth";
+import DamulSection from "@/components/common/DamulSection";
 
 const HomePage = () => {
+  const { data, isLoading } = useAuth();
+
   const [ingredientData, setIngredientData] =
     useState<IngredientData>(initialIngrdientData);
 
@@ -94,58 +97,83 @@ const HomePage = () => {
       ? filteredIngredientData
       : ingredientData;
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
-    <div className={`${isEditMode && "pb-32"}`}>
-      <UserGreeting />
-      <DamulCarousel fetchFn={getRecommandedRecipe} />
+    <div className="flex flex-col gap-3">
+      <div>
+        <DamulSection
+          title={
+            <>
+              {data?.data.nickname}
+              <span className="text-sm sm:text-base font-bold">
+                님 반갑습니다.
+              </span>
+            </>
+          }
+        />
 
-      <div className="p-[10px]">
-        <p className="py-[10px] font-bold">보유 중인 식자재</p>
-        <div className="flex gap-4">
-          <DamulSearchBox
-            className="w-full"
-            placeholder="찾으시는 식자재를 검색해보세요."
-            setInputValue={setSearchKeyword}
-            onInputClick={() => {
-              setSearchKeyword("");
-            }}
-            inputValue={searchKeyword}
-          />
-          <IngredientCategoryFilter onValueChange={setFilterCategory} />
-        </div>
-        {expiringSoonItems.length !== 0 && (
-          <IngredientStorageContainer
-            key={`expiringSoon ${Math.random()}`}
-            title="expiringSoon"
-            items={expiringSoonItems}
-            onEdit={isEditMode}
-            setIngredientData={setIngredientData}
-            setExpiringSoonItems={setExpiringSoonItems}
-          />
-        )}
-
-        {Object.keys(viewData).map((storage) => {
-          if (storage === "expiringSoon") return null;
-
-          return (
-            <div className="relative w-full" key={`${storage}${Math.random()}`}>
-              {(storage === "freezer" || storage === "fridge") &&
-                !localStorage.getItem(`doorOpened_${storage}`) && (
-                  <RefrigeratorDoor storage={storage} />
-                )}
-              <IngredientStorageContainer
-                title={storage as keyof IngredientData}
-                items={
-                  filteredIngredientData[storage as keyof IngredientData] || []
-                }
-                onEdit={isEditMode}
-                setExpiringSoonItems={setExpiringSoonItems}
-                setIngredientData={setIngredientData}
-              />
-            </div>
-          );
-        })}
+        <DamulCarousel fetchFn={getRecommandedRecipe} />
       </div>
+
+      <DamulSection
+        title={"보유 중인 식자재"}
+        className={`${isEditMode && "pb-36"}`}
+      >
+        <>
+          <div className="flex gap-4">
+            <DamulSearchBox
+              className="w-full"
+              placeholder="찾으시는 식자재를 검색해보세요."
+              setInputValue={setSearchKeyword}
+              onInputClick={() => {
+                setSearchKeyword("");
+              }}
+              inputValue={searchKeyword}
+            />
+            <IngredientCategoryFilter onValueChange={setFilterCategory} />
+          </div>
+          {expiringSoonItems.length !== 0 && (
+            <IngredientStorageContainer
+              key={`expiringSoon ${Math.random()}`}
+              title="expiringSoon"
+              items={expiringSoonItems}
+              onEdit={isEditMode}
+              setIngredientData={setIngredientData}
+              setExpiringSoonItems={setExpiringSoonItems}
+            />
+          )}
+
+          {Object.keys(viewData).map((storage) => {
+            if (storage === "expiringSoon") return null;
+
+            return (
+              <div
+                className="relative w-full"
+                key={`${storage}${Math.random()}`}
+              >
+                {(storage === "freezer" || storage === "fridge") &&
+                  !localStorage.getItem(`doorOpened_${storage}`) && (
+                    <RefrigeratorDoor storage={storage} />
+                  )}
+                <IngredientStorageContainer
+                  title={storage as keyof IngredientData}
+                  items={
+                    filteredIngredientData[storage as keyof IngredientData] ||
+                    []
+                  }
+                  onEdit={isEditMode}
+                  setExpiringSoonItems={setExpiringSoonItems}
+                  setIngredientData={setIngredientData}
+                />
+              </div>
+            );
+          })}
+        </>
+      </DamulSection>
+
       {isEditMode ? (
         <IngredientEditOverview onClose={handleEditClick} />
       ) : (

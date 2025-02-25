@@ -14,6 +14,7 @@ import {
 import { getBookmarks } from "@/service/profile";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import useAuth from "@/hooks/useAuth";
+import DamulSection from "@/components/common/DamulSection";
 
 interface RecipeItem {
   id: number;
@@ -43,6 +44,7 @@ const ProfileBookmarkPage = () => {
         size: 10,
         sortType,
       });
+      console.log(response.data);
       if (response?.status === 204) {
         return { data: [], meta: { nextCursor: null, hasNext: false } };
       }
@@ -63,16 +65,10 @@ const ProfileBookmarkPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-2 p-5 bg-white">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-lg font-bold">
-          {user.nickname}님이 북마크한 레시피
-        </h1>
-        <p className="text-normal-600">
-          회원님이 관심있어 하는 레시피들이에요.
-        </p>
-      </div>
-
+    <DamulSection
+      title={`${user.nickname}님이 북마크한 레시피`}
+      description={"회원님이 관심있어 하는 레시피들이에요."}
+    >
       <div className="flex justify-end">
         <Select
           value={sortType}
@@ -119,11 +115,12 @@ const ProfileBookmarkPage = () => {
           <p className="text-center text-normal-200">
             등록한 북마크가 없습니다.
             <br />
-            커뮤니티에서 맘에 드는 레시피를 살펴보고 등록해 보세요.
+            커뮤니티에서 마음에 드는 레시피를 살펴보고 등록해 보세요.
           </p>
         }
+        className="flex flex-col gap-2"
       />
-    </div>
+    </DamulSection>
   );
 };
 

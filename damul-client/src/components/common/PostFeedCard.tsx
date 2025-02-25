@@ -29,7 +29,7 @@ const PostFeedCard = ({
 
   return (
     <div
-      className="flex relative h-24 my-3 border border-neutral-200 rounded-lg hover:border-positive-300 cursor-pointer"
+      className="flex relative h-24 border border-neutral-200 rounded-lg hover:border-positive-300 cursor-pointer"
       onClick={() => {
         navigate(`/community/market/${id}`);
       }}

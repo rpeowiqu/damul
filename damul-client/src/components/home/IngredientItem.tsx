@@ -73,12 +73,12 @@ const IngredientItem = ({
   }, [ingredientData]);
 
   return (
-    <div className="flex border-1 p-4 rounded-lg gap-5 w-full h-60">
+    <div className="flex border-b border-b-normal-100 p-4 gap-5 w-full h-60">
       <div className="flex justify-center items-center px-2">
         <button
           type="button"
           onClick={onDelete}
-          className="flex items-center justify-center w-6 h-6 rounded-full transition ease-in-out duration-150 active:scale-75 active:bg-negative-300"
+          className="flex items-center justify-center w-6 h-6 rounded-full transition ease-in-out duration-150 active:scale-95 active:bg-negative-300"
         >
           <MinusIcon className="w-full fill-negative-500" />
         </button>

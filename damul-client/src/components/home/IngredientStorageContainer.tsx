@@ -153,9 +153,7 @@ const IngredientStorageContainer = ({
   }, []);
 
   return (
-    <div
-      className={`pt-[10px] my-3 border border-normal-100 rounded-xl min-h-[100px]`}
-    >
+    <div className={`pt-2 border border-normal-100 rounded-xl min-h-[100px]`}>
       <div className="flex items-center gap-1 px-2 text-sm">
         <IconComponent />
         <p
@@ -193,7 +191,7 @@ const IngredientStorageContainer = ({
           <button
             onClick={handleOnClick}
             className={`${isOverColumnLimit ? "block" : "hidden"}
-      flex items-center justify-center w-full h-full p-4 mt-2 bg-normal-100/50 rounded-b-xl`}
+      flex items-center justify-center w-full h-full p-2.5 mt-2 bg-normal-100/50 rounded-b-xl`}
           >
             {isExpanded ? (
               <div className="h-2 leading-3 text-xs text-normal-300">접기</div>

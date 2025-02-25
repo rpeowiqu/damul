@@ -111,11 +111,12 @@ const OcrButton = ({
         onChange={onChangeFile}
       />
       <DamulButton
+        variant="positive"
         onClick={handleClick}
-        className="bg-positive-300 items-center border justify-end text-white text-sm gap-1 hover:bg-normal-200/50 transition ease-in-out duration-150 active:scale-75"
+        className="flex justify-center items-center active:scale-95"
       >
-        <ReceiptIcon className="w-6 h-full fill-white stroke-2 stroke-normal-200" />
-        <p>영수증으로 입력하기</p>
+        <ReceiptIcon className="size-6 fill-white stroke-2 stroke-normal-200" />
+        <p>영수증으로 등록하기</p>
       </DamulButton>
     </>
   );

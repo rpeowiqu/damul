@@ -5,6 +5,7 @@ import RecentSearches from "@/components/common/RecentSearches";
 import useManageRecentSearches from "@/hooks/useManageRecentSearches";
 import PostButton from "@/components/community/PostButton";
 import PlusIcon from "@/components/svg/PlusIcon";
+import DamulSection from "@/components/common/DamulSection";
 
 const ChattingSearchPage = () => {
   const [inputValue, setInputValue] = useState("");
@@ -18,19 +19,18 @@ const ChattingSearchPage = () => {
   const navigate = useNavigate();
 
   return (
-    <main className="h-full py-6">
-      <div className="px-4 space-y-6">
-        <div className="flex-grow">
-          <DamulSearchBox
-            placeholder="채팅방 검색"
-            onButtonClick={(content) => {
-              handleAddSearch(content);
-              navigate(`/chatting/search/result?keyword=${content}`);
-            }}
-            inputValue={inputValue}
-            setInputValue={setInputValue}
-          />
-        </div>
+    <div>
+      <DamulSection>
+        <DamulSearchBox
+          placeholder="채팅방 검색"
+          onButtonClick={(content) => {
+            handleAddSearch(content);
+            navigate(`/chatting/search/result?keyword=${content}`);
+          }}
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+        />
+
         <RecentSearches
           recentSearches={recentSearches}
           onRemoveSearch={handleRemoveSearch}
@@ -40,9 +40,10 @@ const ChattingSearchPage = () => {
             navigate(`/chatting/search/result?keyword=${content}`);
           }}
         />
-      </div>
+      </DamulSection>
+
       <PostButton to="/chatting/create" icon={<PlusIcon />} />
-    </main>
+    </div>
   );
 };
 

@@ -15,6 +15,7 @@ import { getRecipes } from "@/service/recipe";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import RecipeFeedCard from "@/components/common/RecipeFeedCard";
 import { RecipeItem } from "@/types/community";
+import DamulSection from "@/components/common/DamulSection";
 
 const CommunityRecipeMainPage = () => {
   const navigate = useNavigate();
@@ -51,63 +52,69 @@ const CommunityRecipeMainPage = () => {
   };
 
   return (
-    <div className="h-full text-center px-4 py-6 pc:px-6 space-y-2">
-      <DamulSearchBox
-        placeholder="찾고 싶은 레시피를 검색해보세요."
-        onInputClick={() => {
-          navigate("/community/recipe/search");
-        }}
-        className="cursor-pointer"
+    <>
+      <DamulSection>
+        <DamulSearchBox
+          placeholder="찾고 싶은 레시피를 검색해보세요."
+          onInputClick={() => {
+            navigate("/community/recipe/search");
+          }}
+          className="cursor-pointer"
+        />
+        <div className="flex justify-end">
+          <Select value={orderType} onValueChange={handleSortChange}>
+            <SelectTrigger className="w-28">
+              <SelectValue placeholder="정렬 방식" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>정렬 조건</SelectLabel>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="latest"
+                >
+                  최신순
+                </SelectItem>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="likes"
+                >
+                  추천순
+                </SelectItem>
+                <SelectItem
+                  className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
+                  value="views"
+                >
+                  조회수순
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        <DamulInfiniteScrollList
+          queryKey={["recipes", orderType]}
+          fetchFn={fetchItems}
+          renderItems={(item: RecipeItem) => (
+            <RecipeFeedCard key={item.id} {...item} />
+          )}
+          skeleton={
+            <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
+          }
+          noContent={
+            <p className="text-center text-normal-200">
+              등록된 레시피가 없습니다.
+              <br />
+              자신만의 노하우가 담긴 레시피를 작성하고 공유해보세요!
+            </p>
+          }
+          className="flex flex-col gap-2"
+        />
+      </DamulSection>
+      <PostButton
+        to="/community/recipe/post"
+        icon={<WriteIcon className="scale-150 fill-positive-300" />}
       />
-      <div className="flex justify-end">
-        <Select value={orderType} onValueChange={handleSortChange}>
-          <SelectTrigger className="w-28">
-            <SelectValue placeholder="정렬 방식" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>정렬 조건</SelectLabel>
-              <SelectItem
-                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="latest"
-              >
-                최신순
-              </SelectItem>
-              <SelectItem
-                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="likes"
-              >
-                추천순
-              </SelectItem>
-              <SelectItem
-                className="data-[highlighted]:bg-positive-50 data-[state=checked]:text-positive-500"
-                value="views"
-              >
-                조회수순
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-      <DamulInfiniteScrollList
-        queryKey={["recipes", orderType]}
-        fetchFn={fetchItems}
-        renderItems={(item: RecipeItem) => (
-          <RecipeFeedCard key={item.id} {...item} />
-        )}
-        skeleton={
-          <div className="h-24 mb-2 animate-pulse bg-normal-100 rounded" />
-        }
-        noContent={
-          <p className="text-center text-normal-200">
-            등록된 레시피가 없습니다.
-            <br />
-            자신만의 노하우가 담긴 레시피를 작성하고 공유해보세요!
-          </p>
-        }
-      />
-      <PostButton to="/community/recipe/post" icon={<WriteIcon />} />
-    </div>
+    </>
   );
 };
 

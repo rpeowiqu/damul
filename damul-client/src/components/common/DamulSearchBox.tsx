@@ -5,8 +5,8 @@ import {
   Dispatch,
   SetStateAction,
   FocusEventHandler,
-  useEffect,
-  useRef,
+  // useEffect,
+  // useRef,
 } from "react";
 import { Input } from "@/components/ui/input";
 import SearchIcon from "../svg/SearchIcon";
@@ -34,13 +34,13 @@ const DamulSearchBox = ({
   onBlur,
   resetAfter = true,
 }: SearchBoxProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+  // const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!onInputClick) {
-      inputRef.current?.focus();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!onInputClick) {
+  //     inputRef.current?.focus();
+  //   }
+  // }, []);
 
   // 입력값 변경 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +71,7 @@ const DamulSearchBox = ({
   return (
     <div className={`relative ${className}`}>
       <Input
-        ref={inputRef}
+        // ref={inputRef}
         placeholder={placeholder}
         className={`rounded-lg transition-colors p-2 pr-8 pc:pl-4 pc:pr-10 bg-normal-50 border border-normal-100 text-sm text-normal-700 focus:border-normal-500 ${className}`}
         onClick={onInputClick}

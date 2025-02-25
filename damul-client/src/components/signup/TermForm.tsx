@@ -12,6 +12,7 @@ import DamulModal from "../common/DamulModal";
 import useCloseOnBack from "@/hooks/useCloseOnBack";
 import { Term } from "@/pages/signup/SignUpPage";
 import useOverlayStore from "@/stores/overlayStore";
+import DamulSection from "../common/DamulSection";
 
 export interface TermsFormProps {
   selectBit: number;
@@ -27,11 +28,11 @@ const TermsForm = ({
   onNext,
 }: TermsFormProps) => {
   const [infoText, setInfoText] = useState<string>("");
-  const [termIndex, setTermIndex] = useState<number>(0);
+  const [termIndex, setTermIndex] = useState<number>(-1);
   const { overlaySet, openOverlay } = useOverlayStore();
   const isOpenOverlay = overlaySet.has("TermsForm");
 
-  useCloseOnBack("TermsForm");
+  useCloseOnBack("TermsForm", () => setTermIndex(-1));
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -70,7 +71,9 @@ const TermsForm = ({
   };
 
   useEffect(() => {
-    openOverlay("TermForm");
+    if (termIndex > -1) {
+      openOverlay("TermsForm");
+    }
   }, [termIndex]);
 
   useEffect(() => {
@@ -78,12 +81,11 @@ const TermsForm = ({
   }, [selectBit]);
 
   return (
-    <div className="pt-10">
-      <h1 className="text-lg sm:text-xl font-black text-normal-700">
-        서비스 이용약관에 동의해 주세요.
-      </h1>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-16 mt-16">
+    <DamulSection
+      title={"서비스 이용약관에 동의해 주세요."}
+      className="flex-1 pt-28"
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-16 pt-10">
         <div className="relative">
           <div className="flex items-center space-x-3">
             <Checkbox
@@ -94,7 +96,7 @@ const TermsForm = ({
             />
             <Label
               htmlFor="checkAll"
-              className="text-normal-700 text-base sm:text-lg font-bold"
+              className="text-normal-700 text-sm sm:text-base font-bold"
             >
               네, 모두 동의합니다.
             </Label>
@@ -147,21 +149,23 @@ const TermsForm = ({
         이용이 제한됩니다.
       </p>
 
-      <DamulModal
-        isOpen={isOpenOverlay}
-        onOpenChange={() => {
-          if (isOpenOverlay) {
-            history.back();
-          }
-        }}
-        contentStyle="max-w-96"
-        title="이용약관"
-      >
-        <div className="w-full h-52 px-5 overflow-y-auto whitespace-pre-wrap">
-          {terms[termIndex].content}
-        </div>
-      </DamulModal>
-    </div>
+      {termIndex > -1 && (
+        <DamulModal
+          isOpen={isOpenOverlay}
+          onOpenChange={() => {
+            if (isOpenOverlay) {
+              history.back();
+            }
+          }}
+          contentStyle="max-w-96"
+          title="이용약관"
+        >
+          <div className="w-full h-52 px-5 overflow-y-auto whitespace-pre-wrap text-normal-500">
+            {terms[termIndex].content}
+          </div>
+        </DamulModal>
+      )}
+    </DamulSection>
   );
 };
 

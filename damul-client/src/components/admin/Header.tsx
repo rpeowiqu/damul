@@ -58,7 +58,7 @@ const Header = () => {
                   <DropdownMenuItem
                     key={index}
                     onSelect={() => nav(`${item.to}`)}
-                    className="hover:!bg-positive-50"
+                    className="data-[highlighted]:bg-positive-50"
                   >
                     {item.name}
                   </DropdownMenuItem>
@@ -66,7 +66,7 @@ const Header = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => nav("/admin/login", { replace: true })}
-                  className="text-normal-500 hover:!text-normal-500 hover:!bg-positive-50"
+                  className="text-normal-500 data-[highlighted]:bg-positive-50"
                 >
                   로그아웃
                 </DropdownMenuItem>

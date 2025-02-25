@@ -85,8 +85,12 @@ const ChattingMenuButton = ({ roomId, postId }: ChattingMenuButtonProps) => {
     }
   };
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
-    <div className="pl-3">
+    <div>
       <div ref={menuRef} className="relative">
         <div
           onClick={() => {

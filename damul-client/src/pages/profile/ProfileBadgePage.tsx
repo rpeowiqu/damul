@@ -1,4 +1,5 @@
 import DamulHoverCard from "@/components/common/DamulHoverCard";
+import DamulSection from "@/components/common/DamulSection";
 import BadgeShowcase from "@/components/profile/BadgeShowcase";
 import {
   Select,
@@ -43,14 +44,10 @@ const ProfileBadgePage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-2 p-5 bg-white">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-lg font-bold">{user.nickname}님의 뱃지 전시대</h1>
-        <div className="flex justify-between items-center">
-          <p className="text-normal-600">그동안 획득한 뱃지들을 살펴보세요!</p>
-        </div>
-      </div>
-
+    <DamulSection
+      title={`${user.nickname}님의 뱃지 전시대`}
+      description={"그동안 획득한 뱃지들을 살펴보세요!"}
+    >
       <div className="flex justify-end items-center gap-4">
         <DamulHoverCard
           hoverCardTrigger={
@@ -88,7 +85,7 @@ const ProfileBadgePage = () => {
       </div>
 
       <BadgeShowcase list={badgeList} sortType={sortType} />
-    </div>
+    </DamulSection>
   );
 };
 

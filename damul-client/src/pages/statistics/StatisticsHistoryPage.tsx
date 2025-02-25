@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DailyReceiptInfo, PurchaseHistory, Receipt } from "@/types/statistics";
 import useAuth from "@/hooks/useAuth";
 import useOverlayStore from "@/stores/overlayStore";
+import DamulSection from "@/components/common/DamulSection";
 
 const StatisticsHistoryPage = () => {
   const { data, isLoading } = useAuth();
@@ -136,9 +137,9 @@ const StatisticsHistoryPage = () => {
   const getAmountSpentDiffText = () => {
     return (
       <div className="flex-1 flex flex-col items-end">
-        <p className="text-xs sm:text-sm text-normal-300">전월 대비</p>
+        <p className="text-xs sm:text-sm">전월 대비</p>
         <p
-          className={clsx("font-bold text-sm sm:text-base", {
+          className={clsx("font-bold", {
             "text-negative-400": purchaseHistoryData.comparedPreviousMonth > 0,
             "text-blue-400": purchaseHistoryData.comparedPreviousMonth < 0,
           })}
@@ -173,48 +174,45 @@ const StatisticsHistoryPage = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-2 sm:gap-5 px-6 sm:px-10 py-8 bg-white">
-        <div>
-          <h1 className="text-lg sm:text-xl font-black">
-            {data?.data.nickname}님의 구매 히스토리
-          </h1>
-
-          <div className="flex items-end pb-3 border-b border-normal-100">
-            <div className="flex-1">
-              <p>
-                <span className="text-sm sm:text-base font-bold">
-                  {selectedMonthDateText}
-                </span>
-                에는
-              </p>
-              <div className="flex items-end text-sm sm:text-base">
-                <AnimatedNumberText
-                  key={selectedMonthDate.getMonth()}
-                  className="text-sm sm:text-base font-bold"
-                  targetValue={purchaseHistoryData.monthlyTotalAmount}
-                  duration={500}
-                  suffix="원"
-                  callback={() => setIsTextAnimationEnd(true)}
-                />
-                을 소비했어요!
+      <DamulSection
+        title={`${data?.data.nickname}님의 구매 히스토리`}
+        description={
+          <>
+            <div className="flex items-end pb-3 border-b border-normal-100">
+              <div className="flex-1">
+                <p>
+                  <span className="font-bold">{selectedMonthDateText}</span>
+                  에는
+                </p>
+                <div className="flex items-end">
+                  <AnimatedNumberText
+                    key={selectedMonthDate.getMonth()}
+                    className="font-bold"
+                    targetValue={purchaseHistoryData.monthlyTotalAmount}
+                    duration={500}
+                    suffix="원"
+                    callback={() => setIsTextAnimationEnd(true)}
+                  />
+                  을 소비했어요!
+                </div>
               </div>
+
+              {isTextAnimationEnd && (
+                <div className="flex gap-1 items-center">
+                  {getAmountSpentDiffArrow()}
+                  {getAmountSpentDiffText()}
+                </div>
+              )}
             </div>
 
-            {isTextAnimationEnd && (
-              <div className="flex gap-1 items-center">
-                {getAmountSpentDiffArrow()}
-                {getAmountSpentDiffText()}
-              </div>
-            )}
-          </div>
-
-          <p className="text-sm sm:text-base text-center text-positive-400 font-bold mt-4">
-            식자재를 등록한 날들을 확인해 보세요!
-          </p>
-        </div>
-
+            <p className="text-sm sm:text-base text-center text-positive-400 font-bold mt-4">
+              식자재를 등록한 날들을 확인해 보세요!
+            </p>
+          </>
+        }
+      >
         <DayPicker
-          className="self-center min-h-96 shadow-md border border-normal-50 p-5 rounded-xl scale-90 sm:scale-100"
+          className="self-center min-h-96 shadow-md border border-normal-50 p-5 rounded-xl scale-95 sm:scale-100"
           classNames={{
             caption_label: "text-lg font-black text-positive-400",
             button_next:
@@ -239,13 +237,10 @@ const StatisticsHistoryPage = () => {
           }}
           required
         />
-      </div>
+      </DamulSection>
 
-      <div className="flex flex-col gap-3 px-6 sm:px-10 py-8 bg-white">
-        <h1 className="text-lg sm:text-xl font-black text-normal-700">
-          {selectedDateText} 상세 구매 이력
-        </h1>
-        <div className="flex flex-col gap-3 rounded-xl border border-normal-100 p-3">
+      <DamulSection title={`${selectedDateText} 상세 구매 이력`}>
+        <div className="flex flex-col gap-3 rounded-xl border border-normal-100 p-3 min-h-[90px]">
           <p className="text-sm text-end">
             총 {receiptDetailInfoRef.current.receiptIds.length}
             개의 영수증
@@ -272,46 +267,46 @@ const StatisticsHistoryPage = () => {
             </p>
           )}
         </div>
-      </div>
 
-      <DamulModal
-        isOpen={receiptId > 0 && !isLoadingReceipt && isOpenOverlay}
-        onOpenChange={() => {
-          if (isOpenOverlay) {
-            history.back();
-          }
-        }}
-        title={"스마트 영수증"}
-        titleStyle="text-normal-500"
-      >
-        <div className="flex flex-col gap-4">
-          <p className="text-black text-end line-clamp-1 break-all">
-            매장명 : {receiptData?.storeName}
-          </p>
-          <div className="h-44 overflow-y-auto">
-            {receiptData?.receiptDetails.map((item, index) => (
-              <ReceiptItem key={index} {...item} />
-            ))}
-          </div>
-          <p className="text-end font-black text-base">
-            총 지출금액 :{" "}
-            <span className="text-negative-400">
-              {receiptData?.totalPrice.toLocaleString()}
-            </span>
-            원
-          </p>
-          <div>
-            <div className="flex justify-center gap-1">
-              <BarCodeIcon className="size-12" />
-              <BarCodeIcon className="size-12" />
-              <BarCodeIcon className="size-12" />
-            </div>
-            <p className="text-center text-black font-black text-xs -mt-2">
-              DA-MUL-LANG-50DAYS
+        <DamulModal
+          isOpen={receiptId > 0 && !isLoadingReceipt && isOpenOverlay}
+          onOpenChange={() => {
+            if (isOpenOverlay) {
+              history.back();
+            }
+          }}
+          title={"스마트 영수증"}
+          titleStyle="text-normal-500"
+        >
+          <div className="flex flex-col gap-4">
+            <p className="text-black text-end line-clamp-1 break-all">
+              매장명 : {receiptData?.storeName}
             </p>
+            <div className="h-44 overflow-y-auto">
+              {receiptData?.receiptDetails.map((item, index) => (
+                <ReceiptItem key={index} {...item} />
+              ))}
+            </div>
+            <p className="text-end font-black text-base">
+              총 지출금액 :{" "}
+              <span className="text-negative-400">
+                {receiptData?.totalPrice.toLocaleString()}
+              </span>
+              원
+            </p>
+            <div>
+              <div className="flex justify-center gap-1">
+                <BarCodeIcon className="size-12" />
+                <BarCodeIcon className="size-12" />
+                <BarCodeIcon className="size-12" />
+              </div>
+              <p className="text-center text-black font-black text-xs -mt-2">
+                DA-MUL-LANG-50DAYS
+              </p>
+            </div>
           </div>
-        </div>
-      </DamulModal>
+        </DamulModal>
+      </DamulSection>
     </div>
   );
 };

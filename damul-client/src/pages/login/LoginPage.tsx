@@ -17,7 +17,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center flex-1 gap-36 px-6 sm:px-10">
+    <div className="flex flex-col justify-center flex-1 gap-36 px-6 sm:px-10 bg-white">
       <div className="text-3xl sm:text-4xl">
         효율적인 식자재 관리
         <br />

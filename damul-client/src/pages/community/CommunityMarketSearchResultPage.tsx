@@ -15,6 +15,7 @@ import PostFeedCard from "@/components/common/PostFeedCard";
 import DamulInfiniteScrollList from "@/components/common/DamulInfiniteScrollList";
 import { getPosts } from "@/service/market";
 import { PostItem } from "@/types/community";
+import DamulSection from "@/components/common/DamulSection";
 
 const CommunityMarketSearchResultPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -61,7 +62,7 @@ const CommunityMarketSearchResultPage = () => {
   };
 
   return (
-    <main className="h-full px-4 py-6 pc:px-6 space-y-2">
+    <DamulSection>
       <div className="flex-grow">
         <DamulSearchBox
           placeholder={keyword}
@@ -120,8 +121,9 @@ const CommunityMarketSearchResultPage = () => {
         noContent={
           <p className="text-center text-normal-200">검색 결과가 없습니다.</p>
         }
+        className="flex flex-col gap-2"
       />
-    </main>
+    </DamulSection>
   );
 };
 
