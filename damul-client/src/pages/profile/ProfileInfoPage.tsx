@@ -164,11 +164,14 @@ const ProfileInfoPage = () => {
         </div>
       </DamulSection>
 
-      <DamulSection title={"자기소개"}>
-        <p className="text-normal-600 whitespace-pre-wrap">
-          {profileInfo.selfIntroduction}
-        </p>
-      </DamulSection>
+      <DamulSection
+        title={"자기소개"}
+        description={
+          <p className="text-normal-600 whitespace-pre-wrap">
+            {profileInfo.selfIntroduction}
+          </p>
+        }
+      />
 
       <DamulSection
         title={"선호 식자재 그래프"}
