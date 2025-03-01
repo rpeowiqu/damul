@@ -1,3 +1,4 @@
+import DamulSection from "@/components/common/DamulSection";
 import IngredientStorageContainer from "@/components/home/IngredientStorageContainer";
 import LockIcon from "@/components/svg/LockIcon";
 import useAuth from "@/hooks/useAuth";
@@ -45,15 +46,10 @@ const ProfileIngredientsPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-2 p-5 bg-white">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-base sm:text-lg font-black text-normal-700">
-          {user.nickname}님의 보유중인 식자재
-        </h1>
-        <p className="text-sm sm:text-base text-normal-500 ">
-          어떤 식자재가 있는지 살펴볼까요?
-        </p>
-      </div>
+    <DamulSection
+      title={`${user.nickname}님의 보유중인 식자재`}
+      description={"어떤 식자재가 있는지 살펴볼까요?"}
+    >
       {ingredientData?.isPrivate ? (
         <div className="flex justify-center gap-2 items-center py-5 text-center text-normal-200">
           <LockIcon className={"size-5 fill-normal-200"} />
@@ -70,7 +66,7 @@ const ProfileIngredientsPage = () => {
           />
         ))
       )}
-    </div>
+    </DamulSection>
   );
 };
 
