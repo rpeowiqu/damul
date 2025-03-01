@@ -1,0 +1,103 @@
+import { useNavigate } from "react-router-dom";
+import CommentItem from "./CommentItem";
+import { Comment } from "@/types/community";
+import useAuth from "@/hooks/useAuth";
+import { useStompClient } from "@/hooks/useStompClient";
+
+interface CommentsSectionProps {
+  id: string;
+  comments: Comment[];
+  onReply: (_comment: Comment) => void;
+  currentChatNum?: number;
+  chatRoomId?: number;
+  chatSize?: number;
+  entered?: boolean;
+  status?: string;
+  type: string;
+  fetchDetailData: () => void;
+}
+const CommentsSection = ({
+  id,
+  comments = [],
+  onReply,
+  currentChatNum,
+  chatRoomId,
+  chatSize,
+  entered,
+  status,
+  type,
+  fetchDetailData,
+}: CommentsSectionProps) => {
+  // 최상위 댓글(대댓글이 아닌 댓글)만 필터링
+  const topLevelComments = comments.filter((c) => !c.parentId);
+  const { data, isLoading } = useAuth();
+  const { sendEnterRoom } = useStompClient({ roomId: chatRoomId ?? 0 });
+  const navigate = useNavigate();
+
+  const handleEnterRoom = () => {
+    if (currentChatNum === chatSize) {
+      alert("정원이 다 찼어요!");
+      return;
+    }
+    if (chatRoomId) {
+      // sendEnterRoom(chatRoomId, data?.data.id);
+      navigate(`/chatting/${chatRoomId}`);
+    }
+  };
+
+  const StatusMarker = () => {
+    if (entered === true) {
+      return (
+        <div className="text-sm content-center bg-normal-100 px-3 rounded-full cursor-pointer">
+          채팅방 참여중 {currentChatNum}/{chatSize}
+        </div>
+      );
+    } else {
+      return status === "ACTIVE" ? (
+        <div
+          className="text-sm content-center bg-positive-200 hover:bg-positive-300 px-3 rounded-full cursor-pointer"
+          onClick={handleEnterRoom}
+        >
+          채팅방 참여하기 {currentChatNum}/{chatSize}
+        </div>
+      ) : (
+        <div className="text-sm content-center bg-normal-100 px-3 rounded-full cursor-pointer">
+          채팅방 모집완료 {currentChatNum}/{chatSize}
+        </div>
+      );
+    }
+  };
+
+  if (isLoading) {
+    return;
+  }
+
+  return (
+    <div className="text-start">
+      <div className="flex flex-row border-b border-neutral-300 justify-between pb-2">
+        <h3 className="text-md pc:text-lg font-semibold">
+          댓글({comments.length})
+        </h3>
+        {type === "market" && <StatusMarker />}
+      </div>
+      <div className="flex flex-col">
+        {topLevelComments.map((comment) => {
+          const replies = comments.filter((c) => c.parentId === comment.id);
+          return (
+            <CommentItem
+              key={comment.id}
+              id={id}
+              comment={comment}
+              replies={replies}
+              onReply={onReply}
+              fetchDetailData={fetchDetailData}
+              type={type}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default CommentsSection;
