@@ -48,6 +48,48 @@ pipeline {
                     image 'docker:24.0-dind'
                     args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
                     reuseNode true
+                script {
+                    def branch = env.BRANCH_NAME
+
+                    sh '''
+                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                        docker buildx rm builder || true
+                        docker buildx create --name builder --driver docker-container --use
+                        docker buildx inspect builder --bootstrap
+                    '''
+
+                    if (env.CHANGE_ID == null) {
+                        if (branch == 'master') {
+                            sh """
+                                docker buildx build --builder builder \
+                                    --platform linux/amd64 \
+                                    -t $CLIENT_DOCKER_IMAGE \
+                                    ./damul-client \
+                                    --push
+                                docker buildx build --builder builder \
+                                    --platform linux/amd64 \
+                                    -t $SERVER_DOCKER_IMAGE \
+                                    ./damul-server \
+                                    --push
+                            """
+                        } else if (branch == 'Client' || branch == 'client-develop') {
+                            sh """
+                                docker buildx build --builder builder \
+                                    --platform linux/amd64 \
+                                    -t $CLIENT_DOCKER_IMAGE \
+                                    ./damul-client \
+                                    --push
+                            """
+                        } else if (branch == 'Server' || branch == 'server-develop') {
+                            sh """
+                                docker buildx build --builder builder \
+                                    --platform linux/amd64 \
+                                    -t $SERVER_DOCKER_IMAGE \
+                                    ./damul-server \
+                                    --push
+                            """
+                        }
+                    }
                 }
             }
             when {
@@ -160,8 +202,8 @@ pipeline {
                 
                 script {
                     def branch = env.BRANCH_NAME
-                    def deployCmd = ''
-                    
+                    def deployCmd = "cd $DEPLOY_PATH && docker compose -f docker-compose.prod.yml pull server && docker compose -f docker-compose.prod.yml up -d server && docker image prune -f"
+
                     switch(branch) {
                         case 'Client':
                             deployCmd = """
